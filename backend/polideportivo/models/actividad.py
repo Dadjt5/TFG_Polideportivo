@@ -2,12 +2,13 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from .instalacion import Instalacion
-from .constantes import TipoActividad, TipoReserva, Terreno, Estado, Periodo
 from .deporte import Deporte
 from .monitor import Monitor
+from .horario import Horario
+from .constantes import TipoActividad, TipoReserva, Terreno, Estado, Periodo, Dia
 
 class Actividad(models.Model):
-    """Modelo para representar las actividades"""
+    """Modelo para representar una actividad"""
 
     nombre = models.CharField(max_length=256, blank=True)
     descripcion = models.CharField(max_length=2048, blank=True)
@@ -21,7 +22,7 @@ class Actividad(models.Model):
     material = models.CharField(max_length=1024, blank=True)
     exterior = models.BooleanField(default=False)
     
-    deporte = models.ForeignKey(Deporte, on_delete=models.RESTRICT)
+    deportes = models.ManyToManyField(Deporte, related_name="actividades")
     instalacion = models.ForeignKey(Instalacion, on_delete=models.RESTRICT)
     monitor = models.ForeignKey(Monitor, on_delete=models.RESTRICT)
     
@@ -33,3 +34,16 @@ class Actividad(models.Model):
 
     def __str__(self):
         return f'{self.nombre}, en la instalacion {self.instalacion}'
+
+
+class Sesion(models.Model):
+    """Modelo para representar una sesion de una actividad"""
+    
+    actividad = models.ForeignKey(Actividad, on_delete=models.RESTRICT)
+    monitor = models.ForeignKey(Monitor, on_delete=models.RESTRICT)
+    horario = models.ForeignKey(Horario, on_delete=models.RESTRICT)    
+
+    dia = models.CharField(default=Dia.SABADO, choices=Dia.choices)
+
+    def __str__(self):
+        return f'Sesion el {self.dia} de {self.actividad}'

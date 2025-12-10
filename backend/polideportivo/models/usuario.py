@@ -3,7 +3,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 class Usuario(AbstractUser):
-    """Modelo para representar a los usuarios (clase abstracta)"""
+    """Modelo para representar a los usuarios"""
 
     nombre = models.CharField(max_length=256, blank=True)
     apellidos = models.CharField(max_length=256, blank=True, null=True)

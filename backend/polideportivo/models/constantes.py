@@ -53,7 +53,7 @@ class Terreno(models.TextChoices):
     """
     Clase para enumerar los tipos de terreno donde se desarrollan las actividades
 
-    Tipos de actividades:
+    Tipos de terreno:
     - AGUA, TIERRA, PISTA
     """
     
@@ -68,7 +68,7 @@ class Periodo(models.TextChoices):
     """
     Clase para enumerar los tipos periodos en los que se realizan las actividades
 
-    Tipos de actividades:
+    Tipos de periodo:
     - PRIMER_CUATRIMESTRE, SEGUNDO_CUATRIMESTRE, ANUAL
     """
     
@@ -83,7 +83,7 @@ class TipoReserva(models.TextChoices):
     """
     Clase para enumerar los tipos de reserva posibles a realizar
 
-    Tipos de actividades:
+    Tipos de reserva:
     - ONLINE, PRESENCIAL, AMBAS, NINGUNA
     """
     
@@ -100,7 +100,7 @@ class Estado(models.TextChoices):
     """
     Clase para enumerar el estado de la actividad
 
-    Tipos de actividades:
+    Tipos de estado:
     - FINALIZADO, EN_PROGRESO, INDEFINIDO
     """
     
@@ -115,7 +115,7 @@ class Dia(models.TextChoices):
     """
     Clase para enumerar los dias posibles para una sesión
 
-    Tipos de actividades:
+    Días de la semana:
     - LUNES, MARTES, MIERCOLES, JUEVES, VIERNES, SABADO, DOMINGO
     """
     
@@ -132,3 +132,82 @@ class Dia(models.TextChoices):
     SABADO = 'sabado'
     
     DOMINGO = 'domingo'
+
+
+class Sexo(models.TextChoices):
+    """
+    Clase para enumerar el sexo a escoger
+
+    Tipos de sexo:
+    - MUJER, HOMBRE, NINGUNO
+    """
+    
+    MUJER = 'Mujer'
+
+    HOMBRE = 'Hombre'
+
+    NINGUNO = 'Prefiero decirlo'
+
+
+class Rol(models.TextChoices):
+    """
+    Clase para enumerar los roles de usuario
+
+    Tipos de rol:
+    - ESTUDIANTE, PTGAS, PDI, EXTERNO
+    """
+    
+    ESTUDIANTE = 'Estudiante de la UAM'
+
+    PDI = 'Profesores y personal de investigación'
+
+    PTGAS = 'Personal administrativo'
+    
+    EXTERNO = 'Externo a la UAM'
+
+
+class Tematica(models.TextChoices):
+    """
+    Clase para enumerar las tematicas de los canales
+
+    Tematicas para los canales:
+    - CHAT, SUGERENCIAS, NUEVAS_ACTIVIDADES
+    """
+    
+    CHAT = 'Chat comun sobre actividades'
+
+    SUGERENCIAS = 'Buzon de sugerencias'
+
+    NUEVAS_ACTIVIDADES = 'Buzon de nuevas actividades'
+
+
+class TipoBono(models.TextChoices):
+    """
+    Clase para enumerar los tipos de bono
+
+    Tipos de bono:
+    - PADEL, TENIS, SALA_MUSCULACION, PISCINA
+    """
+    
+    PADEL = 'Bono para padel'
+
+    TENIS = 'Bono para tenis'
+
+    SALA_MUSCULACION = 'Bono para la sala de musculacion'
+    
+    PISCINA = 'Bono para piscina'
+
+
+class EstadoPago(models.TextChoices):
+    """
+    Clase para enumerar los estados de pago
+
+    Estado del pago:
+    - PENDIENTE, PAGADA, CANCELADA
+    """
+    
+    PENDIENTE = 'Pendiente de pago'
+
+    PAGADA = 'Pagado'
+
+    CANCELADA = 'Pago cancelado'

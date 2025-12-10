@@ -7,7 +7,7 @@ from .pabellon import Pabellon
 from .usuario import Usuario
 
 class Notificacion(models.Model):
-    """Modelo para representar a las notificaciones"""
+    """Modelo para representar una notificacion"""
 
     título = models.CharField(max_length=256, blank=True)
     descripcion = models.CharField(max_length=2048, blank=True)

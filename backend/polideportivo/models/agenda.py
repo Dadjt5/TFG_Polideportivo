@@ -5,7 +5,7 @@ from datetime import time
 from .instalacion import Instalacion
 
 class Instalacion(models.Model):
-    """Modelo para representar las agendas de las instalaciones"""
+    """Modelo para representar la agenda de las instalaciones"""
 
     fecha = models.DateField(auto_now_add=True)
     horaApertura = models.TimeField(default=time(8, 0))

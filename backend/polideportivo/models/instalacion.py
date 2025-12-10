@@ -5,7 +5,7 @@ from .pabellon import Pabellon
 from .constantes import TipoInstalacion
 
 class Instalacion(models.Model):
-    """Modelo para representar las instalaciones"""
+    """Modelo para representar una instalacion"""
 
     nombre = models.CharField(max_length=256, blank=True)
     imagenURL = models.CharField(max_length=2048, blank=True)

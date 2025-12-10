@@ -32,6 +32,7 @@ requests-oauthlib==2.0.0
 # --- DB & ORM ---
 psycopg2-binary==2.9.7
 dj-database-url==2.1.0
+django-multiselectfield==0.1.12
 
 # --- Archivos / Imágenes ---
 Pillow==10.2.0
