@@ -6,12 +6,16 @@ class Configuracion(models.Model):
     """Modelo para representar la configuracion interna de la aplicacion"""
     
     max_deportes_por_usuario = models.PositiveIntegerField(default=5)
-    max_horas_alquiler = models.PositiveIntegerField(default=120)  # minutos
-    otro_parametro = models.CharField(max_length=100, blank=True, null=True)
-
-    class Meta:
-        verbose_name = "Configuración"
-        verbose_name_plural = "Configuraciones"
+    dias_minimo_reserva_actividad = models.PositiveIntegerField(default=1)
+    dias_máximo_reserva_actividad = models.PositiveIntegerField(default=7)
+    dias_minimo_cancelación = models.PositiveIntegerField(default=1)
+    horas_previas_notificacion = models.PositiveIntegerField(default=1)
+    texto_cambios_cancelaciones = models.CharField(max_length=1024, blank=True)
+    texto_avisos_actividades = models.CharField(max_length=1024, blank=True)
+    texto_problemas_pago = models.CharField(max_length=1024, blank=True)
+    texto_salida_lista_espera = models.CharField(max_length=1024, blank=True)
+    texto_ausencias = models.CharField(max_length=1024, blank=True)
+    texto_material_especial = models.CharField(max_length=1024, blank=True)
 
     def save(self, *args, **kwargs):
         """Obligamos a que solo haya una configuracion"""

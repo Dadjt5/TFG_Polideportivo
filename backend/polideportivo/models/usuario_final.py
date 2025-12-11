@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 
 from .usuario import Usuario
 from .deporte import Deporte
-from .foro import Canal
+from .favorito import Favorito
 from .constantes import Sexo, Rol
 
 class UsuarioFinal(models.Model):
@@ -19,13 +19,18 @@ class UsuarioFinal(models.Model):
     codigoPostal = models.CharField(default=64)
     cuentaBancaria = models.CharField(default=64)
     solicitaCreditos = models.CharField(default=False)
-    actividadesRealizadas = models.IntegerField(default=0)
+    actividadesRealizadas = models.PositiveIntegerField(default=0)
     
     deportesFavoritos = models.ManyToManyField(Deporte, blank=True, related_name="usuarios")
-    canales = models.ManyToManyField(Canal, blank=True, related_name="usuarios")
 
     sexo = models.CharField(default=Sexo.NINGUNO, choices=Sexo.choices)
     rol = models.CharField(default=Rol.EXTERNO, choices=Rol.choices)
     
     def __str__(self):
         return f'{self.usuario}'
+
+    def marcarFavorito(self, actividad):
+        Favorito.objects.get_or_create(usuario=self, actividad=actividad, instalacion=None)
+        
+    def marcarFavorito(self, instalacion):
+        Favorito.objects.get_or_create(usuario=self, actividad=None, instalacion=instalacion)

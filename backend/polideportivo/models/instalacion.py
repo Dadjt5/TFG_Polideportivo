@@ -9,7 +9,7 @@ class Instalacion(models.Model):
 
     nombre = models.CharField(max_length=256, blank=True)
     imagenURL = models.CharField(max_length=2048, blank=True)
-    aforoMaximo = models.IntegerField(default=50)
+    aforoMaximo = models.PositiveIntegerField(default=50)
     luz = models.BooleanField(default=False)
     porcentajeTDA = models.FloatField(default=0.0)
     

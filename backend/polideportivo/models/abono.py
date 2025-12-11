@@ -16,7 +16,7 @@ class Abono(models.Model):
 class AbonoDeportivo(Abono):
     """Modelo para representar un abono deportivo"""
 
-    meses = models.IntegerField(default=1)
+    meses = models.PositiveIntegerField(default=1)
     descuentoPrimeraActividad = models.FloatField(default=0.0)
     descuentoRestoActividades = models.FloatField(default=0.0)
     descuentoActividadesExteriores = models.FloatField(default=0.0)

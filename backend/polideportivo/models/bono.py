@@ -8,8 +8,8 @@ from .constantes import TipoBono
 class Bono(models.Model):
     """Modelo para representar un bono"""
 
-    usos = models.IntegerField(default=10)
-    añosValidez = models.IntegerField(default=1)
+    usos = models.PositiveIntegerField(default=10)
+    añosValidez = models.PositiveIntegerField(default=1)
     precioTDA = models.FloatField(default=0.0)
     precioUAM = models.FloatField(default=0.0)
     precioAbono = models.FloatField(default=0.0)

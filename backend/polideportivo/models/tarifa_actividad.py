@@ -14,7 +14,7 @@ class ActividadComun(TarifaActividad):
 
     precioUAM = models.FloatField(default=0.0)
     precioOtros = models.FloatField(default=0.0)
-    numeroHorasSemana = models.IntegerField(default=0)
+    numeroHorasSemana = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return f'Tarifa para actividad comun de precio: {self.precioUAM} para comunidad UAM y precio {self.precioOtros} para externos para {self.numeroHorasSemana} horas por semana'
@@ -23,8 +23,8 @@ class ActividadComun(TarifaActividad):
 class GrupoReducido(TarifaActividad):
     """Modelo para representar una tarifa de una actividad para grupos reducidos"""
 
-    numeroHoras = models.IntegerField(default=0)
-    numeroPersonas = models.IntegerField(default=0)
+    numeroHoras = models.PositiveIntegerField(default=0)
+    numeroPersonas = models.PositiveIntegerField(default=0)
     precio = models.FloatField(default=0.0)
     precioCuatrimestre = models.FloatField(default=0.0)
     precioMensual = models.FloatField(default=0.0)
