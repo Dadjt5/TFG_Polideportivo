@@ -4,7 +4,7 @@ from datetime import time
 
 from .instalacion import Instalacion
 
-class Instalacion(models.Model):
+class Agenda(models.Model):
     """Modelo para representar la agenda de las instalaciones"""
 
     fecha = models.DateField(auto_now_add=True)
