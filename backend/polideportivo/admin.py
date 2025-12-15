@@ -8,7 +8,6 @@ from polideportivo.models import (
     ReservaActividad, Alquiler
 )
 
-admin.site.register(Abono)
 admin.site.register(AbonoDeportivo)
 admin.site.register(AbonoVerano)
 
@@ -45,11 +44,9 @@ admin.site.register(Notificacion)
 
 admin.site.register(Pago)
 
-admin.site.register(Reserva)
 admin.site.register(ReservaActividad)
 admin.site.register(Alquiler)
 
-admin.site.register(Tarifa)
 admin.site.register(TarifaTDA)
 
 admin.site.register(TarifaActividad)
@@ -58,5 +55,4 @@ admin.site.register(TarifaInstalacion)
 
 admin.site.register(TDA)
 
-admin.site.register(Usuario)
 admin.site.register(UsuarioFinal)

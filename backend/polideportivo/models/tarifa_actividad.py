@@ -5,8 +5,7 @@ from .tarifa import Tarifa
 
 class TarifaActividad(Tarifa):
     """Modelo para representar una tarifa de una actividad"""
-
-
+    pass
 
 
 class ActividadComun(TarifaActividad):

@@ -2,11 +2,6 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 import math
 
-from .instalacion import Instalacion
-from .deporte import Deporte
-from .monitor import Monitor
-from .horario import Horario
-from .usuario_final import UsuarioFinal
 from .constantes import TipoActividad, TipoReserva, Terreno, Estado, Periodo, Dia
 
 class Actividad(models.Model):
@@ -24,9 +19,9 @@ class Actividad(models.Model):
     material = models.CharField(max_length=1024, blank=True)
     exterior = models.BooleanField(default=False)
     
-    deportes = models.ManyToManyField(Deporte, related_name="actividades")
-    instalacion = models.ForeignKey(Instalacion, on_delete=models.RESTRICT)
-    monitor = models.ForeignKey(Monitor, on_delete=models.RESTRICT)
+    deportes = models.ManyToManyField('Deporte', related_name="actividades")
+    instalacion = models.ForeignKey('Instalacion', on_delete=models.RESTRICT)
+    monitor = models.ForeignKey('Monitor', on_delete=models.RESTRICT)
     
     tipoActividad = models.CharField(default=TipoActividad.OTROS, choices=TipoActividad.choices)
     tipoReserva = models.CharField(default=TipoReserva.NINGUNA, choices=TipoReserva.choices)
@@ -49,8 +44,8 @@ class Sesion(models.Model):
     """Modelo para representar una sesion de una actividad"""
 
     actividad = models.ForeignKey(Actividad, on_delete=models.RESTRICT)
-    monitor = models.ForeignKey(Monitor, on_delete=models.RESTRICT)
-    horario = models.ForeignKey(Horario, on_delete=models.RESTRICT)    
+    monitor = models.ForeignKey('Monitor', on_delete=models.RESTRICT)
+    horario = models.ForeignKey('Horario', on_delete=models.RESTRICT)    
 
     dia = models.CharField(default=Dia.SABADO, choices=Dia.choices)
 
@@ -72,8 +67,8 @@ class Asistencia(models.Model):
     
     presente = models.BooleanField(default=True)
     
-    usuarioFinal = models.ForeignKey(UsuarioFinal, on_delete=models.RESTRICT)
+    usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.RESTRICT)
     sesion = models.ForeignKey(Sesion, on_delete=models.RESTRICT)
     
     class Meta:
-        unique_together = ('usuario', 'sesion')
+        unique_together = ('usuarioFinal', 'sesion')

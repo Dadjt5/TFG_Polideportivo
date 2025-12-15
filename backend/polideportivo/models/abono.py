@@ -1,13 +1,11 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from .usuario_final import UsuarioFinal
-
 
 class Abono(models.Model):
     """Modelo para representar un abono (clase abstracta)"""
 
-    UsuarioFinal = models.ForeignKey(UsuarioFinal, on_delete=models.RESTRICT)
+    usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.RESTRICT)
 
     class Meta:
         abstract = True

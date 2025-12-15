@@ -32,10 +32,10 @@ class UsuarioCanal(models.Model):
     expulsado = models.BooleanField(default=False)
     
     usuarioFinal = models.ForeignKey(UsuarioFinal, on_delete=models.RESTRICT)
-    canal = models.ForeignKey(Canal, on_delete=models.RESTRICT)
+    canal = models.ForeignKey('Canal', on_delete=models.RESTRICT)
     
     class Meta:
-        unique_together = ('usuario', 'canal')
+        unique_together = ('usuarioFinal', 'canal')
     
 
 class Canal(models.Model):

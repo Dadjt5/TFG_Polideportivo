@@ -44,7 +44,7 @@ router.register(r'pagos', views.PagoViewSet)
 router.register(r'reservasActividad', views.ReservaActividadViewSet)
 router.register(r'alquileres', views.AlquilerViewSet)
 
-router.register(r'tarifasTDA', views.TarifaTDASerializerViewSet)
+router.register(r'tarifasTDA', views.TarifaTDAViewSet)
 router.register(r'tarifasActividad', views.TarifaActividadViewSet)
 router.register(r'tarifasInstalacion', views.TarifaInstalacionViewSet)
 
@@ -57,6 +57,4 @@ router.register(r'users', views.UserViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('auth/', include('djoser.urls')),
-    path('auth/', include('djoser.urls.authtoken')),
 ]

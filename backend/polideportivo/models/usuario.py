@@ -10,7 +10,6 @@ class Usuario(models.Model):
     nombre = models.CharField(max_length=256, blank=True)
     apellidos = models.CharField(max_length=256, blank=True, null=True)
     DNI = models.CharField(max_length=256, blank=True)
-    contraseña = models.CharField(max_length=8)
     consentimiento = models.BooleanField(default=False)
 
     def __str__(self):

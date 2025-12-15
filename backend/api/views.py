@@ -1,21 +1,11 @@
-from django.shortcuts import render
-from django.db import transaction
 from rest_framework import viewsets
-from djoser.views import UserViewSet
-from rest_framework.response import Response
-from rest_framework import permissions
-from rest_framework import status
-from rest_framework.views import APIView
 from rest_framework.permissions import (
     IsAuthenticated,
-    AllowAny,
-    BasePermission,
+    AllowAny
 )
-from rest_framework.authentication import SessionAuthentication
-from rest_framework.authentication import BasicAuthentication
 from django.contrib.auth import get_user_model
 
-from serializers import (
+from .serializers import (
     AbonoDeportivoSerializer, AbonoVeranoSerializer, BonoSerializer,
     ActividadSerializer, AsistenciaSerializer, AgendaSerializer,
     ConfiguracionSerializer, DeporteSerializer, DescuentoSerializer,
@@ -38,25 +28,33 @@ from polideportivo.models import (
 
 User = get_user_model()
 
-class AbonoDeportivoViewSet(viewsets.ModelViewSet):
-    queryset = AbonoDeportivo.objects.all()
-    serializer_class = AbonoDeportivoSerializer
 
+# --- HAY QUE ESTABLECER LOS PERMISOS PARA QUE SEAN PARA ADMIN PARA CADA TIPO DE ADMIN Y A LO MEJOR HACER UN MODELO ADMIN CON CAMPO ROL
 
 # ----------------
 # Abonos
 # ----------------
 
 class AbonoDeportivoViewSet(viewsets.ModelViewSet):
-    queryset = AbonoDeportivo.objects.all()
     serializer_class = AbonoDeportivoSerializer
     permission_classes = [IsAuthenticated]
+    
+    def perform_create(self, serializer):
+        serializer.save(usuarioFinal=self.request.user)
+    
+    def get_queryset(self):
+        return AbonoDeportivo.objects.filter(usuarioFinal=self.request.user)
 
 
 class AbonoVeranoViewSet(viewsets.ModelViewSet):
-    queryset = AbonoVerano.objects.all()
     serializer_class = AbonoVeranoSerializer
     permission_classes = [IsAuthenticated]
+    
+    def perform_create(self, serializer):
+        serializer.save(usuarioFinal=self.request.user)
+        
+    def get_queryset(self):
+        return AbonoVerano.objects.filter(usuarioFinal=self.request.user)
 
 
 # ----------------
@@ -64,15 +62,28 @@ class AbonoVeranoViewSet(viewsets.ModelViewSet):
 # ----------------
 
 class ActividadViewSet(viewsets.ModelViewSet):
-    queryset = Actividad.objects.all()
     serializer_class = ActividadSerializer
     permission_classes = [IsAuthenticated]
 
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_monitor:
+            # Filtrar solo las actividades que dirige
+            return Actividad.objects.filter(monitor=user)
+        else:
+            # Usuario final ve todas las actividades
+            return Actividad.objects.all()
+
 
 class AsistenciaViewSet(viewsets.ModelViewSet):
-    queryset = Asistencia.objects.all()
     serializer_class = AsistenciaSerializer
     permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(usuarioFinal=self.request.user)
+
+    def get_queryset(self):
+        return Asistencia.objects.filter(usuarioFinal=self.request.user)
 
 
 # ----------------
@@ -82,7 +93,7 @@ class AsistenciaViewSet(viewsets.ModelViewSet):
 class AgendaViewSet(viewsets.ModelViewSet):
     queryset = Agenda.objects.all()
     serializer_class = AgendaSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
 
 # ----------------
@@ -90,9 +101,14 @@ class AgendaViewSet(viewsets.ModelViewSet):
 # ----------------
 
 class BonoViewSet(viewsets.ModelViewSet):
-    queryset = Bono.objects.all()
     serializer_class = BonoSerializer
     permission_classes = [IsAuthenticated]
+    
+    def perform_create(self, serializer):
+        serializer.save(usuarioFinal=self.request.user)
+
+    def get_queryset(self):
+        return Bono.objects.filter(usuarioFinal=self.request.user)
 
 
 # ----------------
@@ -102,7 +118,7 @@ class BonoViewSet(viewsets.ModelViewSet):
 class ConfiguracionViewSet(viewsets.ModelViewSet):
     queryset = Configuracion.objects.all()
     serializer_class = ConfiguracionSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]  #Debemos añadir un permiso especial para admin raiz
 
 
 # ----------------
@@ -112,7 +128,7 @@ class ConfiguracionViewSet(viewsets.ModelViewSet):
 class DeporteViewSet(viewsets.ModelViewSet):
     queryset = Deporte.objects.all()
     serializer_class = DeporteSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
 
 # ----------------
@@ -122,7 +138,7 @@ class DeporteViewSet(viewsets.ModelViewSet):
 class DescuentoViewSet(viewsets.ModelViewSet):
     queryset = Descuento.objects.all()
     serializer_class = DescuentoSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
 
 # ----------------
@@ -130,9 +146,14 @@ class DescuentoViewSet(viewsets.ModelViewSet):
 # ----------------
 
 class FavoritoViewSet(viewsets.ModelViewSet):
-    queryset = Favorito.objects.all()
     serializer_class = FavoritoSerializer
     permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(usuarioFinal=self.request.user)
+
+    def get_queryset(self):
+        return Favorito.objects.filter(usuarioFinal=self.request.user)
 
 
 # ----------------
@@ -152,9 +173,14 @@ class CanalViewSet(viewsets.ModelViewSet):
 
 
 class UsuarioCanalViewSet(viewsets.ModelViewSet):
-    queryset = UsuarioCanal.objects.all()
     serializer_class = UsuarioCanalSerializer
     permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(usuarioFinal=self.request.user)
+
+    def get_queryset(self):
+        return UsuarioCanal.objects.filter(usuarioFinal=self.request.user)
 
 
 # ----------------
@@ -164,7 +190,7 @@ class UsuarioCanalViewSet(viewsets.ModelViewSet):
 class HorarioViewSet(viewsets.ModelViewSet):
     queryset = Horario.objects.all()
     serializer_class = HorarioSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
 
 # ----------------
@@ -174,13 +200,13 @@ class HorarioViewSet(viewsets.ModelViewSet):
 class InstalacionViewSet(viewsets.ModelViewSet):
     queryset = Instalacion.objects.all()
     serializer_class = InstalacionSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
 
 class PabellonViewSet(viewsets.ModelViewSet):
     queryset = Pabellon.objects.all()
     serializer_class = PabellonSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
 
 # ----------------
@@ -190,13 +216,18 @@ class PabellonViewSet(viewsets.ModelViewSet):
 class ListaEsperaViewSet(viewsets.ModelViewSet):
     queryset = ListaEspera.objects.all()
     serializer_class = ListaEsperaSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
 
 class EntradaListaEsperaViewSet(viewsets.ModelViewSet):
-    queryset = EntradaListaEspera.objects.all()
     serializer_class = EntradaListaEsperaSerializer
     permission_classes = [IsAuthenticated]
+     
+    def perform_create(self, serializer):
+        serializer.save(usuarioFinal=self.request.user)
+
+    def get_queryset(self):
+        return EntradaListaEspera.objects.filter(usuarioFinal=self.request.user)
 
 
 # ----------------
@@ -214,9 +245,14 @@ class MonitorViewSet(viewsets.ModelViewSet):
 # ----------------
 
 class NotificacionViewSet(viewsets.ModelViewSet):
-    queryset = Notificacion.objects.all()
     serializer_class = NotificacionSerializer
     permission_classes = [IsAuthenticated]
+    
+    def perform_create(self, serializer):
+        serializer.save(usuario=self.request.user)
+
+    def get_queryset(self):
+        return Notificacion.objects.filter(usuario=self.request.user)
 
 
 # ----------------
@@ -234,22 +270,32 @@ class PagoViewSet(viewsets.ModelViewSet):
 # ----------------
 
 class ReservaActividadViewSet(viewsets.ModelViewSet):
-    queryset = ReservaActividad.objects.all()
     serializer_class = ReservaActividadSerializer
     permission_classes = [IsAuthenticated]
 
+    def perform_create(self, serializer):
+        serializer.save(usuarioFinal=self.request.user)
+
+    def get_queryset(self):
+        return ReservaActividad.objects.filter(usuarioFinal=self.request.user)
+
 
 class AlquilerViewSet(viewsets.ModelViewSet):
-    queryset = Alquiler.objects.all()
     serializer_class = AlquilerSerializer
     permission_classes = [IsAuthenticated]
+    
+    def perform_create(self, serializer):
+        serializer.save(usuarioFinal=self.request.user)
+
+    def get_queryset(self):
+        return Alquiler.objects.filter(usuarioFinal=self.request.user)
 
 
 # ----------------
 # Tarifas
 # ----------------
 
-class TarifaTDASerializerViewSet(viewsets.ModelViewSet):
+class TarifaTDAViewSet(viewsets.ModelViewSet):
     queryset = TarifaTDA.objects.all()
     serializer_class = TarifaTDASerializer
     permission_classes = [IsAuthenticated]
@@ -272,9 +318,14 @@ class TarifaInstalacionViewSet(viewsets.ModelViewSet):
 # ----------------
 
 class TDAViewSet(viewsets.ModelViewSet):
-    queryset = TDA.objects.all()
     serializer_class = TDASerializer
     permission_classes = [IsAuthenticated]
+    
+    def perform_create(self, serializer):
+        serializer.save(usuarioFinal=self.request.user)
+
+    def get_queryset(self):
+        return TDA.objects.filter(usuarioFinal=self.request.user)
 
 
 # ----------------
@@ -295,28 +346,3 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
-
-
-
-class SearchTournamentsAPIView(APIView):
-    permission_classes = []
-
-    def post(self, request):
-        search_string = request.data.get("search_string", "")
-        tournaments = Tournament.objects.filter(name__icontains=search_string)\
-            .order_by("-id")
-
-        result = []
-        for t in tournaments:
-            result.append(
-                {
-                    "id": t.id,
-                    "name": t.name,
-                    "tournament_type": t.tournament_type,
-                    "board_type": t.board_type,
-                    "tournament_speed": t.tournament_speed,
-                    "start_date": t.start_date,
-                }
-            )
-
-        return Response(result, status=status.HTTP_200_OK)
