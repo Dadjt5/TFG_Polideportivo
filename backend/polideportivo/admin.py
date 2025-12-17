@@ -5,11 +5,12 @@ from polideportivo.models import (
     Foro, Horario, Instalacion, ListaEspera, Asistencia, Canal, UsuarioCanal, 
     EntradaListaEspera, TarifaTDA, Monitor, Notificacion, Pago, TarifaActividad, 
     TarifaInstalacion, TDA, UsuarioFinal, AbonoDeportivo, AbonoVerano, Pabellon, 
-    ReservaActividad, Alquiler
+    ReservaActividad, Alquiler, Administrador, CompraAbono, CompraBono
 )
 
 admin.site.register(AbonoDeportivo)
 admin.site.register(AbonoVerano)
+admin.site.register(CompraAbono)
 
 admin.site.register(Actividad)
 admin.site.register(Asistencia)
@@ -17,6 +18,7 @@ admin.site.register(Asistencia)
 admin.site.register(Agenda)
 
 admin.site.register(Bono)
+admin.site.register(CompraBono)
 
 admin.site.register(Configuracion)
 
@@ -38,8 +40,6 @@ admin.site.register(Pabellon)
 admin.site.register(ListaEspera)
 admin.site.register(EntradaListaEspera)
 
-admin.site.register(Monitor)
-
 admin.site.register(Notificacion)
 
 admin.site.register(Pago)
@@ -55,4 +55,6 @@ admin.site.register(TarifaInstalacion)
 
 admin.site.register(TDA)
 
+admin.site.register(Monitor)
 admin.site.register(UsuarioFinal)
+admin.site.register(Administrador)

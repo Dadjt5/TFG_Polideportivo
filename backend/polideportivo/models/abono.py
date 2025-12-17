@@ -5,8 +5,6 @@ from django.utils.translation import gettext_lazy as _
 class Abono(models.Model):
     """Modelo para representar un abono (clase abstracta)"""
 
-    usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.RESTRICT)
-
     class Meta:
         abstract = True
 
@@ -35,7 +33,17 @@ class AbonoVerano(Abono):
     precioTDA = models.FloatField(default=0.0)
     precioUAM = models.FloatField(default=0.0)
     precioOtros = models.FloatField(default=0.0)
-
-
+    
     def __str__(self):
         return f'Abono de verano para junio, julio y agosto de coste {self.precioUAM} para la comunidad UAM'
+
+
+class CompraAbono(models.Model):
+    """Modelo para representar la compra de un abono"""
+    
+    fecha = models.DateField(auto_now_add=True)
+    
+    usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.RESTRICT)
+    abonoDeportivo = models.ForeignKey('AbonoDeportivo', on_delete=models.RESTRICT, related_name="compras_deportivo")
+    abonoVerano = models.ForeignKey('AbonoVerano', on_delete=models.RESTRICT, related_name="compras_verano")
+    pago = models.OneToOneField('Pago', on_delete=models.RESTRICT)

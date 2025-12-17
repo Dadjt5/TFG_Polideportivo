@@ -211,3 +211,20 @@ class EstadoPago(models.TextChoices):
     PAGADA = 'Pagado'
 
     CANCELADA = 'Pago cancelado'
+
+
+class RolAdministrador(models.TextChoices):
+    """
+    Clase para enumerar los roles de los administradores
+
+    Roles posibles:
+    - RAIZ, ESPACIOS, USUARIOS, TARIFAS
+    """
+    
+    RAIZ = 'Administrador raiz'
+
+    ESPACIOS = 'Administrador de espacios'
+
+    USUARIOS = 'Administrador de usuarios'
+    
+    TARIFAS = 'Administrador de tarifas'

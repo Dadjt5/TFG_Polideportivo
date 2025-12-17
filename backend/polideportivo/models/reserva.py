@@ -7,6 +7,8 @@ class Reserva(models.Model):
 
     usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.RESTRICT)
     descuento = models.ForeignKey('Descuento', on_delete=models.RESTRICT)
+    
+    pago = models.OneToOneField('Pago', on_delete=models.RESTRICT)
 
     class Meta:
         abstract = True

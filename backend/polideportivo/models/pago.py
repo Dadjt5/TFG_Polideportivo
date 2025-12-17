@@ -12,12 +12,6 @@ class Pago(models.Model):
     coste = models.FloatField(default=0.0)
     fecha = models.DateField(auto_now_add=True)
 
-    reservaActividad = models.OneToOneField('ReservaActividad', on_delete=models.RESTRICT, null=True, blank=True)
-    alquiler = models.OneToOneField('alquiler', on_delete=models.RESTRICT, null=True, blank=True)
-    abonoDeportivo = models.OneToOneField('AbonoDeportivo', on_delete=models.RESTRICT, null=True, blank=True)
-    abonoVerano = models.OneToOneField('AbonoVerano', on_delete=models.RESTRICT, null=True, blank=True)
-    bono = models.OneToOneField('Bono', on_delete=models.RESTRICT, null=True, blank=True)
-
     estadoPago = models.CharField(default=EstadoPago.PENDIENTE, choices=EstadoPago.choices)
 
     def __str__(self):

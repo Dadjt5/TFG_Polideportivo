@@ -19,3 +19,13 @@ class Bono(models.Model):
 
     def __str__(self):
         return f'Bono para {self.tipoBono} de {self.usos} usos en un máximo de {self.añosValidez} años'
+
+
+class CompraBono(models.Model):
+    """Modelo para representar la compra de un bono"""
+    
+    fecha = models.DateField(auto_now_add=True)
+    
+    usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.RESTRICT)
+    bono = models.ForeignKey('Bono', on_delete=models.RESTRICT, related_name="compras_bono")
+    pago = models.OneToOneField('Pago', on_delete=models.RESTRICT)

@@ -7,9 +7,9 @@ class Usuario(models.Model):
 
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
-    nombre = models.CharField(max_length=256, blank=True)
-    apellidos = models.CharField(max_length=256, blank=True, null=True)
-    DNI = models.CharField(max_length=256, blank=True)
+    nombre = models.CharField(max_length=64, blank=True)
+    apellidos = models.CharField(max_length=64, blank=True, null=True)
+    DNI = models.CharField(max_length=9, blank=True)
     consentimiento = models.BooleanField(default=False)
 
     def __str__(self):

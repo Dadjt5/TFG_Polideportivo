@@ -6,7 +6,7 @@ from polideportivo.models import (
     Foro, Horario, Instalacion, ListaEspera, Asistencia, Canal, UsuarioCanal, 
     EntradaListaEspera, TarifaTDA, Monitor, Notificacion, Pago, TarifaActividad, 
     TarifaInstalacion, TDA, UsuarioFinal, AbonoDeportivo, AbonoVerano, Pabellon, 
-    ReservaActividad, Alquiler
+    ReservaActividad, Alquiler, Administrador, CompraBono, CompraAbono
 )
 
 
@@ -34,6 +34,12 @@ class MonitorSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class AdministradorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Administrador
+        fields = '__all__'
+
+
 # --------------------
 # Abonos
 # --------------------
@@ -47,6 +53,12 @@ class AbonoDeportivoSerializer(serializers.ModelSerializer):
 class AbonoVeranoSerializer(serializers.ModelSerializer):
     class Meta:
         model = AbonoVerano
+        fields = '__all__'
+
+
+class CompraAbonoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CompraAbono
         fields = '__all__'
 
 
@@ -83,6 +95,12 @@ class AgendaSerializer(serializers.ModelSerializer):
 class BonoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Bono
+        fields = '__all__'
+
+
+class CompraBonoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CompraBono
         fields = '__all__'
 
 

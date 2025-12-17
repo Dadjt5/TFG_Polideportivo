@@ -57,4 +57,5 @@ router.register(r'users', views.UserViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
+    path("me/", views.meAPIView.as_view(), name="me"),
 ]

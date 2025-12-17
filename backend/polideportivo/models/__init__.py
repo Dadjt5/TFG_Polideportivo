@@ -1,7 +1,7 @@
-from .abono import (Abono, AbonoDeportivo, AbonoVerano)
+from .abono import (Abono, AbonoDeportivo, AbonoVerano, CompraAbono)
 from .actividad import (Actividad, Asistencia)
 from .agenda import Agenda
-from .bono import Bono
+from .bono import (Bono, CompraBono)
 from .configuracion import Configuracion
 from .deporte import Deporte
 from .descuento import Descuento
@@ -20,3 +20,5 @@ from .tarifa_instalacion import TarifaInstalacion
 from .tda import TDA
 from .usuario import Usuario
 from .usuario_final import UsuarioFinal
+from .administrador import Administrador
+from .user import User
