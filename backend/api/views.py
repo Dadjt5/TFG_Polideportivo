@@ -29,7 +29,6 @@ from polideportivo.models import (
 
 
 
-
 # --- HAY QUE ESTABLECER LOS PERMISOS PARA QUE SEAN PARA ADMIN PARA CADA TIPO DE ADMIN Y A LO MEJOR HACER UN MODELO ADMIN CON CAMPO ROL
 
 # ----------------
@@ -43,11 +42,8 @@ class AbonoDeportivoViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         if user.is_usuario_final:
-            try:
-                return AbonoDeportivo.objects.filter(compras_deportivo__usuarioFinal__user=user)
-            except:
-                pass
-        
+            return AbonoDeportivo.objects.filter(compras_deportivo__usuarioFinal__user=user)
+
         return AbonoDeportivo.objects.all()
 
 
@@ -58,10 +54,7 @@ class AbonoVeranoViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         if user.is_usuario_final:
-            try:
-                return AbonoVerano.objects.filter(compras_verano__usuarioFinal__user=user)
-            except:
-                pass
+            return AbonoVerano.objects.filter(compras_verano__usuarioFinal__user=user)
         
         return AbonoVerano.objects.all()
 
@@ -84,6 +77,7 @@ class CompraAbonoViewSet(viewsets.ModelViewSet):
 # Actividades
 # ----------------
 
+# Es necesario modificar algo get_queryset para mostrar las diferentes actividades
 class ActividadViewSet(viewsets.ModelViewSet):
     serializer_class = ActividadSerializer
     permission_classes = [IsAuthenticated]
@@ -107,7 +101,7 @@ class AsistenciaViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         if user.is_usuario_final:
-            return Asistencia.objects.filter(usuarioFinal=user)
+            return Asistencia.objects.filter(usuarioFinal__user=user)
         elif user.is_monitor:
             return Asistencia.objects.filter(sesion__monitor__user=user)
         elif user.is_administrador:
@@ -132,23 +126,16 @@ class BonoViewSet(viewsets.ModelViewSet):
     serializer_class = BonoSerializer
     permission_classes = [IsAuthenticated]
 
-    def perform_create(self, serializer):
-        usuario_final = UsuarioFinal.objects.get(user=self.request.user)
-        serializer.save(usuarioFinal=usuario_final)
-
     def get_queryset(self):
         user = self.request.user
         if user.is_usuario_final:
-            try:
-                return AbonoVerano.objects.filter(compras_verano__usuarioFinal__user=user)
-            except:
-                pass
+            return Bono.objects.filter(compras_bono__usuarioFinal__user=user)
         
-        return AbonoVerano.objects.all()
+        return Bono.objects.all()
 
 
-class CompraAbonoViewSet(viewsets.ModelViewSet):
-    serializer_class = CompraAbonoSerializer
+class CompraBonoViewSet(viewsets.ModelViewSet):
+    serializer_class = CompraBonoSerializer
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
@@ -158,7 +145,9 @@ class CompraAbonoViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         if user.is_administrador:
-            return CompraAbono.objects.all()
+            return CompraBono.objects.all()
+        
+        return []
 
 
 # ----------------
@@ -200,10 +189,12 @@ class FavoritoViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        serializer.save(usuarioFinal=self.request.user)
+        usuario_final = UsuarioFinal.objects.get(user=self.request.user)
+        serializer.save(usuarioFinal=usuario_final)
+
 
     def get_queryset(self):
-        return Favorito.objects.filter(usuarioFinal=self.request.user)
+        return Favorito.objects.filter(usuarioFinal__user=self.request.user)
 
 
 # ----------------
@@ -227,10 +218,12 @@ class UsuarioCanalViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        serializer.save(usuarioFinal=self.request.user)
+        usuario_final = UsuarioFinal.objects.get(user=self.request.user)
+        serializer.save(usuarioFinal=usuario_final)
+
 
     def get_queryset(self):
-        return UsuarioCanal.objects.filter(usuarioFinal=self.request.user)
+        return UsuarioCanal.objects.filter(usuarioFinal__user=self.request.user)
 
 
 # ----------------
@@ -274,10 +267,12 @@ class EntradaListaEsperaViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
      
     def perform_create(self, serializer):
-        serializer.save(usuarioFinal=self.request.user)
+        usuario_final = UsuarioFinal.objects.get(user=self.request.user)
+        serializer.save(usuarioFinal=usuario_final)
+
 
     def get_queryset(self):
-        return EntradaListaEspera.objects.filter(usuarioFinal=self.request.user)
+        return EntradaListaEspera.objects.filter(usuarioFinal__user=self.request.user)
 
 
 # ----------------
@@ -285,12 +280,18 @@ class EntradaListaEsperaViewSet(viewsets.ModelViewSet):
 # ----------------
 
 class MonitorViewSet(viewsets.ModelViewSet):
-    queryset = Monitor.objects.all()
     serializer_class = MonitorSerializer
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_administrador:
+            return Monitor.objects.all()
+        
+        return []
 
 
 # ----------------
@@ -327,10 +328,12 @@ class ReservaActividadViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
-        serializer.save(usuarioFinal=self.request.user)
+        usuario_final = UsuarioFinal.objects.get(user=self.request.user)
+        serializer.save(usuarioFinal=usuario_final)
+
 
     def get_queryset(self):
-        return ReservaActividad.objects.filter(usuarioFinal=self.request.user)
+        return ReservaActividad.objects.filter(usuarioFinal_user=self.request.user)
 
 
 class AlquilerViewSet(viewsets.ModelViewSet):
@@ -338,10 +341,12 @@ class AlquilerViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     
     def perform_create(self, serializer):
-        serializer.save(usuarioFinal=self.request.user)
+        usuario_final = UsuarioFinal.objects.get(user=self.request.user)
+        serializer.save(usuarioFinal=usuario_final)
+
 
     def get_queryset(self):
-        return Alquiler.objects.filter(usuarioFinal=self.request.user)
+        return Alquiler.objects.filter(usuarioFinal__user=self.request.user)
 
 
 # ----------------
@@ -375,10 +380,12 @@ class TDAViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     
     def perform_create(self, serializer):
-        serializer.save(usuarioFinal=self.request.user)
+        usuario_final = UsuarioFinal.objects.get(user=self.request.user)
+        serializer.save(usuarioFinal=usuario_final)
+
 
     def get_queryset(self):
-        return TDA.objects.filter(usuarioFinal=self.request.user)
+        return TDA.objects.filter(usuarioFinal__user=self.request.user)
 
 
 # ----------------
@@ -402,6 +409,9 @@ class AdministradorViewSet(viewsets.ModelViewSet):
     queryset = Administrador.objects.all()
     serializer_class = AdministradorSerializer
     permission_classes = [IsAuthenticated]
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 
 # ----------------
@@ -425,14 +435,12 @@ class meAPIView(APIView):
 
         data = {
             "id": user.id,
-            "nombre": user.nombre,
-            "is_monitor": True if user.tipoUsuario=="Monitor" else False,
-            "is_usuario_final": True if user.tipoUsuario=="UsuarioFinal" else False,
-            "is_administrador": True if user.tipoUsuario=="Administrador" else False,
+            "is_monitor": user.is_monitor,
+            "is_usuario_final": user.is_usuario_final,
+            "is_administrador": user.is_administrador,
         }
-        if user.tipoUsuario=="Administrador":
+        
+        if user.is_administrador:
             data["rol"] = user.administrador.rol
+
         return Response(data)
-    
-    
-    

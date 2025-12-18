@@ -22,3 +22,6 @@ class EntradaListaEspera(models.Model):
 
     def __str__(self):
         return f'Fecha: {self.fechaEntrada}, Hora: {self.horaEntrada}'
+
+    class Meta:
+        unique_together = ('listaEspera', 'usuarioFinal')
