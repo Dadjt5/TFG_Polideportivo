@@ -6,6 +6,8 @@ from rest_framework.permissions import (
     AllowAny
 )
 
+from .permissions import IsAdministrador, IsMonitor, IsUsuarioFinal
+
 from .serializers import (
     AbonoDeportivoSerializer, AbonoVeranoSerializer, BonoSerializer,
     ActividadSerializer, AsistenciaSerializer, AgendaSerializer,
@@ -41,10 +43,7 @@ class AbonoDeportivoViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        if user.is_usuario_final:
-            return AbonoDeportivo.objects.filter(compras_deportivo__usuarioFinal__user=user)
-
-        return AbonoDeportivo.objects.all()
+        return AbonoDeportivo.objects.filter(compras_deportivo__usuarioFinal__user=user)
 
 
 class AbonoVeranoViewSet(viewsets.ModelViewSet):
@@ -53,24 +52,19 @@ class AbonoVeranoViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        if user.is_usuario_final:
-            return AbonoVerano.objects.filter(compras_verano__usuarioFinal__user=user)
-        
-        return AbonoVerano.objects.all()
+        return AbonoVerano.objects.filter(compras_verano__usuarioFinal__user=user)
 
 
 class CompraAbonoViewSet(viewsets.ModelViewSet):
     serializer_class = CompraAbonoSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsUsuarioFinal]
 
     def perform_create(self, serializer):
         usuario_final = UsuarioFinal.objects.get(user=self.request.user)
         serializer.save(usuarioFinal=usuario_final)
 
     def get_queryset(self):
-        user = self.request.user
-        if user.is_administrador:
-            return CompraAbono.objects.all()
+        return CompraAbono.objects.all()
 
 
 # ----------------
@@ -85,7 +79,7 @@ class ActividadViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         if user.is_monitor:
-            return Actividad.objects.filter(monitor=user)
+            return Actividad.objects.filter(monitor__user=user)
         else:
             return Actividad.objects.all()
 
@@ -130,24 +124,19 @@ class BonoViewSet(viewsets.ModelViewSet):
         user = self.request.user
         if user.is_usuario_final:
             return Bono.objects.filter(compras_bono__usuarioFinal__user=user)
-        
-        return Bono.objects.all()
+        elif user.is_administrador:
+            return Bono.objects.all()
+        return []
 
 
 class CompraBonoViewSet(viewsets.ModelViewSet):
+    queryset = CompraBono.objects.all()
     serializer_class = CompraBonoSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsUsuarioFinal]
 
     def perform_create(self, serializer):
         usuario_final = UsuarioFinal.objects.get(user=self.request.user)
         serializer.save(usuarioFinal=usuario_final)
-
-    def get_queryset(self):
-        user = self.request.user
-        if user.is_administrador:
-            return CompraBono.objects.all()
-        
-        return []
 
 
 # ----------------
@@ -157,7 +146,7 @@ class CompraBonoViewSet(viewsets.ModelViewSet):
 class ConfiguracionViewSet(viewsets.ModelViewSet):
     queryset = Configuracion.objects.all()
     serializer_class = ConfiguracionSerializer
-    permission_classes = [IsAuthenticated]  #Debemos añadir un permiso especial para admin raiz
+    permission_classes = [IsAuthenticated]
 
 
 # ----------------
@@ -177,7 +166,7 @@ class DeporteViewSet(viewsets.ModelViewSet):
 class DescuentoViewSet(viewsets.ModelViewSet):
     queryset = Descuento.objects.all()
     serializer_class = DescuentoSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAdministrador]
 
 
 # ----------------
@@ -191,7 +180,6 @@ class FavoritoViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         usuario_final = UsuarioFinal.objects.get(user=self.request.user)
         serializer.save(usuarioFinal=usuario_final)
-
 
     def get_queryset(self):
         return Favorito.objects.filter(usuarioFinal__user=self.request.user)
@@ -220,7 +208,6 @@ class UsuarioCanalViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         usuario_final = UsuarioFinal.objects.get(user=self.request.user)
         serializer.save(usuarioFinal=usuario_final)
-
 
     def get_queryset(self):
         return UsuarioCanal.objects.filter(usuarioFinal__user=self.request.user)
@@ -270,7 +257,6 @@ class EntradaListaEsperaViewSet(viewsets.ModelViewSet):
         usuario_final = UsuarioFinal.objects.get(user=self.request.user)
         serializer.save(usuarioFinal=usuario_final)
 
-
     def get_queryset(self):
         return EntradaListaEspera.objects.filter(usuarioFinal__user=self.request.user)
 
@@ -280,18 +266,12 @@ class EntradaListaEsperaViewSet(viewsets.ModelViewSet):
 # ----------------
 
 class MonitorViewSet(viewsets.ModelViewSet):
+    queryset = Monitor.objects.all()
     serializer_class = MonitorSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdministrador]
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-
-    def get_queryset(self):
-        user = self.request.user
-        if user.is_administrador:
-            return Monitor.objects.all()
-        
-        return []
 
 
 # ----------------
@@ -330,7 +310,6 @@ class ReservaActividadViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         usuario_final = UsuarioFinal.objects.get(user=self.request.user)
         serializer.save(usuarioFinal=usuario_final)
-
 
     def get_queryset(self):
         return ReservaActividad.objects.filter(usuarioFinal_user=self.request.user)
@@ -383,7 +362,6 @@ class TDAViewSet(viewsets.ModelViewSet):
         usuario_final = UsuarioFinal.objects.get(user=self.request.user)
         serializer.save(usuarioFinal=usuario_final)
 
-
     def get_queryset(self):
         return TDA.objects.filter(usuarioFinal__user=self.request.user)
 
@@ -421,8 +399,7 @@ class AdministradorViewSet(viewsets.ModelViewSet):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated]
-
+    permission_classes = [IsAdministrador]
 
 
 # Otros endpoints
