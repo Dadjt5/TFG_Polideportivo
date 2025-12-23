@@ -3,9 +3,9 @@
   <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100">
 
     <!-- MAIN -->
-    <main class="max-w-7xl mx-auto px-6 py-10">
-      <!-- HERO -->
-      <div class="text-center mb-6">
+    <main class="container-fluid mt-5 max-w-7xl mx-auto px-6 py-10">
+      <!-- INTRO -->
+      <div class="text-center mt-10 mb-6">
         <h1 class="text-3xl font-bold text-slate-900">
           {{ t.welcome }}
         </h1>
@@ -13,76 +13,91 @@
           {{ t.welcome2 }}
         </p>
 
-        <!-- SEARCH -->
-        <div class="max-w-2xl mx-auto mt-4">
-          <div class="flex gap-3 bg-white rounded-2xl shadow-lg p-3 border border-slate-200">
-            <div class="flex-1 flex items-center gap-3 px-2">
-              <Search class="w-6 h-6 text-slate-500" />
-              <Input
-                type="text"
-                :placeholder="t.searchPlaceholder"
-                class="text-lg border-0 focus:ring-0"
-              />
+        <!-- BUSQUEDAS -->
+        <div class="container-fluid mx-auto mt-4">
+          <div class="d-flex gap-3 align-items-center bg-white rounded-4 shadow-lg p-3 border">
+            <div class="d-flex align-items-center gap-3 flex-grow-1 px-2">
+              <Search class="text-secondary"/>
+                <input
+                  type="text"
+                  class="form-control border-0 fs-5"
+                  :placeholder="t.searchPlaceholder"
+                />
             </div>
-            <Button class="px-8 py-2 text-lg bg-blue-700 hover:bg-blue-800">
+
+            <button class="btn btn-primary btn-lg px-4">
               {{ t.searchButton }}
-            </Button>
+            </button>
           </div>
         </div>
       </div>
 
-      <!-- FILTERS -->
-      <h2 class="text-2xl font-semibold text-center text-slate-800 mb-4">
+      <!-- FILTROS -->
+      <h2 class="text-2xl font-semibold text-center text-slate-800 mt-5 mb-3">
         {{ t.filterBy }}
       </h2>
 
-      <Tabs default-value="activities" class="w-full">
-        <TabsList class="grid w-full max-w-lg mx-auto grid-cols-2 mb-4 text-lg">
-          <TabsTrigger value="activities">
-            {{ t.activities }}
-          </TabsTrigger>
-          <TabsTrigger value="facilities">
-            {{ t.facilities }}
-          </TabsTrigger>
-        </TabsList>
+    <!-- Tabs triggers -->
+    <ul class="nav nav-tabs justify-content-center mb-4" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button
+          class="nav-link"
+          :class="{ active: activeTab === 'activities' }"
+          @click="activeTab = 'activities'"
+          type="button"
+          role="tab"
+        >
+          {{ t.activities }}
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button
+          class="nav-link"
+          :class="{ active: activeTab === 'facilities' }"
+          @click="activeTab = 'facilities'"
+          type="button"
+          role="tab"
+        >
+          {{ t.facilities }}
+        </button>
+      </li>
+    </ul>
 
-        <!-- ACTIVITIES -->
-        <TabsContent value="activities">
-          <div class="grid md:grid-cols-3 gap-6">
-            <FilterCard
-              :icon="Calendar"
-              :title="t.dayOfWeek"
-              @click="dayFilterOpen = true"
-            />
-            <FilterCard
-              :icon="Activity"
-              :title="t.activityType"
-              @click="activityTypeFilterOpen = true"
-            />
-            <FilterCard
-              :icon="Clock"
-              :title="t.sessionTime"
-              @click="activityTimeFilterOpen = true"
-            />
+    <!-- Tabs content -->
+    <div class="tab-content">
+      <div
+        class="tab-pane fade"
+        :class="{ show: activeTab === 'activities', active: activeTab === 'activities' }"
+      >
+        <!-- Aquí va el contenido de "Activities" -->
+        <div class="row g-3">
+          <div class="col-md-4">
+            <FilterCard title="Día de la semana" @click="dayFilterOpen = true" icon="null" />
           </div>
-        </TabsContent>
+          <div class="col-md-4">
+            <FilterCard title="Tipo de actividad" @click="activityTypeFilterOpen = true" />
+          </div>
+          <div class="col-md-4">
+            <FilterCard title="Horario" @click="activityTimeFilterOpen = true" />
+          </div>
+        </div>
+      </div>
 
-        <!-- FACILITIES -->
-        <TabsContent value="facilities">
-          <div class="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-            <FilterCard
-              :icon="Building2"
-              :title="t.facilityType"
-              @click="facilityTypeFilterOpen = true"
-            />
-            <FilterCard
-              :icon="Clock"
-              :title="t.openingHours"
-              @click="facilityTimeFilterOpen = true"
-            />
+      <div
+        class="tab-pane fade"
+        :class="{ show: activeTab === 'facilities', active: activeTab === 'facilities' }"
+      >
+        <!-- Aquí va el contenido de "Facilities" -->
+        <div class="row g-3">
+          <div class="col-md-6">
+            <FilterCard title="Tipo de instalación" @click="facilityTypeFilterOpen = true" />
           </div>
-        </TabsContent>
-      </Tabs>
+          <div class="col-md-6">
+            <FilterCard title="Horario de apertura" @click="facilityTimeFilterOpen = true" />
+          </div>
+        </div>
+      </div>
+    </div>
 
       <!-- DIALOGS -->
       <DayOfWeekFilter
@@ -160,92 +175,31 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import {
-  Search,
-  Activity,
-  Building2,
-  Clock,
-  Calendar,
-} from "lucide-vue-next";
-
-import Button from "./ui/Button.vue";
-import Input from "./ui/Input.vue";
-import Tabs from "./ui/Tabs.vue";
-import TabsList from "./ui/TabsList.vue";
-import TabsTrigger from "./ui/TabsTrigger.vue";
-import TabsContent from "./ui/TabsContent.vue";
-
-import FilterCard from "./filters/FilterCard.vue";
-import DayOfWeekFilter from "./filters/DayOfWeekFilter.vue";
-import ActivityTypeFilter from "./filters/ActivityTypeFilter.vue";
-import TimeRangeFilter from "./filters/TimeRangeFilter.vue";
-import FacilityTypeFilter from "./filters/FacilityTypeFilter.vue";
+  import { ref } from 'vue';
+  import FilterCard from "./filters/FilterCard.vue";
+  import DayOfWeekFilter from "./filters/DayOfWeekFilter.vue";
+  import ActivityTypeFilter from "./filters/ActivityTypeFilter.vue";
+  import TimeRangeFilter from "./filters/TimeRangeFilter.vue";
+  import FacilityTypeFilter from "./filters/FacilityTypeFilter.vue";
 
 
-/* ------------------ Estados ------------------ */
-const dayFilterOpen = ref(false);
-const activityTypeFilterOpen = ref(false);
-const activityTimeFilterOpen = ref(false);
-const facilityTypeFilterOpen = ref(false);
-const facilityTimeFilterOpen = ref(false);
+  const activeTab = ref('activities');
 
-const language = ref<"es" | "en">("es");
+  const dayFilterOpen = ref(false);
+  const activityTypeFilterOpen = ref(false);
+  const activityTimeFilterOpen = ref(false);
+  const facilityTypeFilterOpen = ref(false);
+  const facilityTimeFilterOpen = ref(false);
 
-const selectedDays = ref<string[]>([]);
-const selectedActivityTypes = ref<string[]>([]);
-const activityStartTime = ref("");
-const activityEndTime = ref("");
+  defineProps<{
+    t: Record<string, string>
+  }>();
 
-const selectedFacilityTypes = ref<string[]>([]);
-const facilityStartTime = ref("");
-const facilityEndTime = ref("");
-
-/* ------------------ Traducciones ------------------ */
-const translations = {
-  es: {
-    home: "Inicio",
-    forum: "Foro",
-    contact: "Contacto",
-    faq: "FAQ",
-    login: "Log-in",
-    welcome: "Bienvenido al Polideportivo XX",
-    welcome2: "Inicia sesión para acceder a todas las funcionalidades",
-    searchPlaceholder: "Buscar actividades o instalaciones...",
-    searchButton: "Buscar",
-    filterBy: "Filtrar por",
-    activities: "Actividades",
-    facilities: "Instalaciones",
-    dayOfWeek: "Día de la semana",
-    activityType: "Tipo de actividad",
-    sessionTime: "Horario de sesión",
-    facilityType: "Tipo de instalación",
-    openingHours: "Horario de apertura",
-  },
-  en: {
-    home: "Home",
-    forum: "Forum",
-    contact: "Contact",
-    faq: "FAQ",
-    login: "Log-in",
-    welcome: "Welcome to Sports Center XX",
-    welcome2: "Log in to access all features",
-    searchPlaceholder: "Search activities or facilities...",
-    searchButton: "Search",
-    filterBy: "Filter by",
-    activities: "Activities",
-    facilities: "Facilities",
-    dayOfWeek: "Day of the week",
-    activityType: "Activity type",
-    sessionTime: "Session time",
-    facilityType: "Facility type",
-    openingHours: "Opening hours",
-  },
-};
-
-const t = computed(() => translations[language.value]);
-
-const toggleLanguage = () => {
-  language.value = language.value === "es" ? "en" : "es";
-};
+  const selectedDays = ref<string[]>([]);
+  const selectedActivityTypes = ref<string[]>([]);
+  const activityStartTime = ref("");
+  const activityEndTime = ref("");
+  const selectedFacilityTypes = ref<string[]>([]);
+  const facilityStartTime = ref("");
+  const facilityEndTime = ref("");
 </script>

@@ -9,6 +9,7 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
   },
   "dependencies": {
+    "bootstrap": "^5.3.8",
     "lucide-vue-next": "^0.562.0",
     "pinia": "^2.0.26",
     "vue": "^3.2.45",

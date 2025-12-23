@@ -1,7 +1,7 @@
 <script setup lang="ts">
 defineProps<{
   title: string;
-  icon: any;
+  icon?: any; // opcional
 }>();
 </script>
 
