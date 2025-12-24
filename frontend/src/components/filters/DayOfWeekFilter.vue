@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
 import Modal from "../ui/Modal.vue";
-import Button from "../ui/Button.vue";
 
 const props = defineProps<{
   open: boolean;
@@ -24,10 +23,9 @@ const days = [
   "Domingo",
 ];
 
-// Copia local de la selección para poder modificarla sin afectar el prop directamente
+// Copia local de la selección
 const localSelection = ref<string[]>([...props.selectedDays]);
 
-// Mantener la copia local sincronizada si cambia el prop
 watch(() => props.selectedDays, (newVal) => {
   localSelection.value = [...newVal];
 });
@@ -46,36 +44,35 @@ const apply = () => {
   emit("apply", localSelection.value);
   emit("update:open", false);
 };
-
-// Limpiar selección
-const clear = () => {
-  localSelection.value = [];
-};
 </script>
 
 <template>
   <Modal :open="open" @update:open="emit('update:open', $event)">
-    <h3 class="text-xl font-semibold mb-4">Día de la semana</h3>
+    <h3 class="fs-4 fw-semibold mb-4 mt-4">
+      Día de la semana
+    </h3>
 
     <!-- Botones para cada día -->
-    <div class="grid grid-cols-2 gap-3 mb-6">
+    <div class="d-grid gap-3 mb-4">
       <button
         v-for="day in days"
         :key="day"
-        @click="toggleDay(day)"
-        class="rounded-xl px-4 py-2 border transition"
+        type="button"
+        class="btn text-start"
         :class="localSelection.includes(day)
-          ? 'bg-blue-600 text-white'
-          : 'bg-white text-slate-700 hover:bg-slate-100'"
+          ? 'btn-primary'
+          : 'btn-outline-secondary'"
+        @click="toggleDay(day)"
       >
         {{ day }}
       </button>
     </div>
 
     <!-- Botones de acción -->
-    <div class="flex justify-between">
-      <Button variant="outline" @click="clear">Limpiar</Button>
-      <Button @click="apply">Aplicar</Button>
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-primary px-3" @click="apply()">
+        Aplicar
+      </button>
     </div>
   </Modal>
 </template>
