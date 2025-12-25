@@ -1,6 +1,11 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { ref, watch, inject, type Ref } from "vue";
 import Modal from "../ui/Modal.vue";
+import type { Language } from "../../useI18N";
+import { useI18n } from "../../useI18N";
+
+const language = inject<Ref<Language>>("language")!;
+const t = useI18n(language);
 
 const props = defineProps<{
   open: boolean;
@@ -14,13 +19,13 @@ const emit = defineEmits<{
 
 // Lista de días de la semana
 const days = [
-  "Lunes",
-  "Martes",
-  "Miércoles",
-  "Jueves",
-  "Viernes",
-  "Sábado",
-  "Domingo",
+  t.value.monday,
+  t.value.tuesday,
+  t.value.wednesday,
+  t.value.thursday,
+  t.value.friday,
+  t.value.saturday,
+  t.value.sunday,
 ];
 
 // Copia local de la selección
@@ -49,7 +54,7 @@ const apply = () => {
 <template>
   <Modal :open="open" @update:open="emit('update:open', $event)">
     <h3 class="fs-4 fw-semibold mb-4 mt-4">
-      Día de la semana
+      {{t.dayOfWeek}}
     </h3>
 
     <!-- Botones para cada día -->
@@ -71,7 +76,7 @@ const apply = () => {
     <!-- Botones de acción -->
     <div class="d-flex justify-content-end">
       <button class="btn btn-primary px-3" @click="apply()">
-        Aplicar
+        {{t.apply}}
       </button>
     </div>
   </Modal>

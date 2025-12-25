@@ -1,7 +1,11 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { watch, type Ref, ref, inject } from 'vue';
 import Modal from "../ui/Modal.vue";
-import Button from "../ui/Button.vue";
+import type { Language } from "../../useI18N";
+import { useI18n } from "../../useI18N";
+
+const language = inject<Ref<Language>>("language")!;
+const t = useI18n(language);
 
 const props = defineProps<{
   open: boolean;
@@ -50,7 +54,7 @@ const apply = () => {
   <Modal :open="open" @update:open="emit('update:open', $event)">
     
     <h3 class="fs-5 fw-semibold mb-3 mt-4">
-      Tipo de instalación
+      {{t.facilityType}}
     </h3>
 
     <div class="d-grid gap-3 mb-4">
@@ -70,7 +74,7 @@ const apply = () => {
 
     <div class="d-flex justify-content-end">
       <button class="btn btn-primary px-3" @click="apply()">
-        Aplicar
+        {{t.apply}}
       </button>
     </div>
 

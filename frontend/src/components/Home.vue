@@ -169,33 +169,33 @@
       <!-- ESTADISTICAS -->
       <div class="mt-5">
         <h2 class="fs-2 fw-semibold text-center text-dark mb-4">
-          Nuestros números
+          {{t.statsTitle}}
         </h2>
 
         <div class="row text-center gy-4">
           <div class="col-6 col-md-4 col-lg">
             <p class="fs-3 text-primary fw-bold mb-1">+50</p>
-            <p class="fs-5 text-secondary mb-0">Actividades</p>
+            <p class="fs-5 text-secondary mb-0">{{t.activities}}</p>
           </div>
 
           <div class="col-6 col-md-4 col-lg">
             <p class="fs-3 text-primary fw-bold mb-1">15</p>
-            <p class="fs-5 text-secondary mb-0">Instalaciones</p>
+            <p class="fs-5 text-secondary mb-0">{{t.facilities}}</p>
           </div>
 
           <div class="col-6 col-md-4 col-lg">
             <p class="fs-3 text-primary fw-bold mb-1">5</p>
-            <p class="fs-5 text-secondary mb-0">Pabellones</p>
+            <p class="fs-5 text-secondary mb-0">{{t.pavilions}}</p>
           </div>
 
           <div class="col-6 col-md-4 col-lg">
             <p class="fs-3 text-primary fw-bold mb-1">+10</p>
-            <p class="fs-5 text-secondary mb-0">Deportes</p>
+            <p class="fs-5 text-secondary mb-0">{{t.sports}}</p>
           </div>
 
           <div class="col-6 col-md-4 col-lg">
             <p class="fs-3 text-primary fw-bold mb-1">+3000</p>
-            <p class="fs-5 text-secondary mb-0">Usuarios</p>
+            <p class="fs-5 text-secondary mb-0">{{t.users}}</p>
           </div>
         </div>
       </div>
@@ -204,7 +204,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, type Ref, ref, inject } from 'vue';
 import {
   Calendar,
   Activity,
@@ -217,14 +217,23 @@ import ActivityTypeFilter from "./filters/ActivityTypeFilter.vue";
 import TimeRangeFilter from "./filters/TimeRangeFilter.vue";
 import FacilityTypeFilter from "./filters/FacilityTypeFilter.vue";
 
+/* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
+import type { Language } from "../useI18N";
+import { useI18n } from "../useI18N";
+
+const language = inject<Ref<Language>>("language")!;
+const t = useI18n(language);
+
+
+/* Orden de los dias dependiendo del idioma */
 const weekOrder = [
-  "Lunes",
-  "Martes",
-  "Miércoles",
-  "Jueves",
-  "Viernes",
-  "Sábado",
-  "Domingo",
+  t.value.monday,
+  t.value.tuesday,
+  t.value.wednesday,
+  t.value.thursday,
+  t.value.friday,
+  t.value.saturday,
+  t.value.sunday,
 ];
 
 const activeTab = ref('activities');
@@ -266,8 +275,4 @@ const activar = (tipo: string) => {
     facilityTimeFilterOpen.value = true;
   }
 };
-
-defineProps<{
-  t: Record<string, string>
-}>();
 </script>

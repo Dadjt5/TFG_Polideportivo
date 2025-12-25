@@ -34,35 +34,37 @@
         <li class="nav-item fs-5">
           <button
             class="btn btn-link nav-link fs-4 px-3 text-white"
-            @click="$emit('toggle-language')"
+            @click="toggleLanguage"
             :title="language === 'es' ? 'Switch to English' : 'Cambiar a Español'"
           >
-            {{ language === 'es' ? '🇪🇸' : '🇬🇧' }}
+            {{ language === "es" ? "🇪🇸" : "🇬🇧" }}
           </button>
         </li>
       </ul>
-
     </div>
   </nav>
 </template>
 
 <script setup lang="ts">
-defineProps<{
-  language: "es" | "en";
-  t: Record<string, string>;
-}>();
+import { inject, type Ref } from "vue";
+import type { Language } from "../useI18N";
+import { useI18n } from "../useI18N";
 
-defineEmits(["toggle-language"]);
+const language = inject<Ref<Language>>("language")!;
+const t = useI18n(language);
+
+const toggleLanguage = () => {
+  language.value = language.value === "es" ? "en" : "es";
+};
 </script>
 
 <style scoped>
 .navbar .nav-link {
   cursor: pointer;
-  text-decoration: none;
   transition: color 0.2s ease-in-out;
 }
 
 .navbar .nav-link:hover {
-  color: #0d6efd; /* primary de Bootstrap */
+  color: #0d6efd;
 }
 </style>
