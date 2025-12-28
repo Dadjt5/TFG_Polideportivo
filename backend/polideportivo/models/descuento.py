@@ -20,3 +20,7 @@ class Descuento(models.Model):
 
     def __str__(self):
         return f'{self.nombre} del {self.porcentaje}% para {self.tipoInstalacion}'
+
+    @classmethod
+    def contar(cls):
+        return cls.objects.count()

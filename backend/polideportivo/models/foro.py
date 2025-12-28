@@ -52,6 +52,10 @@ class Canal(models.Model):
 
     def __str__(self):
         return f'Canal para {self.titulo} con {self.numeroParticipantes} participantes'
+    
+    @classmethod
+    def contar(cls):
+        return cls.objects.count()
 
     def expulsarUsuario(self, usuarioFinal):
         try:

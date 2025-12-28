@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from .agenda import Agenda
 from .constantes import TipoInstalacion
 
 
@@ -13,6 +14,10 @@ class Pabellon(models.Model):
 
     def __str__(self):
         return f'{self.nombre}, localizado en {self.direccion}'
+    
+    @classmethod
+    def contar(cls):
+        return cls.objects.count()
 
 
 class Instalacion(models.Model):
@@ -30,3 +35,26 @@ class Instalacion(models.Model):
 
     def __str__(self):
         return f'{self.nombre}, ubicado en el {self.pabellon}'
+    
+    @classmethod
+    def contar(cls):
+        return cls.objects.count()
+
+    @classmethod
+    def buscar(cls, nombre=None, horaInicio=None, horaFin=None):
+        res = cls.objects.all()
+
+        if nombre:
+            res = res.filter(nombre__icontains=nombre)
+
+        if tipo:
+            tipo = tipo.split(',')
+            res = res.filter(tipoInstalacion__in=tipo)
+
+        if horaInicio:
+            res = res.filter(agenda__horaApertura__lte=horaInicio)
+
+        if horaFin:
+            res = res.filter(agenda__horaCierre__gte=horaFin)
+
+        return res.distinct()

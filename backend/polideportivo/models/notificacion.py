@@ -16,3 +16,7 @@ class Notificacion(models.Model):
 
     def __str__(self):
         return f'{self.titulo}'
+
+    @classmethod
+    def contar(cls):
+        return cls.objects.count()

@@ -10,7 +10,7 @@ class Agenda(models.Model):
     horaCierre = models.TimeField(default=time(20, 0))
     abierto = models.BooleanField(default=True)
     
-    instalacion = models.ForeignKey('Instalacion', on_delete=models.RESTRICT)
+    instalacion = models.ForeignKey('Instalacion', related_name="agenda", on_delete=models.RESTRICT)
 
     def __str__(self):
         return f''

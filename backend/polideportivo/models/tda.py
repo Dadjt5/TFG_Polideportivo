@@ -15,3 +15,7 @@ class TDA(models.Model):
     
     def __str__(self):
         return f'Tarjeta deportiva anual con fecha de inicio: {self.fechaInicio} y fecha de expiracion: {self.fechaExpiracion}'
+
+    @classmethod
+    def contar(cls):
+        return cls.objects.count()

@@ -16,3 +16,7 @@ class Pago(models.Model):
 
     def __str__(self):
         return f'Pago {self.concepto}, de coste {self.coste} en estado {self.estadoPago}'
+
+    @classmethod
+    def contar(cls):
+        return cls.objects.count()

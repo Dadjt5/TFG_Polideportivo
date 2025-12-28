@@ -8,6 +8,10 @@ class Favorito(models.Model):
     usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.RESTRICT)
     actividad = models.ForeignKey('Actividad', on_delete=models.RESTRICT, null=True)
     instalacion = models.ForeignKey('Instalacion', on_delete=models.RESTRICT, null=True)
+    
+    @classmethod
+    def contar(cls):
+        return cls.objects.count()
 
     class Meta:
         unique_together = ('usuario', 'actividad', 'instalacion')

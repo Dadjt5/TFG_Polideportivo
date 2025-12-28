@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 import math
+from django.db.models import Q
 
 from .constantes import TipoActividad, TipoReserva, Terreno, Estado, Periodo, Dia
 
@@ -38,12 +39,39 @@ class Actividad(models.Model):
             horas += sesion.horario.numeroHoras
 
         return math.ceil(horas)
+    
+    @classmethod
+    def contar(cls):
+        return cls.objects.count()
+    
+    @classmethod
+    def buscar(cls, nombre=None, tipo=None, horaInicio=None, horaFin=None, dias=None):
+        res = cls.objects.all()
+
+        if nombre:
+            res = res.filter(nombre__icontains=nombre)
+
+        if tipo:
+            tipo = tipo.split(',')
+            res = res.filter(tipoActividad__in=tipo)
+
+        if horaInicio:
+            res = res.filter(sesion__horario__horaInicio__lte=horaInicio)
+
+        if horaFin:
+            res = res.filter(sesion__horario__horaFin__gte=horaFin)
+
+        if dias:
+            dias = dias.split(',')
+            res = res.filter(sesion__dia__in=dias)
+
+        return res.distinct()
 
 
 class Sesion(models.Model):
     """Modelo para representar una sesion de una actividad"""
 
-    actividad = models.ForeignKey(Actividad, on_delete=models.RESTRICT)
+    actividad = models.ForeignKey(Actividad, related_name="sesion", on_delete=models.RESTRICT)
     monitor = models.ForeignKey('Monitor', on_delete=models.RESTRICT)
     horario = models.ForeignKey('Horario', on_delete=models.RESTRICT)    
 
@@ -60,6 +88,10 @@ class Sesion(models.Model):
             return True
         except:
             return False
+
+    @classmethod
+    def contar(cls):
+        return cls.objects.count()
 
 
 class Asistencia(models.Model):

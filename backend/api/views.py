@@ -29,9 +29,52 @@ from polideportivo.models import (
     ReservaActividad, Alquiler, Administrador, User, CompraBono, CompraAbono
 )
 
+# Estadisticas de base
+class EstadisticasView(APIView):
+    permission_classes = [AllowAny]
+    
+    def get(self, request):
+        data = {
+            "instalaciones": Instalacion.contar()
+            "instalaciones": Instalacion.contar()
+            
+        }
 
+# Busquedas
 
-# --- HAY QUE ESTABLECER LOS PERMISOS PARA QUE SEAN PARA ADMIN PARA CADA TIPO DE ADMIN Y A LO MEJOR HACER UN MODELO ADMIN CON CAMPO ROL
+class BuscarView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        nombre = request.query_params.get('busqueda')
+        horaApertura = request.query_params.get('horaApertura')
+        horaCierre = request.query_params.get('horaCierre')
+        horaInicioSesion = request.query_params.get('horaInicioSesion')
+        horaFinSesion = request.query_params.get('horaFinSesion')
+
+        dias = request.query_params.get('dias')
+        if dias:
+            dias = dias.split(',')
+
+        tiposActividad = request.query_params.get('tipoActividad')
+        if tiposActividad:
+            tiposActividad = tiposActividad.split(',')
+
+        tiposInstalacion = request.query_params.get('tipoInstalacion')
+        if tiposInstalacion:
+            tiposInstalacion = tiposInstalacion.split(',')
+
+        instalaciones = Instalacion.buscar(nombre,tiposInstalacion,horaApertura,horaCierre)
+
+        actividades = Actividad.buscar(nombre,tiposActividad,horaInicioSesion,horaFinSesion,dias)
+
+        data = {
+            "instalaciones": InstalacionSerializer(instalaciones, many=True).data,
+            "actividades": ActividadSerializer(actividades, many=True).data,
+        }
+
+        return Response(data)
+
 
 # ----------------
 # Abonos

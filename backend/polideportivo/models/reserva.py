@@ -22,6 +22,10 @@ class ReservaActividad(Reserva):
 
     def __str__(self):
         return f'Reserva de {self.actividad}'
+    
+    @classmethod
+    def contar(cls):
+        return cls.objects.count()
 
 
 class Alquiler(Reserva):
@@ -35,3 +39,7 @@ class Alquiler(Reserva):
 
     def __str__(self):
         return f'Alquiler de {self.instalacion}, en {self.fecha}'
+    
+    @classmethod
+    def contar(cls):
+        return cls.objects.count()

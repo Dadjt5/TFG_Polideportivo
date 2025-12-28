@@ -31,3 +31,7 @@ class UsuarioFinal(Usuario):
 
     def marcarFavorito(self, instalacion):
         Favorito.objects.get_or_create(usuario=self, actividad=None, instalacion=instalacion)
+
+    @classmethod
+    def contar(cls):
+        return cls.objects.count()

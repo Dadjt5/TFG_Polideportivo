@@ -5,4 +5,6 @@ from .usuario import Usuario
 
 class Monitor(Usuario):
     """Modelo para representar al monitor"""
-    pass
+    @classmethod
+    def contar(cls):
+        return cls.objects.count()

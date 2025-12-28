@@ -29,3 +29,7 @@ class CompraBono(models.Model):
     usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.RESTRICT)
     bono = models.ForeignKey('Bono', on_delete=models.RESTRICT, related_name="compras_bono")
     pago = models.OneToOneField('Pago', on_delete=models.RESTRICT)
+
+    @classmethod
+    def contar(cls):
+        return cls.objects.count()
