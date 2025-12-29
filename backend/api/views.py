@@ -29,38 +29,44 @@ from polideportivo.models import (
     ReservaActividad, Alquiler, Administrador, User, CompraBono, CompraAbono
 )
 
-# Estadisticas de base
+# Estadisticas de home
 class EstadisticasView(APIView):
     permission_classes = [AllowAny]
-    
+    authentication_classes = []
+
     def get(self, request):
         data = {
-            "instalaciones": Instalacion.contar()
-            "instalaciones": Instalacion.contar()
-            
+            "instalaciones": Instalacion.contar(),
+            "actividades": Actividad.contar(),
+            "pabellones": Pabellon.contar(),
+            "deportes": Deporte.contar(),
+            "usuarios": UsuarioFinal.contar()
         }
 
-# Busquedas
+        return Response(data)
 
+
+# Busquedas
 class BuscarView(APIView):
     permission_classes = [AllowAny]
+    authentication_classes = []
 
     def get(self, request):
         nombre = request.query_params.get('busqueda')
-        horaApertura = request.query_params.get('horaApertura')
-        horaCierre = request.query_params.get('horaCierre')
-        horaInicioSesion = request.query_params.get('horaInicioSesion')
-        horaFinSesion = request.query_params.get('horaFinSesion')
+        horaApertura = request.query_params.get('tiempoInicioInstalacion')
+        horaCierre = request.query_params.get('tiempoFinInstalacion')
+        horaInicioSesion = request.query_params.get('tiempoInicioActividad')
+        horaFinSesion = request.query_params.get('tiempoFinActividad')
 
         dias = request.query_params.get('dias')
         if dias:
             dias = dias.split(',')
 
-        tiposActividad = request.query_params.get('tipoActividad')
+        tiposActividad = request.query_params.get('tiposActividad')
         if tiposActividad:
             tiposActividad = tiposActividad.split(',')
 
-        tiposInstalacion = request.query_params.get('tipoInstalacion')
+        tiposInstalacion = request.query_params.get('tiposInstalacion')
         if tiposInstalacion:
             tiposInstalacion = tiposInstalacion.split(',')
 

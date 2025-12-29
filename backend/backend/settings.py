@@ -169,7 +169,7 @@ USE_I18N = True
 
 USE_TZ = True
 
-AUTH_USER_MODEL = 'api.User'
+AUTH_USER_MODEL = 'polideportivo.User'
 
 # The absolute path to the directory where collectstatic will collect
 # static files for deployment.

@@ -14,7 +14,7 @@ class Favorito(models.Model):
         return cls.objects.count()
 
     class Meta:
-        unique_together = ('usuario', 'actividad', 'instalacion')
+        unique_together = ('usuarioFinal', 'actividad', 'instalacion')
         
     def __str__(self):
         if self.actividad:

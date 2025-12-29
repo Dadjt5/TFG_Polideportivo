@@ -20,12 +20,11 @@
 
             <input
               type="text"
-              v-model="textoBusqueda"
               class="form-control border-0 fs-5"
               :placeholder="t.searchPlaceholder"
             />
 
-            <button class="btn btn-primary btn-lg px-4"  @click="buscar">
+            <button class="btn btn-primary btn-lg px-4">
               {{ t.searchButton }}
             </button>
           </div>
@@ -166,50 +165,13 @@
         title="Horario de apertura"
         description="Selecciona el horario de la instalación."
       />
-
-      <!-- ESTADISTICAS -->
-      <div class="mt-5">
-        <h2 class="fs-2 fw-semibold text-center text-dark mb-4">
-          {{t.statsTitle}}
-        </h2>
-
-        <div v-if="loading" class="text-center fs-4">Cargando...</div>
-        <div v-else-if="error" class="text-center fs-4">{{ error }}</div>
-
-        <div v-else class="row text-center gy-4">
-          <div class="col-6 col-md-4 col-lg">
-            <p class="fs-3 text-primary fw-bold mb-1">{{ estadisticas.actividades }}</p>
-            <p class="fs-5 text-secondary mb-0">{{t.activities}}</p>
-          </div>
-
-          <div class="col-6 col-md-4 col-lg">
-            <p class="fs-3 text-primary fw-bold mb-1">{{ estadisticas.instalaciones }}</p>
-            <p class="fs-5 text-secondary mb-0">{{t.facilities}}</p>
-          </div>
-
-          <div class="col-6 col-md-4 col-lg">
-            <p class="fs-3 text-primary fw-bold mb-1">{{ estadisticas.pabellones }}</p>
-            <p class="fs-5 text-secondary mb-0">{{t.pavilions}}</p>
-          </div>
-
-          <div class="col-6 col-md-4 col-lg">
-            <p class="fs-3 text-primary fw-bold mb-1">{{ estadisticas.deportes }}</p>
-            <p class="fs-5 text-secondary mb-0">{{t.sports}}</p>
-          </div>
-
-          <div class="col-6 col-md-4 col-lg">
-            <p class="fs-3 text-primary fw-bold mb-1">{{ estadisticas.usuarios }}</p>
-            <p class="fs-5 text-secondary mb-0">{{t.users}}</p>
-          </div>
-        </div>
-      </div>
     </main>
   </div>
 </template>
 
 <script setup lang="ts">
+import { useRoute } from 'vue-router'
 import { computed, type Ref, ref, inject, onMounted } from 'vue';
-import { useRouter } from 'vue-router'
 import {
   Calendar,
   Activity,
@@ -223,26 +185,30 @@ import TimeRangeFilter from "./filters/TimeRangeFilter.vue";
 import FacilityTypeFilter from "./filters/FacilityTypeFilter.vue";
 
 /* Importamos las comunicaciones con el backend */
-import { getEstadisticas } from "../services/estadisticasService";
+import { getBusqueda } from "../services/buscarService";
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
 import type { Language } from "../useI18N";
 import { useI18n } from "../useI18N";
-
-const router = useRouter()
-const textoBusqueda = ref('')
 
 const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);
 const loading = ref(true);
 const error = ref("");
 
-const estadisticas = ref({
-  actividades: 0,
-  instalaciones: 0,
-  pabellones: 0,
-  deportes: 0,
-  usuarios: 0,
+const route = useRoute()
+  
+const busqueda = route.query.busqueda || ''
+const tiposActividad = route.query.tiposActividad || ''
+const tiposInstalacion = route.query.tiposInstalacion || ''
+const tiempoInicioActividad = route.query.tiempoInicioActividad || ''
+const tiempoFinActividad = route.query.tiempoFinActividad || ''
+const tiempoInicioInstalacion = route.query.tiempoInicioInstalacion || ''
+const tiempoFinInstalacion = route.query.tiempoFinInstalacion || ''
+
+const resultados = ref({
+  actividades: null,
+  instalaciones: null
 });
 
 /* Orden de los dias dependiendo del idioma */
@@ -276,32 +242,6 @@ const orderedSelectedDays = computed(() =>
   weekOrder.filter(day => selectedDays.value.includes(day))
 );
 
-function buscar() {
-  if textoBusqueda != '':
-    busqueda: textoBusqueda.value,
-      dias: selectedDays.value,
-      tiposActividad: selectedActivityTypes.value,
-      tiposInstalacion: selectedFacilityTypes.value,
-      tiempoInicioActividad: activityStartTime.value,
-      tiempoFinActividad: activityEndTime.value,
-      tiempoInicioInstalacion: facilityStartTime.value,
-      tiempoFinInstalacion: facilityEndTime.value,
-  
-  router.push({
-    path: '/buscar',
-    query: {
-      busqueda: textoBusqueda.value,
-      dias: selectedDays.value,
-      tiposActividad: selectedActivityTypes.value,
-      tiposInstalacion: selectedFacilityTypes.value,
-      tiempoInicioActividad: activityStartTime.value,
-      tiempoFinActividad: activityEndTime.value,
-      tiempoInicioInstalacion: facilityStartTime.value,
-      tiempoFinInstalacion: facilityEndTime.value,
-    }
-  })
-}
-
 const activar = (tipo: string) => {
   dayFilterOpen.value = false;
   activityTypeFilterOpen.value = false;
@@ -323,11 +263,10 @@ const activar = (tipo: string) => {
 };
 
 onMounted(async () => {
-  textoBusqueda.value=''
   try {
-    estadisticas.value = await getEstadisticas();
+    resultados.value = await getBusqueda();
   } catch (err) {
-    error.value = "No se han podido cargar las estadisticas";
+    error.value = "No se han encontrado resultados";
     console.error(err);
   } finally {
     loading.value = false;
