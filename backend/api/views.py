@@ -58,15 +58,15 @@ class BuscarView(APIView):
         horaInicioSesion = request.query_params.get('tiempoInicioActividad')
         horaFinSesion = request.query_params.get('tiempoFinActividad')
 
-        dias = request.query_params.get('dias')
+        dias = request.query_params.getlist('dias')
         if dias:
             dias = dias.split(',')
 
-        tiposActividad = request.query_params.get('tiposActividad')
+        tiposActividad = request.query_params.getlist('tiposActividad')
         if tiposActividad:
             tiposActividad = tiposActividad.split(',')
 
-        tiposInstalacion = request.query_params.get('tiposInstalacion')
+        tiposInstalacion = request.query_params.getlist('tiposInstalacion')
         if tiposInstalacion:
             tiposInstalacion = tiposInstalacion.split(',')
 

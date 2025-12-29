@@ -23,6 +23,7 @@
               v-model="textoBusqueda"
               class="form-control border-0 fs-5"
               :placeholder="t.searchPlaceholder"
+              @keyup.enter="buscar"
             />
 
             <button class="btn btn-primary btn-lg px-4"  @click="buscar">
@@ -276,29 +277,58 @@ const orderedSelectedDays = computed(() =>
   weekOrder.filter(day => selectedDays.value.includes(day))
 );
 
+
+type BusquedaCompleta = {
+  busqueda?: string
+  dias?: string[]
+  tiposActividad?: string[]
+  tiempoInicioActividad?: string
+  tiempoFinActividad?: string
+  tiposInstalacion?: string[]
+  tiempoInicioInstalacion?: string
+  tiempoFinInstalacion?: string
+}
+
 function buscar() {
-  if textoBusqueda != '':
-    busqueda: textoBusqueda.value,
-      dias: selectedDays.value,
-      tiposActividad: selectedActivityTypes.value,
-      tiposInstalacion: selectedFacilityTypes.value,
-      tiempoInicioActividad: activityStartTime.value,
-      tiempoFinActividad: activityEndTime.value,
-      tiempoInicioInstalacion: facilityStartTime.value,
-      tiempoFinInstalacion: facilityEndTime.value,
+  const busquedaCompleta: BusquedaCompleta = {}
+
+  /* Controlamos la existencia de cada filtro para no enviarlo en caso de no necesitarlo */
+
+  if(textoBusqueda.value != '') {
+    busquedaCompleta["busqueda"] = textoBusqueda.value
+  }
+
+  if(selectedDays.value.length > 0) {
+    busquedaCompleta["dias"] = selectedDays.value
+  }
+
+  if(selectedActivityTypes.value.length > 0) {
+    busquedaCompleta["tiposActividad"] = selectedActivityTypes.value
+  }
+
+  if(selectedFacilityTypes.value.length > 0) {
+    busquedaCompleta["tiposInstalacion"] = selectedFacilityTypes.value
+  }
   
+  if(activityStartTime.value != '') {
+    busquedaCompleta["tiempoInicioActividad"] = activityStartTime.value
+  }
+
+  if(activityEndTime.value != '') {
+    busquedaCompleta["tiempoFinActividad"] = activityEndTime.value
+  }
+
+  if(facilityStartTime.value != '') {
+    busquedaCompleta["tiempoInicioInstalacion"] = facilityStartTime.value
+  }
+
+  if(facilityEndTime.value != '') {
+    busquedaCompleta["tiempoFinInstalacion"] = facilityEndTime.value
+  }
+
   router.push({
     path: '/buscar',
-    query: {
-      busqueda: textoBusqueda.value,
-      dias: selectedDays.value,
-      tiposActividad: selectedActivityTypes.value,
-      tiposInstalacion: selectedFacilityTypes.value,
-      tiempoInicioActividad: activityStartTime.value,
-      tiempoFinActividad: activityEndTime.value,
-      tiempoInicioInstalacion: facilityStartTime.value,
-      tiempoFinInstalacion: facilityEndTime.value,
-    }
+    query: busquedaCompleta
   })
 }
 

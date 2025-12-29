@@ -41,7 +41,7 @@ class Instalacion(models.Model):
         return cls.objects.count()
 
     @classmethod
-    def buscar(cls, nombre=None, horaInicio=None, horaFin=None):
+    def buscar(cls, nombre=None, tipo=None, horaInicio=None, horaFin=None):
         res = cls.objects.all()
 
         if nombre:

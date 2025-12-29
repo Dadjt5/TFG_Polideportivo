@@ -6,38 +6,29 @@
 
       <!-- INTRO -->
       <div class="text-center mt-5 mb-4">
-        <h1 class="fs-1 fw-bold text-dark">
-          {{ t.welcome }}
-        </h1>
-        <p class="fs-5 text-secondary mt-2">
-          {{ t.welcome2 }}
-        </p>
 
         <!-- BUSQUEDAS -->
         <div class="container-fluid mt-4">
-          <div class="d-flex align-items-center bg-white rounded-3 shadow p-3 border gap-3">
+          <div class="d-flex align-items-center bg-white rounded-3 shadow p-2 border gap-3">
             <Search class="text-secondary"/>
 
             <input
               type="text"
               class="form-control border-0 fs-5"
               :placeholder="t.searchPlaceholder"
+              v-model="textoBusqueda"
+              @keyup.enter="buscar"
             />
 
-            <button class="btn btn-primary btn-lg px-4">
+            <button class="btn btn-primary btn-lg px-4" @click="buscar">
               {{ t.searchButton }}
             </button>
           </div>
         </div>
       </div>
 
-      <!-- FILTROS -->
-      <h2 class="fs-3 fw-semibold text-center text-dark mb-4">
-        {{ t.filterBy }}
-      </h2>
-
       <!-- TABS -->
-      <ul class="nav nav-tabs justify-content-center mb-4">
+      <ul class="nav nav-tabs justify-content-center mb-3">
         <li class="nav-item fs-5">
           <button
             class="nav-link"
@@ -165,13 +156,21 @@
         title="Horario de apertura"
         description="Selecciona el horario de la instalación."
       />
+
+      <ul v-for="inst in resultados.instalaciones">
+        <li>Instalaciones: {{ inst.nombre }}</li>
+      </ul>
+
+      <ul v-for="act in resultados.actividades">
+        <li>Actividades: {{ act.nombre }}</li>
+      </ul>
     </main>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useRoute } from 'vue-router'
-import { computed, type Ref, ref, inject, onMounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router'
+import { computed, type Ref, ref, inject, onMounted, watch } from 'vue';
 import {
   Calendar,
   Activity,
@@ -197,14 +196,7 @@ const loading = ref(true);
 const error = ref("");
 
 const route = useRoute()
-  
-const busqueda = route.query.busqueda || ''
-const tiposActividad = route.query.tiposActividad || ''
-const tiposInstalacion = route.query.tiposInstalacion || ''
-const tiempoInicioActividad = route.query.tiempoInicioActividad || ''
-const tiempoFinActividad = route.query.tiempoFinActividad || ''
-const tiempoInicioInstalacion = route.query.tiempoInicioInstalacion || ''
-const tiempoFinInstalacion = route.query.tiempoFinInstalacion || ''
+const router = useRouter()
 
 const resultados = ref({
   actividades: null,
@@ -262,9 +254,84 @@ const activar = (tipo: string) => {
   }
 };
 
+type BusquedaCompleta = {
+  busqueda?: string
+  dias?: string[]
+  tiposActividad?: string[]
+  tiempoInicioActividad?: string
+  tiempoFinActividad?: string
+  tiposInstalacion?: string[]
+  tiempoInicioInstalacion?: string
+  tiempoFinInstalacion?: string
+}
+
+function buscar() {
+  const busquedaCompleta: BusquedaCompleta = {}
+
+  /* Controlamos la existencia de cada filtro para no enviarlo en caso de no necesitarlo */
+
+  if(textoBusqueda.value != '') {
+    busquedaCompleta["busqueda"] = textoBusqueda.value
+  }
+
+  if(selectedDays.value.length > 0) {
+    busquedaCompleta["dias"] = selectedDays.value
+  }
+
+  if(selectedActivityTypes.value.length > 0) {
+    busquedaCompleta["tiposActividad"] = selectedActivityTypes.value
+  }
+
+  if(selectedFacilityTypes.value.length > 0) {
+    busquedaCompleta["tiposInstalacion"] = selectedFacilityTypes.value
+  }
+  
+  if(activityStartTime.value != '') {
+    busquedaCompleta["tiempoInicioActividad"] = activityStartTime.value
+  }
+
+  if(activityEndTime.value != '') {
+    busquedaCompleta["tiempoFinActividad"] = activityEndTime.value
+  }
+
+  if(facilityStartTime.value != '') {
+    busquedaCompleta["tiempoInicioInstalacion"] = facilityStartTime.value
+  }
+
+  if(facilityEndTime.value != '') {
+    busquedaCompleta["tiempoFinInstalacion"] = facilityEndTime.value
+  }
+
+  router.push({
+    path: '/buscar',
+    query: busquedaCompleta
+  })
+}
+
+watch(() =>
+  route.query,
+  async (newQuery) => {
+    loading.value = true
+    try {
+      resultados.value = await getBusqueda(newQuery)
+    } catch (err) {
+      error.value = "No se han encontrado resultados"
+    } finally {
+      loading.value = false
+    }
+  },
+  { immediate: true }
+)
+
+const textoBusqueda = ref("")
+
 onMounted(async () => {
+  if (route.query.busqueda) {
+    textoBusqueda.value = route.query.busqueda as string
+  }
+
   try {
-    resultados.value = await getBusqueda();
+    resultados.value = await getBusqueda(route.query);
   } catch (err) {
     error.value = "No se han encontrado resultados";
     console.error(err);
