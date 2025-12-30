@@ -128,6 +128,7 @@
         @update:open="activityTypeFilterOpen = $event"
         :selectedTypes="selectedActivityTypes"
         @apply="selectedActivityTypes = $event"
+        :tiposActividad="estadisticas.tiposActividad"
       />
 
       <TimeRangeFilter
@@ -157,16 +158,39 @@
         description="Selecciona el horario de la instalación."
       />
 
-      <ul v-for="inst in resultados.instalaciones">
-        <li>Instalaciones: {{ inst.nombre }}</li>
-      </ul>
+      <!-- RESULTADOS DE LA BUSQUEDA -->
+      <p class="fs-2 text-center mt-5 py-3" v-if="sinResultados">{{ t.noResults }}</p>
+      <div class="container-fluid mt-5 row" v-else>
+        <p class="fs-2 fw-semibold text-center">{{ t.activities }}</p>
+          <div
+            v-for="act in resultados.actividades"
+            :key="act.id"
+            class="col-12 col-sm-6 col-lg-4"
+          >
+          <ActivityCard
+            :icon="Activity"
+            :actividad="act"
+          />
+          </div>
+        </div>
 
-      <ul v-for="act in resultados.actividades">
-        <li>Actividades: {{ act.nombre }}</li>
-      </ul>
-    </main>
-  </div>
+        <p class="fs-2 fw-semibold text-center mt-4">{{ t.facilities }}</p>
+        <div class="row g-4">
+          <div
+            v-for="inst in resultados.instalaciones"
+            :key="inst.id"
+            class="col-12 col-sm-6 col-lg-4"
+          >
+          <FacilityCard
+            :icon="Building2"
+            :instalacion="inst"
+          />
+        </div>
+    </div>
+  </main>
+</div>
 </template>
+
 
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router'
@@ -178,6 +202,8 @@ import {
   Building2
 } from 'lucide-vue-next';
 import FilterCard from "./filters/FilterCard.vue";
+import FacilityCard from "./filters/FacilityCard.vue";
+import ActivityCard from "./filters/ActivityCard.vue";
 import DayOfWeekFilter from "./filters/DayOfWeekFilter.vue";
 import ActivityTypeFilter from "./filters/ActivityTypeFilter.vue";
 import TimeRangeFilter from "./filters/TimeRangeFilter.vue";
@@ -185,6 +211,7 @@ import FacilityTypeFilter from "./filters/FacilityTypeFilter.vue";
 
 /* Importamos las comunicaciones con el backend */
 import { getBusqueda } from "../services/buscarService";
+import { useEstadisticasStore } from "../stores/estadisticas";
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
 import type { Language } from "../useI18N";
@@ -192,16 +219,21 @@ import { useI18n } from "../useI18N";
 
 const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);
-const loading = ref(true);
+const sinResultados = ref(false)
 const error = ref("");
 
 const route = useRoute()
 const router = useRouter()
 
-const resultados = ref({
+interface Resultados {
+  actividades: any[] | null
+  instalaciones: any[] | null
+}
+
+const resultados = ref<Resultados>({
   actividades: null,
   instalaciones: null
-});
+})
 
 /* Orden de los dias dependiendo del idioma */
 const weekOrder = [
@@ -213,6 +245,9 @@ const weekOrder = [
   t.value.saturday,
   t.value.sunday,
 ];
+
+const estadisticasStore = useEstadisticasStore();
+const estadisticas = estadisticasStore.data;
 
 const activeTab = ref('activities');
 
@@ -311,13 +346,19 @@ function buscar() {
 watch(() =>
   route.query,
   async (newQuery) => {
-    loading.value = true
     try {
       resultados.value = await getBusqueda(newQuery)
+      if (resultados.value.actividades == null || resultados.value.instalaciones == null) {
+        sinResultados.value = true
+      } else {
+        if(resultados.value.actividades.length == 0 && resultados.value.instalaciones.length == 0) {
+          sinResultados.value = true
+        } else {
+          sinResultados.value = false
+        }
+      }
     } catch (err) {
       error.value = "No se han encontrado resultados"
-    } finally {
-      loading.value = false
     }
   },
   { immediate: true }
@@ -332,11 +373,16 @@ onMounted(async () => {
 
   try {
     resultados.value = await getBusqueda(route.query);
+    if (resultados.value.actividades == null || resultados.value.instalaciones == null) {
+      sinResultados.value = true
+    } else {
+      if(resultados.value.actividades.length == 0 && resultados.value.instalaciones.length == 0) {
+        sinResultados.value = true
+      }
+    }
   } catch (err) {
     error.value = "No se han encontrado resultados";
     console.error(err);
-  } finally {
-    loading.value = false;
   }
 })
 </script>

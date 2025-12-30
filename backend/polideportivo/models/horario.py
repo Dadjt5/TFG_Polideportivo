@@ -6,8 +6,8 @@ from django.utils.translation import gettext_lazy as _
 class Horario(models.Model):
     """Modelo para representar el horario de una sesion o un alquiler"""
 
-    horaInicio = models.TimeField(auto_now_add=True)
-    horaFin = models.TimeField(auto_now_add=True)
+    horaInicio = models.TimeField()
+    horaFin = models.TimeField()
     numeroHoras = models.FloatField(default=0.0)
 
     def __str__(self):

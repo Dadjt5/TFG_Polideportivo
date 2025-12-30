@@ -19,11 +19,11 @@ class Actividad(models.Model):
     nivel = models.CharField(max_length=64, blank=True)
     material = models.CharField(max_length=1024, blank=True)
     exterior = models.BooleanField(default=False)
-    
+
     deportes = models.ManyToManyField('Deporte', related_name="actividades")
     instalacion = models.ForeignKey('Instalacion', on_delete=models.RESTRICT)
     monitor = models.ForeignKey('Monitor', on_delete=models.RESTRICT)
-    
+
     tipoActividad = models.CharField(default=TipoActividad.OTROS, choices=TipoActividad.choices)
     tipoReserva = models.CharField(default=TipoReserva.NINGUNA, choices=TipoReserva.choices)
     terreno = models.CharField(default=Terreno.PISTA, choices=Terreno.choices)
@@ -32,18 +32,18 @@ class Actividad(models.Model):
 
     def __str__(self):
         return f'{self.nombre}, en la instalacion {self.instalacion}'
-    
+
     def calcularHorasSemanales(self):
         horas = 0.0
-        for sesion in self.sesion_set.all():
+        for sesion in self.sesion.all():
             horas += sesion.horario.numeroHoras
 
         return math.ceil(horas)
-    
+
     @classmethod
     def contar(cls):
         return cls.objects.count()
-    
+
     @classmethod
     def buscar(cls, nombre=None, tipo=None, horaInicio=None, horaFin=None, dias=None):
         res = cls.objects.all()
@@ -52,7 +52,6 @@ class Actividad(models.Model):
             res = res.filter(nombre__icontains=nombre)
 
         if tipo:
-            tipo = tipo.split(',')
             res = res.filter(tipoActividad__in=tipo)
 
         if horaInicio:
@@ -62,7 +61,6 @@ class Actividad(models.Model):
             res = res.filter(sesion__horario__horaFin__gte=horaFin)
 
         if dias:
-            dias = dias.split(',')
             res = res.filter(sesion__dia__in=dias)
 
         return res.distinct()
@@ -76,6 +74,20 @@ class Sesion(models.Model):
     horario = models.ForeignKey('Horario', on_delete=models.RESTRICT)    
 
     dia = models.CharField(default=Dia.SABADO, choices=Dia.choices)
+    
+    class Meta:
+        ordering = [
+            models.Case(
+                models.When(dia='lunes', then=0),
+                models.When(dia='martes', then=1),
+                models.When(dia='miércoles', then=2),
+                models.When(dia='jueves', then=3),
+                models.When(dia='viernes', then=4),
+                models.When(dia='sábado', then=5),
+                models.When(dia='domingo', then=6),
+                output_field=models.IntegerField(),
+            )
+        ]
 
     def __str__(self):
         return f'Sesion el {self.dia} de {self.actividad}'

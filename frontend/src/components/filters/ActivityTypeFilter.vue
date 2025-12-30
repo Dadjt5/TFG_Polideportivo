@@ -10,21 +10,13 @@ const t = useI18n(language);
 const props = defineProps<{
   open: boolean;
   selectedTypes: string[];
+  tiposActividad: string[];
 }>();
 
 const emit = defineEmits<{
   (e: "update:open", value: boolean): void;
   (e: "apply", value: string[]): void;
 }>();
-
-const types = [
-  "Fitness",
-  "Natación",
-  "Artes marciales",
-  "Deportes colectivos",
-  "Yoga",
-];
-
 
 const localSelection = ref<string[]>([]);
 
@@ -59,7 +51,7 @@ const apply = () => {
 
     <div class="d-grid gap-3 mb-4">
       <button
-        v-for="type in types"
+        v-for="type in tiposActividad"
         :key="type"
         type="button"
         class="btn text-start"

@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.utils import timezone
 from django.contrib.auth import get_user_model
 
 from polideportivo.models import (
@@ -6,7 +7,7 @@ from polideportivo.models import (
     Foro, Horario, Instalacion, ListaEspera, Asistencia, Canal, UsuarioCanal, 
     EntradaListaEspera, TarifaTDA, Monitor, Notificacion, Pago, TarifaActividad, 
     TarifaInstalacion, TDA, UsuarioFinal, AbonoDeportivo, AbonoVerano, Pabellon, 
-    ReservaActividad, Alquiler, Administrador, CompraBono, CompraAbono
+    ReservaActividad, Alquiler, Administrador, CompraBono, CompraAbono, Sesion
 )
 
 
@@ -67,10 +68,54 @@ class CompraAbonoSerializer(serializers.ModelSerializer):
 # --------------------
 
 class ActividadSerializer(serializers.ModelSerializer):
+    horasSemanales = serializers.SerializerMethodField()
+    nombreMonitor = serializers.SerializerMethodField()
+    dias = serializers.SerializerMethodField()
+
+
     class Meta:
         model = Actividad
-        fields = '__all__'
+    
+        fields = (
+            "id",
+            "nombre",
+            "tipoActividad",
+            "imagenURL",
+            "plazasMaximas",
+            "plazasReservadas",
+            "edadMinima",
+            "año",
+            "numeroCreditos",
+            "nivel",
+            "material",
+            "exterior",
+            "tipoReserva",
+            "terreno",
+            "periodo",
+            "estado",
+            "horasSemanales",
+            "nombreMonitor",
+            "dias"
+        )
 
+    def get_horasSemanales(self, obj):
+        return obj.calcularHorasSemanales()
+
+    def get_nombreMonitor(self, obj):
+        monitor = obj.monitor
+
+        if monitor:
+            return monitor.nombre
+        return None
+    
+    def get_dias(self, obj):
+        return ",".join(sesion.dia for sesion in obj.sesion.all())
+        
+
+class SesionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Sesion
+        fields = '__all__'
 
 class AsistenciaSerializer(serializers.ModelSerializer):
     class Meta:
@@ -180,16 +225,52 @@ class HorarioSerializer(serializers.ModelSerializer):
 # Instalaciones
 # --------------------
 
-class InstalacionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Instalacion
-        fields = '__all__'
-
-
 class PabellonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Pabellon
         fields = '__all__'
+
+class InstalacionSerializer(serializers.ModelSerializer):
+    pabellon = PabellonSerializer(read_only=True)
+    horaApertura = serializers.SerializerMethodField()
+    horaCierre = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Instalacion
+        fields = (
+            "id",
+            "nombre",
+            "tipoInstalacion",
+            "aforoMaximo",
+            "luz",
+            "imagenURL",
+            "porcentajeTDA",
+            "pabellon",
+            "horaApertura",
+            "horaCierre",
+        )
+
+    def get_horaApertura(self, obj):
+        hoy = timezone.localdate()
+        
+        # Controlamos solo mandar instalaciones que esten abiertas
+        agenda = obj.agenda.filter(fecha=hoy, abierto=True).first()
+
+        if agenda:
+            return agenda.horaApertura
+        
+        return None
+
+    def get_horaCierre(self, obj):
+        hoy = timezone.localdate()
+        
+        # Controlamos solo mandar instalaciones que esten abiertas
+        agenda = obj.agenda.filter(fecha=hoy, abierto=True).first()
+
+        if agenda:
+            return agenda.horaCierre
+        
+        return None
 
 
 # --------------------

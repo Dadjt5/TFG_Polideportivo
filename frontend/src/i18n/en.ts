@@ -15,6 +15,8 @@ export default {
 
     activities: "Activities",
     facilities: "Facilities",
+    activity: "Activity",
+    facility: "Facility",
     pavilions: "Pavilions",
 
     dayOfWeek: "Day of the week",
@@ -38,4 +40,10 @@ export default {
     statsTitle: "Our numbers",
     sports: "Sports",
     users: "Users",
+
+    noResults: "No results",
+    days: "Days",
+    places: "Places",
+    weekHours: "Weekly hours",
+    schedule: "Schedule"
 };

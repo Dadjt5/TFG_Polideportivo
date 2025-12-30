@@ -1,5 +1,5 @@
 from .abono import (Abono, AbonoDeportivo, AbonoVerano, CompraAbono)
-from .actividad import (Actividad, Asistencia)
+from .actividad import (Actividad, Asistencia, Sesion)
 from .agenda import Agenda
 from .bono import (Bono, CompraBono)
 from .configuracion import Configuracion

@@ -48,7 +48,6 @@ class Instalacion(models.Model):
             res = res.filter(nombre__icontains=nombre)
 
         if tipo:
-            tipo = tipo.split(',')
             res = res.filter(tipoInstalacion__in=tipo)
 
         if horaInicio:

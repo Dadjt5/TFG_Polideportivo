@@ -139,6 +139,7 @@
         @update:open="activityTypeFilterOpen = $event"
         :selectedTypes="selectedActivityTypes"
         @apply="selectedActivityTypes = $event"
+        :tiposActividad="estadisticas.tiposActividad"
       />
 
       <TimeRangeFilter
@@ -174,8 +175,7 @@
           {{t.statsTitle}}
         </h2>
 
-        <div v-if="loading" class="text-center fs-4">Cargando...</div>
-        <div v-else-if="error" class="text-center fs-4">{{ error }}</div>
+        <div v-if="error" class="text-center fs-4">{{ error }}</div>
 
         <div v-else class="row text-center gy-4">
           <div class="col-6 col-md-4 col-lg">
@@ -223,8 +223,8 @@ import ActivityTypeFilter from "./filters/ActivityTypeFilter.vue";
 import TimeRangeFilter from "./filters/TimeRangeFilter.vue";
 import FacilityTypeFilter from "./filters/FacilityTypeFilter.vue";
 
-/* Importamos las comunicaciones con el backend */
-import { getEstadisticas } from "../services/estadisticasService";
+/* Importamos las comunicaciones con el backend a traves de nuestro Store para guardar las estadisticas */
+import { useEstadisticasStore } from "../stores/estadisticas";
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
 import type { Language } from "../useI18N";
@@ -235,16 +235,7 @@ const textoBusqueda = ref('')
 
 const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);
-const loading = ref(true);
 const error = ref("");
-
-const estadisticas = ref({
-  actividades: 0,
-  instalaciones: 0,
-  pabellones: 0,
-  deportes: 0,
-  usuarios: 0,
-});
 
 /* Orden de los dias dependiendo del idioma */
 const weekOrder = [
@@ -276,7 +267,6 @@ const facilityEndTime = ref("");
 const orderedSelectedDays = computed(() =>
   weekOrder.filter(day => selectedDays.value.includes(day))
 );
-
 
 type BusquedaCompleta = {
   busqueda?: string
@@ -352,15 +342,24 @@ const activar = (tipo: string) => {
   }
 };
 
+const estadisticasStore = useEstadisticasStore();
+const estadisticas = ref({
+  instalaciones: 0,
+  actividades: 0,
+  pabellones: 0,
+  deportes: 0,
+  usuarios: 0,
+  tiposActividad: []
+});
+
 onMounted(async () => {
   textoBusqueda.value=''
   try {
-    estadisticas.value = await getEstadisticas();
+    await estadisticasStore.cargarEstadisticas();
+    estadisticas.value = estadisticasStore.data;
   } catch (err) {
     error.value = "No se han podido cargar las estadisticas";
     console.error(err);
-  } finally {
-    loading.value = false;
   }
 })
 </script>
