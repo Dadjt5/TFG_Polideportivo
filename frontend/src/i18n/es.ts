@@ -47,5 +47,15 @@ export default {
   days: "Días",
   places: "Plazas",
   weekHours: "Horas semanales",
-  schedule: "Horario"
+  schedule: "Horario",
+
+  loginPage: "Iniciar sesión",
+  instructions: "Introduce tu DNI o ID y contraseña para acceder.",
+  identifierPlaceholder: "DNI o ID",
+  passwordPlaceholder: "Contraseña",
+  forgotPassword: "¿Has olvidado tu contraseña?",
+  newUser: "¿Usuario nuevo?",
+  register: "Registrarse",
+  success: "Inicio de sesión correcto.",
+  error: "Usuario o contraseña incorrectos."
 };
