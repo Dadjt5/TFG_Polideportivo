@@ -157,6 +157,7 @@
         @update:open="facilityTypeFilterOpen = $event"
         :selectedTypes="selectedFacilityTypes"
         @apply="selectedFacilityTypes = $event"
+        :tiposInstalacion="estadisticas.tiposInstalacion"
       />
 
       <TimeRangeFilter
@@ -349,7 +350,8 @@ const estadisticas = ref({
   pabellones: 0,
   deportes: 0,
   usuarios: 0,
-  tiposActividad: []
+  tiposActividad: [],
+  tiposInstalacion: []
 });
 
 onMounted(async () => {

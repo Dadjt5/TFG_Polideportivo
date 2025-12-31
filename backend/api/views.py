@@ -35,10 +35,16 @@ class EstadisticasView(APIView):
     authentication_classes = []
 
     def get(self, request):
-        tipos_unicos = []
+        tiposActividad = []
+        tiposInstalacion = []
+
         for act in Actividad.objects.all():
-            if act.tipoActividad not in tipos_unicos:
-                tipos_unicos.append(act.tipoActividad)
+            if act.tipoActividad not in tiposActividad:
+                tiposActividad.append(act.tipoActividad)
+
+        for inst in Instalacion.objects.all():
+            if inst.tipoInstalacion not in tiposInstalacion:
+                tiposInstalacion.append(inst.tipoInstalacion)
 
         data = {
             "instalaciones": Instalacion.contar(),
@@ -46,7 +52,8 @@ class EstadisticasView(APIView):
             "pabellones": Pabellon.contar(),
             "deportes": Deporte.contar(),
             "usuarios": UsuarioFinal.contar(),
-            "tiposActividad": tipos_unicos
+            "tiposActividad": tiposActividad,
+            "tiposInstalacion": tiposInstalacion
         }
 
         return Response(data)
@@ -65,6 +72,8 @@ class BuscarView(APIView):
         horaFinSesion = request.query_params.get('tiempoFinActividad')
 
         dias = request.query_params.getlist('dias')
+        dias = [d.lower() for d in dias]
+
         tiposActividad = request.query_params.getlist('tiposActividad')
         tiposInstalacion = request.query_params.getlist('tiposInstalacion')
 

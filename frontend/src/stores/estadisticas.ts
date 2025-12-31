@@ -9,7 +9,8 @@ export const useEstadisticasStore = defineStore("estadisticas", () => {
     pabellones: 0,
     deportes: 0,
     usuarios: 0,
-    tiposActividad: []
+    tiposActividad: [],
+    tiposInstalacion:[]
   });
 
   const cargarEstadisticas = async () => {

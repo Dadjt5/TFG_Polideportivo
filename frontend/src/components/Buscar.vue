@@ -146,6 +146,7 @@
         @update:open="facilityTypeFilterOpen = $event"
         :selectedTypes="selectedFacilityTypes"
         @apply="selectedFacilityTypes = $event"
+        :tiposInstalacion="estadisticas.tiposInstalacion"
       />
 
       <TimeRangeFilter
@@ -158,34 +159,52 @@
         description="Selecciona el horario de la instalación."
       />
 
+      <div class="mt-4">
+        <div class="d-flex justify-content-end mb-3">
+          <select
+            class="form-select w-auto"
+            v-model="orderBy"
+            >
+            <option value="nombre_asc">
+              {{ t.orderByNameAsc }}
+            </option>
+            <option value="nombre_desc">
+              {{ t.orderByNameDesc }}
+            </option>
+          </select>
+        </div>
+      </div>
+
       <!-- RESULTADOS DE LA BUSQUEDA -->
-      <p class="fs-2 text-center mt-5 py-3" v-if="sinResultados">{{ t.noResults }}</p>
-      <div class="container-fluid mt-5 row" v-else>
+      <div class="container-fluid mt-4 row">
         <p class="fs-2 fw-semibold text-center">{{ t.activities }}</p>
+        <p class="fs-3 text-center" v-if="sinActividades">{{ t.noResults }}</p>
           <div
-            v-for="act in resultados.actividades"
+            v-for="act in actividadesOrdenadas"
             :key="act.id"
             class="col-12 col-sm-6 col-lg-4"
+            v-else
           >
           <ActivityCard
             :icon="Activity"
             :actividad="act"
           />
           </div>
-        </div>
 
-        <p class="fs-2 fw-semibold text-center mt-4">{{ t.facilities }}</p>
-        <div class="row g-4">
+        <p class="fs-2 fw-semibold text-center mt-5">{{ t.facilities }}</p>
+        <p class="fs-3 text-center" v-if="sinInstalaciones">{{ t.noResults }}</p>
           <div
-            v-for="inst in resultados.instalaciones"
+            v-for="inst in instalacionesOrdenadas"
             :key="inst.id"
             class="col-12 col-sm-6 col-lg-4"
+            v-else
           >
           <FacilityCard
             :icon="Building2"
             :instalacion="inst"
           />
         </div>
+
     </div>
   </main>
 </div>
@@ -219,8 +238,11 @@ import { useI18n } from "../useI18N";
 
 const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);
-const sinResultados = ref(false)
+const sinActividades = ref(false)
+const sinInstalaciones = ref(false)
 const error = ref("");
+
+const orderBy = ref<'nombre_asc' | 'nombre_desc'>('nombre_asc')
 
 const route = useRoute()
 const router = useRouter()
@@ -289,6 +311,28 @@ const activar = (tipo: string) => {
   }
 };
 
+const actividadesOrdenadas = computed(() => {
+  if (!resultados.value.actividades) return []
+
+  return [...resultados.value.actividades].sort((a, b) => {
+    if (orderBy.value === 'nombre_asc') {
+      return a.nombre.localeCompare(b.nombre)
+    }
+    return b.nombre.localeCompare(a.nombre)
+  })
+})
+
+const instalacionesOrdenadas = computed(() => {
+  if (!resultados.value.instalaciones) return []
+
+  return [...resultados.value.instalaciones].sort((a, b) => {
+    if (orderBy.value === 'nombre_asc') {
+      return a.nombre.localeCompare(b.nombre)
+    }
+    return b.nombre.localeCompare(a.nombre)
+  })
+})
+
 type BusquedaCompleta = {
   busqueda?: string
   dias?: string[]
@@ -348,14 +392,15 @@ watch(() =>
   async (newQuery) => {
     try {
       resultados.value = await getBusqueda(newQuery)
-      if (resultados.value.actividades == null || resultados.value.instalaciones == null) {
-        sinResultados.value = true
+      if (resultados.value.actividades != null && resultados.value.actividades.length != 0 ) {
+        sinActividades.value = false
       } else {
-        if(resultados.value.actividades.length == 0 && resultados.value.instalaciones.length == 0) {
-          sinResultados.value = true
-        } else {
-          sinResultados.value = false
-        }
+        sinActividades.value = true
+      }
+      if (resultados.value.instalaciones != null && resultados.value.instalaciones.length != 0 ) {
+        sinInstalaciones.value = false
+      } else {
+        sinInstalaciones.value = true
       }
     } catch (err) {
       error.value = "No se han encontrado resultados"
@@ -364,21 +409,36 @@ watch(() =>
   { immediate: true }
 )
 
+function transformQueryArray(value: unknown): string[] {
+  if (!value) return []
+  return Array.isArray(value) ? value.map(String) : [String(value)]
+}
+
 const textoBusqueda = ref("")
 
 onMounted(async () => {
-  if (route.query.busqueda) {
-    textoBusqueda.value = route.query.busqueda as string
-  }
+  textoBusqueda.value = String(route.query.busqueda)
+
+  selectedDays.value = transformQueryArray(route.query.dias)
+  selectedActivityTypes.value = transformQueryArray(route.query.tiposActividad)
+  selectedFacilityTypes.value = transformQueryArray(route.query.tiposInstalacion)
+
+  activityStartTime.value = String(route.query.tiempoInicioActividad ?? "")
+  activityEndTime.value = String(route.query.tiempoFinActividad ?? "")
+  facilityStartTime.value = String(route.query.tiempoInicioInstalacion ?? "")
+  facilityEndTime.value = String(route.query.tiempoFinInstalacion ?? "")
 
   try {
     resultados.value = await getBusqueda(route.query);
-    if (resultados.value.actividades == null || resultados.value.instalaciones == null) {
-      sinResultados.value = true
+    if (resultados.value.actividades != null && resultados.value.actividades.length != 0 ) {
+      sinActividades.value = false
     } else {
-      if(resultados.value.actividades.length == 0 && resultados.value.instalaciones.length == 0) {
-        sinResultados.value = true
-      }
+      sinActividades.value = true
+    }
+    if (resultados.value.instalaciones != null && resultados.value.instalaciones.length != 0 ) {
+      sinInstalaciones.value = false
+    } else {
+      sinInstalaciones.value = true
     }
   } catch (err) {
     error.value = "No se han encontrado resultados";

@@ -41,6 +41,8 @@ export default {
   sports: "Deportes",
   users: "Usuarios",
 
+  orderByNameAsc: "Nombre (A-Z)",
+  orderByNameDesc: "Nombre (Z-A)",
   noResults: "Sin resultados",
   days: "Días",
   places: "Plazas",
