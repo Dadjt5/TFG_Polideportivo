@@ -60,4 +60,5 @@ urlpatterns = [
     path("me/", views.meAPIView.as_view(), name="me"),
     path("estadisticas/", views.EstadisticasView.as_view(), name="estadisticas"),
     path("buscar/", views.BuscarView.as_view(), name="busqueda"),
+    path("registrarse/", views.RegistroView.as_view(), name="registro"),
 ]

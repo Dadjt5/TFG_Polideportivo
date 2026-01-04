@@ -5,6 +5,8 @@ from rest_framework.permissions import (
     IsAuthenticated,
     AllowAny
 )
+from rest_framework import status
+from datetime import datetime
 
 from .permissions import IsAdministrador, IsMonitor, IsUsuarioFinal
 
@@ -86,6 +88,44 @@ class BuscarView(APIView):
         }
 
         return Response(data)
+
+
+# Registro
+class RegistroView(APIView):
+    permission_classes = [AllowAny]
+    authentication_classes = []
+
+    def post(self, request):
+        nombre = request.data.get('nombre')
+        apellidos = request.data.get('apellidos')
+        sexo = request.data.get('sexo')
+        fechaNacimiento = request.data.get('fechaNacimiento')
+        dni = request.data.get('DNI')
+        telefono = request.data.get('telefono')
+        correo = request.data.get('correo')
+        provincia = request.data.get('provincia')
+        municipio = request.data.get('municipio')
+        localidad = request.data.get('localidad')
+        codigoPostal = request.data.get('codigoPostal')
+        password = request.data.get('password')
+        cuentaBancaria = request.data.get('cuentaBancaria')
+        
+        respuesta = UsuarioFinal.registrar_usuario(
+            nombre=nombre, apellidos=apellidos, sexo=sexo, fechaNacimiento=fechaNacimiento,
+            dni=dni, telefono=telefono, correo=correo, provincia=provincia,
+            municipio=municipio, localidad=localidad, codigoPostal=codigoPostal,
+            password=password, cuentaBancaria=cuentaBancaria
+        )
+
+        if respuesta["error"]:
+            status = status.HTTP_400_BAD_REQUEST
+        else:
+            status = status.HTTP_201_CREATED
+
+        return Response(
+            {"mensaje": respuesta["mensaje"]},
+            status=status
+        )
 
 
 # ----------------

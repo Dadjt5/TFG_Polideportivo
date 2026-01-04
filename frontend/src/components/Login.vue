@@ -76,12 +76,9 @@
             </div>
 
             <!-- Register -->
-            <button
-              class="btn btn-outline-primary w-100 py-2 fs-5 rounded-3"
-              @click="$router.push('/register')"
-            >
-              {{ t.register }}
-            </button>
+             <router-link to="/registrarse" class="btn btn-outline-primary w-100 py-2 fs-5 rounded-3">
+                {{ t.register }}
+              </router-link>
 
           </div>
         </div>
@@ -93,6 +90,9 @@
 <script setup lang="ts">
 import { ref, inject, Ref } from "vue";
 import { useRouter } from "vue-router";
+
+/* Importamos el fichero para realizar el login y para obtener el usuario */
+import { login, getMe } from "../services/loginService"
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
 import type { Language } from "../useI18N";
@@ -110,14 +110,37 @@ const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);
 
 
-const handleLogin = () => {
+const handleLogin = async () => {
+  /* Nos ahorramos comunicaciones con el backend si algún campo esta vacio */
   if (!identifier.value || !password.value) {
     message.value = t.value.error;
     success.value = false;
     return;
   }
 
-  message.value = t.value.success;
-  success.value = true;
+  try {
+    const data = await login({
+      username: identifier.value,
+      password: password.value,
+    });
+
+    message.value = t.value.success;
+    success.value = true;
+
+    localStorage.setItem("access", data.access);
+    localStorage.setItem("refresh", data.refresh);
+
+    const user = await getMe()
+    if (user.is_usuario_final) {
+      router.push("/home-usuario");
+    } else if (user.is_monitor) {
+      router.push("/home-monitor");
+    } else if (user.is_administrador) {
+      router.push("/home-admin");
+    }
+  } catch (error) {
+    message.value = t.value.error;
+    success.value = false;
+  }
 };
 </script>
