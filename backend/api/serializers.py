@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.utils import timezone
 from django.contrib.auth import get_user_model
+import json
 
 from polideportivo.models import (
     Actividad, Agenda, Bono, Configuracion, Deporte, Descuento, Favorito,
@@ -35,6 +36,12 @@ class MonitorSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class MonitorSimpleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Monitor
+        fields = ("id", "nombre")
+
+
 class AdministradorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Administrador
@@ -64,14 +71,109 @@ class CompraAbonoSerializer(serializers.ModelSerializer):
 
 
 # --------------------
+# Horarios
+# --------------------
+
+class HorarioSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Horario
+        fields = '__all__'
+
+
+# --------------------
+# Instalaciones
+# --------------------
+
+class PabellonSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Pabellon
+        fields = '__all__'
+
+
+class InstalacionSimpleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Instalacion
+        fields = ("id", "nombre")
+
+
+class InstalacionSerializer(serializers.ModelSerializer):
+    pabellon = PabellonSerializer(read_only=True)
+    horaApertura = serializers.SerializerMethodField()
+    horaCierre = serializers.SerializerMethodField()
+    imagenURL = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Instalacion
+        fields = (
+            "id",
+            "nombre",
+            "tipoInstalacion",
+            "aforoMaximo",
+            "luz",
+            "imagenURL",
+            "porcentajeTDA",
+            "pabellon",
+            "horaApertura",
+            "horaCierre",
+        )
+
+    def get_horaApertura(self, obj):
+        hoy = timezone.localdate()
+        
+        # Controlamos solo mandar instalaciones que esten abiertas
+        agenda = obj.agenda.filter(fecha=hoy, abierto=True).first()
+
+        if agenda:
+            return agenda.horaApertura
+        
+        return None
+
+    def get_horaCierre(self, obj):
+        hoy = timezone.localdate()
+        
+        # Controlamos solo mandar instalaciones que esten abiertas
+        agenda = obj.agenda.filter(fecha=hoy, abierto=True).first()
+
+        if agenda:
+            return agenda.horaCierre
+        
+        return None
+    
+    def get_imagenURL(self, obj):
+        if not obj.imagenURL:
+            return []
+
+        try:
+            data = json.loads(obj.imagenURL)
+            if isinstance(data, list):
+                return data
+        except Exception:
+            pass
+
+        return [obj.imagenURL]
+
+# --------------------
 # Actividades
 # --------------------
 
-class ActividadSerializer(serializers.ModelSerializer):
-    horasSemanales = serializers.SerializerMethodField()
-    nombreMonitor = serializers.SerializerMethodField()
-    dias = serializers.SerializerMethodField()
+class SesionSerializer(serializers.ModelSerializer):
+    horario = HorarioSerializer(read_only=True)
 
+    class Meta:
+        model = Sesion
+        fields = (
+            "id",
+            "dia",
+            "horario"
+        )
+
+class ActividadSerializer(serializers.ModelSerializer):
+    instalacion = InstalacionSimpleSerializer(read_only=True)
+    monitor = MonitorSimpleSerializer(read_only=True)
+    sesiones = SesionSerializer(many=True, read_only=True)
+    horasSemanales = serializers.SerializerMethodField()
+    dias = serializers.SerializerMethodField()
+    imagenURL = serializers.SerializerMethodField()
 
     class Meta:
         model = Actividad
@@ -94,8 +196,10 @@ class ActividadSerializer(serializers.ModelSerializer):
             "periodo",
             "estado",
             "horasSemanales",
-            "nombreMonitor",
-            "dias"
+            "dias",
+            "instalacion",
+            "monitor",
+            "sesiones"
         )
 
     def get_horasSemanales(self, obj):
@@ -109,13 +213,20 @@ class ActividadSerializer(serializers.ModelSerializer):
         return None
     
     def get_dias(self, obj):
-        return ",".join(sesion.dia for sesion in obj.sesion.all())
-        
+        return ",".join(sesion.dia for sesion in obj.sesiones.all())
+    
+    def get_imagenURL(self, obj):
+        if not obj.imagenURL:
+            return []
 
-class SesionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Sesion
-        fields = '__all__'
+        try:
+            data = json.loads(obj.imagenURL)
+            if isinstance(data, list):
+                return data
+        except Exception:
+            pass
+
+        return [obj.imagenURL]
 
 class AsistenciaSerializer(serializers.ModelSerializer):
     class Meta:
@@ -209,68 +320,6 @@ class UsuarioCanalSerializer(serializers.ModelSerializer):
     class Meta:
         model = UsuarioCanal
         fields = '__all__'
-
-
-# --------------------
-# Horarios
-# --------------------
-
-class HorarioSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Horario
-        fields = '__all__'
-
-
-# --------------------
-# Instalaciones
-# --------------------
-
-class PabellonSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Pabellon
-        fields = '__all__'
-
-class InstalacionSerializer(serializers.ModelSerializer):
-    pabellon = PabellonSerializer(read_only=True)
-    horaApertura = serializers.SerializerMethodField()
-    horaCierre = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Instalacion
-        fields = (
-            "id",
-            "nombre",
-            "tipoInstalacion",
-            "aforoMaximo",
-            "luz",
-            "imagenURL",
-            "porcentajeTDA",
-            "pabellon",
-            "horaApertura",
-            "horaCierre",
-        )
-
-    def get_horaApertura(self, obj):
-        hoy = timezone.localdate()
-        
-        # Controlamos solo mandar instalaciones que esten abiertas
-        agenda = obj.agenda.filter(fecha=hoy, abierto=True).first()
-
-        if agenda:
-            return agenda.horaApertura
-        
-        return None
-
-    def get_horaCierre(self, obj):
-        hoy = timezone.localdate()
-        
-        # Controlamos solo mandar instalaciones que esten abiertas
-        agenda = obj.agenda.filter(fecha=hoy, abierto=True).first()
-
-        if agenda:
-            return agenda.horaCierre
-        
-        return None
 
 
 # --------------------

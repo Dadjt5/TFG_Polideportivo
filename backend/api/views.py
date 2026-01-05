@@ -169,14 +169,15 @@ class CompraAbonoViewSet(viewsets.ModelViewSet):
 # Es necesario modificar algo get_queryset para mostrar las diferentes actividades
 class ActividadViewSet(viewsets.ModelViewSet):
     serializer_class = ActividadSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
+    authentication_classes = []
 
     def get_queryset(self):
         user = self.request.user
-        if user.is_monitor:
+        if user.is_authenticated and getattr(user, "is_monitor", False):
             return Actividad.objects.filter(monitor__user=user)
-        else:
-            return Actividad.objects.all()
+
+        return Actividad.objects.all()
 
 
 class AsistenciaViewSet(viewsets.ModelViewSet):
@@ -326,6 +327,8 @@ class InstalacionViewSet(viewsets.ModelViewSet):
     queryset = Instalacion.objects.all()
     serializer_class = InstalacionSerializer
     permission_classes = [AllowAny]
+    authentication_classes = []
+
 
 
 class PabellonViewSet(viewsets.ModelViewSet):

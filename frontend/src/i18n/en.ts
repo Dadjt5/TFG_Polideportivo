@@ -18,6 +18,7 @@ export default {
   activity: "Activity",
   facility: "Facility",
   pavilions: "Pavilions",
+  pavilion: "Pavilion",
 
   dayOfWeek: "Day of the week",
   activityType: "Activity type",
@@ -88,5 +89,29 @@ export default {
   missing: "Missing or incorrect fields",
   duplicatedDNI: "There is already a user with that ID number.",
   duplicatedEmail: "There is already a user with that email.",
-  registerSuccess: "Registration completed"
+  registerSuccess: "Registration completed",
+
+  activityDetails: "Activity details",
+  facilityDetails: "Facility details",
+  sessions: "Sessions",
+  viewSesion: "View session",
+  booking: "Booking",
+  images: "Images",
+  period: "Period",
+  status: "Status",
+  minimumAge: "Minimum age",
+  availablePlaces: "Available places",
+  level: "Level",
+  reserveType: "Reservation type",
+  terrainType: "Terrain type",
+  credits: "Credits",
+  academicYear: "Academic year",
+  material: "Required material",
+  monitorName: "Monitor name",
+  return: "Return",
+
+  capacity: "Capacity",
+  light: "Light",
+  tdaPercent: "TDA percentage",
+  yes: "Yes",
 };

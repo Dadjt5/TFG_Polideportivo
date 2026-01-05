@@ -35,7 +35,7 @@ class Actividad(models.Model):
 
     def calcularHorasSemanales(self):
         horas = 0.0
-        for sesion in self.sesion.all():
+        for sesion in self.sesiones.all():
             horas += sesion.horario.numeroHoras
 
         return math.ceil(horas)
@@ -69,8 +69,7 @@ class Actividad(models.Model):
 class Sesion(models.Model):
     """Modelo para representar una sesion de una actividad"""
 
-    actividad = models.ForeignKey(Actividad, related_name="sesion", on_delete=models.RESTRICT)
-    monitor = models.ForeignKey('Monitor', on_delete=models.RESTRICT)
+    actividad = models.ForeignKey(Actividad, related_name="sesiones", on_delete=models.RESTRICT)
     horario = models.ForeignKey('Horario', on_delete=models.RESTRICT)    
 
     dia = models.CharField(default=Dia.SABADO, choices=Dia.choices)

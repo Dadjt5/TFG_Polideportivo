@@ -183,6 +183,7 @@
             v-for="act in actividadesOrdenadas"
             :key="act.id"
             class="col-12 col-sm-6 col-lg-4"
+            @click="activityDetail(act.id)"
             v-else
           >
           <ActivityCard
@@ -197,6 +198,7 @@
             v-for="inst in instalacionesOrdenadas"
             :key="inst.id"
             class="col-12 col-sm-6 col-lg-4"
+            @click="facilityDetail(inst.id)"
             v-else
           >
           <FacilityCard
@@ -231,6 +233,7 @@ import FacilityTypeFilter from "./filters/FacilityTypeFilter.vue";
 /* Importamos las comunicaciones con el backend */
 import { getBusqueda } from "../services/buscarService";
 import { useEstadisticasStore } from "../stores/estadisticas";
+
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
 import type { Language } from "../useI18N";
@@ -414,6 +417,21 @@ function transformQueryArray(value: unknown): string[] {
   return Array.isArray(value) ? value.map(String) : [String(value)]
 }
 
+
+const activityDetail = (id: number) => {
+  router.push({
+    name: 'detalle-actividad',
+    params: { id }
+  });
+}
+
+const facilityDetail = (id: number) => {
+  router.push({
+    name: 'detalle-instalacion',
+    params: { id }
+  });
+}
+
 const textoBusqueda = ref("")
 
 onMounted(async () => {
@@ -441,8 +459,8 @@ onMounted(async () => {
       sinInstalaciones.value = true
     }
   } catch (err) {
-    error.value = "No se han encontrado resultados";
     console.error(err);
   }
 })
+
 </script>
