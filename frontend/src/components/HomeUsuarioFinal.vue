@@ -6,7 +6,7 @@
 
       <!-- HERO -->
       <h1 class="text-center fw-bold mb-4">
-        {{ t.welcome }}
+        Bienvenido {{ userStore.user?.username }}
       </h1>
 
       <!-- NOTIFICATIONS + QUICK ACTIONS -->
@@ -107,6 +107,11 @@ import {
   BarChart3,
   CalendarCheck
 } from "lucide-vue-next";
+
+/* Importamos las comunicaciones con el backend a traves de nuestro Store para guardar las estadisticas */
+import { useAuthStore } from "../stores/auth";
+
+const userStore = useAuthStore();
 
 /* ========= ESTADO ========= */
 const language = ref<"es" | "en">("es");

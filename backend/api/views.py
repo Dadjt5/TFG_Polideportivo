@@ -100,7 +100,7 @@ class RegistroView(APIView):
         apellidos = request.data.get('apellidos')
         sexo = request.data.get('sexo')
         fechaNacimiento = request.data.get('fechaNacimiento')
-        dni = request.data.get('DNI')
+        dni = request.data.get('dni')
         telefono = request.data.get('telefono')
         correo = request.data.get('correo')
         provincia = request.data.get('provincia')
@@ -118,13 +118,13 @@ class RegistroView(APIView):
         )
 
         if respuesta["error"]:
-            status = status.HTTP_400_BAD_REQUEST
+            sta = status.HTTP_400_BAD_REQUEST
         else:
-            status = status.HTTP_201_CREATED
+            sta = status.HTTP_201_CREATED
 
         return Response(
-            {"mensaje": respuesta["mensaje"]},
-            status=status
+            {"mensaje": respuesta["respuesta"]},
+            status=sta
         )
 
 

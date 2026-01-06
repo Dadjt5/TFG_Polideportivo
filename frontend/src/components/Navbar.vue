@@ -28,7 +28,16 @@
         </li>
 
         <li class="nav-item fs-5">
-          <router-link to="/login" class="nav-link px-3 text-white">
+          <a
+            v-if="userStore.user"
+            href="#"
+            class="nav-link px-3 text-white"
+            @click.prevent="logout"
+          >
+            {{ t.logout }}
+          </a>
+
+          <router-link to="/login" class="nav-link px-3 text-white" v-else>
             {{ t.login }}
           </router-link>
         </li>
@@ -49,14 +58,27 @@
 
 <script setup lang="ts">
 import { inject, type Ref } from "vue";
+import { useRouter } from "vue-router";
+
+/* Importamos las comunicaciones con el backend a traves de nuestro Store para guardar las estadisticas */
+import { useAuthStore } from "../stores/auth";
+
 import type { Language } from "../useI18N";
 import { useI18n } from "../useI18N";
+
+const router = useRouter();
+const userStore = useAuthStore();
 
 const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);
 
 const toggleLanguage = () => {
   language.value = language.value === "es" ? "en" : "es";
+};
+
+const logout = () => {
+  userStore.logout();
+  router.push("/Home");
 };
 </script>
 

@@ -5,6 +5,7 @@ export default {
   contact: "Contacto",
   faq: "FAQ",
   login: "Acceder",
+  logout: "Cerrar sesión",
 
   /* Home - Buscar */
   welcome: "Bienvenido al Polideportivo XX",

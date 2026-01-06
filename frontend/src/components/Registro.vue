@@ -352,7 +352,7 @@ const handleFinish = async () => {
     errores.value.password = false
   }
 
-  if(formData.confirmPassword == '') {
+  if(formData.confirmPassword == '' || formData.password != formData.confirmPassword) {
     errores.value.confirmPassword = true
     continuar.value = false
   } else {

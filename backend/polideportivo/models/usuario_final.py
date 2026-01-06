@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from django.contrib.auth.models import User
 from django.db import models, transaction
+from django.contrib.auth import get_user_model
 
 from .usuario import Usuario
 from .favorito import Favorito
@@ -41,6 +41,8 @@ class UsuarioFinal(Usuario):
     def registrar_usuario(cls, *, nombre, apellidos, sexo, fechaNacimiento,
                           dni, telefono, correo, provincia, municipio,
                           localidad, codigoPostal, password, cuentaBancaria=None):
+
+        User = get_user_model()
 
         if User.objects.filter(username=dni).exists():
             return {

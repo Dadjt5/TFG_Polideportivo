@@ -16,6 +16,6 @@ export const getMe = async () => {
 
 /* Función para realizar el registro, posteriormente se debe realizar el login */
 export const registrarse = async (payload) => {
-  const response = await api.post("api/v1/registro/", payload);
+  const response = await api.post("api/v1/registrarse/", payload);
   return response.data;
 };
