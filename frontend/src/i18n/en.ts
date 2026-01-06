@@ -6,7 +6,7 @@ export default {
   faq: "FAQ",
   login: "Login",
 
-  /* Home */
+  /* Home - Buscar */
   welcome: "Welcome to Sports Center XX",
   welcome2: "Log in to access all features",
   searchPlaceholder: "Search activities or facilities...",
@@ -50,6 +50,7 @@ export default {
   weekHours: "Weekly hours",
   schedule: "Schedule",
 
+  /* Login */
   loginPage: "Login",
   instructions: "Enter your DNI or ID and password to access.",
   identifierPlaceholder: "DNI or ID",
@@ -60,6 +61,7 @@ export default {
   success: "Login successful.",
   error: "Incorrect username or password.",
 
+  /* Registro */
   registerPage: "User Registration",
   next: "Next",
   back: "Back",
@@ -91,6 +93,7 @@ export default {
   duplicatedEmail: "There is already a user with that email.",
   registerSuccess: "Registration completed",
 
+  /* DetalleActividad */
   activityDetails: "Activity details",
   facilityDetails: "Facility details",
   sessions: "Sessions",
@@ -110,8 +113,30 @@ export default {
   monitorName: "Monitor name",
   return: "Return",
 
+  /* DetalleInstalacion */
   capacity: "Capacity",
   light: "Light",
   tdaPercent: "TDA percentage",
   yes: "Yes",
+
+  /* Contacto */
+  contactTitle: "Sports Center Contact",
+  contactSubtitle: "Contact information of the administration building",
+
+  /* FAQ */
+  faqTitle: "Frequently Asked Questions",
+  questions: [
+    {
+      question: "How can I get the Annual Sports Card?",
+      answer: "Annual Sports Cards (TDA) must be purchased in person at our administration offices. Once purchased, you will receive an identifier to enter on the website, in the Annual Sports Card section of your profile, to link the virtual card with the one you bought."
+    },
+    {
+      question: "How can I prove that I am a member of the UAM community?",
+      answer: "To prove you are a member of the UAM community and qualify for discounted booking prices, you must visit the administration office to verify your UAM credentials. From that moment on, you will also be able to make bookings at a reduced price through the website."
+    },
+    {
+      question: "Can I cancel my registration for an activity at any time?",
+      answer: "No, to cancel a registration for an activity you must do so before the end of a month; generally the cancellation process begins ten days before the end of the month."
+    }
+  ]
 };

@@ -197,10 +197,6 @@ import { registrarse } from "../services/loginService"
 
 const router = useRouter();
 
-const identifier = ref("");
-const password = ref("");
-const success = ref(false);
-const loading = ref(false);
 const continuar = ref(true);
 
 const language = inject<Ref<Language>>("language")!;
@@ -245,6 +241,8 @@ const errores = ref({
 
 const step = ref(1)
 const mensaje = ref("")
+
+/* Expresion regular para comprobar el email */
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /* Para evitar multiples llamadas al backend realizamos aqui ciertas comprobaciones */
@@ -372,7 +370,7 @@ const handleFinish = async () => {
     const data = await registrarse(formData);
     mensaje.value = data.mensaje;
 
-    //router.push("/login");
+    router.push("/login");
   } catch (error) {
     if (error instanceof Error) {
       mensaje.value = error.message;

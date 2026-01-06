@@ -6,7 +6,7 @@ export default {
   faq: "FAQ",
   login: "Acceder",
 
-  /* Home */
+  /* Home - Buscar */
   welcome: "Bienvenido al Polideportivo XX",
   welcome2: "Inicia sesión para acceder a todas las funcionalidades",
   searchPlaceholder: "Buscar actividades o instalaciones...",
@@ -50,6 +50,7 @@ export default {
   weekHours: "Horas semanales",
   schedule: "Horario",
 
+  /* Login */
   loginPage: "Iniciar sesión",
   instructions: "Introduce tu DNI o ID y contraseña para acceder.",
   identifierPlaceholder: "DNI o ID",
@@ -60,6 +61,7 @@ export default {
   success: "Inicio de sesión correcto.",
   error: "Usuario o contraseña incorrectos.",
 
+  /* Registro */
   registerPage: "Registro de Usuario",
   next: "Siguiente",
   back: "Anterior",
@@ -91,6 +93,7 @@ export default {
   duplicatedEmail: "Ya existe un usuario con ese correo electrónico",
   registerSuccess: "Registro completado",
 
+  /* DetalleActividad */
   activityDetails: "Detalles de la actividad",
   facilityDetails: "Detalles de la instalación",
   sessions: "Sesiones",
@@ -110,8 +113,30 @@ export default {
   monitorName: "Nombre del monitor",
   return: "Volver",
 
+  /* DetalleInstalacion */
   capacity: "Capacidad",
   light: "Luz",
   tdaPercent: "Porcentaje de TDA",
   yes: "Si",
+
+  /* Contacto */
+  contactTitle: "Contacto con el centro deportivo",
+  contactSubtitle: "Información de contacto del edificio de administración",
+
+  /* FAQ */
+  faqTitle: "Preguntas frecuentes",
+  questions: [
+    {
+      question: "¿Cómo se pueden conseguir las tarjetas deportivas anuales?",
+      answer: "Las tarjetas deportivas anuales o TDAs se deben comprar presencialmente en nuestras oficinas de administración. Una vez comprada, se suministrará un identificador que introducir en la página web, en la sección Tarjeta deportiva anual del perfil, para poder vincular la tarjeta virtual con la comprada."
+    },
+    {
+      question: "¿Como puedo demostrar que soy miembro de la comunidad UAM?",
+      answer: "Para demostrar que eres miembro de la comunidad UAM y puedas optar a rebajas en los precios de reservas deberás acercarte a la oficina de administración para verificar tus credenciales de la UAM. A partir de ese momento podrás hacer reservas a un precio reducido también desde la página web."
+    },
+    {
+      question: "¿Puedo cancelar una inscripción a una actividad en cualquier momento?",
+      answer: "No, para cancelar una inscripción a una actividad deberás hacerlo antes de que termine un mes, generalmente el proceso de cancelación comienza diez días antes de terminar el mes."
+    }
+  ]
 };

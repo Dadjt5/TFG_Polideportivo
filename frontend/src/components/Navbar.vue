@@ -3,7 +3,9 @@
     <div class="container-fluid px-4">
 
       <span class="navbar-brand fw-bold fs-4">
-        Polideportivo XX
+        <router-link to="/" class="nav-link px-3 text-white">
+          Polideportivo XX
+        </router-link>
       </span>
 
       <ul class="navbar-nav ms-auto flex-row align-items-center">

@@ -1,6 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useAuthStore } from '../stores/auth'
 
 import Home from '../components/Home.vue'
+import Contacto from '../components/Contacto.vue'
+import FAQ from '../components/FAQ.vue'
 import HomeUsuarioFinal from '../components/HomeUsuarioFinal.vue'
 import Buscar from '../components/Buscar.vue'
 import Login from '../components/Login.vue'
@@ -10,26 +13,65 @@ import DetalleInstalacion from '../components/DetalleInstalacion.vue'
 
 const routes = [
   { path: '/', redirect: '/home' },
-  { path: '/home-usuario', component: HomeUsuarioFinal },
-  { path: '/home', component: Home },
-  { path: '/buscar', component: Buscar },
-  { path: '/login', component: Login },
-  { path: '/registrarse', component: Registro },
-  { path: '/actividades/:id',
+  { path: '/home', component: Home, meta: { public: true } },
+  { path: '/buscar', component: Buscar, meta: { public: true } },
+  { path: '/login', component: Login, meta: { public: true } },
+  { path: '/registrarse', component: Registro, meta: { public: true } },
+  {
+    path: '/home-usuario',
+    component: HomeUsuarioFinal,
+    meta: { requiresAuth: true, role: 'usuario_final' }
+  },
+  {
+    path: '/actividades/:id',
     component: DetalleActividad,
     name: 'detalle-actividad',
-    props: true
+    props: true,
+    meta: { public: true }
   },
-  { path: '/instalaciones/:id',
+  {
+    path: '/instalaciones/:id',
     component: DetalleInstalacion,
     name: 'detalle-instalacion',
-    props: true
-  }
+    props: true,
+    meta: { public: true }
+  },
+  { path: '/contact', component: Contacto, meta: { public: true } },
+  { path: '/faq', component: FAQ, meta: { public: true } }
 ]
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
 })
+
+/* Antes de acceder a una direccion revisamos los campos clave y las redirecciones necesarias cuando hay usuarios logueados */
+router.beforeEach(async (to) => {
+  const auth = useAuthStore();
+
+  if (to.meta.public) {
+    return true;
+  }
+
+  if (!auth.isAuthenticated) {
+    return '/login';
+  }
+
+  if (!auth.user) {
+    await auth.fetchUser();
+  }
+
+  if (to.path === '/') {
+    if (auth.role === 'usuario') return '/home-usuario';
+    if (auth.role === 'monitor') return '/home-monitor';
+    if (auth.role === 'admin') return '/home-admin';
+  }
+
+  if (to.meta.role && auth.role !== to.meta.role) {
+    return '/login';
+  }
+
+  return true;
+});
 
 export default router

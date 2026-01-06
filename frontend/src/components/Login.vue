@@ -91,8 +91,9 @@
 import { ref, inject, Ref } from "vue";
 import { useRouter } from "vue-router";
 
-/* Importamos el fichero para realizar el login y para obtener el usuario */
-import { login, getMe } from "../services/loginService"
+/* Importamos el fichero para realizar el login y redirigir a la pantalla indicada guardando el usuario */
+import { login } from "../services/loginService"
+import { useAuthStore } from "../stores/auth";
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
 import type { Language } from "../useI18N";
@@ -130,14 +131,10 @@ const handleLogin = async () => {
     localStorage.setItem("access", data.access);
     localStorage.setItem("refresh", data.refresh);
 
-    const user = await getMe()
-    if (user.is_usuario_final) {
-      router.push("/home-usuario");
-    } else if (user.is_monitor) {
-      router.push("/home-monitor");
-    } else if (user.is_administrador) {
-      router.push("/home-admin");
-    }
+    const auth = useAuthStore();
+    await auth.fetchUser();
+
+    router.push("/");
   } catch (error) {
     message.value = t.value.error;
     success.value = false;
