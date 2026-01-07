@@ -16,8 +16,6 @@
         <!-- BUSQUEDAS -->
         <div class="container-fluid mt-4">
           <div class="d-flex align-items-center bg-white rounded-3 shadow p-3 border gap-3">
-            <Search class="text-secondary"/>
-
             <input
               type="text"
               v-model="textoBusqueda"

@@ -31,102 +31,6 @@ from polideportivo.models import (
     ReservaActividad, Alquiler, Administrador, User, CompraBono, CompraAbono
 )
 
-# Estadisticas de home
-class EstadisticasView(APIView):
-    permission_classes = [AllowAny]
-    authentication_classes = []
-
-    def get(self, request):
-        tiposActividad = []
-        tiposInstalacion = []
-
-        for act in Actividad.objects.all():
-            if act.tipoActividad not in tiposActividad:
-                tiposActividad.append(act.tipoActividad)
-
-        for inst in Instalacion.objects.all():
-            if inst.tipoInstalacion not in tiposInstalacion:
-                tiposInstalacion.append(inst.tipoInstalacion)
-
-        data = {
-            "instalaciones": Instalacion.contar(),
-            "actividades": Actividad.contar(),
-            "pabellones": Pabellon.contar(),
-            "deportes": Deporte.contar(),
-            "usuarios": UsuarioFinal.contar(),
-            "tiposActividad": tiposActividad,
-            "tiposInstalacion": tiposInstalacion
-        }
-
-        return Response(data)
-
-
-# Busquedas
-class BuscarView(APIView):
-    permission_classes = [AllowAny]
-    authentication_classes = []
-
-    def get(self, request):
-        nombre = request.query_params.get('busqueda')
-        horaApertura = request.query_params.get('tiempoInicioInstalacion')
-        horaCierre = request.query_params.get('tiempoFinInstalacion')
-        horaInicioSesion = request.query_params.get('tiempoInicioActividad')
-        horaFinSesion = request.query_params.get('tiempoFinActividad')
-
-        dias = request.query_params.getlist('dias')
-        dias = [d.lower() for d in dias]
-
-        tiposActividad = request.query_params.getlist('tiposActividad')
-        tiposInstalacion = request.query_params.getlist('tiposInstalacion')
-
-        instalaciones = Instalacion.buscar(nombre,tiposInstalacion,horaApertura,horaCierre)
-        actividades = Actividad.buscar(nombre,tiposActividad,horaInicioSesion,horaFinSesion,dias)
-
-        data = {
-            "instalaciones": InstalacionSerializer(instalaciones, many=True).data,
-            "actividades": ActividadSerializer(actividades, many=True).data,
-        }
-
-        return Response(data)
-
-
-# Registro
-class RegistroView(APIView):
-    permission_classes = [AllowAny]
-    authentication_classes = []
-
-    def post(self, request):
-        nombre = request.data.get('nombre')
-        apellidos = request.data.get('apellidos')
-        sexo = request.data.get('sexo')
-        fechaNacimiento = request.data.get('fechaNacimiento')
-        dni = request.data.get('dni')
-        telefono = request.data.get('telefono')
-        correo = request.data.get('correo')
-        provincia = request.data.get('provincia')
-        municipio = request.data.get('municipio')
-        localidad = request.data.get('localidad')
-        codigoPostal = request.data.get('codigoPostal')
-        password = request.data.get('password')
-        cuentaBancaria = request.data.get('cuentaBancaria')
-        
-        respuesta = UsuarioFinal.registrar_usuario(
-            nombre=nombre, apellidos=apellidos, sexo=sexo, fechaNacimiento=fechaNacimiento,
-            dni=dni, telefono=telefono, correo=correo, provincia=provincia,
-            municipio=municipio, localidad=localidad, codigoPostal=codigoPostal,
-            password=password, cuentaBancaria=cuentaBancaria
-        )
-
-        if respuesta["error"]:
-            sta = status.HTTP_400_BAD_REQUEST
-        else:
-            sta = status.HTTP_201_CREATED
-
-        return Response(
-            {"mensaje": respuesta["respuesta"]},
-            status=sta
-        )
-
 
 # ----------------
 # Abonos
@@ -500,8 +404,10 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdministrador]
 
 
+
 # Otros endpoints
 
+# Para devolver el usuario registrado
 class meAPIView(APIView):
     permission_classes = [IsAuthenticated]
     
@@ -519,3 +425,100 @@ class meAPIView(APIView):
             data["rol"] = user.administrador.rol
 
         return Response(data)
+
+# Estadisticas de home
+class EstadisticasView(APIView):
+    permission_classes = [AllowAny]
+    authentication_classes = []
+
+    def get(self, request):
+        tiposActividad = []
+        tiposInstalacion = []
+
+        for act in Actividad.objects.all():
+            if act.tipoActividad not in tiposActividad:
+                tiposActividad.append(act.tipoActividad)
+
+        for inst in Instalacion.objects.all():
+            if inst.tipoInstalacion not in tiposInstalacion:
+                tiposInstalacion.append(inst.tipoInstalacion)
+
+        data = {
+            "instalaciones": Instalacion.contar(),
+            "actividades": Actividad.contar(),
+            "pabellones": Pabellon.contar(),
+            "deportes": Deporte.contar(),
+            "usuarios": UsuarioFinal.contar(),
+            "tiposActividad": tiposActividad,
+            "tiposInstalacion": tiposInstalacion
+        }
+
+        return Response(data)
+
+
+# Busquedas
+class BuscarView(APIView):
+    permission_classes = [AllowAny]
+    authentication_classes = []
+
+    def get(self, request):
+        nombre = request.query_params.get('busqueda')
+        horaApertura = request.query_params.get('tiempoInicioInstalacion')
+        horaCierre = request.query_params.get('tiempoFinInstalacion')
+        horaInicioSesion = request.query_params.get('tiempoInicioActividad')
+        horaFinSesion = request.query_params.get('tiempoFinActividad')
+
+        dias = request.query_params.getlist('dias')
+        dias = [d.lower() for d in dias]
+
+        tiposActividad = request.query_params.getlist('tiposActividad')
+        tiposInstalacion = request.query_params.getlist('tiposInstalacion')
+
+        instalaciones = Instalacion.buscar(nombre,tiposInstalacion,horaApertura,horaCierre)
+        actividades = Actividad.buscar(nombre,tiposActividad,horaInicioSesion,horaFinSesion,dias)
+
+        data = {
+            "instalaciones": InstalacionSerializer(instalaciones, many=True).data,
+            "actividades": ActividadSerializer(actividades, many=True).data,
+        }
+
+        return Response(data)
+
+
+# Registro
+class RegistroView(APIView):
+    permission_classes = [AllowAny]
+    authentication_classes = []
+
+    def post(self, request):
+        nombre = request.data.get('nombre')
+        apellidos = request.data.get('apellidos')
+        sexo = request.data.get('sexo')
+        fechaNacimiento = request.data.get('fechaNacimiento')
+        dni = request.data.get('dni')
+        telefono = request.data.get('telefono')
+        correo = request.data.get('correo')
+        provincia = request.data.get('provincia')
+        municipio = request.data.get('municipio')
+        localidad = request.data.get('localidad')
+        codigoPostal = request.data.get('codigoPostal')
+        password = request.data.get('password')
+        cuentaBancaria = request.data.get('cuentaBancaria')
+
+        respuesta = UsuarioFinal.registrar_usuario(
+            nombre=nombre, apellidos=apellidos, sexo=sexo, fechaNacimiento=fechaNacimiento,
+            dni=dni, telefono=telefono, correo=correo, provincia=provincia,
+            municipio=municipio, localidad=localidad, codigoPostal=codigoPostal,
+            password=password, cuentaBancaria=cuentaBancaria
+        )
+
+        if respuesta["error"]:
+            sta = status.HTTP_400_BAD_REQUEST
+        else:
+            sta = status.HTTP_201_CREATED
+
+        return Response(
+            {"mensaje": respuesta["respuesta"]},
+            status=sta
+        )
+

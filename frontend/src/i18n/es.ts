@@ -92,6 +92,7 @@ export default {
   missing: "Hay campos vacios o erroneos",
   duplicatedDNI: "Ya existe un usuario con ese DNI.",
   duplicatedEmail: "Ya existe un usuario con ese correo electrónico",
+  unexpectedError: "Ha ocurrido un error, pruebe mas tarde",
   registerSuccess: "Registro completado",
 
   /* DetalleActividad */

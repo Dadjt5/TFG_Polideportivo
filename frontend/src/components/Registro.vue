@@ -371,9 +371,11 @@ const handleFinish = async () => {
     mensaje.value = data.mensaje;
 
     router.push("/login");
-  } catch (error) {
-    if (error instanceof Error) {
-      mensaje.value = error.message;
+  } catch (error: any) {
+    if (error.response && error.response.data?.mensaje) {
+      mensaje.value = error.response.data.mensaje;
+    } else {
+      mensaje.value = t.value.unexpectedError
     }
   }
 }

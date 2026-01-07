@@ -92,6 +92,7 @@ export default {
   missing: "Missing or incorrect fields",
   duplicatedDNI: "There is already a user with that ID number.",
   duplicatedEmail: "There is already a user with that email.",
+    unexpectedError: "Something has gone wrong, try again later",
   registerSuccess: "Registration completed",
 
   /* DetalleActividad */
