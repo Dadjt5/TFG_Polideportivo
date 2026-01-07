@@ -14,9 +14,9 @@
                 <div class="d-flex align-items-center gap-2">
                   <i class="bi bi-bell-fill text-primary me-2 fs-4"></i>
                   <h5 class="mb-0">{{ t.notifications }}</h5>
-                  <span v-if="unreadNotifications"
+                  <span v-if="notificaciones.no_leidas"
                         class="badge bg-danger">
-                    {{ unreadNotifications }}
+                    {{ notificaciones.no_leidas }}
                   </span>
                 </div>
                 <a href="#" class="text-primary small">
@@ -24,17 +24,14 @@
                 </a>
               </div>
 
-              <div class="bg-light rounded p-3 mb-2">
-                <strong>Recordatorio de actividad</strong>
+              <div
+                v-for="notf in notificaciones.notificaciones"
+                  :key="notf.id"
+                  class="bg-light rounded p-3 mb-2"
+                >
+                <strong>{{ notf.titulo }}</strong>
                 <p class="mb-0 small text-muted">
-                  Mañana tienes una sesión programada…
-                </p>
-              </div>
-
-              <div class="bg-light rounded p-3">
-                <strong>Modificación de horario</strong>
-                <p class="mb-0 small text-muted">
-                  Se ha cambiado el horario de una actividad…
+                  {{ notf.descripcion }}
                 </p>
               </div>
             </div>
@@ -263,9 +260,6 @@ const estadisticasStore = useEstadisticasStore();
 const estadisticas = estadisticasStore.data;
 
 const router = useRouter()
-
-const error = ref("");
-const unreadNotifications = ref(3);
 
 const activeTab = ref('activities');
 

@@ -417,7 +417,6 @@ function transformQueryArray(value: unknown): string[] {
   return Array.isArray(value) ? value.map(String) : [String(value)]
 }
 
-
 const activityDetail = (id: number) => {
   router.push({
     name: 'detalle-actividad',

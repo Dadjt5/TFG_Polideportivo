@@ -1,6 +1,7 @@
 export default {
   /* Navbar */
   home: "Inicio",
+  seasonTickets: "Abonos y bonos",
   forum: "Foro",
   contact: "Contacto",
   faq: "FAQ",

@@ -34,14 +34,7 @@ export const useAuthStore = defineStore("auth", {
     async fetchUser() {
       if (!this.access) return;
 
-      this.loading = true;
-      try {
-        this.user = await getMe();
-      } catch {
-        this.logout();
-      } finally {
-        this.loading = false;
-      }
+      this.user = await getMe();
     },
 
     logout() {

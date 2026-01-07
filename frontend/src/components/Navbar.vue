@@ -16,6 +16,18 @@
         </li>
 
         <li class="nav-item fs-5">
+          <router-link to="/tickets" v-if="userStore.user" class="nav-link px-3 text-white">
+            {{ t.seasonTickets }}
+          </router-link>
+        </li>
+
+        <li class="nav-item fs-5">
+          <router-link to="/forum" v-if="userStore.user" class="nav-link px-3 text-white">
+            {{ t.forum }}
+          </router-link>
+        </li>
+
+        <li class="nav-item fs-5">
           <router-link to="/contact" class="nav-link px-3 text-white">
             {{ t.contact }}
           </router-link>
