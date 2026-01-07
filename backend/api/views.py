@@ -280,16 +280,23 @@ class MonitorViewSet(viewsets.ModelViewSet):
 # Notificaciones
 # ----------------
 
+
 class NotificacionViewSet(viewsets.ModelViewSet):
     serializer_class = NotificacionSerializer
     permission_classes = [IsAuthenticated]
-    
-    def perform_create(self, serializer):
-        serializer.save(usuario=self.request.user)
 
     def get_queryset(self):
         return Notificacion.objects.filter(usuario=self.request.user)
 
+    def list(self, request):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        no_leidas = Notificacion.contar_no_leidas(request.user)
+        
+        return Response({
+            "notificaciones": serializer.data,
+            "no_leidas": no_leidas
+        })
 
 # ----------------
 # Pagos
@@ -416,6 +423,8 @@ class meAPIView(APIView):
 
         data = {
             "id": user.id,
+            "username": user.username,
+            "email": user.email,
             "is_monitor": user.is_monitor,
             "is_usuario_final": user.is_usuario_final,
             "is_administrador": user.is_administrador,

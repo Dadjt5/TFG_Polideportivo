@@ -232,8 +232,8 @@ import FacilityTypeFilter from "./filters/FacilityTypeFilter.vue";
 
 /* Importamos las comunicaciones con el backend */
 import { getBusqueda } from "../services/buscarService";
-import { useEstadisticasStore } from "../stores/estadisticas";
 
+import { useEstadisticasStore } from "../stores/estadisticas";
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
 import type { Language } from "../useI18N";

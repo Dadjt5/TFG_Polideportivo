@@ -347,7 +347,6 @@ class NotificacionSerializer(serializers.ModelSerializer):
         model = Notificacion
         fields = '__all__'
 
-
 # --------------------
 # Pagos
 # --------------------

@@ -51,6 +51,14 @@ export default {
   weekHours: "Weekly hours",
   schedule: "Schedule",
 
+  /* Home usuario final */
+  notifications: "Notifications",
+  viewAll: "View all",
+  userStats: "Usage statistics",
+  viewUserStats: "View statistics",
+  bookingsMade: "Bookings made",
+  viewBooks: "View reservations",
+
   /* Login */
   loginPage: "Login",
   instructions: "Enter your DNI or ID and password to access.",

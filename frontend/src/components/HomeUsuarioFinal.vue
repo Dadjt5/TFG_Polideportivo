@@ -1,24 +1,18 @@
 <template>
   <div class="min-vh-100 bg-light">
-
-    <!-- MAIN -->
     <main class="container py-4">
 
-      <!-- HERO -->
       <h1 class="text-center fw-bold mb-4">
-        Bienvenido {{ userStore.user?.username }}
+        {{ t.welcome }}
       </h1>
 
-      <!-- NOTIFICATIONS + QUICK ACTIONS -->
-      <div class="row g-4 mb-4">
-
-        <!-- Notifications -->
+      <div class="row g-4 mb-5">
         <div class="col-lg-8">
           <div class="card shadow-sm h-100">
             <div class="card-body">
               <div class="d-flex justify-content-between align-items-center mb-3">
                 <div class="d-flex align-items-center gap-2">
-                  <Bell />
+                  <i class="bi bi-bell-fill text-primary me-2 fs-4"></i>
                   <h5 class="mb-0">{{ t.notifications }}</h5>
                   <span v-if="unreadNotifications"
                         class="badge bg-danger">
@@ -26,7 +20,7 @@
                   </span>
                 </div>
                 <a href="#" class="text-primary small">
-                  {{ t.seeAll }} →
+                  {{ t.viewAll }} →
                 </a>
               </div>
 
@@ -47,16 +41,15 @@
           </div>
         </div>
 
-        <!-- Quick Actions -->
         <div class="col-lg-4">
           <div class="card shadow-sm mb-3">
             <div class="card-body">
               <div class="d-flex align-items-center gap-2 mb-2">
-                <BarChart3 />
-                <h6 class="mb-0">{{ t.statsTitle }}</h6>
+                <i class="bi bi-bar-chart-fill text-primary me-2 fs-4"></i>
+                <h6 class="mb-0">{{ t.userStats }}</h6>
               </div>
               <button class="btn btn-primary w-100">
-                {{ t.statsButton }}
+                {{ t.viewUserStats }}
               </button>
             </div>
           </div>
@@ -64,30 +57,172 @@
           <div class="card shadow-sm">
             <div class="card-body">
               <div class="d-flex align-items-center gap-2 mb-2">
-                <CalendarCheck />
-                <h6 class="mb-0">{{ t.bookingsTitle }}</h6>
+                <i class="bi bi-calendar-fill text-primary me-2 fs-4"></i>
+                <h6 class="mb-0">{{ t.bookingsMade }}</h6>
               </div>
               <button class="btn btn-success w-100">
-                {{ t.bookingsButton }}
+                {{ t.viewBooks }}
               </button>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- SEARCH -->
-      <div class="card shadow-sm mb-4">
-        <div class="card-body d-flex gap-3">
-          <Search />
+      <div class="linea-fina"></div>
+
+      <!-- BUSQUEDAS -->
+      <div class="container-fluid mt-5 mb-4">
+        <div class="d-flex align-items-center bg-white rounded-3 shadow p-3 border gap-3">
           <input
-            class="form-control"
+            type="text"
+            v-model="textoBusqueda"
+            class="form-control border-0 fs-5"
             :placeholder="t.searchPlaceholder"
+            @keyup.enter="buscar"
           />
-          <button class="btn btn-primary">
+
+          <button class="btn btn-primary btn-lg px-4"  @click="buscar">
             {{ t.searchButton }}
           </button>
         </div>
       </div>
+
+      <!-- FILTROS -->
+      <h2 class="fs-3 fw-semibold text-center text-dark mb-4">
+        {{ t.filterBy }}
+      </h2>
+
+      <!-- TABS -->
+      <ul class="nav nav-tabs justify-content-center mb-4">
+        <li class="nav-item fs-5">
+          <button
+            class="nav-link"
+            :class="{ active: activeTab === 'activities' }"
+            @click="activeTab = 'activities'"
+            type="button"
+          >
+            {{ t.activities }}
+          </button>
+        </li>
+
+        <li class="nav-item fs-5">
+          <button
+            class="nav-link"
+            :class="{ active: activeTab === 'facilities' }"
+            @click="activeTab = 'facilities'"
+            type="button"
+          >
+            {{ t.facilities }}
+          </button>
+        </li>
+      </ul>
+
+      <!-- TAB CONTENT -->
+      <div class="tab-content">
+        <!-- ACTIVIDADES -->
+          <div
+            class="tab-pane fade"
+            :class="{ show: activeTab === 'activities', active: activeTab === 'activities' }"
+          >
+            <div class="row g-4">
+              <div class="col-md-4">
+                <FilterCard
+                  :icon="Calendar"
+                  :title="t.dayOfWeek"
+                  :subtitle="orderedSelectedDays.join(', ')"
+                  @click="() => activar('A1')"
+                />
+              </div>
+
+            <div class="col-md-4">
+              <FilterCard
+                :icon="Activity"
+                :title="t.activityType"
+                :subtitle="selectedActivityTypes.join(', ')"
+                @click="() => activar('A2')"
+              />
+            </div>
+
+            <div class="col-md-4">
+              <FilterCard
+                :icon="Clock"
+                :title="t.sessionTime"
+                :subtitle="activityStartTime || activityEndTime ? `${activityStartTime} - ${activityEndTime}`: ''"
+                @click="() => activar('A3')"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- INSTALACIONES -->
+        <div
+          class="tab-pane fade"
+          :class="{ show: activeTab === 'facilities', active: activeTab === 'facilities' }"
+        >
+          <div class="row g-4 justify-content-center">
+            <div class="col-md-6">
+              <FilterCard
+                :icon="Building2"
+                :title="t.facilityType"
+                :subtitle="selectedFacilityTypes.join(', ')"
+                @click="() => activar('I1')"
+              />
+            </div>
+
+            <div class="col-md-6">
+              <FilterCard
+                :icon="Clock"
+                :title="t.openingHours"
+                :subtitle="facilityStartTime || facilityEndTime ? `${facilityStartTime} - ${facilityEndTime}`: ''"
+                @click="() => activar('I2')"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <DayOfWeekFilter
+        :open="dayFilterOpen"
+        @update:open="dayFilterOpen = $event"
+        :selectedDays="selectedDays"
+        @apply="selectedDays = $event"
+      />
+
+      <ActivityTypeFilter
+        :open="activityTypeFilterOpen"
+        @update:open="activityTypeFilterOpen = $event"
+        :selectedTypes="selectedActivityTypes"
+        @apply="selectedActivityTypes = $event"
+        :tiposActividad="estadisticas.tiposActividad"
+      />
+
+      <TimeRangeFilter
+        :open="activityTimeFilterOpen"
+        @update:open="activityTimeFilterOpen = $event"
+        :startTime="activityStartTime"
+        :endTime="activityEndTime"
+        @apply="({ start, end }) => { activityStartTime = start; activityEndTime = end }"
+        title="Horario de sesión"
+        description="Selecciona el rango horario."
+      />
+
+      <FacilityTypeFilter
+        :open="facilityTypeFilterOpen"
+        @update:open="facilityTypeFilterOpen = $event"
+        :selectedTypes="selectedFacilityTypes"
+        @apply="selectedFacilityTypes = $event"
+        :tiposInstalacion="estadisticas.tiposInstalacion"
+      />
+
+      <TimeRangeFilter
+        :open="facilityTimeFilterOpen"
+        @update:open="facilityTimeFilterOpen = $event"
+        :startTime="facilityStartTime"
+        :endTime="facilityEndTime"
+        @apply="({ start, end }) => { facilityStartTime = start; facilityEndTime = end }"
+        title="Horario de apertura"
+        description="Selecciona el horario de la instalación."
+      />
 
     </main>
   </div>
@@ -95,90 +230,183 @@
 
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, inject, type Ref, onMounted } from "vue";
+import { useRouter } from 'vue-router'
 import {
-  Search,
   Activity,
   Building2,
   Clock,
-  Calendar,
-  User,
-  Bell,
-  BarChart3,
-  CalendarCheck
+  Calendar
 } from "lucide-vue-next";
+import FilterCard from "./filters/FilterCard.vue";
+import DayOfWeekFilter from "./filters/DayOfWeekFilter.vue";
+import ActivityTypeFilter from "./filters/ActivityTypeFilter.vue";
+import TimeRangeFilter from "./filters/TimeRangeFilter.vue";
+import FacilityTypeFilter from "./filters/FacilityTypeFilter.vue";
 
-/* Importamos las comunicaciones con el backend a traves de nuestro Store para guardar las estadisticas */
+/* Importamos las comunicaciones con el backend para obtener las notificaciones*/
+import { getNotificaciones } from "../services/usuarioService";
+
+/* Importamos las comunicaciones con el backend a traves de nuestro Store para guardar las estadisticas y el usuario */
 import { useAuthStore } from "../stores/auth";
+import { useEstadisticasStore } from "../stores/estadisticas";
+
+/* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
+import type { Language } from "../useI18N";
+import { useI18n } from "../useI18N";
+
+const language = inject<Ref<Language>>("language")!;
+const t = useI18n(language);
 
 const userStore = useAuthStore();
+const estadisticasStore = useEstadisticasStore();
+const estadisticas = estadisticasStore.data;
 
-/* ========= ESTADO ========= */
-const language = ref<"es" | "en">("es");
+const router = useRouter()
+
+const error = ref("");
 const unreadNotifications = ref(3);
 
-/* Filtros */
+const activeTab = ref('activities');
+
+const dayFilterOpen = ref(false);
+const activityTypeFilterOpen = ref(false);
+const activityTimeFilterOpen = ref(false);
+const facilityTypeFilterOpen = ref(false);
+const facilityTimeFilterOpen = ref(false);
+
 const selectedDays = ref<string[]>([]);
 const selectedActivityTypes = ref<string[]>([]);
 const activityStartTime = ref("");
 const activityEndTime = ref("");
-
 const selectedFacilityTypes = ref<string[]>([]);
 const facilityStartTime = ref("");
 const facilityEndTime = ref("");
 
-/* Modales */
-const showDayFilter = ref(false);
-const showActivityTypeFilter = ref(false);
-const showActivityTimeFilter = ref(false);
-const showFacilityTypeFilter = ref(false);
-const showFacilityTimeFilter = ref(false);
+/* Orden de los dias dependiendo del idioma */
+const weekOrder = [
+  t.value.monday,
+  t.value.tuesday,
+  t.value.wednesday,
+  t.value.thursday,
+  t.value.friday,
+  t.value.saturday,
+  t.value.sunday,
+];
 
-/* ========= TRADUCCIONES ========= */
-const translations = {
-  es: {
-    welcome: "Bienvenido a la web del polideportivo",
-    home: "Inicio",
-    forum: "Foro",
-    contact: "Contacto",
-    faq: "FAQ",
-    logout: "Logout",
-    notifications: "Notificaciones",
-    seeAll: "Ver todas",
-    statsTitle: "Estadísticas de uso",
-    statsButton: "Ver estadísticas",
-    bookingsTitle: "Reservas realizadas",
-    bookingsButton: "Ver reservas",
-    searchPlaceholder: "Buscar actividades o instalaciones...",
-    searchButton: "Buscar",
-    filterBy: "Filtrar por",
-    activities: "Actividades",
-    facilities: "Instalaciones"
-  },
-  en: {
-    welcome: "Welcome to the sports center",
-    home: "Home",
-    forum: "Forum",
-    contact: "Contact",
-    faq: "FAQ",
-    logout: "Logout",
-    notifications: "Notifications",
-    seeAll: "See all",
-    statsTitle: "Usage statistics",
-    statsButton: "View statistics",
-    bookingsTitle: "Your bookings",
-    bookingsButton: "View bookings",
-    searchPlaceholder: "Search activities or facilities...",
-    searchButton: "Search",
-    filterBy: "Filter by",
-    activities: "Activities",
-    facilities: "Facilities"
+const orderedSelectedDays = computed(() =>
+  weekOrder.filter(day => selectedDays.value.includes(day))
+);
+
+type BusquedaCompleta = {
+  busqueda?: string
+  dias?: string[]
+  tiposActividad?: string[]
+  tiempoInicioActividad?: string
+  tiempoFinActividad?: string
+  tiposInstalacion?: string[]
+  tiempoInicioInstalacion?: string
+  tiempoFinInstalacion?: string
+}
+
+const textoBusqueda = ref('')
+
+function buscar() {
+  const busquedaCompleta: BusquedaCompleta = {}
+
+  /* Controlamos la existencia de cada filtro para no enviarlo en caso de no necesitarlo */
+
+  if(textoBusqueda.value != '') {
+    busquedaCompleta["busqueda"] = textoBusqueda.value
+  }
+
+  if(selectedDays.value.length > 0) {
+    busquedaCompleta["dias"] = selectedDays.value
+  }
+
+  if(selectedActivityTypes.value.length > 0) {
+    busquedaCompleta["tiposActividad"] = selectedActivityTypes.value
+  }
+
+  if(selectedFacilityTypes.value.length > 0) {
+    busquedaCompleta["tiposInstalacion"] = selectedFacilityTypes.value
+  }
+  
+  if(activityStartTime.value != '') {
+    busquedaCompleta["tiempoInicioActividad"] = activityStartTime.value
+  }
+
+  if(activityEndTime.value != '') {
+    busquedaCompleta["tiempoFinActividad"] = activityEndTime.value
+  }
+
+  if(facilityStartTime.value != '') {
+    busquedaCompleta["tiempoInicioInstalacion"] = facilityStartTime.value
+  }
+
+  if(facilityEndTime.value != '') {
+    busquedaCompleta["tiempoFinInstalacion"] = facilityEndTime.value
+  }
+
+  router.push({
+    path: '/buscar',
+    query: busquedaCompleta
+  })
+}
+
+const activar = (tipo: string) => {
+  dayFilterOpen.value = false;
+  activityTypeFilterOpen.value = false;
+  activityTimeFilterOpen.value = false;
+  facilityTypeFilterOpen.value = false;
+  facilityTimeFilterOpen.value = false;
+  
+  if(tipo === 'A1') {
+    dayFilterOpen.value = true;
+  } else if(tipo === 'A2') {
+    activityTypeFilterOpen.value = true;
+  } else if(tipo === 'A3') {
+    activityTimeFilterOpen.value = true;
+  } else if(tipo === 'I1') {
+    facilityTypeFilterOpen.value = true;
+  } else {
+    facilityTimeFilterOpen.value = true;
   }
 };
 
-const t = computed(() => translations[language.value]);
+export type Notificacion = {
+  id: number
+  titulo: string
+  descripcion: string
+  leido: boolean
+  actividad: number | null
+  instalacion: number | null
+  pabellon: number | null
+}
 
-const toggleLanguage = () => {
-  language.value = language.value === "es" ? "en" : "es";
-};
+export type NotificacionesResponse = {
+  notificaciones: Notificacion[]
+  no_leidas: number
+}
+
+const notificaciones = ref<NotificacionesResponse>({
+  notificaciones: [],
+  no_leidas: 0
+});
+
+onMounted(async () => {
+  const data = await getNotificaciones();
+
+  notificaciones.value.notificaciones = data.notificaciones;
+  notificaciones.value.no_leidas = data.no_leidas;
+})
+
 </script>
+
+<style>
+  .linea-fina {
+  height: 1px;
+  background-color: #ddd;
+  margin: 1rem 0;
+}
+</style>
