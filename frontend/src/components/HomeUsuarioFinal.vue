@@ -11,17 +11,23 @@
           <div class="card shadow-sm h-100">
             <div class="card-body">
               <div class="d-flex justify-content-between align-items-center mb-3">
-                <div class="d-flex align-items-center gap-2">
-                  <i class="bi bi-bell-fill text-primary me-2 fs-4"></i>
-                  <h5 class="mb-0">{{ t.notifications }}</h5>
-                  <span v-if="notificaciones.no_leidas"
-                        class="badge bg-danger">
+                <router-link
+                  to="/notificaciones"
+                  class="d-flex align-items-center gap-2 text-decoration-none text-dark"
+                >
+                  <i class="bi bi-bell-fill text-primary fs-4"></i>
+
+                  <h5 class="mb-0 text-primary">
+                    {{ t.notifications }}
+                  </h5>
+
+                  <span
+                    v-if="notificaciones.no_leidas"
+                    class="badge bg-danger"
+                  >
                     {{ notificaciones.no_leidas }}
                   </span>
-                </div>
-                <a href="#" class="text-primary small">
-                  {{ t.viewAll }} →
-                </a>
+                </router-link>
               </div>
 
               <div

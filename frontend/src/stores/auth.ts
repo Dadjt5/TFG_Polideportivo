@@ -37,6 +37,11 @@ export const useAuthStore = defineStore("auth", {
       this.user = await getMe();
     },
 
+    setAccess(token: string) {
+      this.access = token
+      localStorage.setItem('access', token)
+    },
+
     logout() {
       this.user = null;
       this.access = null;

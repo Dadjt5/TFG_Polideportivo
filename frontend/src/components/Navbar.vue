@@ -22,13 +22,13 @@
         </li>
 
         <li class="nav-item fs-5">
-          <router-link to="/forum" v-if="userStore.user" class="nav-link px-3 text-white">
+          <router-link to="/foro" v-if="userStore.user" class="nav-link px-3 text-white">
             {{ t.forum }}
           </router-link>
         </li>
 
         <li class="nav-item fs-5">
-          <router-link to="/contact" class="nav-link px-3 text-white">
+          <router-link to="/contacto" class="nav-link px-3 text-white">
             {{ t.contact }}
           </router-link>
         </li>
@@ -51,6 +51,12 @@
 
           <router-link to="/login" class="nav-link px-3 text-white" v-else>
             {{ t.login }}
+          </router-link>
+        </li>
+
+        <li class="nav-item fs-5">
+          <router-link to="/profile" v-if="userStore.user" class="nav-link">
+            <i class="bi bi-person-fill px-3 text-white me-2 fs-2"></i>
           </router-link>
         </li>
 

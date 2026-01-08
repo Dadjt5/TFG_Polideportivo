@@ -10,6 +10,7 @@ import Login from '../components/Login.vue'
 import Registro from '../components/Registro.vue'
 import DetalleActividad from '../components/DetalleActividad.vue'
 import DetalleInstalacion from '../components/DetalleInstalacion.vue'
+import Notificaciones from '../components/Notificaciones.vue'
 
 const routes = [
   { path: '/', redirect: '/home' },
@@ -36,7 +37,8 @@ const routes = [
     props: true,
     meta: { public: true }
   },
-  { path: '/contact', component: Contacto, meta: { public: true } },
+  { path: '/notificaciones', component: Notificaciones, meta: { requiresAuth: true } },
+  { path: '/contacto', component: Contacto, meta: { public: true } },
   { path: '/faq', component: FAQ, meta: { public: true } }
 ]
 
