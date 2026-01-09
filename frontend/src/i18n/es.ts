@@ -131,6 +131,15 @@ export default {
   tdaPercent: "Porcentaje de TDA",
   yes: "Si",
 
+  /* Notificaciones */
+  notSubtitle: "Consulta y gestiona tus avisos del polideportivo",
+  markRead: "Marcar como leída",
+  markUnread: "Marcar como no leída",
+  delete: "Eliminar",
+  pin: "Fijar",
+  unpin: "Desfijar",
+  empty: "No tienes notificaciones.",
+
   /* Contacto */
   contactTitle: "Contacto con el centro deportivo",
   contactSubtitle: "Información de contacto del edificio de administración",

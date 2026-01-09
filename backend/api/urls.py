@@ -61,4 +61,5 @@ urlpatterns = [
     path("estadisticas/", views.EstadisticasView.as_view(), name="estadisticas"),
     path("buscar/", views.BuscarView.as_view(), name="busqueda"),
     path("registrarse/", views.RegistroView.as_view(), name="registro"),
+    path("notificaciones/guardar", views.GuardarNotificacionView.as_view(), name="modificar-notificacion"),
 ]

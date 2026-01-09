@@ -130,6 +130,15 @@ export default {
   tdaPercent: "TDA percentage",
   yes: "Yes",
 
+  /* Notificaciones */
+  notSubtitle: "Check and manage your sports center alerts",
+  markRead: "Mark as read",
+  markUnread: "Mark as unread",
+  delete: "Delete",
+  pin: "Pin",
+  unpin: "Unpin",
+  empty: "You don't have notifications",
+
   /* Contacto */
   contactTitle: "Sports Center Contact",
   contactSubtitle: "Contact information of the administration building",

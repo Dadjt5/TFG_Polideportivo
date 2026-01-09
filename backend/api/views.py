@@ -298,6 +298,7 @@ class NotificacionViewSet(viewsets.ModelViewSet):
             "no_leidas": no_leidas
         })
 
+
 # ----------------
 # Pagos
 # ----------------
@@ -531,3 +532,20 @@ class RegistroView(APIView):
             status=sta
         )
 
+
+# Guardar informacion de notificaciones
+class GuardarNotificacionView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        notificaciones = request.data.get('notificaciones', [])
+
+        for n in notificaciones:
+            Notificacion.cambiar_estado(
+                usuario=request.user,
+                id=n['id'],
+                leido=n['leido'],
+                fijado=n['fijado']
+            )
+
+        return Response({"status": "ok"})

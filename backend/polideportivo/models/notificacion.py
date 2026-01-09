@@ -9,16 +9,18 @@ class Notificacion(models.Model):
 
     titulo = models.CharField(max_length=256, blank=True)
     descripcion = models.CharField(max_length=2048, blank=True)
-    fecha = models.DateTimeField(default=timezone.now)
+    fecha = models.DateField(default=timezone.localdate())
+    hora = models.TimeField(default=timezone.localtime().time())
     leido = models.BooleanField(default=False)
+    fijado = models.BooleanField(default=False)
 
     actividad = models.ForeignKey('Actividad', on_delete=models.RESTRICT, blank=True, null=True)
     instalacion = models.ForeignKey('Instalacion', on_delete=models.RESTRICT, blank=True, null=True)
     pabellon = models.ForeignKey('Pabellon', on_delete=models.RESTRICT, blank=True, null=True)
     usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.RESTRICT)
-    
+
     class Meta:
-        ordering = ['-fecha']
+        ordering = ['-fecha', '-hora']
 
     def __str__(self):
         return f'{self.titulo}'
@@ -30,3 +32,7 @@ class Notificacion(models.Model):
     @classmethod
     def contar_no_leidas(cls, usuario):
         return cls.objects.filter(usuario=usuario, leido=False).count()
+
+    @classmethod
+    def cambiar_estado(cls, usuario, id, leido, fijado):
+        cls.objects.filter(id=id, usuario=usuario).update(leido=leido, fijado=fijado)

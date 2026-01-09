@@ -55,7 +55,7 @@
         </li>
 
         <li class="nav-item fs-5">
-          <router-link to="/profile" v-if="userStore.user" class="nav-link">
+          <router-link to="/perfil" v-if="userStore.user" class="nav-link">
             <i class="bi bi-person-fill px-3 text-white me-2 fs-2"></i>
           </router-link>
         </li>

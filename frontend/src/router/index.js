@@ -51,6 +51,10 @@ const router = createRouter({
 router.beforeEach(async (to) => {
   const auth = useAuthStore();
 
+  if (!auth.user) {
+    await auth.fetchUser();
+  }
+
   if (to.path === '/home') {
     if (auth.role === 'usuario_final') return '/home-usuario';
     if (auth.role === 'monitor') return '/home-monitor';
@@ -63,10 +67,6 @@ router.beforeEach(async (to) => {
 
   if (!auth.isAuthenticated) {
     return '/login';
-  }
-
-  if (!auth.user) {
-    await auth.fetchUser();
   }
 
   if (to.meta.role && auth.role !== to.meta.role) {
