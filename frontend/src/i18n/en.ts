@@ -8,6 +8,18 @@ export default {
   login: "Login",
   logout: "Logout",
 
+  /* Perfil */
+  role: "Role",
+  identity: "Identification",
+  viewTDA: "View annual sports card",
+  moreViewTDA: "Check your annual sports card",
+  favoriteSports: "Select favorite sports",
+  moreFavoriteSports: "Choose your favorite sports",
+  modifyPersonalData: "Manage personal data",
+  moreModifyPersonalData: "Manage your name, password, email, and other information",
+  viewTickets: "View passes and vouchers",
+  moreViewTickets: "Review your owned passes and vouchers",
+
   /* Home - Buscar */
   welcome: "Welcome to Sports Center XX",
   welcome2: "Log in to access all features",

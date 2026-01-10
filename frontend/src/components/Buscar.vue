@@ -1,13 +1,8 @@
 <template>
   <div class="min-vh-100 bg-light">
-
-    <!-- MAIN -->
     <main class="container-fluid mt-2 px-5 py-1">
 
-      <!-- INTRO -->
       <div class="text-center mt-5 mb-4">
-
-        <!-- BUSQUEDAS -->
         <div class="container-fluid mt-4">
           <div class="d-flex align-items-center bg-white rounded-3 shadow p-2 border gap-3">
             <Search class="text-secondary"/>
@@ -27,7 +22,6 @@
         </div>
       </div>
 
-      <!-- TABS -->
       <ul class="nav nav-tabs justify-content-center mb-3">
         <li class="nav-item fs-5">
           <button
@@ -52,9 +46,7 @@
         </li>
       </ul>
 
-      <!-- TAB CONTENT -->
       <div class="tab-content">
-        <!-- ACTIVIDADES -->
           <div
             class="tab-pane fade"
             :class="{ show: activeTab === 'activities', active: activeTab === 'activities' }"
@@ -89,7 +81,6 @@
           </div>
         </div>
 
-        <!-- INSTALACIONES -->
         <div
           class="tab-pane fade"
           :class="{ show: activeTab === 'facilities', active: activeTab === 'facilities' }"

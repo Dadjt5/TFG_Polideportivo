@@ -5,7 +5,7 @@ class User(AbstractUser):
 
     @property
     def is_usuario_final(self):
-        return hasattr(self, 'usuariofinal')
+        return hasattr(self, 'usuario_final')
 
     @property
     def is_monitor(self):

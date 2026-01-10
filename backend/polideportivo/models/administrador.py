@@ -9,7 +9,7 @@ class Administrador(models.Model):
 
     nombre = models.CharField(max_length=256, blank=True)
 
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="administrador")
 
     rol = models.CharField(default=RolAdministrador.USUARIOS, choices=RolAdministrador.choices)
 

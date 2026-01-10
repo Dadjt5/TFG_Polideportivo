@@ -16,3 +16,10 @@ export const guardarNotificaciones = async (payload) => {
 export const borrarNotificaciones = async (id) => {
   await api.delete(`api/v1/notificaciones/${id}/`)
 };
+
+
+/* Función para recuperar el usuario con todos sus campos */
+export const getUsuarioFinal = async (id) => {
+  const response = await api.get(`api/v1/usuariosFinales/${id}/`)
+  return response.data
+};

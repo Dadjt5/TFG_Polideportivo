@@ -384,10 +384,9 @@ class UsuarioFinalViewSet(viewsets.ModelViewSet):
     queryset = UsuarioFinal.objects.all()
     serializer_class = UsuarioFinalSerializer
     permission_classes = [IsAuthenticated]
-    
+
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-
 
 # ----------------
 # Administradores
@@ -418,7 +417,7 @@ class UserViewSet(viewsets.ModelViewSet):
 # Para devolver el usuario registrado
 class meAPIView(APIView):
     permission_classes = [IsAuthenticated]
-    
+
     def get(self, request):
         user = request.user
 
@@ -430,11 +429,25 @@ class meAPIView(APIView):
             "is_usuario_final": user.is_usuario_final,
             "is_administrador": user.is_administrador,
         }
-        
+
+        if user.is_usuario_final:
+            data["usuario_final_id"] = user.usuario_final.id
+        else:
+            data["usuario_final_id"] = None
+
+        if user.is_monitor:
+            data["monitor_id"] = user.monitor.id
+        else:
+            data["monitor_id"] = None
+
         if user.is_administrador:
+            data["administrador_id"] = user.administrador.id
             data["rol"] = user.administrador.rol
+        else:
+            data["administrador_id"] = None
 
         return Response(data)
+
 
 # Estadisticas de home
 class EstadisticasView(APIView):

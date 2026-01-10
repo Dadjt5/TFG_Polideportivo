@@ -248,7 +248,7 @@ import TimeRangeFilter from "./filters/TimeRangeFilter.vue";
 import FacilityTypeFilter from "./filters/FacilityTypeFilter.vue";
 
 /* Importamos las comunicaciones con el backend para obtener las notificaciones*/
-import { getNotificaciones } from "../services/usuarioService";
+import { getNotificaciones } from "../services/usuarioFinalService";
 
 /* Importamos las comunicaciones con el backend a traves de nuestro Store para guardar las estadisticas y el usuario */
 import { useAuthStore } from "../stores/auth";

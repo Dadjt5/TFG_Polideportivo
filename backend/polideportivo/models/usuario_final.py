@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.db import models, transaction
 from django.contrib.auth import get_user_model
+from django.conf import settings
 
 from .usuario import Usuario
 from .favorito import Favorito
@@ -20,6 +21,7 @@ class UsuarioFinal(Usuario):
     actividadesRealizadas = models.PositiveIntegerField(default=0)
 
     deportesFavoritos = models.ManyToManyField('Deporte', blank=True, related_name="usuarios")
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="usuario_final")
 
     sexo = models.CharField(default=Sexo.NINGUNO, choices=Sexo.choices)
     rol = models.CharField(default=Rol.EXTERNO, choices=Rol.choices)

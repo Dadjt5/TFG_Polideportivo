@@ -132,6 +132,10 @@ const handleLogin = async () => {
     localStorage.setItem("refresh", data.refresh);
 
     const auth = useAuthStore();
+
+    auth.access = data.access;
+    auth.refresh = data.refresh; 
+
     await auth.fetchUser();
 
     router.push("/");

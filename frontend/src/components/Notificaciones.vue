@@ -84,7 +84,7 @@ import { inject, type Ref, ref, computed, onMounted } from "vue";
 import { onBeforeRouteLeave } from 'vue-router'
 
 /* Importamos las comunicaciones con el backend para obtener, editar o guardar las notificaciones*/
-import { getNotificaciones, guardarNotificaciones, borrarNotificaciones } from "../services/usuarioService";
+import { getNotificaciones, guardarNotificaciones, borrarNotificaciones } from "../services/usuarioFinalService";
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
 import type { Language } from "../useI18N";

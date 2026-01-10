@@ -8,6 +8,18 @@ export default {
   login: "Acceder",
   logout: "Cerrar sesión",
 
+  /* Perfil */
+  role: "Rol",
+  identity: "Identificación",
+  viewTDA: "Ver tarjeta deportiva anual",
+  moreViewTDA: "Consulta tu tarjeta deportiva anual",
+  favoriteSports: "Seleccionar deportes favoritos",
+  moreFavoriteSports: "Elige tus deportes favoritos",
+  modifyPersonalData: "Modificar datos personales",
+  moreModifyPersonalData: "Modifica tu nombre, contraseña, email y otra información",
+  viewTickets: "Ver Abonos y bonos",
+  moreViewTickets: "Revisa los abonos y bonos en posesión",
+
   /* Home - Buscar */
   welcome: "Bienvenido al Polideportivo XX",
   welcome2: "Inicia sesión para acceder a todas las funcionalidades",

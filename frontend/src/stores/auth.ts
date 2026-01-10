@@ -9,6 +9,10 @@ export interface User {
   is_usuario_final: boolean;
   is_monitor: boolean;
   is_administrador: boolean;
+
+  usuario_final_id: number,
+  monitor_id: number,
+  administrador_id: number
 }
 
 export const useAuthStore = defineStore("auth", {
