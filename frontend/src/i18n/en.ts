@@ -151,6 +151,26 @@ export default {
   unpin: "Unpin",
   empty: "You don't have notifications",
 
+  /* Abonos y bonos */
+  ticketsTitle: "Purchase Bonuses and Subscriptions",
+  bonus: "Bonuses",
+  subscription: "Subscriptions",
+  uses: "Number of uses",
+  validity: "Years of validity",
+  buy: "Buy",
+  price: "Price",
+  sport: "Sport",
+  sportsSubscription: 'Sports subscription',
+  summerSubscription: 'Summer subscription',
+  unlimitedPool: 'Unlimited access to the swimming pool',
+  unlimitedGym: 'Unlimited access to the gym',
+  activityDiscount: '30% discount on activities',
+  facilityDiscount: 'Discount on facility reservations',
+  summerPool: 'Access to the summer swimming pool',
+  cheaper: 'Cheaper than the sports subscription',
+  sportPeriod: "1 month, 4 months o 12 months",
+  summerPeriod: "12 months",
+
   /* Contacto */
   contactTitle: "Sports Center Contact",
   contactSubtitle: "Contact information of the administration building",

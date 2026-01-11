@@ -204,13 +204,6 @@ class ActividadSerializer(serializers.ModelSerializer):
 
     def get_horasSemanales(self, obj):
         return obj.calcularHorasSemanales()
-
-    def get_nombreMonitor(self, obj):
-        monitor = obj.monitor
-
-        if monitor:
-            return monitor.nombre
-        return None
     
     def get_dias(self, obj):
         return ",".join(sesion.dia for sesion in obj.sesiones.all())
@@ -249,9 +242,78 @@ class AgendaSerializer(serializers.ModelSerializer):
 # --------------------
 
 class BonoSerializer(serializers.ModelSerializer):
+    nombreInstalacion = serializers.SerializerMethodField()
+    nombreDeporte = serializers.SerializerMethodField()
+    precioFinal = serializers.SerializerMethodField()
+    textoPrecio = serializers.SerializerMethodField()
+
     class Meta:
         model = Bono
-        fields = '__all__'
+        fields = (
+            "id",
+            "validez",
+            "usos",
+            "precioFinal",
+            "textoPrecio",
+            "nombreInstalacion",
+            "nombreDeporte"
+        )
+    
+    def get_precioFinal(self, obj):
+        user = self.context.get('user')
+        precio = obj.precioOtros
+
+        if user.is_usuario_final:
+            if user.usuario_final.tda.first():
+                if precio > obj.precioTDA:
+                    precio = obj.precioTDA
+
+            if user.usuario_final.rol and "externo" not in user.usuario_final.rol.lower():
+                if precio > obj.precioUAM:
+                    precio = obj.precioUAM
+
+            if user.usuario_final.abono.first():
+                if precio > obj.precioAbono:
+                    precio = obj.precioAbono
+
+        return precio
+    
+    def get_textoPrecio(self, obj):
+        user = self.context.get('user')
+        cadena = ""
+        precio = obj.precioOtros
+        
+        if user.is_usuario_final:
+            if user.usuario_final.tda.first():
+                if precio > obj.precioTDA:
+                    precio = obj.precioTDA
+                    cadena = "Descuento por TDA"
+
+            if user.usuario_final.rol and "externo" not in user.usuario_final.rol.lower():
+                if precio > obj.precioUAM:
+                    precio = obj.precioUAM
+                    cadena = "Descuento comunidad UAM"
+
+            if user.usuario_final.abono.first():
+                if precio > obj.precioAbono:
+                    precio = obj.precioAbono
+                    cadena = "Descuento por abono"
+
+        return cadena
+    
+    def get_nombreInstalacion(self, obj):
+        instalacion = obj.instalacion
+
+        if instalacion:
+            return instalacion.nombre
+        return None
+    
+    def get_nombreDeporte(self, obj):
+        deporte = obj.deporte
+
+        if deporte:
+            return deporte.titulo
+        return None
 
 
 class CompraBonoSerializer(serializers.ModelSerializer):

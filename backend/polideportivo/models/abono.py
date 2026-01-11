@@ -43,7 +43,7 @@ class CompraAbono(models.Model):
     
     fecha = models.DateField(auto_now_add=True)
     
-    usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.RESTRICT)
+    usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.RESTRICT, related_name="abono")
     abonoDeportivo = models.ForeignKey('AbonoDeportivo', on_delete=models.RESTRICT, related_name="compras_deportivo")
     abonoVerano = models.ForeignKey('AbonoVerano', on_delete=models.RESTRICT, related_name="compras_verano")
     pago = models.OneToOneField('Pago', on_delete=models.RESTRICT)

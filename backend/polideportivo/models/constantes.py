@@ -181,23 +181,6 @@ class Tematica(models.TextChoices):
     NUEVAS_ACTIVIDADES = 'Buzon de nuevas actividades'
 
 
-class TipoBono(models.TextChoices):
-    """
-    Clase para enumerar los tipos de bono
-
-    Tipos de bono:
-    - PADEL, TENIS, SALA_MUSCULACION, PISCINA
-    """
-    
-    PADEL = 'Bono para padel'
-
-    TENIS = 'Bono para tenis'
-
-    SALA_MUSCULACION = 'Bono para la sala de musculacion'
-    
-    PISCINA = 'Bono para piscina'
-
-
 class EstadoPago(models.TextChoices):
     """
     Clase para enumerar los estados de pago

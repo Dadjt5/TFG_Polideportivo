@@ -3,20 +3,26 @@
     <main class="container py-4">
       <h1 class="text-center fw-bold mb-4">
         <i class="bi bi-ticket-perforated text-primary me-2 fs-1"></i>
-        {{ t.purchase }}
+        {{ t.ticketsTitle }}
       </h1>
 
       <section class="mb-5">
         <h2 class="fw-semibold mb-3">{{ t.bonus }}</h2>
 
         <div class="row g-4">
-          <div class="col-md-4" v-for="b in bonuses" :key="b.id">
+          <div class="col-md-4" v-for="b in bonos" :key="b.id">
             <div class="card h-100 shadow-sm rounded-4">
               <div class="card-body">
-                <p><strong>{{ b.sport }}</strong></p>
-                <p><strong>{{ t.uses }}:</strong> {{ b.uses }}</p>
-                <p><strong>{{ t.validity }}:</strong> {{ b.validity }} año</p>
-                <p><strong>Precio:</strong> {{ b.price }}€</p>
+                <p v-if="b.instalacion!=''">
+                  <strong>{{ t.facility }}:</strong> {{ b.instalacion }}
+                </p>
+                <p v-else>
+                  <strong>{{ t.sport }}:</strong> {{ b.deporte }}
+                </p>
+                <p><strong>{{ t.uses }}:</strong> {{ b.numeroUsos }}</p>
+                <p><strong>{{ t.validity }}:</strong> {{ b.validez }}</p>
+                <p><strong>{{ t.price }}:</strong> {{ b.precio }}€</p>
+                <p v-if="b.descripcionPrecio!=''">{{ b.descripcionPrecio }}</p>
               </div>
               <div class="card-footer bg-transparent border-0">
                 <button class="btn btn-success w-100 rounded-pill">
@@ -58,65 +64,22 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, inject, type Ref } from 'vue'
 
-const language = ref('es')
+/* Importamos los metodos con los que obtener los bonos y abonos del backend */
+import { getAbonos, getBonos } from "../services/abonoBonoService"
 
-const translations = {
-  es: {
-    home: 'Inicio',
-    forum: 'Foro',
-    contact: 'Contacto',
-    faq: 'FAQ',
-    logout: 'Logout',
-    purchase: 'Compra de bonos y abonos',
-    bonus: 'Bonos',
-    subscription: 'Abonos',
-    uses: 'Número de usos',
-    validity: 'Años de validez',
-    buy: 'Comprar',
-    sports: 'Abono deportivo',
-    summer: 'Abono de verano',
-    unlimitedPool: 'Acceso ilimitado a la piscina',
-    unlimitedGym: 'Acceso ilimitado a la sala de musculación',
-    activityDiscount: 'Descuento del 30% en actividades',
-    facilityDiscount: 'Reducción de precios en reserva de instalaciones',
-    summerPool: 'Acceso a la piscina de verano',
-    cheaper: 'Más barato que el abono deportivo'
-  },
-  en: {
-    home: 'Home',
-    forum: 'Forum',
-    contact: 'Contact',
-    faq: 'FAQ',
-    logout: 'Logout',
-    purchase: 'Purchase Bonuses and Subscriptions',
-    bonus: 'Bonuses',
-    subscription: 'Subscriptions',
-    uses: 'Number of uses',
-    validity: 'Years of validity',
-    buy: 'Buy',
-    sports: 'Sports subscription',
-    summer: 'Summer subscription'
-  }
-}
+/* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
+import type { Language } from "../useI18N";
+import { useI18n } from "../useI18N";
 
-const t = computed(() => translations[language.value])
-
-const toggleLanguage = () => {
-  language.value = language.value === 'es' ? 'en' : 'es'
-}
-
-const bonuses = ref([
-  { id: 1, sport: 'Instalación: Piscina', uses: 10, validity: 1, price: 40 },
-  { id: 2, sport: 'Instalación: Sala musculación', uses: 20, validity: 1, price: 40 },
-  { id: 3, sport: 'Deporte: Tenis', uses: 15, validity: 1, price: 30 }
-])
+const language = inject<Ref<Language>>("language")!;
+const t = useI18n(language);
 
 const abonos = computed(() => [
   {
     id: 1,
-    name: t.value.sports,
+    name: t.value.sportsSubscription,
     duracion: '1 mes, 4 meses o 12 meses',
     benefits: [
       t.value.unlimitedPool,
@@ -127,22 +90,11 @@ const abonos = computed(() => [
   },
   {
     id: 2,
-    name: t.value.summer,
+    name: t.value.summerSubscription,
     duracion: '12 meses',
     benefits: [t.value.summerPool, t.value.cheaper]
   }
 ])
-
-interface Abonos {
-  actividades: any[] | null
-  instalaciones: any[] | null
-}
-
-const resultados = ref<Abonos>({
-  actividades: null,
-  instalaciones: null
-})
-
 
 const abono = ref({
   id: 0,
@@ -152,30 +104,47 @@ const abono = ref({
   plazasReservadas: 0,
   edadMinima: 0,
   año: 0,
-  numeroCreditos: 0,
-  nivel: "",
-  material: "",
-  exterior: false,
-  tipoReserva: "",
-  terreno: "",
-  periodo: "",
-  estado: "",
-  dias: ""
+  numeroCreditos: 0
 });
+
+const bonoBase = {
+  id: 0,
+  instalacion: '',
+  deporte: '',
+  numeroUsos: 0,
+  validez: 0,
+  precio: 0,
+  descripcionPrecio: ''
+}
+
+type Bono = typeof bonoBase
+const bonos = ref<Bono[]>([])
 
 onMounted(async () => {
   try {
-    const abonos = await getAbonos();
-    const bonos = await getBonos();
+    //const responseAbonos = await getAbonos();
+    const responseBonos = await getBonos() as Array<{
+      id: number
+      validez: number
+      usos: number
+      precioFinal: number
+      textoPrecio: string
+      nombreInstalacion: string | null
+      nombreDeporte: string | null
+      tipoBono: string
+    }>
 
-    data.value = {
-      nombre: user.nombre,
-      apellidos: user.apellidos,
-      email: userStore.user?.email || '',
-      rol: user.rol
-    };
+    bonos.value = responseBonos.map(b => ({
+      id: b.id,
+      instalacion: b.nombreInstalacion ?? '',
+      deporte: b.nombreDeporte ?? '',
+      numeroUsos: b.usos,
+      validez: b.validez,
+      precio: b.precioFinal,
+      descripcionPrecio: b.textoPrecio
+    }))
   } catch(e) {
-    console.log("Error al obtener el usuario", e)
+    console.log("Error al obtener los abonos o los bonos", e)
   }
 })
 </script>

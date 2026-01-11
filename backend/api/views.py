@@ -117,16 +117,14 @@ class AgendaViewSet(viewsets.ModelViewSet):
 # ----------------
     
 class BonoViewSet(viewsets.ModelViewSet):
+    queryset = Bono.objects.all()
     serializer_class = BonoSerializer
     permission_classes = [IsAuthenticated]
 
-    def get_queryset(self):
-        user = self.request.user
-        if user.is_usuario_final:
-            return Bono.objects.filter(compras_bono__usuarioFinal__user=user)
-        elif user.is_administrador:
-            return Bono.objects.all()
-        return []
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['user'] = self.request.user
+        return context
 
 
 class CompraBonoViewSet(viewsets.ModelViewSet):

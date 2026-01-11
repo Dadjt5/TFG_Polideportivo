@@ -118,6 +118,13 @@ const data = ref({
   rol: ''
 });
 
+const verTarjeta = (id: number) => {
+  router.push({
+    name: 'ver-tda',
+    params: { id }
+  });
+}
+
 const logout = () => {
   userStore.logout();
   router.push("/");

@@ -13,6 +13,7 @@ import DetalleInstalacion from '../components/DetalleInstalacion.vue'
 import Notificaciones from '../components/Notificaciones.vue'
 import Perfil from '../components/Perfil.vue'
 import AbonoBono from '../components/AbonoBono.vue'
+import TarjetaDeportivaAnual from '../components/TarjetaDeportivaAnual.vue'
 
 const routes = [
   { path: '/', redirect: '/home' },
@@ -43,7 +44,8 @@ const routes = [
   { path: '/perfil', component: Perfil, meta: { requiresAuth: true } },
   { path: '/tickets', component: AbonoBono, meta: { requiresAuth: true } },
   { path: '/contacto', component: Contacto, meta: { public: true } },
-  { path: '/faq', component: FAQ, meta: { public: true } }
+  { path: '/faq', component: FAQ, meta: { public: true } },
+  { path: '/ver-tda', component: TarjetaDeportivaAnual, meta: { requiresAuth: true }}
 ]
 
 const router = createRouter({

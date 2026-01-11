@@ -152,6 +152,26 @@ export default {
   unpin: "Desfijar",
   empty: "No tienes notificaciones.",
 
+  /* Abonos y bonos */
+  ticketsTitle: "Comprar abonos y bonos",
+  bonus: "Bonos",
+  subscription: "Abonos",
+  uses: "Usos",
+  validity: "Años de validez",
+  price: "Precio",
+  buy: "Comprar",
+  sport: "Deporte",
+  sportsSubscription: 'Abono deportivo',
+  summerSubscription: 'Abono de verano',
+  unlimitedPool: 'Acceso ilimitado a la piscina',
+  unlimitedGym: 'Acceso ilimitado a la sala de musculación',
+  activityDiscount: 'Descuento del 30% en actividades',
+  facilityDiscount: 'Reducción de precios en reserva de instalaciones',
+  summerPool: 'Acceso a la piscina de verano',
+  cheaper: 'Más barato que el abono deportivo',
+  sportPeriod: "1 mes, 4 meses o 12 meses",
+  summerPeriod: "12 meses",
+
   /* Contacto */
   contactTitle: "Contacto con el centro deportivo",
   contactSubtitle: "Información de contacto del edificio de administración",

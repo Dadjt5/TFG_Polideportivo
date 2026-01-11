@@ -11,8 +11,8 @@ class TDA(models.Model):
     fechaExpiracion = models.DateField()
     enRegla = models.BooleanField(default=False)
     
-    usuarioFinal = models.ForeignKey(UsuarioFinal, on_delete=models.RESTRICT)
-    
+    usuarioFinal = models.ForeignKey(UsuarioFinal, on_delete=models.RESTRICT, related_name="tda", null=True)
+
     def __str__(self):
         return f'Tarjeta deportiva anual con fecha de inicio: {self.fechaInicio} y fecha de expiracion: {self.fechaExpiracion}'
 
