@@ -286,16 +286,6 @@ class NotificacionViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return Notificacion.objects.filter(usuario=self.request.user)
 
-    def list(self, request):
-        queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True)
-        no_leidas = Notificacion.contar_no_leidas(request.user)
-        
-        return Response({
-            "notificaciones": serializer.data,
-            "no_leidas": no_leidas
-        })
-
 
 # ----------------
 # Pagos

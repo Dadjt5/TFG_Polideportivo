@@ -28,10 +28,6 @@ class Notificacion(models.Model):
     @classmethod
     def contar(cls):
         return cls.objects.count()
-    
-    @classmethod
-    def contar_no_leidas(cls, usuario):
-        return cls.objects.filter(usuario=usuario, leido=False).count()
 
     @classmethod
     def cambiar_estado(cls, usuario, id, leido, fijado):

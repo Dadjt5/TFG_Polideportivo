@@ -9,7 +9,6 @@ class TDA(models.Model):
 
     fechaInicio = models.DateField(auto_now_add=True)
     fechaExpiracion = models.DateField()
-    enRegla = models.BooleanField(default=False)
     
     usuarioFinal = models.ForeignKey(UsuarioFinal, on_delete=models.RESTRICT, related_name="tda", null=True)
 

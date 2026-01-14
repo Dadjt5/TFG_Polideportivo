@@ -23,3 +23,10 @@ export const getUsuarioFinal = async (id) => {
   const response = await api.get(`api/v1/usuariosFinales/${id}/`)
   return response.data
 };
+
+
+/* Función para recuperar la TDA */
+export const getTDA = async () => {
+  const response = await api.get('api/v1/tdas/')
+  return response.data
+};

@@ -45,7 +45,10 @@ const routes = [
   { path: '/tickets', component: AbonoBono, meta: { requiresAuth: true } },
   { path: '/contacto', component: Contacto, meta: { public: true } },
   { path: '/faq', component: FAQ, meta: { public: true } },
-  { path: '/ver-tda', component: TarjetaDeportivaAnual, meta: { requiresAuth: true }}
+  { path: '/ver-tda', component: TarjetaDeportivaAnual, meta: { requiresAuth: true }},
+  //{ path: '/ver-deportes-favoritos', component: DeportesFavoritos, meta: { requiresAuth: true }},
+  //{ path: '/modificar-datos', component: ModificarDatos, meta: { requiresAuth: true }},
+  //{ path: '/ver-abonos', component: AbonosBonosUsuarioFinal, meta: { requiresAuth: true }},
 ]
 
 const router = createRouter({

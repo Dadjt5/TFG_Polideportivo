@@ -22,18 +22,19 @@
                   </h5>
 
                   <span
-                    v-if="notificaciones.no_leidas"
+                    v-if="usuarioFinalStore.unreadCount > 0"
                     class="badge bg-danger"
                   >
-                    {{ notificaciones.no_leidas }}
+                    {{ usuarioFinalStore.unreadCount }}
                   </span>
                 </router-link>
               </div>
 
               <div
-                v-for="notf in notificaciones.notificaciones"
+                v-for="notf in usuarioFinalStore.notificaciones"
                   :key="notf.id"
-                  class="bg-light rounded p-3 mb-2"
+                  class="rounded p-3 mb-2"
+                  :class="notf.leido ? 'bg-white' : 'bg-primary bg-opacity-10'"
                 >
                 <strong>{{ notf.titulo }}</strong>
                 <p class="mb-0 small text-muted">
@@ -247,11 +248,9 @@ import ActivityTypeFilter from "./filters/ActivityTypeFilter.vue";
 import TimeRangeFilter from "./filters/TimeRangeFilter.vue";
 import FacilityTypeFilter from "./filters/FacilityTypeFilter.vue";
 
-/* Importamos las comunicaciones con el backend para obtener las notificaciones*/
-import { getNotificaciones } from "../services/usuarioFinalService";
-
 /* Importamos las comunicaciones con el backend a traves de nuestro Store para guardar las estadisticas y el usuario */
 import { useAuthStore } from "../stores/auth";
+import { useUserStore } from "../stores/usuarioFinal";
 import { useEstadisticasStore } from "../stores/estadisticas";
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
@@ -262,6 +261,7 @@ const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);
 
 const userStore = useAuthStore();
+const usuarioFinalStore = useUserStore();
 const estadisticasStore = useEstadisticasStore();
 const estadisticas = estadisticasStore.data;
 
@@ -374,34 +374,18 @@ const activar = (tipo: string) => {
   }
 };
 
-export type Notificacion = {
-  id: number
-  titulo: string
-  descripcion: string
-  leido: boolean
-  actividad: number | null
-  instalacion: number | null
-  pabellon: number | null
-}
-
-export type NotificacionesResponse = {
-  notificaciones: Notificacion[]
-  no_leidas: number
-}
-
-const notificaciones = ref<NotificacionesResponse>({
-  notificaciones: [],
-  no_leidas: 0
-});
 
 onMounted(async () => {
-  const data = await getNotificaciones();
+  if (!usuarioFinalStore.usuarioFinal) {
+    await usuarioFinalStore.fetchUser(userStore.user?.usuario_final_id)
+  }
 
-  notificaciones.value.notificaciones = data.notificaciones;
-  notificaciones.value.no_leidas = data.no_leidas;
+  if (usuarioFinalStore.notificaciones.length === 0) {
+    await usuarioFinalStore.fetchNotificaciones();
+  }
 })
-
 </script>
+
 
 <style>
   .linea-fina {

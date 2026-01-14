@@ -14,6 +14,7 @@
     "bootstrap-icons": "^1.13.1",
     "lucide-vue-next": "^0.562.0",
     "pinia": "^2.0.26",
+    "qrcode-vue3": "^1.7.1",
     "qs": "^6.14.1",
     "vue": "^3.2.45",
     "vue-router": "^4.6.4"
