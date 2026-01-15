@@ -171,6 +171,26 @@ export default {
   sportPeriod: "1 month, 4 months o 12 months",
   summerPeriod: "12 months",
 
+  /* TDA */
+  /* TDA inactiva */
+  TDAEmptyTitle: "Link Annual Sports Card",
+  TDAinstructions: "Enter your card code to link it to your account and generate your QR code.",
+  inputPlaceholder: 'Your card secret code',
+  linkButton: 'Link card',
+  TDAsuccess: 'Card linked successfully.',
+  TDAerror: 'Invalid ID or already linked.',
+
+  /* TDA activa */
+  TDATitle: "Annual Sports Card",
+  cardInfo: "Your card information",
+  issued: "Issued",
+  expires: "Expires",
+  qrTitle: "Access QR Code",
+  regenerateQR: "Regenerate QR",
+  downloadQR: "Download QR",
+  inactive: "Inactive",
+  active: "Active",
+
   /* Contacto */
   contactTitle: "Sports Center Contact",
   contactSubtitle: "Contact information of the administration building",

@@ -62,4 +62,5 @@ urlpatterns = [
     path("buscar/", views.BuscarView.as_view(), name="busqueda"),
     path("registrarse/", views.RegistroView.as_view(), name="registro"),
     path("notificaciones/guardar", views.GuardarNotificacionView.as_view(), name="modificar-notificacion"),
+    path("tda/validar", views.ValidarTDAView.as_view(), name="validar-tda"),
 ]

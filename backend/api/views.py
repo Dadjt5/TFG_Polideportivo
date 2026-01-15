@@ -550,3 +550,19 @@ class GuardarNotificacionView(APIView):
             )
 
         return Response({"status": "ok"})
+
+
+# Asignar la TDA al usuario
+class ValidarTDAView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        tda_id = request.data.get("tda_id")
+        tda = TDA.objects.filter(id=tda_id).first()
+
+        resultado = tda.asignar_usuario(request.user.usuario_final)
+        
+        if resultado:
+            return Response({"status": "ok"})
+
+        return Response({"status": "error"})

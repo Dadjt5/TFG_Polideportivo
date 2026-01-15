@@ -9,8 +9,8 @@ class Notificacion(models.Model):
 
     titulo = models.CharField(max_length=256, blank=True)
     descripcion = models.CharField(max_length=2048, blank=True)
-    fecha = models.DateField(default=timezone.localdate())
-    hora = models.TimeField(default=timezone.localtime().time())
+    fecha = models.DateField(default=timezone.now)
+    hora = models.TimeField(default=timezone.now)
     leido = models.BooleanField(default=False)
     fijado = models.BooleanField(default=False)
 
