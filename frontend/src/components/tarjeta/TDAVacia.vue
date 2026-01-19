@@ -12,12 +12,12 @@
             type="text"
             class="form-control text-center mb-3"
             :placeholder="t.inputPlaceholder"
-            v-model="tdaId"
+            v-model="codigo"
           />
 
-          <button class="btn btn-primary w-100 mb-3" @click="vincularTarjeta">{{ t.linkButton }}</button>
+          <button class="btn btn-primary w-100 mb-4" @click="vincularTarjeta">{{ t.linkButton }}</button>
 
-          <p v-if="error">{{ t.TDAerror }}</p>
+          <p class="text-danger" v-if="error">{{ t.TDAerror }}</p>
         </div>
       </div>
     </div>
@@ -32,19 +32,33 @@ import { type Ref, inject, ref } from "vue";
 import type { Language } from "../../useI18N";
 import { useI18n } from "../../useI18N";
 
+/* Importamos la forma de tratar de validar la TDA desde el backend */
+import { validarTDA } from "../../services/usuarioFinalService";
+
+import { useUserStore } from '../../stores/usuarioFinal';
+
 const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);
 
-const tdaId = ref('');
+const usuarioFinalStore = useUserStore();
+
+const codigo = ref('');
 const error = ref(false);
 
-const vincularTarjeta = () => {
-  if (tdaId.value.trim() === '') {
+const vincularTarjeta = async () => {
+  if (codigo.value.trim() === '') {
     error.value = true
     return;
   }
 
-  error.value = false
+  const respuesta = await validarTDA({codigo: codigo.value})
+
+  if(respuesta.status == "error") {
+    error.value = true
+  } else {
+    error.value = false
+    await usuarioFinalStore.fetchTDA();
+  }
 };
 
 </script>

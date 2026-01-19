@@ -1,5 +1,12 @@
 import { defineStore } from "pinia";
-import { getTDA, getUsuarioFinal, getNotificaciones, borrarNotificaciones, guardarNotificaciones } from "../services/usuarioFinalService";
+import {
+  marcarFavoritos,
+  getTDA,
+  getUsuarioFinal,
+  getNotificaciones,
+  borrarNotificaciones,
+  guardarNotificaciones
+} from "../services/usuarioFinalService";
 
 let intervalId: number | null = null;
 
@@ -27,7 +34,12 @@ export const useUserStore = defineStore("user", {
     usuarioFinal: JSON.parse(localStorage.getItem("usuarioFinal") || "null"),
     tda: null as TDA | null,
     notificaciones: [] as Notificacion[],
+    favoritos: {
+      actividades: [] as number[],
+      instalaciones: [] as number[],
+    },
     cambiosPendientes: false,
+    cambiosFavoritos: false,
   }),
 
   getters: {
@@ -44,6 +56,12 @@ export const useUserStore = defineStore("user", {
       ...state.notificaciones.filter(n => n.fijado),
       ...state.notificaciones.filter(n => !n.fijado),
     ],
+    activityIsFavorite: (state) => (id: number) => {
+      return state.favoritos.actividades.includes(id);
+    },
+    facilityIsFavorite: (state) => (id: number) => {
+      return state.favoritos.instalaciones.includes(id);
+    },
   },
 
   actions: {
@@ -51,6 +69,8 @@ export const useUserStore = defineStore("user", {
       try {
         const data = await getUsuarioFinal(id);
         this.usuarioFinal = data;
+        this.favoritos.actividades = data.actividades_favoritas ?? [];
+        this.favoritos.instalaciones = data.instalaciones_favoritas ?? [];
         localStorage.setItem("usuarioFinal", JSON.stringify(data));
       } catch {
         this.clear();
@@ -74,17 +94,18 @@ export const useUserStore = defineStore("user", {
       }
     },
 
-    startPolling() {
+    comenzarIntervalo() {
       if (intervalId) return;
 
       intervalId = setInterval(() => {
         if (this.usuarioFinal) {
           this.fetchNotificaciones();
+          this.sincronizarFavoritos();
         }
       }, 60 * 5000); // 5 minutos
     },
 
-    stopPolling() {
+    finalizarIntervalo() {
       if (intervalId) {
         clearInterval(intervalId);
         intervalId = null;
@@ -95,7 +116,7 @@ export const useUserStore = defineStore("user", {
       this.usuarioFinal = null;
       this.notificaciones = [];
       localStorage.removeItem("usuarioFinal");
-      this.stopPolling();
+      this.finalizarIntervalo();
     },
 
     cambiarLeido(id: number) {
@@ -129,6 +150,44 @@ export const useUserStore = defineStore("user", {
         }))
       });
       this.cambiosPendientes = false;
-    }
+    },
+
+    marcarInstalacionFavorita(id: number) {
+      if (this.favoritos.instalaciones.includes(id)) {
+        this.favoritos.instalaciones = this.favoritos.instalaciones.filter(
+          favoritoId => favoritoId !== id
+        );
+      } else {
+        this.favoritos.instalaciones.push(id);
+      }
+      this.cambiosFavoritos = true;
+    },
+
+    marcarActividadFavorita(id: number) {
+      if (this.favoritos.actividades.includes(id)) {
+        this.favoritos.actividades = this.favoritos.actividades.filter(
+          favoritoId => favoritoId !== id
+        );
+      } else {
+        this.favoritos.actividades.push(id);
+      }
+      this.cambiosFavoritos = true;
+    },
+
+
+    async sincronizarFavoritos() {
+      if (!this.cambiosFavoritos) return;
+
+      try {
+        await marcarFavoritos({
+          actividad_ids: this.favoritos.actividades,
+          instalacion_ids: this.favoritos.instalaciones,
+        })
+
+        this.cambiosFavoritos = false;
+      } catch (e) {
+        console.warn("No se han sincronizado las actividades favoritas", e);
+      }
+    },
   },
 });

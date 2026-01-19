@@ -11,7 +11,7 @@ class TDA(models.Model):
     fechaInicio = models.DateField(auto_now_add=True)
     fechaExpiracion = models.DateField()
     _codigo_secreto_hash = models.CharField(max_length=128, blank=True)
-    
+
     usuarioFinal = models.ForeignKey(UsuarioFinal, on_delete=models.RESTRICT, related_name="tda", blank=True, null=True)
 
     def __str__(self):
@@ -20,7 +20,7 @@ class TDA(models.Model):
     def nuevo_codigo_secreto(self, codigo: str):
         self._codigo_secreto_hash = make_password(codigo)
 
-    def comprobar_codigo_secreto(self, codigo: str) -> bool:
+    def comprobar_codigo_secreto(self, codigo: str):
         return check_password(codigo, self._codigo_secreto_hash)
 
     def asignar_usuario(self, usuario_final):
@@ -28,6 +28,7 @@ class TDA(models.Model):
             return False
 
         self.usuarioFinal = usuario_final
+        self._codigo_secreto_hash = ""
         self.save()
 
         return True

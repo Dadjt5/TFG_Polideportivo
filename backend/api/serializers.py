@@ -25,9 +25,45 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UsuarioFinalSerializer(serializers.ModelSerializer):
+    actividadesFavoritas = serializers.SerializerMethodField()
+    instalacionesFavoritas = serializers.SerializerMethodField()
+    
     class Meta:
         model = UsuarioFinal
-        fields = '__all__'
+        fields = (
+            "id",
+            "nombre",
+            "apellidos",
+            "DNI",
+            "fechaNacimiento",
+            "telefono",
+            "provincia",
+            "municipio",
+            "localidad",
+            "codigoPostal",
+            "cuentaBancaria",
+            "actividadesRealizadas",
+            "deportesFavoritos",
+            "sexo",
+            "rol",
+            "user",
+            "actividadesFavoritas",
+            "instalacionesFavoritas",
+        )
+
+    def get_actividadesFavoritas(self, obj):
+        return list(
+            obj.favoritos
+            .filter(actividad__isnull=False)
+            .values_list("actividad_id", flat=True)
+        )
+
+    def get_instalacionesFavoritas(self, obj):
+        return list(
+            obj.favoritos
+            .filter(instalacion__isnull=False)
+            .values_list("instalacion_id", flat=True)
+        )
 
 
 class MonitorSerializer(serializers.ModelSerializer):

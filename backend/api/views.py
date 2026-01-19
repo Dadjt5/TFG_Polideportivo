@@ -557,12 +557,58 @@ class ValidarTDAView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        tda_id = request.data.get("tda_id")
-        tda = TDA.objects.filter(id=tda_id).first()
+        codigo = request.data.get("codigo")
 
-        resultado = tda.asignar_usuario(request.user.usuario_final)
-        
-        if resultado:
-            return Response({"status": "ok"})
+        tdas_libres = TDA.objects.filter(usuarioFinal__isnull=True)
+
+        for tda in tdas_libres:
+            if tda.comprobar_codigo_secreto(codigo):
+                tda.asignar_usuario(request.user.usuario_final)
+                return Response({"status": "ok"})
 
         return Response({"status": "error"})
+
+
+# Obtener actividades e instalaciones de una lista de ids dados
+class ObtenerActividadesInstalaciones(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        actividad_ids = request.data.get("actividad_ids", [])
+        instalacion_ids = request.data.get("instalacion_ids", [])
+
+        actividades = Actividad.objects.filter(id__in=actividad_ids)
+        instalaciones = Instalacion.objects.filter(id__in=instalacion_ids)
+
+        data = {
+            "actividades": ActividadSerializer(actividades, many=True).data,
+            "instalaciones": InstalacionSerializer(instalaciones, many=True).data,
+        }
+
+        return Response(data)
+
+
+# Marcar o desmarcar actividades o instalaciones como favoritos
+class AlterarFavoritosView(APIView):
+    permission_classes = [IsUsuarioFinal]
+
+    def post(self, request):
+        usuarioFinal = request.user.usuario_final
+
+        actividad_ids = request.data.get("actividad_ids", [])
+        instalacion_ids = request.data.get("instalacion_ids", [])
+        
+        if not actividad_ids and not instalacion_ids:
+            return Response({"status": "error"})
+
+        for act_id in actividad_ids:
+            actividad = Actividad.objects.filter(id=act_id).first()
+            if actividad:
+                usuarioFinal.cambiarFavorito(actividad=actividad)
+
+        for ins_id in instalacion_ids:
+            instalacion = Instalacion.objects.filter(id=ins_id).first()
+            if instalacion:
+                usuarioFinal.cambiarFavorito(instalacion=instalacion)
+        
+        return Response({"status": "ok"})

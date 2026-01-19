@@ -119,6 +119,7 @@ const authStore = useAuthStore();
 const usuarioFinalStore = useUserStore();
 
 const logout = () => {
+  usuarioFinalStore.finalizarIntervalo();
   authStore.logout();
   router.push("/");
 };

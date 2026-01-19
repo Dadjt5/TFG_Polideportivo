@@ -1,12 +1,17 @@
 <script setup lang="ts">
 import { type Ref, inject } from 'vue';
+
 import type { Language } from "../../useI18N";
 import { useI18n } from "../../useI18N";
+
+import { useUserStore } from '../../stores/usuarioFinal';
 
 const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);
 
-defineProps<{
+const usuarioFinalStore = useUserStore();
+
+const props = defineProps<{
   actividad: {
     id: number
     nombre: string
@@ -30,53 +35,62 @@ defineProps<{
   }
   icon: any
 }>()
+
+const cambiarFavorito = () => {
+  usuarioFinalStore.marcarActividadFavorita(props.actividad.id)
+}
+
 </script>
 
 <template>
-    <div class="card shadow-sm h-100 activity-card">
-      <div class="card-body">
+  <div class="card shadow-sm h-100 activity-card">
+    <div class="card-body">
 
-        <!-- HEADER -->
-        <div class="d-flex justify-content-between align-items-start mb-3">
-          <div class="d-flex align-items-start gap-3">
+      <div class="d-flex justify-content-between align-items-start mb-3">
 
-            <!-- ICONO -->
-            <div class="icon-wrapper bg-primary-subtle">
-              <component :is="icon" class="icon text-primary" />
-            </div>
+        <div class="d-flex align-items-start gap-3">
 
-            <!-- TITULO + BADGE -->
-            <div>
-              <h5 class="mb-1">{{ actividad.nombre }}</h5>
-              <span class="badge rounded-pill text-bg-primary">
-                {{ t.activity }}
-              </span>
-            </div>
+          <div class="icon-wrapper bg-primary-subtle">
+            <component :is="icon" class="icon text-primary" />
+          </div>
+
+          <div>
+            <h5 class="mb-1">{{ actividad.nombre }}</h5>
+            <span class="badge rounded-pill text-bg-primary">
+              {{ t.activity }}
+            </span>
           </div>
         </div>
 
-        <!-- INFO -->
-        <div class="text-muted small">
-          <div class="d-flex justify-content-between mb-1">
-            <span>{{ t.days }}</span>
-            <strong>{{ actividad.dias }}</strong>
-          </div>
-
-          <div class="d-flex justify-content-between mb-1">
-            <span>{{ t.places }}</span>
-            <strong>
-              {{ actividad.plazasReservadas }}/{{ actividad.plazasMaximas }}
-            </strong>
-          </div>
-
-          <div class="d-flex justify-content-between">
-            <span>{{t.weekHours}}</span>
-            <strong>{{ actividad.horasSemanales }} h</strong>
-          </div>
-        </div>
+        <button v-if="usuarioFinalStore.isLogged" class="btn btn-link p-0 text-warning" @click.stop="cambiarFavorito">
+          <i :class="[
+            'bi',
+            usuarioFinalStore.activityIsFavorite(actividad.id) ? 'bi-star-fill' : 'bi-star'
+          ]" class="fs-4"></i>
+        </button>
 
       </div>
+
+      <div class="text-muted small">
+        <div class="d-flex justify-content-between mb-1">
+          <span>{{ t.days }}</span>
+          <strong>{{ actividad.dias }}</strong>
+        </div>
+
+        <div class="d-flex justify-content-between mb-1">
+          <span>{{ t.places }}</span>
+          <strong>
+            {{ actividad.plazasReservadas }}/{{ actividad.plazasMaximas }}
+          </strong>
+        </div>
+
+        <div class="d-flex justify-content-between">
+          <span>{{ t.weekHours }}</span>
+          <strong>{{ actividad.horasSemanales }} h</strong>
+        </div>
+      </div>
     </div>
+  </div>
 
 </template>
 

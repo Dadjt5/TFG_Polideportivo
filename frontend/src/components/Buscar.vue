@@ -197,10 +197,9 @@
             :instalacion="inst"
           />
         </div>
-
-    </div>
-  </main>
-</div>
+      </div>
+    </main>
+  </div>
 </template>
 
 
@@ -263,6 +262,7 @@ const weekOrder = [
 ];
 
 const estadisticasStore = useEstadisticasStore();
+
 const estadisticas = estadisticasStore.data;
 
 const activeTab = ref('activities');

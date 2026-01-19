@@ -11,31 +11,22 @@
           <div class="card shadow-sm h-100">
             <div class="card-body">
               <div class="d-flex justify-content-between align-items-center mb-3">
-                <router-link
-                  to="/notificaciones"
-                  class="d-flex align-items-center gap-2 text-decoration-none text-dark"
-                >
+                <router-link to="/notificaciones"
+                  class="d-flex align-items-center gap-2 text-decoration-none text-dark">
                   <i class="bi bi-bell-fill text-primary fs-4"></i>
 
                   <h5 class="mb-0 text-primary">
                     {{ t.notifications }}
                   </h5>
 
-                  <span
-                    v-if="usuarioFinalStore.unreadCount > 0"
-                    class="badge bg-danger"
-                  >
+                  <span v-if="usuarioFinalStore.unreadCount > 0" class="badge bg-danger">
                     {{ usuarioFinalStore.unreadCount }}
                   </span>
                 </router-link>
               </div>
 
-              <div
-                v-for="notf in usuarioFinalStore.notificaciones"
-                  :key="notf.id"
-                  class="rounded p-3 mb-2"
-                  :class="notf.leido ? 'bg-white' : 'bg-primary bg-opacity-10'"
-                >
+              <div v-for="notf in usuarioFinalStore.notificaciones" :key="notf.id" class="rounded p-3 mb-2"
+                :class="notf.leido ? 'bg-white' : 'bg-primary bg-opacity-10'">
                 <strong>{{ notf.titulo }}</strong>
                 <p class="mb-0 small text-muted">
                   {{ notf.descripcion }}
@@ -77,15 +68,10 @@
       <!-- BUSQUEDAS -->
       <div class="container-fluid mt-5 mb-4">
         <div class="d-flex align-items-center bg-white rounded-3 shadow p-3 border gap-3">
-          <input
-            type="text"
-            v-model="textoBusqueda"
-            class="form-control border-0 fs-5"
-            :placeholder="t.searchPlaceholder"
-            @keyup.enter="buscar"
-          />
+          <input type="text" v-model="textoBusqueda" class="form-control border-0 fs-5"
+            :placeholder="t.searchPlaceholder" @keyup.enter="buscar" />
 
-          <button class="btn btn-primary btn-lg px-4"  @click="buscar">
+          <button class="btn btn-primary btn-lg px-4" @click="buscar">
             {{ t.searchButton }}
           </button>
         </div>
@@ -99,23 +85,15 @@
       <!-- TABS -->
       <ul class="nav nav-tabs justify-content-center mb-4">
         <li class="nav-item fs-5">
-          <button
-            class="nav-link"
-            :class="{ active: activeTab === 'activities' }"
-            @click="activeTab = 'activities'"
-            type="button"
-          >
+          <button class="nav-link" :class="{ active: activeTab === 'activities' }" @click="activeTab = 'activities'"
+            type="button">
             {{ t.activities }}
           </button>
         </li>
 
         <li class="nav-item fs-5">
-          <button
-            class="nav-link"
-            :class="{ active: activeTab === 'facilities' }"
-            @click="activeTab = 'facilities'"
-            type="button"
-          >
+          <button class="nav-link" :class="{ active: activeTab === 'facilities' }" @click="activeTab = 'facilities'"
+            type="button">
             {{ t.facilities }}
           </button>
         </li>
@@ -124,109 +102,91 @@
       <!-- TAB CONTENT -->
       <div class="tab-content">
         <!-- ACTIVIDADES -->
-          <div
-            class="tab-pane fade"
-            :class="{ show: activeTab === 'activities', active: activeTab === 'activities' }"
-          >
-            <div class="row g-4">
-              <div class="col-md-4">
-                <FilterCard
-                  :icon="Calendar"
-                  :title="t.dayOfWeek"
-                  :subtitle="orderedSelectedDays.join(', ')"
-                  @click="() => activar('A1')"
-                />
-              </div>
-
+        <div class="tab-pane fade" :class="{ show: activeTab === 'activities', active: activeTab === 'activities' }">
+          <div class="row g-4">
             <div class="col-md-4">
-              <FilterCard
-                :icon="Activity"
-                :title="t.activityType"
-                :subtitle="selectedActivityTypes.join(', ')"
-                @click="() => activar('A2')"
-              />
+              <FilterCard :icon="Calendar" :title="t.dayOfWeek" :subtitle="orderedSelectedDays.join(', ')"
+                @click="() => activar('A1')" />
             </div>
 
             <div class="col-md-4">
-              <FilterCard
-                :icon="Clock"
-                :title="t.sessionTime"
-                :subtitle="activityStartTime || activityEndTime ? `${activityStartTime} - ${activityEndTime}`: ''"
-                @click="() => activar('A3')"
-              />
+              <FilterCard :icon="Activity" :title="t.activityType" :subtitle="selectedActivityTypes.join(', ')"
+                @click="() => activar('A2')" />
+            </div>
+
+            <div class="col-md-4">
+              <FilterCard :icon="Clock" :title="t.sessionTime"
+                :subtitle="activityStartTime || activityEndTime ? `${activityStartTime} - ${activityEndTime}` : ''"
+                @click="() => activar('A3')" />
             </div>
           </div>
         </div>
 
         <!-- INSTALACIONES -->
-        <div
-          class="tab-pane fade"
-          :class="{ show: activeTab === 'facilities', active: activeTab === 'facilities' }"
-        >
+        <div class="tab-pane fade" :class="{ show: activeTab === 'facilities', active: activeTab === 'facilities' }">
           <div class="row g-4 justify-content-center">
             <div class="col-md-6">
-              <FilterCard
-                :icon="Building2"
-                :title="t.facilityType"
-                :subtitle="selectedFacilityTypes.join(', ')"
-                @click="() => activar('I1')"
-              />
+              <FilterCard :icon="Building2" :title="t.facilityType" :subtitle="selectedFacilityTypes.join(', ')"
+                @click="() => activar('I1')" />
             </div>
 
             <div class="col-md-6">
-              <FilterCard
-                :icon="Clock"
-                :title="t.openingHours"
-                :subtitle="facilityStartTime || facilityEndTime ? `${facilityStartTime} - ${facilityEndTime}`: ''"
-                @click="() => activar('I2')"
-              />
+              <FilterCard :icon="Clock" :title="t.openingHours"
+                :subtitle="facilityStartTime || facilityEndTime ? `${facilityStartTime} - ${facilityEndTime}` : ''"
+                @click="() => activar('I2')" />
             </div>
           </div>
         </div>
+
+        <div class="container-fluid mt-4 row">
+        <p class="fs-2 fw-semibold text-center">{{ t.activities }} {{ t.favourites }}</p>
+          <div
+            v-for="id_actividad in usuarioFinalStore.favoritos.actividades"
+            :key="id_actividad"
+            class="col-12 col-sm-6 col-lg-4"
+            @click="activityDetail(id_actividad)"
+          >
+          <ActivityCard
+            :icon="Activity"
+            :actividad="recursosStore.getActividad(id_actividad)"
+          />
+          </div>
+
+        <p class="fs-2 fw-semibold text-center mt-5">{{ t.facilities }} {{ t.favourites }}</p>
+          <div
+            v-for="id_instalaciones in usuarioFinalStore.favoritos.instalaciones"
+            :key="id_instalaciones"
+            class="col-12 col-sm-6 col-lg-4"
+            @click="facilityDetail(id_instalaciones)"
+          >
+          <FacilityCard
+            :icon="Building2"
+            :instalacion="recursosStore.getInstalacion(id_instalaciones)"
+          />
+        </div>
+      </div>
       </div>
 
-      <DayOfWeekFilter
-        :open="dayFilterOpen"
-        @update:open="dayFilterOpen = $event"
-        :selectedDays="selectedDays"
-        @apply="selectedDays = $event"
-      />
+      <DayOfWeekFilter :open="dayFilterOpen" @update:open="dayFilterOpen = $event" :selectedDays="selectedDays"
+        @apply="selectedDays = $event" />
 
-      <ActivityTypeFilter
-        :open="activityTypeFilterOpen"
-        @update:open="activityTypeFilterOpen = $event"
-        :selectedTypes="selectedActivityTypes"
-        @apply="selectedActivityTypes = $event"
-        :tiposActividad="estadisticas.tiposActividad"
-      />
+      <ActivityTypeFilter :open="activityTypeFilterOpen" @update:open="activityTypeFilterOpen = $event"
+        :selectedTypes="selectedActivityTypes" @apply="selectedActivityTypes = $event"
+        :tiposActividad="estadisticas.tiposActividad" />
 
-      <TimeRangeFilter
-        :open="activityTimeFilterOpen"
-        @update:open="activityTimeFilterOpen = $event"
-        :startTime="activityStartTime"
-        :endTime="activityEndTime"
-        @apply="({ start, end }) => { activityStartTime = start; activityEndTime = end }"
-        title="Horario de sesión"
-        description="Selecciona el rango horario."
-      />
+      <TimeRangeFilter :open="activityTimeFilterOpen" @update:open="activityTimeFilterOpen = $event"
+        :startTime="activityStartTime" :endTime="activityEndTime"
+        @apply="({ start, end }) => { activityStartTime = start; activityEndTime = end }" title="Horario de sesión"
+        description="Selecciona el rango horario." />
 
-      <FacilityTypeFilter
-        :open="facilityTypeFilterOpen"
-        @update:open="facilityTypeFilterOpen = $event"
-        :selectedTypes="selectedFacilityTypes"
-        @apply="selectedFacilityTypes = $event"
-        :tiposInstalacion="estadisticas.tiposInstalacion"
-      />
+      <FacilityTypeFilter :open="facilityTypeFilterOpen" @update:open="facilityTypeFilterOpen = $event"
+        :selectedTypes="selectedFacilityTypes" @apply="selectedFacilityTypes = $event"
+        :tiposInstalacion="estadisticas.tiposInstalacion" />
 
-      <TimeRangeFilter
-        :open="facilityTimeFilterOpen"
-        @update:open="facilityTimeFilterOpen = $event"
-        :startTime="facilityStartTime"
-        :endTime="facilityEndTime"
-        @apply="({ start, end }) => { facilityStartTime = start; facilityEndTime = end }"
-        title="Horario de apertura"
-        description="Selecciona el horario de la instalación."
-      />
+      <TimeRangeFilter :open="facilityTimeFilterOpen" @update:open="facilityTimeFilterOpen = $event"
+        :startTime="facilityStartTime" :endTime="facilityEndTime"
+        @apply="({ start, end }) => { facilityStartTime = start; facilityEndTime = end }" title="Horario de apertura"
+        description="Selecciona el horario de la instalación." />
 
     </main>
   </div>
@@ -252,6 +212,7 @@ import FacilityTypeFilter from "./filters/FacilityTypeFilter.vue";
 import { useAuthStore } from "../stores/auth";
 import { useUserStore } from "../stores/usuarioFinal";
 import { useEstadisticasStore } from "../stores/estadisticas";
+import { useResourceStore } from "../stores/recursos";
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
 import type { Language } from "../useI18N";
@@ -263,6 +224,7 @@ const t = useI18n(language);
 const userStore = useAuthStore();
 const usuarioFinalStore = useUserStore();
 const estadisticasStore = useEstadisticasStore();
+const recursosStore = useResourceStore();
 const estadisticas = estadisticasStore.data;
 
 const router = useRouter()
@@ -316,35 +278,35 @@ function buscar() {
 
   /* Controlamos la existencia de cada filtro para no enviarlo en caso de no necesitarlo */
 
-  if(textoBusqueda.value != '') {
+  if (textoBusqueda.value != '') {
     busquedaCompleta["busqueda"] = textoBusqueda.value
   }
 
-  if(selectedDays.value.length > 0) {
+  if (selectedDays.value.length > 0) {
     busquedaCompleta["dias"] = selectedDays.value
   }
 
-  if(selectedActivityTypes.value.length > 0) {
+  if (selectedActivityTypes.value.length > 0) {
     busquedaCompleta["tiposActividad"] = selectedActivityTypes.value
   }
 
-  if(selectedFacilityTypes.value.length > 0) {
+  if (selectedFacilityTypes.value.length > 0) {
     busquedaCompleta["tiposInstalacion"] = selectedFacilityTypes.value
   }
-  
-  if(activityStartTime.value != '') {
+
+  if (activityStartTime.value != '') {
     busquedaCompleta["tiempoInicioActividad"] = activityStartTime.value
   }
 
-  if(activityEndTime.value != '') {
+  if (activityEndTime.value != '') {
     busquedaCompleta["tiempoFinActividad"] = activityEndTime.value
   }
 
-  if(facilityStartTime.value != '') {
+  if (facilityStartTime.value != '') {
     busquedaCompleta["tiempoInicioInstalacion"] = facilityStartTime.value
   }
 
-  if(facilityEndTime.value != '') {
+  if (facilityEndTime.value != '') {
     busquedaCompleta["tiempoFinInstalacion"] = facilityEndTime.value
   }
 
@@ -354,20 +316,34 @@ function buscar() {
   })
 }
 
+const activityDetail = (id: number) => {
+  router.push({
+    name: 'detalle-actividad',
+    params: { id }
+  });
+}
+
+const facilityDetail = (id: number) => {
+  router.push({
+    name: 'detalle-instalacion',
+    params: { id }
+  });
+}
+
 const activar = (tipo: string) => {
   dayFilterOpen.value = false;
   activityTypeFilterOpen.value = false;
   activityTimeFilterOpen.value = false;
   facilityTypeFilterOpen.value = false;
   facilityTimeFilterOpen.value = false;
-  
-  if(tipo === 'A1') {
+
+  if (tipo === 'A1') {
     dayFilterOpen.value = true;
-  } else if(tipo === 'A2') {
+  } else if (tipo === 'A2') {
     activityTypeFilterOpen.value = true;
-  } else if(tipo === 'A3') {
+  } else if (tipo === 'A3') {
     activityTimeFilterOpen.value = true;
-  } else if(tipo === 'I1') {
+  } else if (tipo === 'I1') {
     facilityTypeFilterOpen.value = true;
   } else {
     facilityTimeFilterOpen.value = true;
@@ -378,17 +354,20 @@ const activar = (tipo: string) => {
 onMounted(async () => {
   if (!usuarioFinalStore.usuarioFinal) {
     await usuarioFinalStore.fetchUser(userStore.user?.usuario_final_id)
+    await recursosStore.fetchActividadesInstalaciones(usuarioFinalStore.favoritos.actividades, usuarioFinalStore.favoritos.instalaciones)
   }
 
   if (usuarioFinalStore.notificaciones.length === 0) {
     await usuarioFinalStore.fetchNotificaciones();
   }
+
+  usuarioFinalStore.comenzarIntervalo();
 })
 </script>
 
 
 <style>
-  .linea-fina {
+.linea-fina {
   height: 1px;
   background-color: #ddd;
   margin: 1rem 0;

@@ -71,6 +71,7 @@ export default {
   viewUserStats: "View statistics",
   bookingsMade: "Bookings made",
   viewBooks: "View reservations",
+  favourites: "favourites",
 
   /* Login */
   loginPage: "Login",

@@ -78,14 +78,16 @@
 import { inject, type Ref } from "vue";
 import { useRouter } from "vue-router";
 
-/* Importamos las comunicaciones con el backend a traves de nuestro Store para guardar las estadisticas */
+/* Importamos las comunicaciones con el backend a traves de nuestro Store para usar el usuario */
 import { useAuthStore } from "../stores/auth";
+import { useUserStore } from "../stores/usuarioFinal";
 
 import type { Language } from "../useI18N";
 import { useI18n } from "../useI18N";
 
 const router = useRouter();
 const userStore = useAuthStore();
+const usuarioFinalStore = useUserStore();
 
 const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);
@@ -95,6 +97,7 @@ const toggleLanguage = () => {
 };
 
 const logout = () => {
+  usuarioFinalStore.finalizarIntervalo();
   userStore.logout();
   router.push("/Home");
 };

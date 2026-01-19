@@ -29,11 +29,26 @@ class UsuarioFinal(Usuario):
     def __str__(self):
         return f'Usuario: {self.id}, nacido el {self.fechaNacimiento}'
 
-    def marcarFavorito(self, actividad):
-        Favorito.objects.get_or_create(usuario=self, actividad=actividad, instalacion=None)
+    def cambiarFavorito(self, *, actividad=None, instalacion=None):
+        if actividad and instalacion:
+            raise ValueError("Solo puede haber actividad o instalación")
 
-    def marcarFavorito(self, instalacion):
-        Favorito.objects.get_or_create(usuario=self, actividad=None, instalacion=instalacion)
+        favorito = Favorito.objects.filter(
+            usuarioFinal=self,
+            actividad=actividad,
+            instalacion=instalacion
+        ).first()
+
+        if favorito:
+            favorito.delete()
+            return False
+
+        Favorito.objects.create(
+            usuarioFinal=self,
+            actividad=actividad,
+            instalacion=instalacion
+        )
+        return True
 
     @classmethod
     def contar(cls):
