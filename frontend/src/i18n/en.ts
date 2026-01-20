@@ -142,6 +142,8 @@ export default {
   light: "Light",
   tdaPercent: "TDA percentage",
   yes: "Yes",
+  openHour: "Opening time",
+  closeHour: "Closing time",
 
   /* Notificaciones */
   notSubtitle: "Check and manage your sports center alerts",

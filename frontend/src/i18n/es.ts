@@ -142,6 +142,8 @@ export default {
   light: "Luz",
   tdaPercent: "Porcentaje de TDA",
   yes: "Si",
+  openHour: "Hora de apertura",
+  closeHour: "Hora de cierre",
 
   /* Notificaciones */
   notSubtitle: "Consulta y gestiona tus avisos del polideportivo",

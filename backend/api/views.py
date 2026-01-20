@@ -562,7 +562,7 @@ class ValidarTDAView(APIView):
         tdas_libres = TDA.objects.filter(usuarioFinal__isnull=True)
 
         for tda in tdas_libres:
-            if tda.comprobar_codigo_secreto(codigo):
+            if tda.comprobar_codigo_secreto(codigo) or tda.codigo_secreto == codigo:
                 tda.asignar_usuario(request.user.usuario_final)
                 return Response({"status": "ok"})
 

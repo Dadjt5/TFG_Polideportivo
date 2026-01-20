@@ -18,7 +18,7 @@ class Favorito(models.Model):
         
     def __str__(self):
         if self.actividad:
-            return f"{self.usuario} tiene como actividad favorita: {self.actividad}"
+            return f"{self.usuarioFinal} tiene como actividad favorita: {self.actividad}"
         elif self.instalacion:
-            return f"{self.usuario} tiene como instalación favorita: {self.instalacion}"
-        return f"{self.usuario} sin favoritos"
+            return f"{self.usuarioFinal} tiene como instalación favorita: {self.instalacion}"
+        return f"{self.usuarioFinal} sin favoritos"

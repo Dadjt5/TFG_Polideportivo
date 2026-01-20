@@ -35,8 +35,8 @@ export const useUserStore = defineStore("user", {
     tda: null as TDA | null,
     notificaciones: [] as Notificacion[],
     favoritos: {
-      actividades: [] as number[],
-      instalaciones: [] as number[],
+      actividades: JSON.parse(localStorage.getItem("actividadesFavoritas") || "[]") as number[],
+      instalaciones: JSON.parse(localStorage.getItem("instalacionesFavoritas") || "[]") as number[],
     },
     cambiosPendientes: false,
     cambiosFavoritos: false,
@@ -71,9 +71,11 @@ export const useUserStore = defineStore("user", {
         this.usuarioFinal = data;
         this.favoritos.actividades = data.actividades_favoritas ?? [];
         this.favoritos.instalaciones = data.instalaciones_favoritas ?? [];
+        localStorage.setItem("actividadesFavoritas", JSON.stringify(this.favoritos.actividades));
+        localStorage.setItem("instalacionesFavoritas", JSON.stringify(this.favoritos.instalaciones));
         localStorage.setItem("usuarioFinal", JSON.stringify(data));
       } catch {
-        this.clear();
+        this.cerrarSesion();
       }
     },
 
@@ -112,7 +114,7 @@ export const useUserStore = defineStore("user", {
       }
     },
 
-    clear() {
+    cerrarSesion() {
       this.usuarioFinal = null;
       this.notificaciones = [];
       localStorage.removeItem("usuarioFinal");
@@ -161,6 +163,8 @@ export const useUserStore = defineStore("user", {
         this.favoritos.instalaciones.push(id);
       }
       this.cambiosFavoritos = true;
+
+      localStorage.setItem("instalacionesFavoritas", JSON.stringify(this.favoritos.instalaciones));
     },
 
     marcarActividadFavorita(id: number) {
@@ -172,8 +176,9 @@ export const useUserStore = defineStore("user", {
         this.favoritos.actividades.push(id);
       }
       this.cambiosFavoritos = true;
-    },
 
+      localStorage.setItem("actividadesFavoritas", JSON.stringify(this.favoritos.actividades));
+    },
 
     async sincronizarFavoritos() {
       if (!this.cambiosFavoritos) return;

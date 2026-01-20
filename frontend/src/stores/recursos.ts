@@ -2,28 +2,36 @@ import { defineStore } from "pinia";
 import { getActividadesInstalaciones } from "../services/detalleService";
 
 export interface Actividad {
-  id: number;
-  titulo: string;
-  descripcion: string;
-  leido: boolean;
-  fijado: boolean;
-  fecha: string;
-  hora: string;
-  actividad: number | null;
-  instalacion: number | null;
-  pabellon: number | null;
+  id: number
+  nombre: string
+  tipoActividad: string
+  imagenURL: string
+  plazasMaximas: number
+  plazasReservadas: number
+  edadMinima: number
+  año: number
+  numeroCreditos: number
+  nivel: string
+  material: string
+  exterior: boolean
+  tipoReserva: string
+  terreno: string
+  periodo: string
+  estado: string
+  horasSemanales: number
+  nombreMonitor: string
+  dias: string
 }
 
 export interface Instalacion {
-  id: number;
-  nombre: string;
-  imagenURL: string | null;
-  descripcion: string;
-  aforoMaximo: number;
-  luz: boolean;
-  porcentajeTDA: number;
-  pabellon: number | null;
-  tipoInstalacion: string;
+  id: number
+  nombre: string
+  horaApertura: string
+  horaCierre: string
+  pabellon?: {
+    nombre: string
+    direccion: string
+  }
 }
 
 export const useResourceStore = defineStore("recursos", {
@@ -61,6 +69,11 @@ export const useResourceStore = defineStore("recursos", {
         response.instalaciones.forEach((ins: Instalacion) => {
           this.instalacionesById[ins.id] = ins;
         });
+
+        return {
+          actividades: response.actividades,
+          instalaciones: response.instalaciones
+        };
 
       } catch (e) {
         console.warn("No se han podido cargar las actividades e instalaciones favoritas", e);

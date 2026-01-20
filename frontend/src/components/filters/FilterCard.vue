@@ -8,9 +8,7 @@ defineProps<{
 
 <template>
   <div
-    class="card text-center h-100 shadow-sm border cursor-pointer"
-    @click="$emit('click')"
-  >
+    class="card text-center h-100 shadow-sm border cursor-pointer">
     <div class="card-body d-flex flex-column align-items-center justify-content-center gap-3 p-4">
       <component
         v-if="icon"

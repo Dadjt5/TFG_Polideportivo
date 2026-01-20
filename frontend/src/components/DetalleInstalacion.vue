@@ -10,12 +10,20 @@
 
         <div class="col-lg-6">
           <div class="bg-white rounded-3 shadow-sm p-4 h-100">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <h4 class="mb-3 d-flex align-items-center">
+                <i class="bi bi-info-circle-fill text-primary me-2"></i>
+                {{ t.facilityDetails }}
+              </h4>
 
-            <h4 class="mb-3 d-flex align-items-center">
-              <i class="bi bi-info-circle-fill text-primary me-2"></i>
-              {{ t.facilityDetails }}
-            </h4>
-
+              <button v-if="usuarioFinalStore.isLogged" class="btn btn-link p-0 text-warning"
+                @click.stop="cambiarFavorito">
+                <i :class="[
+                  'bi',
+                  usuarioFinalStore.facilityIsFavorite(instalacion.id) ? 'bi-star-fill' : 'bi-star'
+                ]" class="fs-2"></i>
+              </button>
+            </div>
             <div class="row g-3">
 
               <div class="col-12 col-sm-6">
@@ -42,14 +50,14 @@
               <div class="col-12 col-sm-6" v-if="instalacion.pabellon">
                 <p>
                   <span class="fw-medium">{{ t.pavilion }}:</span>
-                    {{ instalacion.pabellon.nombre }}
+                  {{ instalacion.pabellon.nombre }}
                 </p>
               </div>
 
               <div class="col-12 col-sm-6" v-if="instalacion.pabellon">
                 <p>
                   <span class="fw-medium">{{ t.address }}:</span>
-                    {{ instalacion.pabellon.direccion }}
+                  {{ instalacion.pabellon.direccion }}
                 </p>
               </div>
 
@@ -57,6 +65,20 @@
                 <p>
                   <span class="fw-medium">{{ t.facilityType }}:</span>
                   {{ instalacion.tipoInstalacion }}
+                </p>
+              </div>
+
+              <div class="col-12 col-sm-6" v-if="instalacion.horaApertura">
+                <p>
+                  <span class="fw-medium">{{ t.openHour }}:</span>
+                  {{ instalacion.horaApertura }}
+                </p>
+              </div>
+
+              <div class="col-12 col-sm-6" v-if="instalacion.horaCierre">
+                <p>
+                  <span class="fw-medium">{{ t.closeHour }}:</span>
+                  {{ instalacion.horaCierre }}
                 </p>
               </div>
             </div>
@@ -72,17 +94,9 @@
             </h4>
 
             <div class="row g-2">
-              <div
-                class="col-6"
-                v-for="(img, i) in instalacion.imagenURL"
-                :key="i"
-              >
+              <div class="col-6" v-for="(img, i) in instalacion.imagenURL" :key="i">
 
-              <img
-                :src="img"
-                class="img-fluid rounded"
-                alt="Instalacion"
-              />
+                <img :src="img" class="img-fluid rounded" alt="Instalacion" />
               </div>
             </div>
           </div>
@@ -92,10 +106,7 @@
 
       <!-- Volver -->
       <div class="d-flex justify-content-center mt-5">
-        <button
-          class="btn btn-secondary btn-lg px-5"
-          @click="volver"
-        >
+        <button class="btn btn-secondary btn-lg px-5" @click="volver">
           {{ t.return }}
         </button>
       </div>
@@ -111,6 +122,7 @@ import { useRouter } from "vue-router";
 
 /* Importamos la comunicacion para recuperar la informacion de instalaciones del backend */
 import { getInstalacionDetalle } from "../services/detalleService";
+import { useUserStore } from '../stores/usuarioFinal';
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
 import type { Language } from "../useI18N";
@@ -122,6 +134,7 @@ const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);
 
 const router = useRouter();
+const usuarioFinalStore = useUserStore();
 
 const instalacion = ref({
   id: 0,
@@ -130,10 +143,15 @@ const instalacion = ref({
   aforoMaximo: 50,
   luz: false,
   porcentajeTDA: 0,
+  horaApertura: "",
+  horaCierre: "",
   pabellon: { id: -1, nombre: "", direccion: "" },
   tipoInstalacion: ""
 });
 
+const cambiarFavorito = () => {
+  usuarioFinalStore.marcarInstalacionFavorita(instalacion.value.id)
+}
 
 const volver = () => {
   router.back();

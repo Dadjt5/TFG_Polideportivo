@@ -4,13 +4,16 @@ import Modal from "../ui/Modal.vue";
 import type { Language } from "../../useI18N";
 import { useI18n } from "../../useI18N";
 
+import { useEstadisticasStore } from "../../stores/estadisticas";
+
+const estadisticasStore = useEstadisticasStore();
+
 const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);
 
 const props = defineProps<{
   open: boolean;
   selectedTypes: string[];
-  tiposActividad: string[];
 }>();
 
 const emit = defineEmits<{
@@ -51,7 +54,7 @@ const apply = () => {
 
     <div class="d-grid gap-3 mb-4">
       <button
-        v-for="type in tiposActividad"
+        v-for="type in estadisticasStore.data.tiposActividad"
         :key="type"
         type="button"
         class="btn text-start"

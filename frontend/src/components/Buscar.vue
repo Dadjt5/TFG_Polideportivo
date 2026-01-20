@@ -57,7 +57,7 @@
                   :icon="Calendar"
                   :title="t.dayOfWeek"
                   :subtitle="orderedSelectedDays.join(', ')"
-                  @click="() => activar('A1')"
+                  @click="activar('A1')"
                 />
               </div>
 
@@ -66,7 +66,7 @@
                 :icon="Activity"
                 :title="t.activityType"
                 :subtitle="selectedActivityTypes.join(', ')"
-                @click="() => activar('A2')"
+                @click="activar('A2')"
               />
             </div>
 
@@ -75,7 +75,7 @@
                 :icon="Clock"
                 :title="t.sessionTime"
                 :subtitle="activityStartTime || activityEndTime ? `${activityStartTime} - ${activityEndTime}`: ''"
-                @click="() => activar('A3')"
+                @click="activar('A3')"
               />
             </div>
           </div>
@@ -91,7 +91,7 @@
                 :icon="Building2"
                 :title="t.facilityType"
                 :subtitle="selectedFacilityTypes.join(', ')"
-                @click="() => activar('I1')"
+                @click="activar('I1')"
               />
             </div>
 
@@ -100,7 +100,7 @@
                 :icon="Clock"
                 :title="t.openingHours"
                 :subtitle="facilityStartTime || facilityEndTime ? `${facilityStartTime} - ${facilityEndTime}`: ''"
-                @click="() => activar('I2')"
+                @click="activar('I2')"
               />
             </div>
           </div>
@@ -286,22 +286,41 @@ const orderedSelectedDays = computed(() =>
 );
 
 const activar = (tipo: string) => {
-  dayFilterOpen.value = false;
-  activityTypeFilterOpen.value = false;
-  activityTimeFilterOpen.value = false;
-  facilityTypeFilterOpen.value = false;
-  facilityTimeFilterOpen.value = false;
-  
-  if(tipo === 'A1') {
-    dayFilterOpen.value = true;
-  } else if(tipo === 'A2') {
-    activityTypeFilterOpen.value = true;
-  } else if(tipo === 'A3') {
-    activityTimeFilterOpen.value = true;
-  } else if(tipo === 'I1') {
-    facilityTypeFilterOpen.value = true;
+  if (tipo === 'A1') {
+    dayFilterOpen.value = !dayFilterOpen.value;
+
+    activityTypeFilterOpen.value = false;
+    activityTimeFilterOpen.value = false;
+    facilityTypeFilterOpen.value = false;
+    facilityTimeFilterOpen.value = false;
+  } else if (tipo === 'A2') {
+    activityTypeFilterOpen.value = !activityTypeFilterOpen.value;
+    
+    dayFilterOpen.value = false;
+    activityTimeFilterOpen.value = false;
+    facilityTypeFilterOpen.value = false;
+    facilityTimeFilterOpen.value = false;
+  } else if (tipo === 'A3') {
+    activityTimeFilterOpen.value = !activityTimeFilterOpen.value;
+
+    dayFilterOpen.value = false;
+    activityTypeFilterOpen.value = false;
+    facilityTypeFilterOpen.value = false;
+    facilityTimeFilterOpen.value = false;
+  } else if (tipo === 'I1') {
+    facilityTypeFilterOpen.value = !facilityTypeFilterOpen.value;
+
+    dayFilterOpen.value = false;
+    activityTypeFilterOpen.value = false;
+    activityTimeFilterOpen.value = false;
+    facilityTimeFilterOpen.value = false;
   } else {
-    facilityTimeFilterOpen.value = true;
+    facilityTimeFilterOpen.value = !facilityTimeFilterOpen.value;
+
+    dayFilterOpen.value = false;
+    activityTypeFilterOpen.value = false;
+    activityTimeFilterOpen.value = false;
+    facilityTypeFilterOpen.value = false;
   }
 };
 

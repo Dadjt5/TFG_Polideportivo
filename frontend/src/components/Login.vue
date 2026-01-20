@@ -25,6 +25,7 @@
                 class="form-control py-2"
                 :placeholder="t.identifierPlaceholder"
                 v-model="identifier"
+                @keyup.enter="handleLogin"
               />
             </div>
 
@@ -38,6 +39,7 @@
                 class="form-control py-2"
                 :placeholder="t.passwordPlaceholder"
                 v-model="password"
+                @keyup.enter="handleLogin"
               />
             </div>
 

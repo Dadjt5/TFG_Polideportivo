@@ -66,24 +66,22 @@
       <div class="linea-fina"></div>
 
       <!-- BUSQUEDAS -->
-      <div class="container-fluid mt-5 mb-4">
-        <div class="d-flex align-items-center bg-white rounded-3 shadow p-3 border gap-3">
-          <input type="text" v-model="textoBusqueda" class="form-control border-0 fs-5"
-            :placeholder="t.searchPlaceholder" @keyup.enter="buscar" />
+      <div class="text-center mt-5 mb-4">
+        <div class="container-fluid mt-4">
+          <div class="d-flex align-items-center bg-white rounded-3 shadow p-2 border gap-3">
+            <Search class="text-secondary" />
 
-          <button class="btn btn-primary btn-lg px-4" @click="buscar">
-            {{ t.searchButton }}
-          </button>
+            <input type="text" class="form-control border-0 fs-5" :placeholder="t.searchPlaceholder"
+              v-model="textoBusqueda" @keyup.enter="buscar" />
+
+            <button class="btn btn-primary btn-lg px-4" @click="buscar">
+              {{ t.searchButton }}
+            </button>
+          </div>
         </div>
       </div>
 
-      <!-- FILTROS -->
-      <h2 class="fs-3 fw-semibold text-center text-dark mb-4">
-        {{ t.filterBy }}
-      </h2>
-
-      <!-- TABS -->
-      <ul class="nav nav-tabs justify-content-center mb-4">
+      <ul class="nav nav-tabs justify-content-center mb-3">
         <li class="nav-item fs-5">
           <button class="nav-link" :class="{ active: activeTab === 'activities' }" @click="activeTab = 'activities'"
             type="button">
@@ -99,9 +97,7 @@
         </li>
       </ul>
 
-      <!-- TAB CONTENT -->
       <div class="tab-content">
-        <!-- ACTIVIDADES -->
         <div class="tab-pane fade" :class="{ show: activeTab === 'activities', active: activeTab === 'activities' }">
           <div class="row g-4">
             <div class="col-md-4">
@@ -122,7 +118,6 @@
           </div>
         </div>
 
-        <!-- INSTALACIONES -->
         <div class="tab-pane fade" :class="{ show: activeTab === 'facilities', active: activeTab === 'facilities' }">
           <div class="row g-4 justify-content-center">
             <div class="col-md-6">
@@ -137,56 +132,43 @@
             </div>
           </div>
         </div>
-
-        <div class="container-fluid mt-4 row">
-        <p class="fs-2 fw-semibold text-center">{{ t.activities }} {{ t.favourites }}</p>
-          <div
-            v-for="id_actividad in usuarioFinalStore.favoritos.actividades"
-            :key="id_actividad"
-            class="col-12 col-sm-6 col-lg-4"
-            @click="activityDetail(id_actividad)"
-          >
-          <ActivityCard
-            :icon="Activity"
-            :actividad="recursosStore.getActividad(id_actividad)"
-          />
-          </div>
-
-        <p class="fs-2 fw-semibold text-center mt-5">{{ t.facilities }} {{ t.favourites }}</p>
-          <div
-            v-for="id_instalaciones in usuarioFinalStore.favoritos.instalaciones"
-            :key="id_instalaciones"
-            class="col-12 col-sm-6 col-lg-4"
-            @click="facilityDetail(id_instalaciones)"
-          >
-          <FacilityCard
-            :icon="Building2"
-            :instalacion="recursosStore.getInstalacion(id_instalaciones)"
-          />
-        </div>
-      </div>
       </div>
 
       <DayOfWeekFilter :open="dayFilterOpen" @update:open="dayFilterOpen = $event" :selectedDays="selectedDays"
         @apply="selectedDays = $event" />
 
       <ActivityTypeFilter :open="activityTypeFilterOpen" @update:open="activityTypeFilterOpen = $event"
-        :selectedTypes="selectedActivityTypes" @apply="selectedActivityTypes = $event"
-        :tiposActividad="estadisticas.tiposActividad" />
+        :selectedTypes="selectedActivityTypes" @apply="selectedActivityTypes = $event"/>
 
       <TimeRangeFilter :open="activityTimeFilterOpen" @update:open="activityTimeFilterOpen = $event"
         :startTime="activityStartTime" :endTime="activityEndTime"
-        @apply="({ start, end }) => { activityStartTime = start; activityEndTime = end }" title="Horario de sesión"
-        description="Selecciona el rango horario." />
+        @apply="({ start, end }) => { activityStartTime = start; activityEndTime = end }"/>
 
       <FacilityTypeFilter :open="facilityTypeFilterOpen" @update:open="facilityTypeFilterOpen = $event"
-        :selectedTypes="selectedFacilityTypes" @apply="selectedFacilityTypes = $event"
-        :tiposInstalacion="estadisticas.tiposInstalacion" />
+        :selectedTypes="selectedFacilityTypes" @apply="selectedFacilityTypes = $event"/>
 
       <TimeRangeFilter :open="facilityTimeFilterOpen" @update:open="facilityTimeFilterOpen = $event"
         :startTime="facilityStartTime" :endTime="facilityEndTime"
-        @apply="({ start, end }) => { facilityStartTime = start; facilityEndTime = end }" title="Horario de apertura"
-        description="Selecciona el horario de la instalación." />
+        @apply="({ start, end }) => { facilityStartTime = start; facilityEndTime = end }"/>
+
+
+      <div class="container-fluid mt-5 row">
+        <div v-if="longitudActividades !== 0">
+          <p class="fs-2 fw-semibold text-center">{{ t.activities }} {{ t.favourites }}</p>
+          <div v-for="actividad in actividadesFavoritas" :key="actividad.id" class="col-12 col-sm-6 col-lg-4"
+            @click="activityDetail(actividad.id)">
+            <ActivityCard :icon="Activity" :actividad="actividad" />
+          </div>
+        </div>
+
+        <div v-if="longitudInstalaciones !== 0">
+          <p class="fs-2 fw-semibold text-center mt-5">{{ t.facilities }} {{ t.favourites }}</p>
+          <div v-for="instalacion in instalacionesFavoritas" :key="instalacion.id" class="col-12 col-sm-6 col-lg-4"
+            @click="facilityDetail(instalacion.id)">
+            <FacilityCard :icon="Building2" :instalacion="instalacion" />
+          </div>
+        </div>
+      </div>
 
     </main>
   </div>
@@ -207,12 +189,16 @@ import DayOfWeekFilter from "./filters/DayOfWeekFilter.vue";
 import ActivityTypeFilter from "./filters/ActivityTypeFilter.vue";
 import TimeRangeFilter from "./filters/TimeRangeFilter.vue";
 import FacilityTypeFilter from "./filters/FacilityTypeFilter.vue";
+import FacilityCard from './filters/FacilityCard.vue'
+import ActivityCard from './filters/ActivityCard.vue'
 
 /* Importamos las comunicaciones con el backend a traves de nuestro Store para guardar las estadisticas y el usuario */
 import { useAuthStore } from "../stores/auth";
 import { useUserStore } from "../stores/usuarioFinal";
 import { useEstadisticasStore } from "../stores/estadisticas";
-import { useResourceStore } from "../stores/recursos";
+
+import { getActividadesInstalaciones } from "../services/detalleService";
+
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
 import type { Language } from "../useI18N";
@@ -224,8 +210,6 @@ const t = useI18n(language);
 const userStore = useAuthStore();
 const usuarioFinalStore = useUserStore();
 const estadisticasStore = useEstadisticasStore();
-const recursosStore = useResourceStore();
-const estadisticas = estadisticasStore.data;
 
 const router = useRouter()
 
@@ -331,35 +315,88 @@ const facilityDetail = (id: number) => {
 }
 
 const activar = (tipo: string) => {
-  dayFilterOpen.value = false;
-  activityTypeFilterOpen.value = false;
-  activityTimeFilterOpen.value = false;
-  facilityTypeFilterOpen.value = false;
-  facilityTimeFilterOpen.value = false;
-
   if (tipo === 'A1') {
-    dayFilterOpen.value = true;
+    dayFilterOpen.value = !dayFilterOpen.value;
+
+    activityTypeFilterOpen.value = false;
+    activityTimeFilterOpen.value = false;
+    facilityTypeFilterOpen.value = false;
+    facilityTimeFilterOpen.value = false;
   } else if (tipo === 'A2') {
-    activityTypeFilterOpen.value = true;
+    activityTypeFilterOpen.value = !activityTypeFilterOpen.value;
+    
+    dayFilterOpen.value = false;
+    activityTimeFilterOpen.value = false;
+    facilityTypeFilterOpen.value = false;
+    facilityTimeFilterOpen.value = false;
   } else if (tipo === 'A3') {
-    activityTimeFilterOpen.value = true;
+    activityTimeFilterOpen.value = !activityTimeFilterOpen.value;
+
+    dayFilterOpen.value = false;
+    activityTypeFilterOpen.value = false;
+    facilityTypeFilterOpen.value = false;
+    facilityTimeFilterOpen.value = false;
   } else if (tipo === 'I1') {
-    facilityTypeFilterOpen.value = true;
+    facilityTypeFilterOpen.value = !facilityTypeFilterOpen.value;
+
+    dayFilterOpen.value = false;
+    activityTypeFilterOpen.value = false;
+    activityTimeFilterOpen.value = false;
+    facilityTimeFilterOpen.value = false;
   } else {
-    facilityTimeFilterOpen.value = true;
+    facilityTimeFilterOpen.value = !facilityTimeFilterOpen.value;
+
+    dayFilterOpen.value = false;
+    activityTypeFilterOpen.value = false;
+    activityTimeFilterOpen.value = false;
+    facilityTypeFilterOpen.value = false;
   }
 };
 
+interface Resultados {
+  actividades: any[] | null
+  instalaciones: any[] | null
+}
+
+const resultados = ref<Resultados>({
+  actividades: null,
+  instalaciones: null
+})
+
+const actividadesFavoritas = computed(() => {
+  if (!resultados.value.actividades) return []
+
+  return [...resultados.value.actividades].sort((a, b) => {
+    return a.nombre.localeCompare(b.nombre)
+  })
+})
+
+const instalacionesFavoritas= computed(() => {
+  if (!resultados.value.instalaciones) return []
+
+  return [...resultados.value.instalaciones].sort((a, b) => {
+    return a.nombre.localeCompare(b.nombre)
+  })
+})
+
+const longitudActividades = computed(() => actividadesFavoritas.value.length);
+const longitudInstalaciones = computed(() => instalacionesFavoritas.value.length);
 
 onMounted(async () => {
+  await estadisticasStore.cargarEstadisticas();
+
   if (!usuarioFinalStore.usuarioFinal) {
     await usuarioFinalStore.fetchUser(userStore.user?.usuario_final_id)
-    await recursosStore.fetchActividadesInstalaciones(usuarioFinalStore.favoritos.actividades, usuarioFinalStore.favoritos.instalaciones)
   }
 
   if (usuarioFinalStore.notificaciones.length === 0) {
     await usuarioFinalStore.fetchNotificaciones();
   }
+
+  resultados.value = await getActividadesInstalaciones({
+    actividad_ids: usuarioFinalStore.favoritos.actividades,
+    instalacion_ids: usuarioFinalStore.favoritos.instalaciones,
+  });
 
   usuarioFinalStore.comenzarIntervalo();
 })

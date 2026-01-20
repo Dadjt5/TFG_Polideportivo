@@ -56,7 +56,6 @@ router.register(r'users', views.UserViewSet, basename="user")
 
 
 urlpatterns = [
-    path('', include(router.urls)),
     path("me/", views.meAPIView.as_view(), name="me"),
     path("estadisticas/", views.EstadisticasView.as_view(), name="estadisticas"),
     path("buscar/", views.BuscarView.as_view(), name="busqueda"),
@@ -65,4 +64,5 @@ urlpatterns = [
     path("tda/validar/", views.ValidarTDAView.as_view(), name="validar-tda"),
     path("marcar/favoritas/", views.AlterarFavoritosView.as_view(), name="marcar-favoritas"),
     path("obtener/favoritas/", views.ObtenerActividadesInstalaciones.as_view(), name="favoritas"),
+    path('', include(router.urls)),
 ]

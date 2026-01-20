@@ -55,13 +55,13 @@ class Actividad(models.Model):
             res = res.filter(tipoActividad__in=tipo)
 
         if horaInicio:
-            res = res.filter(sesion__horario__horaInicio__lte=horaInicio)
+            res = res.filter(sesiones__horario__horaInicio__lte=horaInicio)
 
         if horaFin:
-            res = res.filter(sesion__horario__horaFin__gte=horaFin)
+            res = res.filter(sesiones__horario__horaFin__gte=horaFin)
 
         if dias:
-            res = res.filter(sesion__dia__in=dias)
+            res = res.filter(sesiones__dia__in=dias)
 
         return res.distinct()
 

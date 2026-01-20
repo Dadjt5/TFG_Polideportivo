@@ -4,13 +4,16 @@ import Modal from "../ui/Modal.vue";
 import type { Language } from "../../useI18N";
 import { useI18n } from "../../useI18N";
 
+import { useEstadisticasStore } from "../../stores/estadisticas";
+
+const estadisticasStore = useEstadisticasStore();
+
 const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);
 
 const props = defineProps<{
   open: boolean;
   selectedTypes: string[];
-  tiposInstalacion: string[];
 }>();
 
 const emit = defineEmits<{
@@ -46,13 +49,13 @@ const apply = () => {
 <template>
   <Modal :open="open" @update:open="emit('update:open', $event)">
     
-    <h3 class="fs-5 fw-semibold mb-3 mt-4">
+    <h3 class="fs-4 fw-semibold mb-3 mt-4">
       {{t.facilityType}}
     </h3>
 
     <div class="d-grid gap-3 mb-4">
       <button
-        v-for="type in tiposInstalacion"
+        v-for="type in estadisticasStore.data.tiposInstalacion"
         :key="type"
         type="button"
         class="btn text-start"

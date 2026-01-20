@@ -11,6 +11,7 @@ class TDA(models.Model):
     fechaInicio = models.DateField(auto_now_add=True)
     fechaExpiracion = models.DateField()
     _codigo_secreto_hash = models.CharField(max_length=128, blank=True)
+    codigo_secreto = models.CharField(max_length=128, blank=True)
 
     usuarioFinal = models.ForeignKey(UsuarioFinal, on_delete=models.RESTRICT, related_name="tda", blank=True, null=True)
 

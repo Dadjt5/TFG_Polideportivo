@@ -240,10 +240,10 @@ class ActividadSerializer(serializers.ModelSerializer):
 
     def get_horasSemanales(self, obj):
         return obj.calcularHorasSemanales()
-    
+
     def get_dias(self, obj):
         return ",".join(sesion.dia for sesion in obj.sesiones.all())
-    
+
     def get_imagenURL(self, obj):
         if not obj.imagenURL:
             return []

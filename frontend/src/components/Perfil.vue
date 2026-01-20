@@ -3,15 +3,54 @@
     <main class="container py-4">
 
       <div class="card shadow-sm h-100 mb-5">
-        <div class="card-body text-center">
-          <i class="bi bi-person-circle text-primary icono-perfil"></i>
+        <div class="card-body">
 
-          <p class="mb-1 fs-4">{{ usuarioFinalStore.usuarioFinal.nombre }} {{ usuarioFinalStore.usuarioFinal.apellidos
-            }}</p>
-          <p class="mb-1 fs-4">{{ usuarioFinalStore.usuarioFinal.email }}</p>
-          <p class="mb-0 text-muted fs-5">{{ usuarioFinalStore.usuarioFinal.rol }}</p>
+          <!-- CUANDO TIENE TDA -->
+          <div v-if="usuarioFinalStore.hasTda" class="row align-items-center">
+            <div class="col-md-6 text-start">
+              <i class="bi bi-person-circle text-primary icono-perfil mb-2"></i>
+
+              <p class="mb-1 fs-4">
+                {{ usuarioFinalStore.usuarioFinal.nombre }}
+                {{ usuarioFinalStore.usuarioFinal.apellidos }}
+              </p>
+
+              <p class="mb-1 fs-4">
+                {{ usuarioFinalStore.usuarioFinal.email }}
+              </p>
+
+              <p class="mb-0 text-muted fs-5">
+                {{ usuarioFinalStore.usuarioFinal.rol }}
+              </p>
+            </div>
+
+            <div class="col-md-4 text-center">
+              <QRCodeVue3 :key="qrKey" :value="qrValue" level="H" :size="100" />
+            </div>
+
+          </div>
+
+          <!-- CUANDO NO TIENE TDA -->
+          <div v-else class="text-center">
+            <i class="bi bi-person-circle text-primary icono-perfil mb-2"></i>
+
+            <p class="mb-1 fs-4">
+              {{ usuarioFinalStore.usuarioFinal.nombre }}
+              {{ usuarioFinalStore.usuarioFinal.apellidos }}
+            </p>
+
+            <p class="mb-1 fs-4">
+              {{ usuarioFinalStore.usuarioFinal.email }}
+            </p>
+
+            <p class="mb-0 text-muted fs-5">
+              {{ usuarioFinalStore.usuarioFinal.rol }}
+            </p>
+          </div>
+
         </div>
       </div>
+
 
       <div class="linea-fina"></div>
 
@@ -100,8 +139,9 @@
 </template>
 
 <script setup lang="ts">
-import { type Ref, inject } from 'vue';
+import { onMounted, computed, ref, type Ref, inject } from 'vue';
 import { useRouter } from "vue-router";
+import QRCodeVue3 from 'qrcode-vue3';
 
 /* Importamos las comunicaciones con el backend a traves de nuestro Store para guardar el usuario final */
 import { useAuthStore } from '../stores/auth';
@@ -118,11 +158,28 @@ const router = useRouter();
 const authStore = useAuthStore();
 const usuarioFinalStore = useUserStore();
 
+const qrKey = computed(() => token.value);
+let token = ref("1234")
+
+const qrValue = computed(() =>
+  JSON.stringify({
+    id: usuarioFinalStore.tda?.id,
+    usuario: usuarioFinalStore.usuarioFinal.nombre,
+    token: token.value,
+  })
+);
+
 const logout = () => {
-  usuarioFinalStore.finalizarIntervalo();
+  usuarioFinalStore.cerrarSesion();
   authStore.logout();
   router.push("/");
 };
+
+onMounted(async () => {
+  if (!usuarioFinalStore.hasTda) {
+    await usuarioFinalStore.fetchTDA();
+  }
+});
 </script>
 
 <style scoped>

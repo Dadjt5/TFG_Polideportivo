@@ -74,7 +74,7 @@
                   :icon="Calendar"
                   :title="t.dayOfWeek"
                   :subtitle="orderedSelectedDays.join(', ')"
-                  @click="() => activar('A1')"
+                  @click="activar('A1')"
                 />
               </div>
 
@@ -83,7 +83,7 @@
                 :icon="Activity"
                 :title="t.activityType"
                 :subtitle="selectedActivityTypes.join(', ')"
-                @click="() => activar('A2')"
+                @click="activar('A2')"
               />
             </div>
 
@@ -92,7 +92,7 @@
                 :icon="Clock"
                 :title="t.sessionTime"
                 :subtitle="activityStartTime || activityEndTime ? `${activityStartTime} - ${activityEndTime}`: ''"
-                @click="() => activar('A3')"
+                @click="activar('A3')"
               />
             </div>
           </div>
@@ -109,7 +109,7 @@
                 :icon="Building2"
                 :title="t.facilityType"
                 :subtitle="selectedFacilityTypes.join(', ')"
-                @click="() => activar('I1')"
+                @click="activar('I1')"
               />
             </div>
 
@@ -118,7 +118,7 @@
                 :icon="Clock"
                 :title="t.openingHours"
                 :subtitle="facilityStartTime || facilityEndTime ? `${facilityStartTime} - ${facilityEndTime}`: ''"
-                @click="() => activar('I2')"
+                @click="activar('I2')"
               />
             </div>
           </div>
@@ -137,7 +137,7 @@
         @update:open="activityTypeFilterOpen = $event"
         :selectedTypes="selectedActivityTypes"
         @apply="selectedActivityTypes = $event"
-        :tiposActividad="estadisticas.tiposActividad"
+        :tiposActividad="estadisticasStore.data.tiposActividad"
       />
 
       <TimeRangeFilter
@@ -155,7 +155,7 @@
         @update:open="facilityTypeFilterOpen = $event"
         :selectedTypes="selectedFacilityTypes"
         @apply="selectedFacilityTypes = $event"
-        :tiposInstalacion="estadisticas.tiposInstalacion"
+        :tiposInstalacion="estadisticasStore.data.tiposInstalacion"
       />
 
       <TimeRangeFilter
@@ -178,27 +178,27 @@
 
         <div v-else class="row text-center gy-4">
           <div class="col-6 col-md-4 col-lg">
-            <p class="fs-3 text-primary fw-bold mb-1">{{ estadisticas.actividades }}</p>
+            <p class="fs-3 text-primary fw-bold mb-1">{{ estadisticasStore.data.actividades }}</p>
             <p class="fs-5 text-secondary mb-0">{{t.activities}}</p>
           </div>
 
           <div class="col-6 col-md-4 col-lg">
-            <p class="fs-3 text-primary fw-bold mb-1">{{ estadisticas.instalaciones }}</p>
+            <p class="fs-3 text-primary fw-bold mb-1">{{ estadisticasStore.data.instalaciones }}</p>
             <p class="fs-5 text-secondary mb-0">{{t.facilities}}</p>
           </div>
 
           <div class="col-6 col-md-4 col-lg">
-            <p class="fs-3 text-primary fw-bold mb-1">{{ estadisticas.pabellones }}</p>
+            <p class="fs-3 text-primary fw-bold mb-1">{{ estadisticasStore.data.pabellones }}</p>
             <p class="fs-5 text-secondary mb-0">{{t.pavilions}}</p>
           </div>
 
           <div class="col-6 col-md-4 col-lg">
-            <p class="fs-3 text-primary fw-bold mb-1">{{ estadisticas.deportes }}</p>
+            <p class="fs-3 text-primary fw-bold mb-1">{{ estadisticasStore.data.deportes }}</p>
             <p class="fs-5 text-secondary mb-0">{{t.sports}}</p>
           </div>
 
           <div class="col-6 col-md-4 col-lg">
-            <p class="fs-3 text-primary fw-bold mb-1">{{ estadisticas.usuarios }}</p>
+            <p class="fs-3 text-primary fw-bold mb-1">{{ estadisticasStore.data.usuarios }}</p>
             <p class="fs-5 text-secondary mb-0">{{t.users}}</p>
           </div>
         </div>
@@ -322,41 +322,50 @@ function buscar() {
 }
 
 const activar = (tipo: string) => {
-  dayFilterOpen.value = false;
-  activityTypeFilterOpen.value = false;
-  activityTimeFilterOpen.value = false;
-  facilityTypeFilterOpen.value = false;
-  facilityTimeFilterOpen.value = false;
-  
-  if(tipo === 'A1') {
-    dayFilterOpen.value = true;
-  } else if(tipo === 'A2') {
-    activityTypeFilterOpen.value = true;
-  } else if(tipo === 'A3') {
-    activityTimeFilterOpen.value = true;
-  } else if(tipo === 'I1') {
-    facilityTypeFilterOpen.value = true;
+  if (tipo === 'A1') {
+    dayFilterOpen.value = !dayFilterOpen.value;
+
+    activityTypeFilterOpen.value = false;
+    activityTimeFilterOpen.value = false;
+    facilityTypeFilterOpen.value = false;
+    facilityTimeFilterOpen.value = false;
+  } else if (tipo === 'A2') {
+    activityTypeFilterOpen.value = !activityTypeFilterOpen.value;
+    
+    dayFilterOpen.value = false;
+    activityTimeFilterOpen.value = false;
+    facilityTypeFilterOpen.value = false;
+    facilityTimeFilterOpen.value = false;
+  } else if (tipo === 'A3') {
+    activityTimeFilterOpen.value = !activityTimeFilterOpen.value;
+
+    dayFilterOpen.value = false;
+    activityTypeFilterOpen.value = false;
+    facilityTypeFilterOpen.value = false;
+    facilityTimeFilterOpen.value = false;
+  } else if (tipo === 'I1') {
+    facilityTypeFilterOpen.value = !facilityTypeFilterOpen.value;
+
+    dayFilterOpen.value = false;
+    activityTypeFilterOpen.value = false;
+    activityTimeFilterOpen.value = false;
+    facilityTimeFilterOpen.value = false;
   } else {
-    facilityTimeFilterOpen.value = true;
+    facilityTimeFilterOpen.value = !facilityTimeFilterOpen.value;
+
+    dayFilterOpen.value = false;
+    activityTypeFilterOpen.value = false;
+    activityTimeFilterOpen.value = false;
+    facilityTypeFilterOpen.value = false;
   }
 };
 
 const estadisticasStore = useEstadisticasStore();
-const estadisticas = ref({
-  instalaciones: 0,
-  actividades: 0,
-  pabellones: 0,
-  deportes: 0,
-  usuarios: 0,
-  tiposActividad: [],
-  tiposInstalacion: []
-});
 
 onMounted(async () => {
   textoBusqueda.value=''
   try {
     await estadisticasStore.cargarEstadisticas();
-    estadisticas.value = estadisticasStore.data;
   } catch (err) {
     error.value = "No se han podido cargar las estadisticas";
     console.error(err);

@@ -11,8 +11,6 @@ const props = defineProps<{
   open: boolean;
   startTime: string;
   endTime: string;
-  title: string;
-  description?: string;
 }>();
 
 const emit = defineEmits<{
@@ -53,7 +51,7 @@ const apply = () => {
       {{ t.sessionTime }}
     </h3>
 
-    <p v-if="description" class="text-secondary mb-3">
+    <p class="text-secondary mb-3">
       {{ t.subtitleHours }}
     </p>
 

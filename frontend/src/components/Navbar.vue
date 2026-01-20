@@ -97,9 +97,9 @@ const toggleLanguage = () => {
 };
 
 const logout = () => {
-  usuarioFinalStore.finalizarIntervalo();
+  usuarioFinalStore.cerrarSesion();
   userStore.logout();
-  router.push("/Home");
+  router.push("/");
 };
 </script>
 

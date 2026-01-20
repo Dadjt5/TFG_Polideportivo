@@ -14,6 +14,7 @@ import Notificaciones from '../components/Notificaciones.vue'
 import Perfil from '../components/Perfil.vue'
 import AbonoBono from '../components/AbonoBono.vue'
 import TarjetaDeportivaAnual from '../components/TarjetaDeportivaAnual.vue'
+import ModificarDatosPersonales from '../components/ModificarDatosPersonales.vue'
 
 const routes = [
   { path: '/', redirect: '/home' },
@@ -47,13 +48,17 @@ const routes = [
   { path: '/faq', component: FAQ, meta: { public: true } },
   { path: '/ver-tda', component: TarjetaDeportivaAnual, meta: { requiresAuth: true }},
   //{ path: '/ver-deportes-favoritos', component: DeportesFavoritos, meta: { requiresAuth: true }},
-  //{ path: '/modificar-datos', component: ModificarDatos, meta: { requiresAuth: true }},
+  { path: '/modificar-datos', component: ModificarDatosPersonales, meta: { requiresAuth: true }},
   //{ path: '/ver-abonos', component: AbonosBonosUsuarioFinal, meta: { requiresAuth: true }},
 ]
 
+/* Cada vez que se accede a una página se redirige el scrollbar arriba */
 const router = createRouter({
   history: createWebHistory(),
   routes,
+  scrollBehavior(to, from, savedPosition) {
+    return { top: 0 };
+  }
 })
 
 /* Antes de acceder a una direccion revisamos los campos clave y las redirecciones necesarias cuando hay usuarios logueados */
