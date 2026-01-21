@@ -375,7 +375,7 @@ class ConfiguracionSerializer(serializers.ModelSerializer):
 class DeporteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Deporte
-        fields = '__all__'
+        fields = ("id", "titulo")
 
 
 # --------------------

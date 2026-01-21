@@ -174,6 +174,13 @@ export default {
   sportPeriod: "1 month, 4 months o 12 months",
   summerPeriod: "12 months",
 
+  /* Datos personales */
+  personalDataTitle: "Modify personal data",
+  saveChanges: "Save changes",
+  inmutableData: "Inmutable data",
+  editableData: "Editable data",
+  informationAboutData: "If you wish to edit this information, please contact us.",
+
   /* TDA */
   /* TDA inactiva */
   TDAEmptyTitle: "Link Annual Sports Card",

@@ -365,7 +365,9 @@ const estadisticasStore = useEstadisticasStore();
 onMounted(async () => {
   textoBusqueda.value=''
   try {
-    await estadisticasStore.cargarEstadisticas();
+    if(!estadisticasStore.data.modificado) {
+      await estadisticasStore.cargarEstadisticas();
+    }
   } catch (err) {
     error.value = "No se han podido cargar las estadisticas";
     console.error(err);

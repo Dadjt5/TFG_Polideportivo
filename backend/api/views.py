@@ -453,6 +453,8 @@ class EstadisticasView(APIView):
         for inst in Instalacion.objects.all():
             if inst.tipoInstalacion not in tiposInstalacion:
                 tiposInstalacion.append(inst.tipoInstalacion)
+                
+        deportes = list(Deporte.objects.values("id", "titulo"))
 
         data = {
             "instalaciones": Instalacion.contar(),
@@ -461,7 +463,8 @@ class EstadisticasView(APIView):
             "deportes": Deporte.contar(),
             "usuarios": UsuarioFinal.contar(),
             "tiposActividad": tiposActividad,
-            "tiposInstalacion": tiposInstalacion
+            "tiposInstalacion": tiposInstalacion,
+            "tiposDeporte": deportes
         }
 
         return Response(data)

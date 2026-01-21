@@ -174,6 +174,13 @@ export default {
   sportPeriod: "1 mes, 4 meses o 12 meses",
   summerPeriod: "12 meses",
 
+  /* Datos personales */
+  personalDataTitle: "Modificar datos personales",
+  saveChanges: "Guardar cambios",
+  inmutableData: "Datos no modificables",
+  editableData: "Datos modificables",
+  informationAboutData: "Si quieres editar esta información ponte en contacto con nosotros.",
+
   /* TDA */
   /* TDA inactiva */
   TDAEmptyTitle: "Vincular Tarjeta Deportiva Anual",

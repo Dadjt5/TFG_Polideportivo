@@ -383,7 +383,9 @@ const longitudActividades = computed(() => actividadesFavoritas.value.length);
 const longitudInstalaciones = computed(() => instalacionesFavoritas.value.length);
 
 onMounted(async () => {
-  await estadisticasStore.cargarEstadisticas();
+  if(!estadisticasStore.data.modificado) {
+    await estadisticasStore.cargarEstadisticas();
+  }
 
   if (!usuarioFinalStore.usuarioFinal) {
     await usuarioFinalStore.fetchUser(userStore.user?.usuario_final_id)

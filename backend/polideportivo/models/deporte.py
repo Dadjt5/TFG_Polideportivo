@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 class Deporte(models.Model):
     """Modelo para representar un deporte"""
 
-    titulo = models.CharField(max_length=256, blank=True)
+    titulo = models.CharField(max_length=256, unique=True, blank=True)
 
     def __str__(self):
         return f'{self.titulo}'
