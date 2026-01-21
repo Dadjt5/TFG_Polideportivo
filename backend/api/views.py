@@ -155,6 +155,9 @@ class DeporteViewSet(viewsets.ModelViewSet):
     queryset = Deporte.objects.all()
     serializer_class = DeporteSerializer
     permission_classes = [AllowAny]
+    
+    def get_queryset(self):
+        return Deporte.objects.filter(usuariosFinales__user=self.request.user)
 
 
 # ----------------

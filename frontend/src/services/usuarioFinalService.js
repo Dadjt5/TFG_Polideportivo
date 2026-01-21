@@ -6,6 +6,12 @@ export const getUsuarioFinal = async (id) => {
   return response.data
 };
 
+/* Función para cambiar ciertos campos del usuario final */
+export const modificarUsuarioFinal = async (id, data) => {
+  const response = await api.patch(`api/v1/usuariosFinales/${id}/`, data)
+  return response.data
+}
+
 
 /* Función para obtener las notificaciones */
 export const getNotificaciones = async () => {

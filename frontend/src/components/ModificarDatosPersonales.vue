@@ -43,7 +43,6 @@
             <div class="col-md-4">
               <label class="form-label">{{ t.sex }}</label>
               <select class="form-select" v-model="usuario.sexo">
-                <option value="">{{ t.selectOption }}</option>
                 <option value="male">{{ t.male }}</option>
                 <option value="female">{{ t.female }}</option>
                 <option value="other">{{ t.other }}</option>
@@ -81,25 +80,57 @@
             <h5 class="fw-semibold mb-3">{{ t.account }}</h5>
             <input type="text" class="form-control" v-model="usuario.cuentaBancaria">
           </div>
+        </div>
+      </div>
 
-          <!-- DEPORTES FAVORITOS -->
-          <div class="mb-4">
-            <h5 class="fw-semibold mb-3">{{ t.favoriteSports }}</h5>
-            <select class="form-select" v-model="usuario.deportesFavoritos" multiple>
-              <option v-for="deporte in Object.values(estadisticasStore.data.tiposDeporte)" :key="deporte.id" :value="deporte.id">
+      <!-- Deportes favoritos -->
+      <div class="container py-4 mb-4">
+        <h2 class="mb-4">{{ t.favoriteSports }}</h2>
+
+        <div class="row">
+          <div class="col-md-5">
+            <h6 class="mb-2">{{ t.sports }}</h6>
+            <ul class="list-group overflow-auto" style="max-height: 300px;">
+              <li v-for="deporte in Object.values(estadisticasStore.data.tiposDeporte)" :key="deporte.id"
+                class="list-group-item d-flex justify-content-between align-items-center">
                 {{ deporte.titulo }}
-              </option>
-            </select>
+                <button class="btn btn-sm btn-primary" @click="addFavorite(deporte)"
+                  :disabled="deportesRestantes <= 0 || usuario.deportesFavoritos.includes(deporte.id)">
+                  +
+                </button>
+              </li>
+            </ul>
           </div>
 
+          <div class="col-md-2 d-flex flex-column justify-content-center align-items-center">
+            <p class="text-center mb-2">{{ t.sportsMaxNumber }}</p>
+            <p><strong>{{ deportesRestantes }}</strong></p>
+          </div>
+
+          <div class="col-md-5">
+            <h6 class="mb-2">{{ t.favouritesSports }}</h6>
+            <ul class="list-group overflow-auto" style="max-height: 300px;">
+              <li v-for="deporte in favoritosSeleccionados" :key="deporte.id"
+                class="list-group-item d-flex justify-content-between align-items-center">
+                {{ deporte.titulo }}
+                <button class="btn btn-sm btn-danger" @click="removeFavorite(deporte)">
+                  -
+                </button>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
 
       <!-- BOTÓN GUARDAR -->
       <div class="text-center mb-5">
-        <button class="btn btn-primary btn-lg px-4" @click="guardarCambios">
+        <button class="btn btn-primary btn-lg px-4 me-3" @click="guardarCambios">
           {{ t.saveChanges }}
         </button>
+
+        <router-link to="/perfil" class="btn btn-secondary btn-lg px-4">
+          {{ t.return }}
+        </router-link>
       </div>
 
     </main>
@@ -108,10 +139,13 @@
 
 
 <script setup lang="ts">
-import { type Ref, inject, ref, onMounted } from 'vue'
+import { computed, type Ref, inject, ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 
 import { useUserStore } from '../stores/usuarioFinal'
 import { useEstadisticasStore } from '../stores/estadisticas';
+
+import { modificarUsuarioFinal } from '../services/usuarioFinalService';
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
 import type { Language } from "../useI18N";
@@ -123,7 +157,10 @@ const t = useI18n(language);
 const usuarioFinalStore = useUserStore()
 const estadisticasStore = useEstadisticasStore()
 
+const router = useRouter()
+
 const usuario = ref({
+  id: 0,
   nombre: '',
   apellidos: '',
   DNI: '',
@@ -135,20 +172,89 @@ const usuario = ref({
   codigoPostal: '',
   cuentaBancaria: '',
   sexo: '',
-  deportesFavoritos: [] as string[],
+  deportesFavoritos: [] as number[],
 })
+
+const deportesRestantes = ref(5)
+
+const favoritosSeleccionados = computed(() => {
+  return Object.values(estadisticasStore.data.tiposDeporte)
+    .filter((d: any) => usuario.value.deportesFavoritos.includes(d.id));
+});
+
+const addFavorite = (deporte: any) => {
+  if (usuario.value.deportesFavoritos.length < 5) {
+    usuario.value.deportesFavoritos.push(deporte.id);
+    deportesRestantes.value -= 1
+  }
+};
+
+const removeFavorite = (deporte: any) => {
+  usuario.value.deportesFavoritos = usuario.value.deportesFavoritos.filter(id => id !== deporte.id);
+  deportesRestantes.value += 1
+};
+
+/* Solo mandamos al backend para modificar los campos que se hayan modificado */
+function camposModificados() {
+  const data: any = {}
+
+  if(usuarioFinalStore.usuarioFinal.sexo != usuario.value.sexo) {
+      data["sexo"] = usuario.value.sexo
+  }
+
+  if(usuarioFinalStore.usuarioFinal.telefono != usuario.value.telefono) {
+    data["telefono"] = usuario.value.telefono
+  }
+
+  if(usuarioFinalStore.usuarioFinal.provincia != usuario.value.provincia) {
+    data["provincia"] = usuario.value.provincia
+  }
+
+  if(usuarioFinalStore.usuarioFinal.municipio != usuario.value.municipio) {
+    data["municipio"] = usuario.value.municipio
+  }
+
+  if(usuarioFinalStore.usuarioFinal.localidad != usuario.value.localidad) {
+    data["localidad"] = usuario.value.localidad
+  }
+
+  if(usuarioFinalStore.usuarioFinal.codigoPostal != usuario.value.codigoPostal) {
+    data["codigoPostal"] = usuario.value.codigoPostal
+  }
+
+  if(usuarioFinalStore.usuarioFinal.cuentaBancaria != usuario.value.cuentaBancaria) {
+    data["cuentaBancaria"] = usuario.value.cuentaBancaria
+  }
+
+  const favoritosActuales = ((usuarioFinalStore.usuarioFinal.deportes as {id: number, titulo: string}[]) || []).map(d => d.id).sort()
+  const favoritosNuevosIds = [...usuario.value.deportesFavoritos].sort()
+
+  if(JSON.stringify(favoritosActuales) !== JSON.stringify(favoritosNuevosIds)) {
+    data["deportes_ids"] = favoritosNuevosIds
+  }
+
+  return data
+}
 
 const guardarCambios = async () => {
   try {
-    //await actualizarUsuarioFinal(usuario.value)
-  } catch (error) {
-    console.error(error)
+    const data = camposModificados()
+    if(Object.keys(data).length > 0) {
+      await modificarUsuarioFinal(usuario.value.id, data)
+      await usuarioFinalStore.fetchUser(usuario.value.id)
+      router.push({
+        path: '/perfil'
+      })
+    }
+  } catch (e) {
+    console.error("Error al modificar el usuario final", e)
   }
 }
 
+/* La variable usuario nos permite cambiar el usuario final unicamente en esta pantalla */
 onMounted(async () => {
   const data = usuarioFinalStore.usuarioFinal
-  if (data) {
+  if(data) {
     usuario.value = {
       ...usuario.value,
       ...data,

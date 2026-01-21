@@ -15,6 +15,7 @@ import Perfil from '../components/Perfil.vue'
 import AbonoBono from '../components/AbonoBono.vue'
 import TarjetaDeportivaAnual from '../components/TarjetaDeportivaAnual.vue'
 import ModificarDatosPersonales from '../components/ModificarDatosPersonales.vue'
+import ListaDeActividades from '../components/ListaDeActividades.vue'
 
 const routes = [
   { path: '/', redirect: '/home' },
@@ -46,6 +47,7 @@ const routes = [
   { path: '/tickets', component: AbonoBono, meta: { requiresAuth: true } },
   { path: '/contacto', component: Contacto, meta: { public: true } },
   { path: '/faq', component: FAQ, meta: { public: true } },
+  { path: '/actividades', component: ListaDeActividades, meta: {public: true} },
   { path: '/ver-tda', component: TarjetaDeportivaAnual, meta: { requiresAuth: true }},
   //{ path: '/ver-deportes-favoritos', component: DeportesFavoritos, meta: { requiresAuth: true }},
   { path: '/modificar-datos', component: ModificarDatosPersonales, meta: { requiresAuth: true }},

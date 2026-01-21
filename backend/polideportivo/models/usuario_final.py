@@ -20,7 +20,7 @@ class UsuarioFinal(Usuario):
     cuentaBancaria = models.CharField(max_length=64, default="")
     actividadesRealizadas = models.PositiveIntegerField(default=0)
 
-    deportesFavoritos = models.ManyToManyField('Deporte', blank=True, related_name="usuarios")
+    deportesFavoritos = models.ManyToManyField('Deporte', blank=True, related_name="usuariosFinales")
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="usuario_final")
 
     sexo = models.CharField(default=Sexo.NINGUNO, choices=Sexo.choices)

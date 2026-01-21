@@ -14,6 +14,17 @@ from polideportivo.models import (
 
 User = get_user_model()
 
+
+# --------------------
+# Deportes
+# --------------------
+
+class DeporteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Deporte
+        fields = ("id", "titulo")
+
+
 # --------------------
 # Usuarios
 # --------------------
@@ -25,6 +36,13 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UsuarioFinalSerializer(serializers.ModelSerializer):
+    deportesFavoritos = DeporteSerializer(many=True, read_only=True)
+    deportes_ids = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=Deporte.objects.all(),
+        write_only=True,
+        source="deportesFavoritos"
+    )
     actividadesFavoritas = serializers.SerializerMethodField()
     instalacionesFavoritas = serializers.SerializerMethodField()
     
@@ -44,6 +62,7 @@ class UsuarioFinalSerializer(serializers.ModelSerializer):
             "cuentaBancaria",
             "actividadesRealizadas",
             "deportesFavoritos",
+            "deportes_ids",
             "sexo",
             "rol",
             "user",
@@ -366,16 +385,6 @@ class ConfiguracionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Configuracion
         fields = '__all__'
-
-
-# --------------------
-# Deportes
-# --------------------
-
-class DeporteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Deporte
-        fields = ("id", "titulo")
 
 
 # --------------------

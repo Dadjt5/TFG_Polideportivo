@@ -180,6 +180,8 @@ export default {
   inmutableData: "Inmutable data",
   editableData: "Editable data",
   informationAboutData: "If you wish to edit this information, please contact us.",
+  sportsMaxNumber: "Remaining sports",
+  favouritesSports: "Favourite sports",
 
   /* TDA */
   /* TDA inactiva */
