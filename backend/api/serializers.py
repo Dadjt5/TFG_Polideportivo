@@ -395,7 +395,7 @@ class CompraBonoSerializer(serializers.ModelSerializer):
             "fechaExpiracion",
             "vecesUsado",
             "valido",
-            "usosRestantes"
+            "usosRestantes",
             "bono",
             "pago"
         )

@@ -1,13 +1,10 @@
 <template>
   <div class="min-vh-100 bg-light">
     <div class="container py-5">
-      <h2 class="text-center mb-2 fw-semibold">
+      <h2 class="text-center mb-5 fw-semibold">
         <i class="bi bi-bell-fill text-primary fs-4 me-3"></i>
         {{ t.notifications }}
       </h2>
-      <p class="text-center text-muted fs-5 mb-4">
-        {{ t.notSubtitle }}
-      </p>
 
       <p v-if="usuarioFinalStore.sortedNotifications.length === 0" class="text-center text-muted">
         {{ t.empty }}

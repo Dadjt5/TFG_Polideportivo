@@ -11,11 +11,11 @@
       <!-- BONOS -->
       <section class="mb-5">
         <h2 class="fw-semibold mb-3">
-          <i class="bi bi-ticket-detailed me-2"></i>
+          <i class="bi bi-ticket-detailed text-primary me-2"></i>
           {{ t.bonus }}
         </h2>
 
-        <div v-if="bonos.length === 0" class="text-muted text-center">
+        <div v-if="bonos.length === 0" class="text-muted text-center fs-4">
           {{ t.noBonus }}
         </div>
 
@@ -23,11 +23,11 @@
           <div class="col-md-6" v-for="b in bonos" :key="b.id">
             <div class="card h-100 shadow-sm rounded-4">
               <div class="card-body">
-                <p v-if="b.bono.instalacion">
-                  <strong>{{ t.facility }}:</strong> {{ b.bono.instalacion }}
+                <p v-if="b.bono.nombreInstalacion">
+                  <strong>{{ t.facility }}:</strong> {{ b.bono.nombreInstalacion }}
                 </p>
                 <p v-else>
-                  <strong>{{ t.sport }}:</strong> {{ b.bono.deporte }}
+                  <strong>{{ t.sport }}:</strong> {{ b.bono.nombreDeporte }}
                 </p>
 
                 <p>
@@ -45,7 +45,7 @@
 
                 <p>
                   <strong>{{ t.expires }}:</strong>
-                  {{ b.fechaExpiracion }}
+                  {{ new Date(b.fechaExpiracion).toLocaleDateString() }}
                 </p>
               </div>
             </div>
@@ -56,11 +56,11 @@
       <!-- ABONOS -->
       <section>
         <h2 class="fw-semibold mb-3">
-          <i class="bi bi-calendar me-2"></i>
+          <i class="bi bi-calendar text-primary me-2"></i>
           {{ t.subscription }}
         </h2>
 
-        <div v-if="abonos.length === 0" class="text-muted text-center">
+        <div v-if="abonos.length === 0" class="text-muted text-center fs-4">
           {{ t.noSubscripcion }}
         </div>
 
@@ -118,8 +118,8 @@ type BonoComprado = {
   bono: {
     id: number,
     usos: number,
-    instalacion: string,
-    deporte: string
+    nombreInstalacion: string,
+    nombreDeporte: string
   }
   fechaExpiracion: string
   usosRestantes: number

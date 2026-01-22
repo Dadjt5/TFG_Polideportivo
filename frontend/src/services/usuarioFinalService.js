@@ -62,3 +62,9 @@ export const getAbonos = async () => {
   const response = await api.get('api/v1/compraAbono/')
   return response.data
 }
+
+/* Función para obtener las reservas realizadas por el usuario final */
+export const getReservasRealizadas = async () => {
+  const response = await api.get('api/v1/reservas/')
+  return response.data
+}

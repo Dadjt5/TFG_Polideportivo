@@ -10,6 +10,9 @@ router = routers.DefaultRouter()
 router.register(r'abonosDeportivos', views.AbonoDeportivoViewSet, basename="abono-deportivo")
 router.register(r'abonosVerano', views.AbonoVeranoViewSet, basename="abono-verano")
 
+router.register(r'compraAbono', views.CompraAbonoViewSet, basename="compra-abono")
+router.register(r'compraBono', views.CompraBonoViewSet, basename="compra-bono")
+
 router.register(r'actividades', views.ActividadViewSet, basename="actividad")
 router.register(r'asistencias', views.AsistenciaViewSet, basename="asistencia")
 
@@ -64,5 +67,6 @@ urlpatterns = [
     path("tda/validar/", views.ValidarTDAView.as_view(), name="validar-tda"),
     path("marcar/favoritas/", views.AlterarFavoritosView.as_view(), name="marcar-favoritas"),
     path("obtener/favoritas/", views.ObtenerActividadesInstalaciones.as_view(), name="favoritas"),
+    path("reservas/", views.ReservasView.as_view(), name="Reservas-favoritas"),
     path('', include(router.urls)),
 ]

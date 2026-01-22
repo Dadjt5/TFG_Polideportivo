@@ -17,6 +17,7 @@ import VerAbonosBonos from '../components/VerAbonosBonos.vue'
 import TarjetaDeportivaAnual from '../components/TarjetaDeportivaAnual.vue'
 import ModificarDatosPersonales from '../components/ModificarDatosPersonales.vue'
 import ListaDeActividades from '../components/ListaDeActividades.vue'
+import ReservasRealizadas from '../components/ReservasRealizadas.vue'
 
 const routes = [
   { path: '/', redirect: '/home' },
@@ -44,13 +45,13 @@ const routes = [
     meta: { public: true }
   },
   { path: '/notificaciones', component: Notificaciones, meta: { requiresAuth: true } },
+  { path: '/reservas-realizadas', component: ReservasRealizadas, meta: { requiresAuth: true } },
   { path: '/perfil', component: Perfil, meta: { requiresAuth: true } },
   { path: '/comprar-abonos', component: ComprarAbonosBonos, meta: { requiresAuth: true } },
   { path: '/contacto', component: Contacto, meta: { public: true } },
   { path: '/faq', component: FAQ, meta: { public: true } },
   { path: '/actividades', component: ListaDeActividades, meta: {public: true} },
   { path: '/ver-tda', component: TarjetaDeportivaAnual, meta: { requiresAuth: true }},
-  //{ path: '/ver-deportes-favoritos', component: DeportesFavoritos, meta: { requiresAuth: true }},
   { path: '/modificar-datos', component: ModificarDatosPersonales, meta: { requiresAuth: true }},
   { path: '/ver-abonos', component: VerAbonosBonos, meta: { requiresAuth: true }},
 ]

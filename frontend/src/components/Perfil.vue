@@ -74,42 +74,6 @@
         </div>
 
         <div class="col-md-6">
-          <router-link to="/ver-deportes-favoritos" class="text-decoration-none text-dark">
-            <div class="card shadow-sm h-100 option-card">
-              <div class="card-body">
-                <div class="d-flex align-items-center gap-3">
-                  <i class="bi bi-heart text-primary fs-3"></i>
-                  <div>
-                    <h6 class="mb-1">{{ t.favoriteSports }}</h6>
-                    <p class="text-muted mb-0 small">
-                      {{ t.moreFavoriteSports }}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </router-link>
-        </div>
-
-        <div class="col-md-6">
-          <router-link to="/modificar-datos" class="text-decoration-none text-dark">
-            <div class="card shadow-sm h-100 option-card">
-              <div class="card-body">
-                <div class="d-flex align-items-center gap-3">
-                  <i class="bi bi-nut text-primary fs-3"></i>
-                  <div>
-                    <h6 class="mb-1">{{ t.modifyPersonalData }}</h6>
-                    <p class="text-muted mb-0 small">
-                      {{ t.moreModifyPersonalData }}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </router-link>
-        </div>
-
-        <div class="col-md-6">
           <router-link to="/ver-abonos" class="text-decoration-none text-dark">
             <div class="card shadow-sm h-100 option-card">
               <div class="card-body">
@@ -126,6 +90,43 @@
             </div>
           </router-link>
         </div>
+
+        <div class="col-md-6">
+          <router-link to="/modificar-datos" class="text-decoration-none text-dark">
+            <div class="card shadow-sm h-100 option-card">
+              <div class="card-body">
+                <div class="d-flex align-items-center gap-3">
+                  <i class="bi bi-pencil-square text-primary fs-3"></i>
+                  <div>
+                    <h6 class="mb-1">{{ t.modifyPersonalData }}</h6>
+                    <p class="text-muted mb-0 small">
+                      {{ t.moreModifyPersonalData }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </router-link>
+        </div>
+
+        <div class="col-md-6">
+          <router-link to="/ver-deportes-favoritos" class="text-decoration-none text-dark">
+            <div class="card shadow-sm h-100 option-card">
+              <div class="card-body">
+                <div class="d-flex align-items-center gap-3">
+                  <i class="bi bi-nut text-primary fs-3"></i>
+                  <div>
+                    <h6 class="mb-1">{{ t.favoriteSports }}</h6>
+                    <p class="text-muted mb-0 small">
+                      {{ t.moreFavoriteSports }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </router-link>
+        </div>
+
       </div>
 
       <div class="text-center mt-5">

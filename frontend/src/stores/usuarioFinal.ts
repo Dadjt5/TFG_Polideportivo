@@ -33,7 +33,7 @@ export const useUserStore = defineStore("user", {
   state: () => ({
     usuarioFinal: JSON.parse(localStorage.getItem("usuarioFinal") || "null"),
     tda: null as TDA | null,
-    notificaciones: [] as Notificacion[],
+    notificaciones: JSON.parse(localStorage.getItem("notificaciones") || "[]") as Notificacion[],
     favoritos: {
       actividades: JSON.parse(localStorage.getItem("actividadesFavoritas") || "[]") as number[],
       instalaciones: JSON.parse(localStorage.getItem("instalacionesFavoritas") || "[]") as number[],
@@ -91,6 +91,7 @@ export const useUserStore = defineStore("user", {
     async fetchNotificaciones() {
       try {
         this.notificaciones = await getNotificaciones();
+        localStorage.setItem("notificaciones", JSON.stringify(this.notificaciones));
       } catch (e) {
         console.warn("No se pudieron cargar notificaciones");
       }

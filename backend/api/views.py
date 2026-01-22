@@ -63,7 +63,7 @@ class CompraAbonoViewSet(viewsets.ModelViewSet):
         serializer.save(usuarioFinal=usuario_final)
 
     def get_queryset(self):
-        return CompraAbono.objects.all()
+        return CompraAbono.objects.filter(usuarioFinal__user=self.request.user)
 
 
 # ----------------
@@ -128,13 +128,20 @@ class BonoViewSet(viewsets.ModelViewSet):
 
 
 class CompraBonoViewSet(viewsets.ModelViewSet):
-    queryset = CompraBono.objects.all()
     serializer_class = CompraBonoSerializer
     permission_classes = [IsUsuarioFinal]
+    
+    def get_queryset(self):
+        return CompraBono.objects.filter(usuarioFinal__user=self.request.user)
 
     def perform_create(self, serializer):
         usuario_final = UsuarioFinal.objects.get(user=self.request.user)
         serializer.save(usuarioFinal=usuario_final)
+        
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['user'] = self.request.user
+        return context
 
 
 # ----------------
@@ -618,3 +625,25 @@ class AlterarFavoritosView(APIView):
                 usuarioFinal.cambiarFavorito(instalacion=instalacion)
         
         return Response({"status": "ok"})
+
+
+# Obtener las reservas tanto de alquileres de instalaciones como reservas de actividades
+class ReservasView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        user = request.user
+
+        if user.is_usuario_final:
+            alquileres = Alquiler.objects.filter(usuarioFinal__user=user)
+            reservasActividades = ReservaActividad.objects.filter(usuarioFinal__user=user)
+        elif user.is_administrador:
+            alquileres = Alquiler.objects.all()
+            reservasActividades = ReservaActividad.objects.all()
+
+        data = {
+            "alquileres": AlquilerSerializer(alquileres, many=True).data,
+            "reservasActividades": ReservaActividadSerializer(reservasActividades, many=True).data,
+        }
+
+        return Response(data)

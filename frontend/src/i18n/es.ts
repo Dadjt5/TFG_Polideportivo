@@ -154,6 +154,11 @@ export default {
   unpin: "Desfijar",
   empty: "No tienes notificaciones.",
 
+  /* Reservas realizadas */
+  myBookings: "Mis reservas",
+  noBookings: "Aún no has realizado ninguna reserva",
+  
+
   /* Abonos y bonos */
   ticketsTitle: "Comprar abonos y bonos",
   bonus: "Bonos",

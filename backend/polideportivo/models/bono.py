@@ -44,7 +44,7 @@ class CompraBono(models.Model):
         super().save(*args, **kwargs)
         
     @property
-    def usos_restantes(self):
+    def usosRestantes(self):
         return max(0, self.bono.usos - self.vecesUsado)
 
     @property

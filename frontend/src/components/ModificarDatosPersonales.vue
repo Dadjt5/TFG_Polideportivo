@@ -260,6 +260,7 @@ onMounted(async () => {
       ...data,
       deportesFavoritos: data.deportesFavoritos.map((d: any) => d.id)
     }
+    deportesRestantes.value -= favoritosSeleccionados.value.length
   }
 })
 </script>

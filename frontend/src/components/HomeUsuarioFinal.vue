@@ -55,9 +55,9 @@
                 <i class="bi bi-calendar-fill text-primary me-2 fs-4"></i>
                 <h6 class="mb-0">{{ t.bookingsMade }}</h6>
               </div>
-              <button class="btn btn-success w-100">
+              <router-link to="/reservas-realizadas" v-if="userStore.user" class="btn btn-success w-100">
                 {{ t.viewBooks }}
-              </button>
+              </router-link>
             </div>
           </div>
         </div>
@@ -198,7 +198,6 @@ import { useUserStore } from "../stores/usuarioFinal";
 import { useEstadisticasStore } from "../stores/estadisticas";
 
 import { getActividadesInstalaciones } from "../services/detalleService";
-
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
 import type { Language } from "../useI18N";
