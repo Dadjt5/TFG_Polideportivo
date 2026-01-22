@@ -1,5 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from dateutil.relativedelta import relativedelta
+from django.utils import timezone
 
 
 class Bono(models.Model):
@@ -22,8 +24,10 @@ class Bono(models.Model):
 class CompraBono(models.Model):
     """Modelo para representar la compra de un bono"""
     
-    fecha = models.DateField(auto_now_add=True)
-    
+    fecha = models.DateTimeField(default=timezone.now)
+    vecesUsado = models.PositiveIntegerField(default=0)
+    fechaExpiracion = models.DateTimeField(blank=True, null=True)
+
     usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.RESTRICT)
     bono = models.ForeignKey('Bono', on_delete=models.RESTRICT, related_name="compras_bono")
     pago = models.OneToOneField('Pago', on_delete=models.RESTRICT)
@@ -31,3 +35,18 @@ class CompraBono(models.Model):
     @classmethod
     def contar(cls):
         return cls.objects.count()
+    
+    def save(self, *args, **kwargs):
+        if not self.fechaExpiracion:
+            self.fechaExpiracion = self.fecha + relativedelta(
+                years=self.bono.validez
+            )
+        super().save(*args, **kwargs)
+        
+    @property
+    def usos_restantes(self):
+        return max(0, self.bono.usos - self.vecesUsado)
+
+    @property
+    def activo(self):
+        return self.fechaExpiracion > timezone.now()

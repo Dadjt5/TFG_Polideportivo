@@ -173,6 +173,13 @@ export default {
   cheaper: "Más barato que el abono deportivo",
   sportPeriod: "1 mes, 4 meses o 12 meses",
   summerPeriod: "12 meses",
+  noBonus: "No has comprado ningún bono",
+  noSubscripcion: "No has comprado ningún abono",
+  mySubscripcions: "Tus abonos y bonos",
+  startDate: "Fecha de inicio",
+  endDate: "Fecha de finalización",
+  remainingDays: "Dias restantes",
+  remainingUses: "Usos restantes",
 
   /* Datos personales */
   personalDataTitle: "Modificar datos personales",

@@ -49,3 +49,16 @@ export const marcarFavoritos = async (payload) => {
   const response = await api.post('api/v1/marcar/favoritas/', payload)
   return response.data
 };
+
+
+/* Función para obtener los bonos comprados por el usuario final */
+export const getBonos = async () => {
+  const response = await api.get('api/v1/compraBono/')
+  return response.data
+}
+
+/* Función para obtener los abonos comprados por el usuario final */
+export const getAbonos = async () => {
+  const response = await api.get('api/v1/compraAbono/')
+  return response.data
+}

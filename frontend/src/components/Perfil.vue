@@ -110,7 +110,7 @@
         </div>
 
         <div class="col-md-6">
-          <router-link to="/ver-abono" class="text-decoration-none text-dark">
+          <router-link to="/ver-abonos" class="text-decoration-none text-dark">
             <div class="card shadow-sm h-100 option-card">
               <div class="card-body">
                 <div class="d-flex align-items-center gap-3">

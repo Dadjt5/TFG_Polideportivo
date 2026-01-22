@@ -173,6 +173,14 @@ export default {
   cheaper: 'Cheaper than the sports subscription',
   sportPeriod: "1 month, 4 months o 12 months",
   summerPeriod: "12 months",
+  noBonus: "You have not purchased any vouchers",
+  noSubscripcion: "You have not purchased any subscriptions",
+  mySubscripcions: "Your subscriptions and vouchers",
+  startDate: "Start date",
+  endDate: "End date",
+  remainingDays: "Remaining days",
+  remainingUses: "Remaining uses",
+
 
   /* Datos personales */
   personalDataTitle: "Modify personal data",

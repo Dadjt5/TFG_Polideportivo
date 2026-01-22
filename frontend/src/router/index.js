@@ -12,7 +12,8 @@ import DetalleActividad from '../components/DetalleActividad.vue'
 import DetalleInstalacion from '../components/DetalleInstalacion.vue'
 import Notificaciones from '../components/Notificaciones.vue'
 import Perfil from '../components/Perfil.vue'
-import AbonoBono from '../components/AbonoBono.vue'
+import ComprarAbonosBonos from '../components/ComprarAbonosBonos.vue'
+import VerAbonosBonos from '../components/VerAbonosBonos.vue'
 import TarjetaDeportivaAnual from '../components/TarjetaDeportivaAnual.vue'
 import ModificarDatosPersonales from '../components/ModificarDatosPersonales.vue'
 import ListaDeActividades from '../components/ListaDeActividades.vue'
@@ -44,14 +45,14 @@ const routes = [
   },
   { path: '/notificaciones', component: Notificaciones, meta: { requiresAuth: true } },
   { path: '/perfil', component: Perfil, meta: { requiresAuth: true } },
-  { path: '/tickets', component: AbonoBono, meta: { requiresAuth: true } },
+  { path: '/comprar-abonos', component: ComprarAbonosBonos, meta: { requiresAuth: true } },
   { path: '/contacto', component: Contacto, meta: { public: true } },
   { path: '/faq', component: FAQ, meta: { public: true } },
   { path: '/actividades', component: ListaDeActividades, meta: {public: true} },
   { path: '/ver-tda', component: TarjetaDeportivaAnual, meta: { requiresAuth: true }},
   //{ path: '/ver-deportes-favoritos', component: DeportesFavoritos, meta: { requiresAuth: true }},
   { path: '/modificar-datos', component: ModificarDatosPersonales, meta: { requiresAuth: true }},
-  //{ path: '/ver-abonos', component: AbonosBonosUsuarioFinal, meta: { requiresAuth: true }},
+  { path: '/ver-abonos', component: VerAbonosBonos, meta: { requiresAuth: true }},
 ]
 
 /* Cada vez que se accede a una página se redirige el scrollbar arriba */

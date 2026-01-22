@@ -22,7 +22,7 @@
         </li>
 
         <li class="nav-item fs-5">
-          <router-link to="/tickets" v-if="userStore.user" class="nav-link px-3 text-white">
+          <router-link to="/comprar-abonos" v-if="userStore.user" class="nav-link px-3 text-white">
             {{ t.seasonTickets }}
           </router-link>
         </li>
