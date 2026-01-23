@@ -18,6 +18,7 @@ import TarjetaDeportivaAnual from '../components/TarjetaDeportivaAnual.vue'
 import ModificarDatosPersonales from '../components/ModificarDatosPersonales.vue'
 import ListaDeActividades from '../components/ListaDeActividades.vue'
 import ReservasRealizadas from '../components/ReservasRealizadas.vue'
+import Foro from '../components/Foro.vue'
 
 const routes = [
   { path: '/', redirect: '/home' },
@@ -54,6 +55,7 @@ const routes = [
   { path: '/ver-tda', component: TarjetaDeportivaAnual, meta: { requiresAuth: true }},
   { path: '/modificar-datos', component: ModificarDatosPersonales, meta: { requiresAuth: true }},
   { path: '/ver-abonos', component: VerAbonosBonos, meta: { requiresAuth: true }},
+  { path: '/foro', component: Foro, meta: {requiresAuth: true }},
 ]
 
 /* Cada vez que se accede a una página se redirige el scrollbar arriba */

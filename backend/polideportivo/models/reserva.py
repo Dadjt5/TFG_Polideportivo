@@ -1,5 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
+
 
 
 class Reserva(models.Model):
@@ -31,7 +33,7 @@ class ReservaActividad(Reserva):
 class Alquiler(Reserva):
     """Modelo para representar un alquiler en una instalacion"""
 
-    fecha = models.TimeField(auto_now_add=True)
+    fecha = models.TimeField(default=timezone.now)
     
     instalacion = models.ForeignKey('Instalacion', on_delete=models.CASCADE)
     horario = models.ForeignKey('Horario', on_delete=models.RESTRICT)

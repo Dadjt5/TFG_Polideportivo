@@ -158,6 +158,12 @@ export default {
   myBookings: "My reservations",
   noBookings: "You haven't made any bookings yet.",
 
+  /* Foro */
+  forumTitle: "Sports Centre Forum",
+  forumSubtitle: "Select a discussion channel",
+  suggestionBox: "Suggestion box",
+  newActivitiesBox: "New activities",
+
   /* Abonos y bonos */
   ticketsTitle: "Purchase Bonuses and Subscriptions",
   bonus: "Bonuses",

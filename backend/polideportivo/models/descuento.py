@@ -19,7 +19,7 @@ class Descuento(models.Model):
     tiposInstalacion = MultiSelectField(choices=TipoInstalacion.choices, max_length=512)
 
     def __str__(self):
-        return f'{self.nombre} del {self.porcentaje}% para {self.tipoInstalacion}'
+        return f'{self.nombre} del {self.porcentaje}% para {self.tiposInstalacion}'
 
     @classmethod
     def contar(cls):

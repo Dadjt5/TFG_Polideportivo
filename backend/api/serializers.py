@@ -233,6 +233,28 @@ class SesionSerializer(serializers.ModelSerializer):
             "horario"
         )
 
+
+class ActividadSimpleSerializer(serializers.ModelSerializer):
+    horasSemanales = serializers.SerializerMethodField()
+    dias = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Actividad
+        fields = (
+            "id",
+            "nombre",
+            "horasSemanales",
+            "dias",
+            "estado"
+        )
+    
+    def get_horasSemanales(self, obj):
+        return obj.calcularHorasSemanales()
+
+    def get_dias(self, obj):
+        return ",".join(sesion.dia for sesion in obj.sesiones.all())
+
+
 class ActividadSerializer(serializers.ModelSerializer):
     instalacion = InstalacionSimpleSerializer(read_only=True)
     monitor = MonitorSimpleSerializer(read_only=True)
@@ -493,15 +515,37 @@ class PagoSerializer(serializers.ModelSerializer):
 # --------------------
 
 class ReservaActividadSerializer(serializers.ModelSerializer):
+    actividad = ActividadSimpleSerializer(read_only=True)
+    pago = PagoSerializer(read_only=True)
+
     class Meta:
         model = ReservaActividad
-        fields = '__all__'
+        fields = (
+            "id",
+            "tarifa",
+            "pago",
+            "descuento",
+            "actividad"
+        )
 
 
 class AlquilerSerializer(serializers.ModelSerializer):
+    instalacion = InstalacionSimpleSerializer(read_only=True)
+    horario = HorarioSerializer(read_only=True)
+    descuento = DescuentoSerializer(read_only=True)
+    pago = PagoSerializer(read_only=True)
+
     class Meta:
         model = Alquiler
-        fields = '__all__'
+        fields = (
+            "id",
+            "fecha",
+            "tarifa",
+            "pago",
+            "instalacion",
+            "horario",
+            "descuento",
+        )
 
 
 # --------------------

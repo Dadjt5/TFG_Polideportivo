@@ -630,20 +630,56 @@ class AlterarFavoritosView(APIView):
 # Obtener las reservas tanto de alquileres de instalaciones como reservas de actividades
 class ReservasView(APIView):
     permission_classes = [IsAuthenticated]
-    
+
     def get(self, request):
         user = request.user
+        reservas = []
 
+        alquileres = Alquiler.objects.filter(usuarioFinal__user=user)
+        actividades = ReservaActividad.objects.filter(usuarioFinal__user=user)
+
+        for alquiler in alquileres:
+            reservas.append({
+                "id": alquiler.id,
+                "tipo": "alquiler",
+                "fechaInicio": alquiler.horario.fecha_inicio,
+                "id_obj": alquiler.instalacion.id,
+                "titulo": alquiler.instalacion.nombre,
+                "horario": f"{alquiler.horario.horaInicio} - {alquiler.horario.horaFin}",
+                "dias": "",
+                "pago": {
+                    "coste": alquiler.pago.coste,
+                    "estadoPago": alquiler.pago.estadoPago,
+                }
+            })
+
+        for reserva in actividades:
+            reservas.append({
+                "id": reserva.id,
+                "tipo": "actividad",
+                "fechaInicio": reserva.actividad.fecha_inicio,
+                "id_obj": reserva.actividad.id,
+                "titulo": reserva.actividad.nombre,
+                "horario": reserva.actividad.horasSemanales,
+                "dias": reserva.actividad.dias,
+                "pago": {
+                    "coste": reserva.pago.coste,
+                    "estadoPago": reserva.pago.estadoPago,
+                }
+            })
+
+        reservas.sort(key=lambda r: r["fechaInicio"])
+
+        return Response(reservas)
+
+
+# Mostrar el foro y los canales, pero sin los mensajes
+class ForoView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        
         if user.is_usuario_final:
-            alquileres = Alquiler.objects.filter(usuarioFinal__user=user)
-            reservasActividades = ReservaActividad.objects.filter(usuarioFinal__user=user)
-        elif user.is_administrador:
-            alquileres = Alquiler.objects.all()
-            reservasActividades = ReservaActividad.objects.all()
-
-        data = {
-            "alquileres": AlquilerSerializer(alquileres, many=True).data,
-            "reservasActividades": ReservaActividadSerializer(reservasActividades, many=True).data,
-        }
-
-        return Response(data)
+            
+        elif user.id_administrador:

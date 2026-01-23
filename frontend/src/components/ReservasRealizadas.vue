@@ -12,35 +12,32 @@
 
       <!-- LISTA DE RESERVAS -->
       <div v-else class="row g-4">
-        <div v-for="reserva in reservasOrdenadas" :key="reserva.id" class="col-12">
+        <div v-for="reserva in reservas" :key="reserva.id" class="col-12">
           <div class="card shadow-sm rounded-4">
             <div class="card-body d-flex justify-content-between align-items-center">
 
               <div>
                 <h5 class="mb-1">
-                  <i class="bi me-2" :class="iconoReserva(reserva)"></i>
-                  {{ tituloReserva(reserva) }}
+                  <span v-if="reserva.tipo === 'alquiler'">
+                    <i class="bi bi-building me-2"></i>
+                  </span>
+                  <span v-else>
+                    <i class="bi bi-activity me-2"></i>
+                  </span>
+                  {{ reserva.titulo }}
                 </h5>
 
                 <p class="mb-1 text-muted">
                   <i class="bi bi-calendar-event me-1"></i>
-                  {{ formatearFecha(reserva.fechaInicio) }}
+                  {{ reserva.fechaInicio }}
                 </p>
 
                 <p class="mb-0 text-muted">
                   <i class="bi bi-credit-card me-1"></i>
-                  {{ reserva.pago?.importe }} €
-                  <span v-if="reserva.descuento">
-                    · {{ reserva.descuento.nombre }}
-                  </span>
+                  {{ reserva.pago.coste }} €
                 </p>
+
               </div>
-
-              <!-- ESTADO -->
-              <span class="badge fs-6" :class="badgeEstado(reserva)">
-                {{ textoEstado(reserva) }}
-              </span>
-
             </div>
           </div>
         </div>
@@ -60,68 +57,24 @@ import { getReservasRealizadas } from "../services/usuarioFinalService";
 import type { Language } from "../useI18N";
 import { useI18n } from "../useI18N";
 
-const language = inject < Ref < Language >> ("language")!;
+const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);
 
 type Reservas = {
-  alquileres: {
-    id: number,
-    instalacion: number,
-    horario: number,
-    tarifa: number,
-    descuento: number,
-    pago: number
-  }
-  reservasActividades: {
-    id: number,
-    actividad: number,
-    tarifa: number,
-    descuento: number,
-    pago: number
+  id: number
+  tipo: 'alquiler' | 'actividad'
+  fechaInicio: string
+  titulo: string
+  id_obj: number
+  horario: string
+  dias: string
+  pago: {
+    coste: number
+    estadoPago: string
   }
 }
 
 const reservas = ref<Reservas[]>([])
-
-const reservasOrdenadas = computed(() => {
-  return [...reservas.value].sort(
-    (a, b) => new Date(a.fechaInicio) - new Date(b.fechaInicio)
-  )
-})
-
-function formatearFecha(fecha) {
-  return new Date(fecha).toLocaleString("es-ES", {
-    dateStyle: "medium",
-    timeStyle: "short"
-  })
-}
-
-function iconoReserva(reserva) {
-  return reserva.actividad ? "bi-person-walking" : "bi-building"
-}
-
-function tituloReserva(reserva) {
-  return reserva.actividad
-    ? reserva.actividad.nombre
-    : reserva.instalacion.nombre
-}
-
-function textoEstado(reserva) {
-  const ahora = new Date()
-  const inicio = new Date(reserva.fechaInicio)
-
-  if (inicio > ahora) return "Próxima"
-  return "Finalizada"
-}
-
-function badgeEstado(reserva) {
-  const ahora = new Date()
-  const inicio = new Date(reserva.fechaInicio)
-
-  return inicio > ahora
-    ? "bg-success"
-    : "bg-secondary"
-}
 
 onMounted(async () => {
   try {
@@ -130,5 +83,4 @@ onMounted(async () => {
     console.log("Error al obtener las reservas realizadas", e)
   }
 })
-
 </script>

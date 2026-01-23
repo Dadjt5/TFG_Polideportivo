@@ -157,7 +157,12 @@ export default {
   /* Reservas realizadas */
   myBookings: "Mis reservas",
   noBookings: "Aún no has realizado ninguna reserva",
-  
+
+  /* Foro */
+  forumTitle: 'Foro del Polideportivo',
+  forumSubtitle: 'Selecciona un canal de conversación',
+  suggestionBox: 'Buzón de sugerencias',
+  newActivitiesBox: 'Nuevas actividades',
 
   /* Abonos y bonos */
   ticketsTitle: "Comprar abonos y bonos",

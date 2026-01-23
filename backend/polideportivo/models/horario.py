@@ -12,8 +12,19 @@ class Horario(models.Model):
 
     def __str__(self):
         return f'Horario: {self.horaInicio}-{self.horaFin}'
+    
+    def save(self, *args, **kwargs):
+        if not self.numeroHoras:
+            t1 = self.horaInicio.hour*3600 + self.horaInicio.minute*60 + self.horaInicio.second
+            t2 = self.horaFin.hour*3600 + self.horaFin.minute*60 + self.horaFin.second
+            horas = (t1-t2)/3600
+        
+            self.numeroHoras = horas
+        
+        super().save(*args, **kwargs)
 
-    def comprobarHoras(self):
+    @property
+    def valido(self):
         t1 = self.horaInicio.hour*3600 + self.horaInicio.minute*60 + self.horaInicio.second
         t2 = self.horaFin.hour*3600 + self.horaFin.minute*60 + self.horaFin.second
         
@@ -22,11 +33,3 @@ class Horario(models.Model):
             return False
 
         return True
-
-    def asignarHoras(self):
-        t1 = self.horaInicio.hour*3600 + self.horaInicio.minute*60 + self.horaInicio.second
-        t2 = self.horaFin.hour*3600 + self.horaFin.minute*60 + self.horaFin.second
-        horas = (t1-t2)/3600
-
-        self.numeroHoras = horas
-        self.save(update_fields=["numeroHoras"])
