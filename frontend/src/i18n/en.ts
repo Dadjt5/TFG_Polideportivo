@@ -163,6 +163,10 @@ export default {
   forumSubtitle: "Select a discussion channel",
   suggestionBox: "Suggestion box",
   newActivitiesBox: "New activities",
+  hiddenMessages: "Messages are hidden in this box.",
+  writeMessage: "Write your message...",
+  cantWriteMessage: "You cannot write in this box.",
+  send: "Send",
 
   /* Abonos y bonos */
   ticketsTitle: "Purchase Bonuses and Subscriptions",

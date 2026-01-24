@@ -8,7 +8,8 @@ from polideportivo.models import (
     Foro, Horario, Instalacion, ListaEspera, Asistencia, Canal, UsuarioCanal, 
     EntradaListaEspera, TarifaTDA, Monitor, Notificacion, Pago, TarifaActividad, 
     TarifaInstalacion, TDA, UsuarioFinal, AbonoDeportivo, AbonoVerano, Pabellon, 
-    ReservaActividad, Alquiler, Administrador, CompraBono, CompraAbono, Sesion
+    ReservaActividad, Alquiler, Administrador, CompraBono, CompraAbono, Sesion,
+    Mensaje
 )
 
 
@@ -473,6 +474,25 @@ class UsuarioCanalSerializer(serializers.ModelSerializer):
     class Meta:
         model = UsuarioCanal
         fields = '__all__'
+
+
+class MensajeSerializer(serializers.ModelSerializer):
+    nombreUsuario = serializers.SerializerMethodField()
+    class Meta:
+        model = Mensaje
+        fields = (
+            "id",
+            "texto",
+            "fechaEnvio",
+            "nombreUsuario"
+        )
+
+    def get_nombreUsuario(self, obj):
+        usuarioFinal = obj.usuarioFinal
+
+        if usuarioFinal:
+            return usuarioFinal.nombre
+        return None
 
 
 # --------------------

@@ -7,19 +7,19 @@
       <p class="text-center text-secondary fs-5 mb-5">{{ t.forumSubtitle }}</p>
 
       <!-- LISTA DE CANALES -->
-      <div v-if="!selectedChannel" class="row g-4">
+      <div v-if="!canalSeleccionado" class="row g-4">
         <div
-          v-for="channel in channels"
-          :key="channel.id"
+          v-for="canal in canales"
+          :key="canal.id"
           class="col-sm-6 col-lg-4"
         >
           <div
             class="card h-100 shadow-sm border-0 rounded-4 text-center cursor-pointer"
-            @click="selectedChannel = channel"
+            @click="canalSeleccionado=canal, abrirCanal(canal.id)"
           >
             <div class="card-body py-5">
               <i class="bi bi-chat-dots fs-1 text-primary mb-3"></i>
-              <h5 class="fw-medium">{{ channel.name }}</h5>
+              <h5 class="fw-medium">{{ canal.titulo }}</h5>
             </div>
           </div>
         </div>
@@ -29,25 +29,26 @@
       <div v-else class="card shadow-lg border-0 rounded-4 p-4">
         <button
           class="btn btn-secondary mb-4 align-self-start"
-          @click="selectedChannel = null"
+          @click="canalSeleccionado=undefined"
         >
           ← {{ t.back }}
         </button>
 
-        <h2 class="fw-semibold mb-4">{{ selectedChannel.name }}</h2>
+        <h2 class="fw-semibold mb-4">{{ canalSeleccionado.titulo }}</h2>
+        <p class="text-center text-secondary fs-5 mb-5">{{ canalSeleccionado.tema }}</p>
 
         <div
           class="border rounded-4 p-3 mb-4 overflow-auto"
           style="max-height: 320px"
         >
-          <div v-if="!selectedChannel.hideMessages">
+          <div v-if="!canalSeleccionado.secreto">
             <div
-              v-for="(msg, index) in allMessages[selectedChannel.id]"
-              :key="index"
+              v-for="m in mensajes"
+              :key="m.id"
               class="bg-white border rounded-3 p-3 mb-2"
             >
-              <p class="fw-medium mb-1">{{ msg.user }}</p>
-              <p class="mb-0 text-secondary">{{ msg.text }}</p>
+              <p class="fw-medium mb-1">{{ m.nombreUsuario }}</p>
+              <p class="mb-0 text-secondary">{{ m.texto }}</p>
             </div>
           </div>
 
@@ -55,9 +56,7 @@
             v-else
             class="text-center text-muted fst-italic"
           >
-            {{ language === 'es'
-              ? 'Los mensajes están ocultos en este buzón.'
-              : 'Messages are hidden in this box.' }}
+            {{ t.hiddenMessages }}
           </p>
         </div>
 
@@ -65,13 +64,15 @@
           <input
             type="text"
             class="form-control form-control-lg rounded-3"
-            :placeholder="language === 'es'
-              ? 'Escribe tu mensaje...'
-              : 'Write your message...'"
+            v-model="textoMensaje"
+            :disabled="canalSeleccionado.silenciado"
+            :placeholder="canalSeleccionado.silenciado === false ? t.writeMessage : t.cantWriteMessage"
           />
-          <button class="btn btn-primary px-4 rounded-3">
-            {{ language === 'es' ? 'Enviar' : 'Send' }}
-          </button>
+          <span v-if="!canalSeleccionado.silenciado">
+            <button class="btn btn-primary px-4 rounded-3" @click="enviar(canalSeleccionado.id)">
+              {{ t.send }}
+            </button>
+          </span>
         </div>
       </div>
     </div>
@@ -79,9 +80,10 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, inject, type Ref, ref, computed } from 'vue'
+import { onMounted, inject, type Ref, ref } from 'vue'
 
-import { getForo } from "../services/foroService"
+import { getForo, getMensajes, enviarMensaje } from "../services/foroService"
+import { useUserStore } from "../stores/usuarioFinal";
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
 import type { Language } from "../useI18N";
@@ -90,47 +92,59 @@ import { useI18n } from "../useI18N";
 const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);
 
-const selectedChannel = ref<any>(null)
-
-const channels = computed(() => [
-  { id: 'sala-musculacion', name: language.value === 'es' ? 'Sala de musculación' : 'Gym room' },
-  { id: 'piscina', name: language.value === 'es' ? 'Piscina' : 'Swimming pool' },
-  { id: 'tenis', name: language.value === 'es' ? 'Tenis' : 'Tennis' },
-  { id: 'sugerencias', name: t.value.suggestionBox, hideMessages: true },
-  { id: 'actividades', name: t.value.newActivitiesBox },
-])
-
-const allMessages: Record<string, { user: string; text: string }[]> = {
-  sugerencias: [
-    { user: 'Usuario123', text: 'Sería genial añadir más máquinas en la sala de musculación.' },
-    { user: 'Ana Gómez', text: 'Propongo ampliar el horario de la piscina los fines de semana.' },
-  ],
-  tenis: [
-    { user: 'Jorge', text: '¿Alguien quiere jugar dobles el sábado?' },
-    { user: 'Lucía', text: 'Estoy disponible por la mañana.' },
-    { user: 'Carlos', text: 'Perfecto, nos vemos en la pista 2.' },
-  ],
+type Canal = {
+  id: number,
+  titulo: string,
+  numeroParticipantes: number,
+  tema: string,
+  secreto: boolean,
+  silenciado: boolean
 }
 
-type Foro = {
-  id: number
-  canales: {
-    id: number,
-    titulo: string,
-    numeroParticipantes: number,
-    tema: string,
-    secreto: boolean
+type Mensaje = {
+  id: number,
+  texto: string,
+  fechaEnvio: string,
+  nombreUsuario: string
+}
+
+const usuarioFinalStore = useUserStore();
+
+const canales = ref<Canal[]>([]);
+const mensajes = ref<Mensaje[]>([]);
+
+const canalSeleccionado = ref<Canal>();
+
+const textoMensaje = ref("")
+
+const abrirCanal = async (id: number) => {
+  try {
+    mensajes.value = await getMensajes(id)
+  } catch(e) {
+    console.log("Error al obtener los mensajes del canal", e)
   }
 }
 
-const foro = ref<Foro[]>([])
+const enviar = async (id: number) => {
+  if (!textoMensaje.value.trim()) return
 
+  try {
+    const data = {
+      "texto": textoMensaje.value
+    }
+    await enviarMensaje(id, data)
+    textoMensaje.value = ""
+    mensajes.value = await getMensajes(id)
+  } catch(e) {
+    console.log("Error al enviar el mensaje", e)
+  }
+}
 
 onMounted(async () => {
   try {
-    foro.value = await getForo()
+    canales.value = await getForo()
   } catch(e) {
-    console.log("Error al obtener las reservas realizadas", e)
+    console.log("Error al obtener los canales del foro", e)
   }
 })
 </script>

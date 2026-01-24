@@ -7,6 +7,7 @@ from rest_framework.permissions import (
 )
 from rest_framework import status
 from datetime import datetime
+from django.shortcuts import get_object_or_404
 
 from .permissions import IsAdministrador, IsMonitor, IsUsuarioFinal
 
@@ -20,7 +21,7 @@ from .serializers import (
     PagoSerializer, ReservaActividadSerializer, AlquilerSerializer,
     TarifaTDASerializer, TarifaActividadSerializer, TarifaInstalacionSerializer,
     TDASerializer, UsuarioFinalSerializer, UserSerializer, AdministradorSerializer,
-    CompraBonoSerializer, CompraAbonoSerializer
+    CompraBonoSerializer, CompraAbonoSerializer, MensajeSerializer
 )
 
 from polideportivo.models import (
@@ -28,7 +29,8 @@ from polideportivo.models import (
     Foro, Horario, Instalacion, ListaEspera, Asistencia, Canal, UsuarioCanal, 
     EntradaListaEspera, TarifaTDA, Monitor, Notificacion, Pago, TarifaActividad, 
     TarifaInstalacion, TDA, UsuarioFinal, AbonoDeportivo, AbonoVerano, Pabellon, 
-    ReservaActividad, Alquiler, Administrador, User, CompraBono, CompraAbono
+    ReservaActividad, Alquiler, Administrador, User, CompraBono, CompraAbono,
+    Mensaje
 )
 
 
@@ -213,12 +215,14 @@ class UsuarioCanalViewSet(viewsets.ModelViewSet):
     serializer_class = UsuarioCanalSerializer
     permission_classes = [IsAuthenticated]
 
-    def perform_create(self, serializer):
-        usuario_final = UsuarioFinal.objects.get(user=self.request.user)
-        serializer.save(usuarioFinal=usuario_final)
-
     def get_queryset(self):
         return UsuarioCanal.objects.filter(usuarioFinal__user=self.request.user)
+
+
+class MensajeViewSet(viewsets.ModelViewSet):
+    queryset = Mensaje.objects.all()
+    serializer_class = MensajeSerializer
+    permission_classes = [IsAuthenticated]
 
 
 # ----------------
@@ -679,7 +683,49 @@ class ForoView(APIView):
 
     def get(self, request):
         user = request.user
-        
+        foro = Foro.objects.all().first()
+
         if user.is_usuario_final:
+            canales = []
             
+            for canal in foro.canal.all():
+                usuarioCanal = UsuarioCanal.objects.filter(canal=canal, usuarioFinal=user.usuario_final).first()
+                if not canal.oculto and not usuarioCanal.expulsado:
+                    canales.append({
+                        "id": canal.id,
+                        "titulo": canal.titulo,
+                        "numeroParticipantes": canal.numeroParticipantes,
+                        "tema": canal.tema,
+                        "secreto": canal.secreto,
+                        "silenciado": usuarioCanal.silenciado
+                    })
+                
+            return Response(canales)
         elif user.id_administrador:
+            return Response(foro)
+    
+        return Response("Usuario incorrecto")
+
+
+# Mostrar los mensajes del un canal
+class MensajesCanalView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, canal_id):
+        canal = get_object_or_404(Canal, id=canal_id)
+
+        mensajes = canal.getMensajes().order_by("fechaEnvio")
+        
+        serializer = MensajeSerializer(mensajes, many=True)
+
+        return Response(serializer.data)
+    
+    def post(self, request, canal_id):
+        canal = get_object_or_404(Canal, id=canal_id)
+
+        resultado = canal.nuevoMensaje(request.user.usuario_final, request.data.get("texto", ""))
+
+        if resultado:
+            return Response({"respuesta": "Mensaje enviado"}, status=status.HTTP_201_CREATED)
+
+        return Response({"respuesta": "No puedes escribir en este canal"}, status=status.HTTP_403_FORBIDDEN)

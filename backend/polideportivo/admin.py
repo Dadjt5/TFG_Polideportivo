@@ -5,7 +5,8 @@ from polideportivo.models import (
     Foro, Horario, Instalacion, ListaEspera, Asistencia, Canal, UsuarioCanal, 
     EntradaListaEspera, TarifaTDA, Monitor, Notificacion, Pago, TarifaActividad, 
     TarifaInstalacion, TDA, UsuarioFinal, AbonoDeportivo, AbonoVerano, Pabellon, 
-    ReservaActividad, Alquiler, Administrador, CompraAbono, CompraBono, Sesion
+    ReservaActividad, Alquiler, Administrador, CompraAbono, CompraBono, Sesion,
+    Mensaje
 )
 
 admin.site.register(AbonoDeportivo)
@@ -32,6 +33,7 @@ admin.site.register(Favorito)
 admin.site.register(Foro)
 admin.site.register(Canal)
 admin.site.register(UsuarioCanal)
+admin.site.register(Mensaje)
 
 admin.site.register(Horario)
 

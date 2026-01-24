@@ -31,6 +31,7 @@ router.register(r'favoritos', views.FavoritoViewSet, basename="favorito")
 router.register(r'foros', views.ForoViewSet, basename="foro")
 router.register(r'canales', views.CanalViewSet, basename="canal")
 router.register(r'usuariosCanal', views.UsuarioCanalViewSet, basename="usuario-canal")
+router.register(r'mensaje', views.MensajeViewSet, basename="mensaje-canal")
 
 router.register(r'horarios', views.HorarioViewSet, basename="horario")
 
@@ -68,5 +69,7 @@ urlpatterns = [
     path("marcar/favoritas/", views.AlterarFavoritosView.as_view(), name="marcar-favoritas"),
     path("obtener/favoritas/", views.ObtenerActividadesInstalaciones.as_view(), name="favoritas"),
     path("reservas/", views.ReservasView.as_view(), name="Reservas-favoritas"),
+    path("foro/", views.ForoView.as_view(), name="Foro"),
+    path("canales/<int:canal_id>/mensajes/", views.MensajesCanalView.as_view(), name="Mensajes-canal"),
     path('', include(router.urls)),
 ]

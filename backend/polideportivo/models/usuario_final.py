@@ -59,6 +59,8 @@ class UsuarioFinal(Usuario):
                           dni, telefono, correo, provincia, municipio,
                           localidad, codigoPostal, password, cuentaBancaria=None):
 
+        from .foro import Canal
+
         User = get_user_model()
 
         if User.objects.filter(username=dni).exists():
@@ -80,7 +82,7 @@ class UsuarioFinal(Usuario):
                 password=password
             )
 
-            cls.objects.create(
+            usuarioFinal = cls.objects.create(
                 user=auth_user,
                 nombre=nombre,
                 apellidos=apellidos,
@@ -94,6 +96,9 @@ class UsuarioFinal(Usuario):
                 codigoPostal=codigoPostal,
                 cuentaBancaria=cuentaBancaria
             )
+
+            for canal in Canal.objects.all():
+                canal.añadirUsuario(usuarioFinal)
 
         return {
             "respuesta": "Usuario registrado correctamente",

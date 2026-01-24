@@ -6,7 +6,7 @@ from .configuracion import Configuracion
 from .deporte import Deporte
 from .descuento import Descuento
 from .favorito import Favorito
-from .foro import (Foro, Canal, UsuarioCanal)
+from .foro import (Foro, Canal, UsuarioCanal, Mensaje)
 from .horario import Horario
 from .instalacion import (Instalacion, Pabellon)
 from .lista_espera import (ListaEspera, EntradaListaEspera)

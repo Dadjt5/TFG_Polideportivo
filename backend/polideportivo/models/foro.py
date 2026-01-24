@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.db import transaction
 
 from .usuario_final import UsuarioFinal
 from .constantes import Tematica
@@ -8,17 +9,19 @@ from .constantes import Tematica
 class Foro(models.Model):
     """Modelo para representar el foro"""
 
-    numeroParticipantes = models.PositiveIntegerField(default=1)
+    numeroParticipantes = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return f'Foro con {self.numeroParticipantes}'
 
-    def nuevoCanal(self, titulo: str):
+    def nuevoCanal(self, titulo):
         try:
-            canal = Canal.objects.create(titulo=titulo, foro=self, numeroParticipantes=0)
-            
-            for usuario in UsuarioFinal.objects.all():
-                UsuarioCanal.objects.get_or_create(usuarioFinal=usuario, canal=canal)
+            with transaction.atomic():
+                canal = Canal.objects.create(titulo=titulo, foro=self, numeroParticipantes=0)
+
+                for usuario in UsuarioFinal.objects.all():
+                    canal.añadirUsuario(usuario)
+
             return True
         except Exception:
             return False
@@ -31,9 +34,9 @@ class UsuarioCanal(models.Model):
     silenciado = models.BooleanField(default=False)
     expulsado = models.BooleanField(default=False)
     
-    usuarioFinal = models.ForeignKey(UsuarioFinal, on_delete=models.RESTRICT)
-    canal = models.ForeignKey('Canal', on_delete=models.RESTRICT)
-    
+    usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.RESTRICT, related_name="canales")
+    canal = models.ForeignKey('Canal', on_delete=models.RESTRICT, related_name="usuarioFinal")
+
     class Meta:
         unique_together = ('usuarioFinal', 'canal')
     
@@ -42,11 +45,11 @@ class Canal(models.Model):
     """Modelo para representar un canal"""
 
     titulo = models.CharField(max_length=256, blank=True)
-    numeroParticipantes = models.PositiveIntegerField(default=1)
+    numeroParticipantes = models.PositiveIntegerField(default=0)
     oculto = models.BooleanField(default=False)
     secreto = models.BooleanField(default=False)
 
-    foro = models.ForeignKey(Foro, on_delete=models.RESTRICT)
+    foro = models.ForeignKey(Foro, on_delete=models.RESTRICT, related_name="canal")
 
     tema = models.CharField(default=Tematica.CHAT, choices=Tematica.choices)
 
@@ -56,21 +59,62 @@ class Canal(models.Model):
     @classmethod
     def contar(cls):
         return cls.objects.count()
+    
+    def getMensajes(self):
+        return self.mensajes.all()
+    
+    def nuevoMensaje(self, usuario, texto):
+        if not usuario:
+            return False
+
+        relacion = UsuarioCanal.objects.filter(
+            usuarioFinal=usuario,
+            canal=self,
+            expulsado=False,
+            silenciado=False
+        ).first()
+
+        if not relacion:
+            return False
+
+        Mensaje.objects.create(canal=self, usuarioFinal=usuario, texto=texto)
+        return True
 
     def expulsarUsuario(self, usuarioFinal):
         try:
             relacion = UsuarioCanal.objects.get(usuarioFinal=usuarioFinal, canal=self)
-            if relacion.expulsado == False:
-                return False
-            
-            relacion.expulsado = True
-            relacion.save(update_fields=["expulsado"])
-            return True
         except:
             return False
 
+        if relacion.expulsado:
+            return False
+
+        with transaction.atomic():
+            relacion.expulsado = True
+            relacion.save(update_fields=["expulsado"])
+
+            self.numeroParticipantes -= 1
+            self.save(update_fields=["numeroParticipantes"])
+
+        return True
+
     def añadirUsuario(self, usuarioFinal):
-        UsuarioCanal.objects.get_or_create(usuarioFinal=usuarioFinal, canal=self)
+        with transaction.atomic():
+            relacion, creada = UsuarioCanal.objects.get_or_create(
+                usuarioFinal=usuarioFinal,
+                canal=self
+            )
+
+            if not creada:
+                return False
+
+            self.numeroParticipantes += 1
+            self.foro.numeroParticipantes += 1
+
+            self.save(update_fields=["numeroParticipantes"])
+            self.foro.save(update_fields=["numeroParticipantes"])
+
+        return True
 
     def cambiarSilencioUsuario(self, usuarioFinal):
         try:
@@ -80,3 +124,19 @@ class Canal(models.Model):
             return True
         except:
             return False
+
+
+class Mensaje(models.Model):
+    """Mensaje enviado en un canal del foro"""
+
+    texto = models.TextField()
+    fechaEnvio = models.DateTimeField(auto_now_add=True)
+
+    usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.SET_NULL, null=True, blank=True)
+    canal = models.ForeignKey('Canal', on_delete=models.CASCADE, related_name="mensajes")
+
+    class Meta:
+        ordering = ["fechaEnvio"]
+
+    def __str__(self):
+        return f"Mensaje en {self.canal.titulo}"

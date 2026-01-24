@@ -163,6 +163,10 @@ export default {
   forumSubtitle: 'Selecciona un canal de conversación',
   suggestionBox: 'Buzón de sugerencias',
   newActivitiesBox: 'Nuevas actividades',
+  hiddenMessages: "En este canal los mensajes estan ocultos.",
+  writeMessage: "Escribe tu mensaje...",
+  cantWriteMessage: "No puedes escribir en este canal.",
+  send: "Enviar",
 
   /* Abonos y bonos */
   ticketsTitle: "Comprar abonos y bonos",
