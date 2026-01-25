@@ -89,7 +89,13 @@ class UsuarioFinalSerializer(serializers.ModelSerializer):
 class MonitorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Monitor
-        fields = '__all__'
+        fields = (
+            "id",
+            "nombre",
+            "apellidos",
+            "DNI",
+            "user"
+        )
 
 
 class MonitorSimpleSerializer(serializers.ModelSerializer):

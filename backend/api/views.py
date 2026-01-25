@@ -6,7 +6,6 @@ from rest_framework.permissions import (
     AllowAny
 )
 from rest_framework import status
-from datetime import datetime
 from django.shortcuts import get_object_or_404
 
 from .permissions import IsAdministrador, IsMonitor, IsUsuarioFinal
@@ -21,7 +20,7 @@ from .serializers import (
     PagoSerializer, ReservaActividadSerializer, AlquilerSerializer,
     TarifaTDASerializer, TarifaActividadSerializer, TarifaInstalacionSerializer,
     TDASerializer, UsuarioFinalSerializer, UserSerializer, AdministradorSerializer,
-    CompraBonoSerializer, CompraAbonoSerializer, MensajeSerializer
+    CompraBonoSerializer, CompraAbonoSerializer, MensajeSerializer, SesionSerializer
 )
 
 from polideportivo.models import (
@@ -30,7 +29,7 @@ from polideportivo.models import (
     EntradaListaEspera, TarifaTDA, Monitor, Notificacion, Pago, TarifaActividad, 
     TarifaInstalacion, TDA, UsuarioFinal, AbonoDeportivo, AbonoVerano, Pabellon, 
     ReservaActividad, Alquiler, Administrador, User, CompraBono, CompraAbono,
-    Mensaje
+    Mensaje, Sesion
 )
 
 
@@ -729,3 +728,27 @@ class MensajesCanalView(APIView):
             return Response({"respuesta": "Mensaje enviado"}, status=status.HTTP_201_CREATED)
 
         return Response({"respuesta": "No puedes escribir en este canal"}, status=status.HTTP_403_FORBIDDEN)
+
+
+# Mostrar las sesiones del monitor
+class SesionesMonitorView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, monitor_id):
+        sesiones = []
+
+        actividades = Actividad.objects.filter(monitor_id=monitor_id)
+        
+        for actividad in actividades:
+            if actividad.activa:
+                for sesion in actividades.sesiones:
+                    sesiones.append({
+                        "idActividad": actividad.id,
+                        "idSesion": sesion.id,
+                        "nombre": actividad.nombre,
+                        "dia": sesion.dia,
+                        "horaInicio": sesion.horario.horaInicio,
+                        "horaFin": sesion.horario.horaFin
+                    })
+
+        return Response(sesiones)

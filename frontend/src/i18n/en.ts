@@ -195,7 +195,6 @@ export default {
   remainingDays: "Remaining days",
   remainingUses: "Remaining uses",
 
-
   /* Datos personales */
   personalDataTitle: "Modify personal data",
   saveChanges: "Save changes",
@@ -224,6 +223,10 @@ export default {
   downloadQR: "Download QR",
   inactive: "Inactive",
   active: "Active",
+
+  /* Home Monitor */
+  monitorHomeTitle: "Dashboard of",
+  weeklyActivities: "Weekly activities",
 
   /* Contacto */
   contactTitle: "Sports Center Contact",

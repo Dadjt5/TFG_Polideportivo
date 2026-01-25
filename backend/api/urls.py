@@ -71,5 +71,6 @@ urlpatterns = [
     path("reservas/", views.ReservasView.as_view(), name="Reservas-favoritas"),
     path("foro/", views.ForoView.as_view(), name="Foro"),
     path("canales/<int:canal_id>/mensajes/", views.MensajesCanalView.as_view(), name="Mensajes-canal"),
+    path("monitor/<int:monitor_id>/sesiones/", views.SesionesMonitorView.as_view(), name="Sesiones-monitor"),
     path('', include(router.urls)),
 ]

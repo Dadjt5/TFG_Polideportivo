@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 import math
-from django.db.models import Q
+from django.utils import timezone
 
 from .constantes import TipoActividad, TipoReserva, Terreno, Estado, Periodo, Dia
 
@@ -22,7 +22,7 @@ class Actividad(models.Model):
 
     deportes = models.ManyToManyField('Deporte', related_name="actividades")
     instalacion = models.ForeignKey('Instalacion', on_delete=models.RESTRICT)
-    monitor = models.ForeignKey('Monitor', on_delete=models.RESTRICT)
+    monitor = models.ForeignKey('Monitor', on_delete=models.RESTRICT, related_name="actividades")
 
     tipoActividad = models.CharField(default=TipoActividad.OTROS, choices=TipoActividad.choices)
     tipoReserva = models.CharField(default=TipoReserva.NINGUNA, choices=TipoReserva.choices)
@@ -32,6 +32,21 @@ class Actividad(models.Model):
 
     def __str__(self):
         return f'{self.nombre}, en la instalacion {self.instalacion}'
+    
+    @property
+    def activa(self):
+        if self.periodo == Periodo.ANUAL:
+            return True
+
+        now = timezone.now()
+
+        if self.periodo == Periodo.PRIMER_CUATRIMESTRE:
+            return now.month in [9,10,11,12,1]
+
+        if self.periodo == Periodo.SEGUNDO_CUATRIMESTRE:
+            return now.month in [2,3,4,5]
+
+        return False
 
     def calcularHorasSemanales(self):
         horas = 0.0

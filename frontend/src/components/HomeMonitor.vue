@@ -1,44 +1,27 @@
 <template>
   <div class="min-vh-100 bg-light">
-    <!-- NAVBAR -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top shadow-sm">
-      <div class="container">
-        <span class="navbar-brand fs-5 fw-bold">Polideportivo XX</span>
-
-        <div class="d-flex align-items-center ms-auto gap-3">
-          <button class="btn btn-light" @click="toggleLanguage" :title="language === 'es' ? 'Switch to English' : 'Cambiar a Español'">
-            {{ language === 'es' ? '🇪🇸' : '🇬🇧' }}
-          </button>
-          <button class="btn btn-light" @click="logout">{{ t.logout }}</button>
-          <button class="btn btn-light rounded-circle p-2">
-            <User class="text-primary" />
-          </button>
-        </div>
-      </div>
-    </nav>
-
     <main class="container py-4">
-      <h1 class="text-center fs-2 fw-bold mb-4">{{ t.dashboard }}</h1>
-
+      <h1 class="text-center fs-2 fw-bold mb-4">{{ t.monitorHomeTitle }}</h1>
       <div class="row g-4">
-        <!-- NOTIFICACIONES -->
+
         <div class="col-lg-12">
           <div class="card shadow-sm border-0 mb-4">
             <div class="card-body">
               <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="mb-0 d-flex align-items-center gap-2">
-                  <Bell class="text-primary fs-4" />
-                  {{ t.notifications }}
-                  <span v-if="usuarioFinalStore.unreadCount > 0" class="badge bg-danger">
-                    {{ usuarioFinalStore.unreadCount }}
-                  </span>
-                </h5>
-                <button class="btn btn-link text-primary" @click="verTodasNotificaciones">{{ t.seeAll }}</button>
+                <router-link to="/notificaciones">
+                  <h5 class="mb-0 d-flex align-items-center gap-2">
+                    <i class="bi bi-bell-fill text-primary fs-4"></i>
+                    {{ t.notifications }}
+                    <span v-if="monitorStore.unreadCount > 0" class="badge bg-danger">
+                      {{ monitorStore.unreadCount }}
+                    </span>
+                  </h5>
+                </router-link>
               </div>
 
               <div class="row g-3">
                 <div
-                  v-for="notf in usuarioFinalStore.notificaciones"
+                  v-for="notf in monitorStore.notificaciones"
                   :key="notf.id"
                   class="col-md-4"
                 >
@@ -55,16 +38,16 @@
           </div>
         </div>
 
-        <!-- ACTIVIDADES DE LA SEMANA -->
         <div class="col-lg-12">
           <div class="card shadow-sm border-0">
             <div class="card-body">
               <h5 class="mb-3 d-flex align-items-center gap-2">
-                <Calendar class="text-primary" /> {{ t.weeklyActivities }}
+                <i class="bi bi-calendar text-primary fs-4"></i>
+                {{ t.weeklyActivities }}
               </h5>
 
               <div class="row g-3">
-                <div v-for="day in weeklyActivities" :key="day.id" class="col text-center">
+                <div v-for="day in actividadesSemanales" :key="day.id" class="col text-center">
                   <div class="border rounded p-2 bg-light h-100">
                     <div class="fw-semibold mb-2 border-bottom pb-1">{{ day.day }}</div>
                     <div v-if="day.activities.length === 0" class="text-muted small py-2">-</div>
@@ -92,36 +75,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref, inject, type Ref, computed, onMounted } from 'vue';
+import { ref, inject, type Ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { User, Bell, Calendar } from 'lucide-vue-next';
+
 import { useAuthStore } from '../stores/auth';
-import { useUserStore } from '../stores/usuarioFinal';
-import { useI18n } from '../useI18N';
+import { useMonitorStore } from '../stores/monitor';
 
-const language = ref('es');
-const t = computed(() => {
-  const translations = {
-    es: {
-      home: "Inicio", logout: "Logout", dashboard: "Panel principal de Laura",
-      notifications: "Notificaciones", seeAll: "Ver todas", weeklyActivities: "Actividades de la semana"
-    },
-    en: {
-      home: "Home", logout: "Logout", dashboard: "Monitor Dashboard",
-      notifications: "Notifications", seeAll: "See all", weeklyActivities: "Weekly Activities"
-    }
-  };
-  return translations[language.value];
-});
+/* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
+import type { Language } from "../useI18N";
+import { useI18n } from "../useI18N";
 
-const toggleLanguage = () => language.value = language.value === 'es' ? 'en' : 'es';
-const logout = () => console.log("Logout"); // Implementa tu logout
+const language = inject<Ref<Language>>("language")!;
+const t = useI18n(language);
 
 const userStore = useAuthStore();
-const usuarioFinalStore = useUserStore();
+const monitorStore = useMonitorStore();
 const router = useRouter();
 
-const weeklyActivities = ref([
+const actividadesSemanales = ref([
   { id: 1, day: 'Lunes', activities: [{ id: 101, name: 'Natación' }, { id: 102, name: 'Musculación' }] },
   { id: 2, day: 'Martes', activities: [{ id: 103, name: 'Pádel' }] },
   { id: 3, day: 'Miércoles', activities: [{ id: 104, name: 'Yoga' }, { id: 105, name: 'CrossFit' }] },
@@ -132,25 +103,25 @@ const weeklyActivities = ref([
 ]);
 
 const activityDetail = (id: number) => {
-  router.push({ name: 'detalle-actividad', params: { id } });
-};
-
-const verTodasNotificaciones = () => {
-  router.push('/notificaciones');
+  router.push({
+    name: 'detalle-actividad',
+    params: { id }
+  });
 };
 
 onMounted(async () => {
-  if (!usuarioFinalStore.usuarioFinal) {
-    await usuarioFinalStore.fetchUser(userStore.user?.usuario_final_id);
+  if (!monitorStore.monitor) {
+    await monitorStore.fetchUser(userStore.user?.monitor_id);
   }
-  if (usuarioFinalStore.notificaciones.length === 0) {
-    await usuarioFinalStore.fetchNotificaciones();
+  if (monitorStore.notificaciones.length === 0) {
+    await monitorStore.fetchNotificaciones();
   }
+
+  monitorStore.comenzarIntervalo();
 });
 </script>
 
 <style scoped>
-/* Ajustes finos */
 .card {
   border-radius: 1rem;
 }

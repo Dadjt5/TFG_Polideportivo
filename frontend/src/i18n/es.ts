@@ -224,6 +224,10 @@ export default {
   inactive: "Inactiva",
   active: "Activa",
 
+  /* Home Monitor */
+  monitorHomeTitle: "Panel principal de",
+  weeklyActivities: "Actividades de la semana",
+
   /* Contacto */
   contactTitle: "Contacto con el centro deportivo",
   contactSubtitle: "Información de contacto del edificio de administración",

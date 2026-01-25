@@ -3,10 +3,12 @@ import {
   marcarFavoritos,
   getTDA,
   getUsuarioFinal,
+} from "../services/usuarioFinalService";
+import {
   getNotificaciones,
   borrarNotificaciones,
   guardarNotificaciones
-} from "../services/usuarioFinalService";
+} from "../services/notificacionService";
 
 let intervalId: number | null = null;
 
@@ -119,6 +121,9 @@ export const useUserStore = defineStore("user", {
       this.usuarioFinal = null;
       this.notificaciones = [];
       localStorage.removeItem("usuarioFinal");
+      localStorage.removeItem("notificaciones");
+      localStorage.removeItem("actividadesFavoritas");
+      localStorage.removeItem("instalacionesFavoritas");
       this.finalizarIntervalo();
     },
 
