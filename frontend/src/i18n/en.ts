@@ -228,6 +228,13 @@ export default {
   monitorHomeTitle: "Dashboard of",
   weeklyActivities: "Weekly activities",
 
+  /* Nuevo monitor */
+  newMonitor: "Create monitor",
+
+  /* Pasar lista / Detalle sesion */
+  save: "Save",
+  participants: "Participants",
+
   /* Contacto */
   contactTitle: "Sports Center Contact",
   contactSubtitle: "Contact information of the administration building",

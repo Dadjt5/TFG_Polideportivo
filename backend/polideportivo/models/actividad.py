@@ -122,11 +122,11 @@ class Sesion(models.Model):
 
 class Asistencia(models.Model):
     """Modelo para representar la relación entre sesion y usuario"""
-    
+
     presente = models.BooleanField(default=True)
-    
+
     usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.RESTRICT)
-    sesion = models.ForeignKey(Sesion, on_delete=models.RESTRICT)
-    
+    sesion = models.ForeignKey(Sesion, on_delete=models.RESTRICT, related_name="asistencias")
+
     class Meta:
         unique_together = ('usuarioFinal', 'sesion')

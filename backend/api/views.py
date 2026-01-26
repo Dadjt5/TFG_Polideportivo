@@ -281,11 +281,7 @@ class EntradaListaEsperaViewSet(viewsets.ModelViewSet):
 class MonitorViewSet(viewsets.ModelViewSet):
     queryset = Monitor.objects.all()
     serializer_class = MonitorSerializer
-    permission_classes = [IsAdministrador]
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
+    permission_classes = [IsAuthenticated]
 
 # ----------------
 # Notificaciones
@@ -386,9 +382,6 @@ class UsuarioFinalViewSet(viewsets.ModelViewSet):
     serializer_class = UsuarioFinalSerializer
     permission_classes = [IsAuthenticated]
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
 # ----------------
 # Administradores
 # ----------------
@@ -397,9 +390,6 @@ class AdministradorViewSet(viewsets.ModelViewSet):
     queryset = Administrador.objects.all()
     serializer_class = AdministradorSerializer
     permission_classes = [IsAuthenticated]
-    
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
 
 
 # ----------------
@@ -537,6 +527,34 @@ class RegistroView(APIView):
             dni=dni, telefono=telefono, correo=correo, provincia=provincia,
             municipio=municipio, localidad=localidad, codigoPostal=codigoPostal,
             password=password, cuentaBancaria=cuentaBancaria
+        )
+
+        if respuesta["error"]:
+            sta = status.HTTP_400_BAD_REQUEST
+        else:
+            sta = status.HTTP_201_CREATED
+
+        return Response(
+            {"mensaje": respuesta["respuesta"]},
+            status=sta
+        )
+
+
+# Registrar monitor
+class RegistroMonitorView(APIView):
+    permission_classes = [AllowAny]
+    authentication_classes = []
+
+    def post(self, request):
+        nombre = request.data.get('nombre')
+        apellidos = request.data.get('apellidos')
+        correo = request.data.get('correo')
+        dni = request.data.get('dni')
+        password = request.data.get('password')
+
+        respuesta = Monitor.registrar_monitor(
+            nombre=nombre, apellidos=apellidos, dni=dni, 
+            correo=correo, password=password
         )
 
         if respuesta["error"]:
@@ -741,7 +759,7 @@ class SesionesMonitorView(APIView):
         
         for actividad in actividades:
             if actividad.activa:
-                for sesion in actividades.sesiones:
+                for sesion in actividad.sesiones.all():
                     sesiones.append({
                         "idActividad": actividad.id,
                         "idSesion": sesion.id,
@@ -752,3 +770,40 @@ class SesionesMonitorView(APIView):
                     })
 
         return Response(sesiones)
+
+
+# Mostrar informacion en detalle de una sesion para el monitor
+class DetalleSesionView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, actividad_id, sesion_id):
+        data = []
+
+        actividad = get_object_or_404(Actividad, id=actividad_id)
+        sesion = get_object_or_404(Sesion, id=sesion_id, actividad=actividad)
+
+        data = {
+            "dia": sesion.dia,
+            "horaInicio": sesion.horario.horaInicio,
+            "horaFin": sesion.horario.horaFin,
+            "actividad": {
+                "nombre": actividad.nombre,
+                "periodo": actividad.periodo,
+                "estado": actividad.estado,
+                "instalacion": {
+                    "id": actividad.instalacion.id,
+                    "nombre": actividad.instalacion.nombre
+                },
+                "nivel": actividad.nivel
+            },
+            "participantes": []
+        }
+
+        for asistencia in sesion.asistencias.all():
+            data["participantes"].append({
+                "id": asistencia.usuarioFinal.id,
+                "nombre": asistencia.nombreUsuario,
+                "presente": asistencia.presente
+            })
+
+        return Response(data)

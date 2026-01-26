@@ -112,7 +112,6 @@ const loading = ref(false);
 const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);
 
-
 const handleLogin = async () => {
   /* Nos ahorramos comunicaciones con el backend si algún campo esta vacio */
   if (!identifier.value || !password.value) {

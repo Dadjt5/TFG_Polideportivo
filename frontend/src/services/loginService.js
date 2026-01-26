@@ -19,3 +19,9 @@ export const registrarse = async (payload) => {
   const response = await api.post("api/v1/registrarse/", payload);
   return response.data;
 };
+
+/* Función para realizar el registro del monitor por parte del admin */
+export const registrarMonitor = async (payload) => {
+  const response = await api.post("api/v1/registrar/monitor/", payload);
+  return response.data;
+};

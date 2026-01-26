@@ -19,6 +19,9 @@ import ModificarDatosPersonales from '../components/ModificarDatosPersonales.vue
 import ListaDeActividades from '../components/ListaDeActividades.vue'
 import ReservasRealizadas from '../components/ReservasRealizadas.vue'
 import Foro from '../components/Foro.vue'
+import NuevoMonitor from '../components/NuevoMonitor.vue'
+import HomeMonitor from '../components/HomeMonitor.vue'
+import DetalleSesion from '../components/DetalleSesion.vue'
 
 const routes = [
   { path: '/', redirect: '/home' },
@@ -26,10 +29,16 @@ const routes = [
   { path: '/buscar', component: Buscar, meta: { public: true } },
   { path: '/login', component: Login, meta: { public: true } },
   { path: '/registrarse', component: Registro, meta: { public: true } },
+  { path: '/registrar/monitor', component: NuevoMonitor, meta: { requiresAuth: true }},
   {
     path: '/home-usuario',
     component: HomeUsuarioFinal,
     meta: { requiresAuth: true, role: 'usuario_final' }
+  },
+  {
+    path: '/home-monitor',
+    component: HomeMonitor,
+    meta: { requiresAuth: true, role: 'monitor' }
   },
   {
     path: '/actividades/:id',
@@ -44,6 +53,13 @@ const routes = [
     name: 'detalle-instalacion',
     props: true,
     meta: { public: true }
+  },
+  {
+    path: '/actividades/:idAct/sesiones/:idSesion',
+    component: DetalleSesion,
+    name: 'detalle-sesion',
+    props: true,
+    meta: { requiresAuth: true }
   },
   { path: '/notificaciones', component: Notificaciones, meta: { requiresAuth: true } },
   { path: '/reservas-realizadas', component: ReservasRealizadas, meta: { requiresAuth: true } },

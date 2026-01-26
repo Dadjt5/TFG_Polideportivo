@@ -43,9 +43,9 @@
                 <i class="bi bi-bar-chart-fill text-primary me-2 fs-4"></i>
                 <h6 class="mb-0">{{ t.userStats }}</h6>
               </div>
-              <button class="btn btn-primary w-100">
-                {{ t.viewUserStats }}
-              </button>
+                <router-link to="/registrar/monitor" v-if="userStore.user" class="btn btn-success w-100">
+                  {{ t.viewUserStats }}
+                </router-link>
             </div>
           </div>
 

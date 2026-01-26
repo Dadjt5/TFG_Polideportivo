@@ -119,19 +119,19 @@ class Dia(models.TextChoices):
     - LUNES, MARTES, MIERCOLES, JUEVES, VIERNES, SABADO, DOMINGO
     """
     
-    LUNES = 'lunes'
+    LUNES = 'Lunes'
 
-    MARTES = 'martes'
+    MARTES = 'Martes'
 
-    MIERCOLES = 'miercoles'
+    MIERCOLES = 'Miercoles'
     
-    JUEVES = 'jueves'
+    JUEVES = 'Jueves'
     
-    VIERNES = 'viernes'
+    VIERNES = 'Viernes'
     
-    SABADO = 'sabado'
+    SABADO = 'Sabado'
     
-    DOMINGO = 'domingo'
+    DOMINGO = 'Domingo'
 
 
 class Sexo(models.TextChoices):

@@ -17,3 +17,9 @@ export const getActividadesInstalaciones = async (payload) => {
   const response = await api.post('/api/v1/obtener/favoritas/', payload);
   return response.data
 }
+
+/* Función para obtener la informacion de una sesión */
+export const getSesionDetalle = async (idActividad, idSesion) => {
+  const response = await api.get(`/api/v1/actividades/${idActividad}/sesiones/${idSesion}/`);
+  return response.data;
+};

@@ -22,13 +22,13 @@
         </li>
 
         <li class="nav-item fs-5">
-          <router-link to="/comprar-abonos" v-if="userStore.user" class="nav-link px-3 text-white">
+          <router-link to="/comprar-abonos" v-if="userStore.role === 'usuario_final'" class="nav-link px-3 text-white">
             {{ t.seasonTickets }}
           </router-link>
         </li>
 
         <li class="nav-item fs-5">
-          <router-link to="/foro" v-if="userStore.user" class="nav-link px-3 text-white">
+          <router-link to="/foro" v-if="userStore.role === 'usuario_final'" class="nav-link px-3 text-white">
             {{ t.forum }}
           </router-link>
         </li>
@@ -87,6 +87,7 @@ import { useRouter } from "vue-router";
 /* Importamos las comunicaciones con el backend a traves de nuestro Store para usar el usuario */
 import { useAuthStore } from "../stores/auth";
 import { useUserStore } from "../stores/usuarioFinal";
+import { useMonitorStore } from "../stores/monitor";
 
 import type { Language } from "../useI18N";
 import { useI18n } from "../useI18N";
@@ -94,6 +95,7 @@ import { useI18n } from "../useI18N";
 const router = useRouter();
 const userStore = useAuthStore();
 const usuarioFinalStore = useUserStore();
+const monitorStore = useMonitorStore();
 
 const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);
@@ -103,7 +105,11 @@ const toggleLanguage = () => {
 };
 
 const logout = () => {
-  usuarioFinalStore.cerrarSesion();
+  if(userStore.role == "usuario_final") {
+    usuarioFinalStore.cerrarSesion();
+  } else if(userStore.role == "monitor") {
+    monitorStore.cerrarSesion();
+  }
   userStore.logout();
   router.push("/");
 };

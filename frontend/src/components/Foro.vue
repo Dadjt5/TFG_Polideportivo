@@ -108,8 +108,6 @@ type Mensaje = {
   nombreUsuario: string
 }
 
-const usuarioFinalStore = useUserStore();
-
 const canales = ref<Canal[]>([]);
 const mensajes = ref<Mensaje[]>([]);
 

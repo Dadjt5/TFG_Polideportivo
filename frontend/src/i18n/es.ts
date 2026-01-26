@@ -228,6 +228,13 @@ export default {
   monitorHomeTitle: "Panel principal de",
   weeklyActivities: "Actividades de la semana",
 
+  /* Nuevo monitor */
+  newMonitor: "Crear monitor",
+
+  /* Pasar lista / Detalle sesion */
+  save: "Guardar",
+  participants: "Participantes",
+
   /* Contacto */
   contactTitle: "Contacto con el centro deportivo",
   contactSubtitle: "Información de contacto del edificio de administración",

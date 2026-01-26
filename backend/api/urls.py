@@ -64,6 +64,7 @@ urlpatterns = [
     path("estadisticas/", views.EstadisticasView.as_view(), name="estadisticas"),
     path("buscar/", views.BuscarView.as_view(), name="busqueda"),
     path("registrarse/", views.RegistroView.as_view(), name="registro"),
+    path("registrar/monitor/", views.RegistroMonitorView.as_view(), name="registrar-monitor"),
     path("notificaciones/guardar/", views.GuardarNotificacionView.as_view(), name="modificar-notificacion"),
     path("tda/validar/", views.ValidarTDAView.as_view(), name="validar-tda"),
     path("marcar/favoritas/", views.AlterarFavoritosView.as_view(), name="marcar-favoritas"),
@@ -71,6 +72,7 @@ urlpatterns = [
     path("reservas/", views.ReservasView.as_view(), name="Reservas-favoritas"),
     path("foro/", views.ForoView.as_view(), name="Foro"),
     path("canales/<int:canal_id>/mensajes/", views.MensajesCanalView.as_view(), name="Mensajes-canal"),
-    path("monitor/<int:monitor_id>/sesiones/", views.SesionesMonitorView.as_view(), name="Sesiones-monitor"),
+    path("monitores/<int:monitor_id>/sesiones/", views.SesionesMonitorView.as_view(), name="Sesiones-monitor"),
+    path("actividades/<int:actividad_id>/sesiones/<int:sesion_id>/", views.DetalleSesionView.as_view(), name="Detalle-sesion"),
     path('', include(router.urls)),
 ]

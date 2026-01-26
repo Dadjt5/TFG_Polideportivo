@@ -317,10 +317,24 @@ class ActividadSerializer(serializers.ModelSerializer):
         return [obj.imagenURL]
 
 class AsistenciaSerializer(serializers.ModelSerializer):
+    nombreUsuario = serializers.SerializerMethodField()
+
     class Meta:
         model = Asistencia
-        fields = '__all__'
+        fields = (
+            "id",
+            "sesion",
+            "presente",
+            "usuarioFinal",
+            "nombreUsuario"
+        )
 
+    def get_nombreUsuario(self, obj):
+        usuarioFinal = obj.usuarioFinal
+
+        if usuarioFinal:
+            return usuarioFinal.nombre
+        return None 
 
 # --------------------
 # Agenda

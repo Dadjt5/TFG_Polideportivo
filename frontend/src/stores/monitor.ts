@@ -53,7 +53,10 @@ export const useMonitorStore = defineStore("monitor", {
       try {
         const data = await getMonitor(id);
         const sesiones = await getSesionesSemanales(id)
+
         this.monitor = data;
+        this.sesiones = sesiones;
+
         localStorage.setItem("monitor", JSON.stringify(data));
         localStorage.setItem("sesiones", JSON.stringify(sesiones));
       } catch {

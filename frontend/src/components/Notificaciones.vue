@@ -6,13 +6,13 @@
         {{ t.notifications }}
       </h2>
 
-      <p v-if="usuarioFinalStore.sortedNotifications.length === 0" class="text-center text-muted">
+      <p v-if="activeStore.sortedNotifications.length === 0" class="text-center text-muted">
         {{ t.empty }}
       </p>
 
       <div class="d-flex flex-column gap-3">
         <div
-          v-for="notif in usuarioFinalStore.sortedNotifications"
+          v-for="notif in activeStore.sortedNotifications"
           :key="notif.id"
           class="card rounded-4 shadow-sm"
           :class="notif.leido ? 'bg-white' : 'bg-primary bg-opacity-10'"
@@ -77,33 +77,42 @@
 </template>
 
 <script setup lang="ts">
-import { inject, type Ref, onMounted } from "vue";
+import { inject, type Ref, onMounted, computed } from "vue";
 import { onBeforeRouteLeave } from 'vue-router'
 
 /* Importamos el store del usuario para manejar las notificaciones */
 import { useUserStore } from "../stores/usuarioFinal";
+import { useMonitorStore } from "../stores/monitor";
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
 import type { Language } from "../useI18N";
 import { useI18n } from "../useI18N";
+import { useAuthStore } from "../stores/auth";
 
 const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);
 
+const userStore = useAuthStore();
 const usuarioFinalStore = useUserStore();
+const monitorStore = useMonitorStore();
 
-const markRead = (id: number) => usuarioFinalStore.cambiarLeido(id);
-const togglePin = (id: number) => usuarioFinalStore.cambiarFijado(id);
-const deleteNotif = (id: number) => usuarioFinalStore.deleteNotificacion(id);
+const activeStore = computed(() => {
+  return userStore.role === "monitor"
+    ? monitorStore
+    : usuarioFinalStore;
+});
 
+const markRead = (id: number) => activeStore.value.cambiarLeido(id);
+const togglePin = (id: number) => activeStore.value.cambiarFijado(id);
+const deleteNotif = (id: number) => activeStore.value.deleteNotificacion(id);
 
 onBeforeRouteLeave(async () => {
-  await usuarioFinalStore.guardarCambios();
+  await activeStore.value.guardarCambios();
 });
 
 onMounted(async () => {
-  if (!usuarioFinalStore.notificaciones) {
-    await usuarioFinalStore.fetchNotificaciones();
+  if (!activeStore.value.notificaciones) {
+    await activeStore.value.fetchNotificaciones();
   }
-})
+});
 </script>
