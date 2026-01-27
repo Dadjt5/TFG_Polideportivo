@@ -106,11 +106,13 @@ class Sesion(models.Model):
     def __str__(self):
         return f'Sesion el {self.dia} de {self.actividad}'
     
-    def ponerFalta(self, usuarioFinal):
+    def cambiarFalta(self, usuarioFinal, falta):
         try:
             asistencia = Asistencia.objects.get(usuarioFinal=usuarioFinal, sesion=self)
-            asistencia.presente = False
-            asistencia.save(update_fields=["presente"])
+
+            if asistencia.presente != falta:
+                asistencia.presente = falta
+                asistencia.save(update_fields=["presente"])
             return True
         except:
             return False
@@ -123,7 +125,7 @@ class Sesion(models.Model):
 class Asistencia(models.Model):
     """Modelo para representar la relación entre sesion y usuario"""
 
-    presente = models.BooleanField(default=True)
+    presente = models.BooleanField(default=False)
 
     usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.RESTRICT)
     sesion = models.ForeignKey(Sesion, on_delete=models.RESTRICT, related_name="asistencias")

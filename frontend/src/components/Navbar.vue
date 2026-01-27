@@ -81,7 +81,7 @@
 </template>
 
 <script setup lang="ts">
-import { inject, type Ref } from "vue";
+import { inject, type Ref, computed } from "vue";
 import { useRouter } from "vue-router";
 
 /* Importamos las comunicaciones con el backend a traves de nuestro Store para usar el usuario */
@@ -97,6 +97,12 @@ const userStore = useAuthStore();
 const usuarioFinalStore = useUserStore();
 const monitorStore = useMonitorStore();
 
+const activeStore = computed(() => {
+  return userStore.role === "monitor"
+    ? monitorStore
+    : usuarioFinalStore;
+});
+
 const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);
 
@@ -105,11 +111,7 @@ const toggleLanguage = () => {
 };
 
 const logout = () => {
-  if(userStore.role == "usuario_final") {
-    usuarioFinalStore.cerrarSesion();
-  } else if(userStore.role == "monitor") {
-    monitorStore.cerrarSesion();
-  }
+  activeStore.value.cerrarSesion();
   userStore.logout();
   router.push("/");
 };

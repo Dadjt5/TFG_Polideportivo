@@ -279,9 +279,22 @@ class EntradaListaEsperaViewSet(viewsets.ModelViewSet):
 # ----------------
 
 class MonitorViewSet(viewsets.ModelViewSet):
-    queryset = Monitor.objects.all()
     serializer_class = MonitorSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Monitor.objects.filter(user=self.request.user)
+
+    def update(self, request, *args, **kwargs):
+        monitor = self.get_queryset().first()
+        serializer = self.get_serializer(
+            monitor,
+            data=request.data,
+            partial=True
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
 
 # ----------------
 # Notificaciones
@@ -514,7 +527,7 @@ class RegistroView(APIView):
         fechaNacimiento = request.data.get('fechaNacimiento')
         dni = request.data.get('dni')
         telefono = request.data.get('telefono')
-        correo = request.data.get('correo')
+        email = request.data.get('email')
         provincia = request.data.get('provincia')
         municipio = request.data.get('municipio')
         localidad = request.data.get('localidad')
@@ -524,7 +537,7 @@ class RegistroView(APIView):
 
         respuesta = UsuarioFinal.registrar_usuario(
             nombre=nombre, apellidos=apellidos, sexo=sexo, fechaNacimiento=fechaNacimiento,
-            dni=dni, telefono=telefono, correo=correo, provincia=provincia,
+            dni=dni, telefono=telefono, correo=email, provincia=provincia,
             municipio=municipio, localidad=localidad, codigoPostal=codigoPostal,
             password=password, cuentaBancaria=cuentaBancaria
         )
@@ -548,13 +561,13 @@ class RegistroMonitorView(APIView):
     def post(self, request):
         nombre = request.data.get('nombre')
         apellidos = request.data.get('apellidos')
-        correo = request.data.get('correo')
+        email = request.data.get('email')
         dni = request.data.get('dni')
         password = request.data.get('password')
 
         respuesta = Monitor.registrar_monitor(
             nombre=nombre, apellidos=apellidos, dni=dni, 
-            correo=correo, password=password
+            email=email, password=password
         )
 
         if respuesta["error"]:
@@ -802,8 +815,27 @@ class DetalleSesionView(APIView):
         for asistencia in sesion.asistencias.all():
             data["participantes"].append({
                 "id": asistencia.usuarioFinal.id,
-                "nombre": asistencia.nombreUsuario,
+                "nombre": asistencia.usuarioFinal.nombre,
                 "presente": asistencia.presente
             })
 
         return Response(data)
+
+class GuardarAsistenciaView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, actividad_id, sesion_id):
+        actividad = get_object_or_404(Actividad, id=actividad_id)
+        sesion = get_object_or_404(Sesion, id=sesion_id, actividad=actividad)
+
+        # Desde el frontend enviamos los usuarios que han cambiado en el campo presente
+        participantes = request.data.get("participantes", [])
+
+        for participante in participantes:
+            usuarioFinal = get_object_or_404(UsuarioFinal, id=participante["id"])
+            resultado = sesion.cambiarFalta(usuarioFinal, participante["presente"])
+
+            if not resultado:
+                return Response({"respuesta": "Error al pasar lista"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response({"respuesta": "Resultados cambiados correctamente"}, status=status.HTTP_200_OK)

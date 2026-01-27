@@ -11,7 +11,7 @@ class Monitor(Usuario):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="monitor")
 
     @classmethod
-    def registrar_monitor(cls, *, nombre, apellidos, dni, correo, password):
+    def registrar_monitor(cls, *, nombre, apellidos, dni, email, password):
 
         User = get_user_model()
 
@@ -21,7 +21,7 @@ class Monitor(Usuario):
                 "error": True
             }
 
-        if User.objects.filter(email=correo).exists():
+        if User.objects.filter(email=email).exists():
             return {
                 "respuesta": "Ya existe un usuario con ese email",
                 "error": True
@@ -30,7 +30,7 @@ class Monitor(Usuario):
         with transaction.atomic():
             auth_user = User.objects.create_user(
                 username=dni,
-                email=correo,
+                email=email,
                 password=password
             )
 

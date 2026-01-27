@@ -81,7 +81,7 @@
       </div>
 
       <div class="d-flex justify-content-center mt-5 gap-3">
-        <button class="btn btn-success btn-lg px-5" @click="guardarAsistencia">
+        <button class="btn btn-success btn-lg px-5" @click="actualizarAsistencia">
           {{ t.save }}
         </button>
 
@@ -100,6 +100,7 @@ import { ref, onMounted, inject, type Ref } from "vue";
 import { useRouter } from "vue-router";
 
 import { getSesionDetalle } from "../services/detalleService"
+import { guardarAsistencia } from "../services/monitorService";
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
 import type { Language } from "../useI18N";
@@ -141,19 +142,25 @@ const facilityDetail = (id: number) => {
 }
 
 const cambiarAsistencia = (u: any) => {
-  u.asiste = !u.asiste;
+  u.presente = !u.presente;
 };
 
-const guardarAsistencia = async () => {
-//  await guardarAsistenciaSesion(
-//    sesion.value.idSesion,
-//    sesion.value.participantes
-//  );
+const actualizarAsistencia = async () => {
+  try {
+		const respuesta = await guardarAsistencia(props.idAct, props.idSesion, sesion.value.participantes);
+		router.back();
+	} catch(e) {
+		console.log("Error al guardar la asistencia de los usuarios", e)
+	}
 };
 
 const volver = () => router.back();
 
 onMounted(async () => {
-  sesion.value = await getSesionDetalle(props.idAct, props.idSesion);
+	try {
+	  sesion.value = await getSesionDetalle(props.idAct, props.idSesion);
+	} catch(e) {
+		console.log("Error al obtener la informacion de la sesion", e)
+	}
 });
 </script>

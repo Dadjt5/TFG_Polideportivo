@@ -87,6 +87,10 @@ class UsuarioFinalSerializer(serializers.ModelSerializer):
 
 
 class MonitorSerializer(serializers.ModelSerializer):
+    # La contraseña no se pasa cuando se hace un get, solo para modificarla
+    password = serializers.CharField(write_only=True, required=False, allow_blank=True)
+    email = serializers.EmailField(source='user.email')
+
     class Meta:
         model = Monitor
         fields = (
@@ -94,8 +98,28 @@ class MonitorSerializer(serializers.ModelSerializer):
             "nombre",
             "apellidos",
             "DNI",
-            "user"
+            "user",
+            "email",
+            "password"
         )
+        
+    def update(self, instance, validated_data):
+        user_data = validated_data.pop('user', {})
+
+        if 'email' in user_data:
+            instance.user.email = user_data['email']
+
+        password = validated_data.pop('password', None)
+        if password:
+            instance.user.set_password(password)
+
+        instance.user.save()
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+        return instance
 
 
 class MonitorSimpleSerializer(serializers.ModelSerializer):

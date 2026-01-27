@@ -56,7 +56,7 @@ class UsuarioFinal(Usuario):
     
     @classmethod
     def registrar_usuario(cls, *, nombre, apellidos, sexo, fechaNacimiento,
-                          dni, telefono, correo, provincia, municipio,
+                          dni, telefono, email, provincia, municipio,
                           localidad, codigoPostal, password, cuentaBancaria=None):
 
         from .foro import Canal
@@ -69,7 +69,7 @@ class UsuarioFinal(Usuario):
                 "error": True
             }
 
-        if User.objects.filter(email=correo).exists():
+        if User.objects.filter(email=email).exists():
             return {
                 "respuesta": "Ya existe un usuario con ese email",
                 "error": True
@@ -78,7 +78,7 @@ class UsuarioFinal(Usuario):
         with transaction.atomic():
             auth_user = User.objects.create_user(
                 username=dni,
-                email=correo,
+                email=email,
                 password=password
             )
 

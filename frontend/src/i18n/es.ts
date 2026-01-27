@@ -235,6 +235,9 @@ export default {
   save: "Guardar",
   participants: "Participantes",
 
+  /* Perfil Monitor */
+  photo: "Fotografía",
+
   /* Contacto */
   contactTitle: "Contacto con el centro deportivo",
   contactSubtitle: "Información de contacto del edificio de administración",
