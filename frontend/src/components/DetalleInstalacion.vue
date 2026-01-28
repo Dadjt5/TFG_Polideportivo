@@ -104,8 +104,12 @@
         </div>
       </div>
 
-      <!-- Volver -->
+      <!-- Reserva y Volver -->
       <div class="d-flex justify-content-center mt-5">
+        <button v-if="usuarioFinalStore.isLogged" class="btn btn-success btn-lg px-5 me-4" @click="reservar">
+          {{ t.booking }}
+        </button>
+
         <button class="btn btn-secondary btn-lg px-5" @click="volver">
           {{ t.return }}
         </button>
@@ -151,6 +155,13 @@ const instalacion = ref({
 
 const cambiarFavorito = () => {
   usuarioFinalStore.marcarInstalacionFavorita(instalacion.value.id)
+}
+
+const reservar = () => {
+  router.push({
+    name: 'reserva-instalacion',
+    params: { id: instalacion.value.id }
+  })
 }
 
 const volver = () => {

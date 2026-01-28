@@ -24,7 +24,7 @@ class ReservaActividad(Reserva):
 
     def __str__(self):
         return f'Reserva de {self.actividad}'
-    
+
     @classmethod
     def contar(cls):
         return cls.objects.count()

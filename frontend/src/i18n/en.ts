@@ -224,6 +224,17 @@ export default {
   inactive: "Inactive",
   active: "Active",
 
+  /* Reservar actividad */
+  activityBookingTitle: "Booking confirmation",
+  activityBookingSubtitle: "Please review the details before proceeding to payment.",
+  bookingData: "Booking data",
+  date: "Date",
+  timetable: "Timetable",
+  tariff: "Tariff",
+  discount: "Discount",
+  cancel: "Cancel",
+  payContinue: "Proceed with payment",
+
   /* Home Monitor */
   monitorHomeTitle: "Dashboard of",
   weeklyActivities: "Weekly activities",

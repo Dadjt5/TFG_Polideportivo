@@ -37,6 +37,8 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UsuarioFinalSerializer(serializers.ModelSerializer):
+    # La contraseña no se pasa cuando se hace un get, solo para modificarla
+    password = serializers.CharField(write_only=True, required=False, allow_blank=True)
     deportesFavoritos = DeporteSerializer(many=True, read_only=True)
     deportes_ids = serializers.PrimaryKeyRelatedField(
         many=True,
@@ -69,6 +71,7 @@ class UsuarioFinalSerializer(serializers.ModelSerializer):
             "user",
             "actividadesFavoritas",
             "instalacionesFavoritas",
+            "password",
         )
 
     def get_actividadesFavoritas(self, obj):
@@ -84,6 +87,18 @@ class UsuarioFinalSerializer(serializers.ModelSerializer):
             .filter(instalacion__isnull=False)
             .values_list("instalacion_id", flat=True)
         )
+        
+    def update(self, instance, validated_data):
+        password = validated_data.pop("password", None)
+        if password:
+            instance.user.set_password(password)
+            instance.user.save()
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+        return instance
 
 
 class MonitorSerializer(serializers.ModelSerializer):
@@ -486,7 +501,12 @@ class DescuentoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Descuento
         fields = '__all__'
+        
 
+class DescuentoSimpleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Descuento
+        fields = ('nombre', 'porcentaje')
 
 # --------------------
 # Favoritos
@@ -575,12 +595,36 @@ class PagoSerializer(serializers.ModelSerializer):
 
 
 # --------------------
+# Tarifas
+# --------------------
+
+class TarifaTDASerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TarifaTDA
+        fields = '__all__'
+
+
+class TarifaActividadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TarifaActividad
+        fields = '__all__'
+
+
+class TarifaInstalacionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TarifaInstalacion
+        fields = '__all__'
+
+
+# --------------------
 # Reservas
 # --------------------
 
 class ReservaActividadSerializer(serializers.ModelSerializer):
     actividad = ActividadSimpleSerializer(read_only=True)
+    descuento = DescuentoSimpleSerializer(read_only=True)
     pago = PagoSerializer(read_only=True)
+    tarifa = TarifaActividadSerializer(read_only=True)
 
     class Meta:
         model = ReservaActividad
@@ -610,28 +654,6 @@ class AlquilerSerializer(serializers.ModelSerializer):
             "horario",
             "descuento",
         )
-
-
-# --------------------
-# Tarifas
-# --------------------
-
-class TarifaTDASerializer(serializers.ModelSerializer):
-    class Meta:
-        model = TarifaTDA
-        fields = '__all__'
-
-
-class TarifaActividadSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = TarifaActividad
-        fields = '__all__'
-
-
-class TarifaInstalacionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = TarifaInstalacion
-        fields = '__all__'
 
 
 # --------------------

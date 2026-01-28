@@ -54,6 +54,7 @@
               <input
                 type="email"
                 class="form-control"
+                :class="{ 'is-invalid': errores.email }"
                 :placeholder="monitorStore.monitor?.email"
                 v-model="monitor.email"
               />
@@ -66,8 +67,22 @@
               <input
                 type="password"
                 class="form-control"
+                :class="{ 'is-invalid': errores.password }"
                 placeholder="********"
                 v-model="monitor.password"
+              />
+            </div>
+
+            <div>
+              <label class="form-label fw-medium">
+                {{ t.passwordConfirm }}
+              </label>
+              <input
+                type="password"
+                class="form-control"
+                :class="{ 'is-invalid': errores.password }"
+                placeholder="********"
+                v-model="monitor.confirmPassword"
               />
             </div>
 
@@ -109,21 +124,44 @@ const monitorStore = useMonitorStore();
 const authStore = useAuthStore();
 const router = useRouter();
 
+/* Expresion regular para comprobar el email */
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const continuar = ref(true);
+
 const monitor = ref({
   email: '',
-  password: ''
+  password: '',
+  confirmPassword: ''
 })
+
+const errores = ref({
+  email: false,
+  password: false
+});
 
 /* Solo mandamos al backend para modificar los campos que se hayan modificado */
 function camposModificados() {
 	const data: any = {}
+  continuar.value = true
+  errores.value.email = false
+  errores.value.password = false
 
 	if (monitor.value.email) {
-  	data.email = monitor.value.email
+    if(monitor.value.email == '' || !emailRegex.test(monitor.value.email)) {
+      errores.value.email = true
+      continuar.value = false
+    }
+
+    data.email = monitor.value.email
 	}
 
 	if (monitor.value.password) {
-  	data.password = monitor.value.password
+    if(monitor.value.password != monitor.value.confirmPassword) {
+      errores.value.password = true
+      continuar.value = false
+    }
+
+    data.password = monitor.value.password
 	}
 
 	return data
@@ -132,10 +170,14 @@ function camposModificados() {
 const guardarCambios = async () => {
   try {
     const data = camposModificados()
+
+    if(!continuar.value) return
+
     await modificarMonitor(monitorStore.monitor.id, data)
 
 		if (data.password) {
-  		authStore.logout()
+      monitorStore.cerrarSesion()
+   		authStore.logout()
   		router.push("/login")
   		return
 		}

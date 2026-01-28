@@ -73,6 +73,16 @@
               <label class="form-label">{{ t.postalCode }}</label>
               <input type="text" class="form-control" v-model="usuario.codigoPostal">
             </div>
+
+            <div class="col-md-4 mt-3">
+              <label class="form-label">{{ t.passwordPlaceholder }}</label>
+              <input type="password" class="form-control" :class="{ 'is-invalid': error }" v-model="usuario.password">
+            </div>
+
+            <div class="col-md-4 mt-3">
+              <label class="form-label">{{ t.passwordConfirm }}</label>
+              <input type="password" class="form-control" :class="{ 'is-invalid': error }" v-model="usuario.confirmPassword">
+            </div>
           </div>
 
           <!-- CUENTA -->
@@ -172,9 +182,12 @@ const usuario = ref({
   codigoPostal: '',
   cuentaBancaria: '',
   sexo: '',
+  password: '',
+  confirmPassword: '',
   deportesFavoritos: [] as number[],
 })
 
+const error = ref(false)
 const deportesRestantes = ref(5)
 
 const favoritosSeleccionados = computed(() => {
@@ -224,6 +237,15 @@ function camposModificados() {
 
   if(usuarioFinalStore.usuarioFinal.cuentaBancaria != usuario.value.cuentaBancaria) {
     data["cuentaBancaria"] = usuario.value.cuentaBancaria
+  }
+
+  if(usuario.value.password) {
+    if(usuario.value.password == usuario.value.confirmPassword) {
+      data["password"] = usuario.value.password
+      error.value = false
+    } else {
+      error.value = true
+    }
   }
 
   const favoritosActuales = ((usuarioFinalStore.usuarioFinal.deportes as {id: number, titulo: string}[]) || []).map(d => d.id).sort()

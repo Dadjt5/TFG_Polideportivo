@@ -166,7 +166,7 @@
 
       <!-- Reserva y Volver -->
       <div class="d-flex justify-content-center mt-5">
-        <button v-if="usuarioFinalStore.isLogged" class="btn btn-success btn-lg px-5 me-4">
+        <button v-if="usuarioFinalStore.isLogged" class="btn btn-success btn-lg px-5 me-4" @click="reservar">
           {{ t.booking }}
         </button>
 
@@ -235,6 +235,10 @@ const actividad = ref({
   sesiones: [] as any[]
 });
 
+const cambiarFavorito = () => {
+  usuarioFinalStore.marcarActividadFavorita(actividad.value.id)
+}
+
 const facilityDetail = (id: number) => {
   router.push({
     name: 'detalle-instalacion',
@@ -242,17 +246,19 @@ const facilityDetail = (id: number) => {
   });
 }
 
+const reservar = () => {
+  router.push({
+    name: 'reserva-actividad',
+    params: { id: actividad.value.id }
+  })
+}
+
 const volver = () => {
   router.back();
 };
-
-const cambiarFavorito = () => {
-  usuarioFinalStore.marcarActividadFavorita(actividad.value.id)
-}
 
 onMounted(async () => {
   const id = parseInt(props.id);
   actividad.value = await getActividadDetalle(id);
 });
-
 </script>

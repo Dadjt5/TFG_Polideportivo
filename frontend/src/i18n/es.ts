@@ -224,6 +224,17 @@ export default {
   inactive: "Inactiva",
   active: "Activa",
 
+  /* Reservar actividad */
+  activityBookingTitle: "Confirmación de la reserva",
+  activityBookingSubtitle: "Por favor, revise los detalles antes de proceder al pago.",
+  bookingData: "Datos de la reserva",
+  date: "Fecha",
+  timetable: "Horario",
+  tariff: "Tarifa",
+  discount: "Descuento",
+  cancel: "Cancelar",
+  payContinue: "Continuar con el pago",
+
   /* Home Monitor */
   monitorHomeTitle: "Panel principal de",
   weeklyActivities: "Actividades de la semana",

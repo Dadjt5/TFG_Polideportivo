@@ -707,6 +707,31 @@ class ReservasView(APIView):
         return Response(reservas)
 
 
+# Obtener la información de una reserva de una actividad
+class ReservasActividadView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, reserva_id):
+        user = request.user
+
+        reserva = get_object_or_404(ReservaActividad, id=reserva_id)
+
+        data = {
+            "id": reserva.id,
+            "fechaInicio": reserva.actividad.fecha_inicio,
+            "id_obj": reserva.actividad.id,
+            "titulo": reserva.actividad.nombre,
+            "horario": reserva.actividad.horasSemanales,
+            "dias": reserva.actividad.dias,
+            "pago": {
+                "coste": reserva.pago.coste,
+                "estadoPago": reserva.pago.estadoPago,
+            }
+        }
+
+        return Response(data)
+
+
 # Mostrar el foro y los canales, pero sin los mensajes
 class ForoView(APIView):
     permission_classes = [IsAuthenticated]
