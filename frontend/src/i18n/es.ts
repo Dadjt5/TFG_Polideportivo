@@ -234,6 +234,7 @@ export default {
   discount: "Descuento",
   cancel: "Cancelar",
   payContinue: "Continuar con el pago",
+  prices: "Precios",
 
   /* Home Monitor */
   monitorHomeTitle: "Panel principal de",

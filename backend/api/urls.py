@@ -45,7 +45,7 @@ router.register(r'notificaciones', views.NotificacionViewSet, basename="notifica
 
 router.register(r'pagos', views.PagoViewSet, basename="pago")
 
-router.register(r'reservasActividad', views.ReservaActividadViewSet, basename="reserva-actividad")
+router.register(r'reservasActividad', views.ReservaActividadViewSet, basename="reservas-actividad")
 router.register(r'alquileres', views.AlquilerViewSet, basename="alquiler-instalacion")
 
 router.register(r'tarifasTDA', views.TarifaTDAViewSet, basename="tarifa-tda")
@@ -71,9 +71,10 @@ urlpatterns = [
     path("obtener/favoritas/", views.ObtenerActividadesInstalaciones.as_view(), name="favoritas"),
     path("reservas/", views.ReservasView.as_view(), name="Reservas-favoritas"),
     path("foro/", views.ForoView.as_view(), name="Foro"),
-    path("canales/<int:canal_id>/mensajes/", views.MensajesCanalView.as_view(), name="Mensajes-canal"),
-    path("monitores/<int:monitor_id>/sesiones/", views.SesionesMonitorView.as_view(), name="Sesiones-monitor"),
-    path("actividades/<int:actividad_id>/sesiones/<int:sesion_id>/", views.DetalleSesionView.as_view(), name="Detalle-sesion"),
+    path("canales/<int:canal_id>/mensajes/", views.MensajesCanalView.as_view(), name="mensajes-canal"),
+    path("monitores/<int:monitor_id>/sesiones/", views.SesionesMonitorView.as_view(), name="sesiones-monitor"),
+    path("actividades/<int:actividad_id>/sesiones/<int:sesion_id>/", views.DetalleSesionView.as_view(), name="detalle-sesion"),
     path("actividades/<int:actividad_id>/sesiones/<int:sesion_id>/asistencia/", views.GuardarAsistenciaView.as_view(), name="guardar-asistencia"),
+    path("tarifas/actividades/<int:actividad_id>/", views.TarifaActividadView.as_view(), name="tarifa-actividad"),
     path('', include(router.urls)),
 ]

@@ -2,8 +2,10 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 import math
 from django.utils import timezone
+from django.core.exceptions import ValidationError
 
 from .constantes import TipoActividad, TipoReserva, Terreno, Estado, Periodo, Dia
+from tarifa_actividad import Fisioterapia, GrupoReducido, ActividadComun
 
 class Actividad(models.Model):
     """Modelo para representar una actividad"""
@@ -23,6 +25,7 @@ class Actividad(models.Model):
     deportes = models.ManyToManyField('Deporte', related_name="actividades")
     instalacion = models.ForeignKey('Instalacion', on_delete=models.RESTRICT)
     monitor = models.ForeignKey('Monitor', on_delete=models.RESTRICT, related_name="actividades")
+    tarifa = models.ForeignKey('TarifaActividad', on_delete=models.PROTECT, blank=True, null=True)
 
     tipoActividad = models.CharField(default=TipoActividad.OTROS, choices=TipoActividad.choices)
     tipoReserva = models.CharField(default=TipoReserva.NINGUNA, choices=TipoReserva.choices)
@@ -32,7 +35,50 @@ class Actividad(models.Model):
 
     def __str__(self):
         return f'{self.nombre}, en la instalacion {self.instalacion}'
-    
+
+    def save(self, *args, **kwargs):
+        if not self.tarifa:
+            if self.tipoActividad == TipoActividad.OTROS:
+                tarifa = ActividadComun.objects.filter(por_defecto=True).first()
+            elif self.tipoActividad == TipoActividad.FISIOTERAPIA:
+                tarifa = Fisioterapia.objects.filter(por_defecto=True).first()
+            else:
+                tarifa = GrupoReducido.objects.filter(por_defecto=True).first()
+
+            if not tarifa:
+                raise ValidationError("No existe una tarifa por defecto para este tipo de actividad")
+
+            self.tarifa = tarifa
+        super().save(*args, **kwargs)
+
+    def obtener_precios(self):
+        if self.tipoActividad == TipoActividad.OTROS:
+            return {
+                "precioUAM": self.tarifa.precioUAM,
+                "precioOtros": self.tarifa.precioOtros,
+                "numeroHorasSemana": self.tarifa.numeroHorasSemana
+            }
+        elif self.tipoActividad == TipoActividad.GRUPOS_REDUCIDOS:
+            return {
+                "numeroHoras": self.tarifa.numeroHoras,
+                "numeroPersonas": self.tarifa.numeroPersonas,
+                "precio": self.tarifa.precio,
+                "precioCuatrimestre": self.tarifa.precioCuatrimestre,
+                "precioMensual": self.tarifa.precioMensual
+            }
+        else:
+            return {
+                "precioConsultaTDA": self.tarifa.precioConsultaTDA,
+                "precioConsultaUAM": self.tarifa.precioConsultaUAM,
+                "precioConsultaOtros": self.tarifa.precioConsultaOtros,
+                "precioSesiones1_5TDA": self.tarifa.precioSesiones1_5TDA,
+                "precioSesiones1_5UAM": self.tarifa.precioSesiones1_5UAM,
+                "precioSesiones1_5Otros": self.tarifa.precioSesiones1_5Otros,
+                "precioSesiones6TDA": self.tarifa.precioSesiones6TDA,
+                "precioSesiones6UAM": self.tarifa.precioSesiones6UAM,
+                "precioSesiones6Otros": self.tarifa.precioSesiones6Otros
+            }
+
     @property
     def activa(self):
         if self.periodo == Periodo.ANUAL:

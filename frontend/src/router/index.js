@@ -22,6 +22,8 @@ import Foro from '../components/Foro.vue'
 import NuevoMonitor from '../components/NuevoMonitor.vue'
 import HomeMonitor from '../components/HomeMonitor.vue'
 import DetalleSesion from '../components/DetalleSesion.vue'
+import ReservaActividad from '../components/ReservaActividad.vue'
+import Alquiler from '../components/Alquiler.vue'
 
 const routes = [
   { path: '/', redirect: '/home' },
@@ -72,6 +74,20 @@ const routes = [
   { path: '/modificar-datos', component: ModificarDatosPersonales, meta: { requiresAuth: true }},
   { path: '/ver-abonos', component: VerAbonosBonos, meta: { requiresAuth: true }},
   { path: '/foro', component: Foro, meta: {requiresAuth: true }},
+  {
+    path: '/actividad/:id/reservar',
+    component: ReservaActividad,
+    name: 'reservar-actividad',
+    props: true,
+    meta: { requiresAuth: true }
+  },
+    {
+    path: '/instalacion/:id/reservar',
+    component: Alquiler,
+    name: 'reservar-instalacion',
+    props: true,
+    meta: { requiresAuth: true }
+  },
 ]
 
 /* Cada vez que se accede a una página se redirige el scrollbar arriba */

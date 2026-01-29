@@ -159,7 +159,7 @@ const cambiarFavorito = () => {
 
 const reservar = () => {
   router.push({
-    name: 'reserva-instalacion',
+    name: 'reservar-instalacion',
     params: { id: instalacion.value.id }
   })
 }

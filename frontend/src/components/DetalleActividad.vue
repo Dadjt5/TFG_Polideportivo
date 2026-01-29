@@ -222,6 +222,7 @@ const actividad = ref({
   periodo: "",
   estado: "",
   dias: "",
+  horasSemanales: "",
   instalacion: {
     id: -1,
     nombre: ""
@@ -248,8 +249,13 @@ const facilityDetail = (id: number) => {
 
 const reservar = () => {
   router.push({
-    name: 'reserva-actividad',
-    params: { id: actividad.value.id }
+    name: 'reservar-actividad',
+    params: {
+      id: actividad.value.id,
+      nombre: actividad.value.nombre,
+      dias: actividad.value.dias,
+      horasSemanales: actividad.value.horasSemanales
+    }
   })
 }
 

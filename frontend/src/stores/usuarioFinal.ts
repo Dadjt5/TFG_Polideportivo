@@ -52,6 +52,12 @@ export const useUserStore = defineStore("user", {
       const fechaExpiracion = new Date(s.tda.fechaExpiracion);
       return hoy <= fechaExpiracion;
     },
+    isUAM: (s) => {
+      return s.usuarioFinal.rol != 'Externo a la UAM';
+    },
+    hasAbono: (s) => {
+      return !s.usuarioFinal.abono;
+    },
     unreadCount: (state) =>
       state.notificaciones.filter(n => !n.leido).length,
     sortedNotifications: (state) => [

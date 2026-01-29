@@ -332,7 +332,7 @@ class ReservaActividadViewSet(viewsets.ModelViewSet):
         serializer.save(usuarioFinal=usuario_final)
 
     def get_queryset(self):
-        return ReservaActividad.objects.filter(usuarioFinal_user=self.request.user)
+        return ReservaActividad.objects.filter(usuarioFinal__user=self.request.user)
 
 
 class AlquilerViewSet(viewsets.ModelViewSet):
@@ -707,31 +707,6 @@ class ReservasView(APIView):
         return Response(reservas)
 
 
-# Obtener la información de una reserva de una actividad
-class ReservasActividadView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request, reserva_id):
-        user = request.user
-
-        reserva = get_object_or_404(ReservaActividad, id=reserva_id)
-
-        data = {
-            "id": reserva.id,
-            "fechaInicio": reserva.actividad.fecha_inicio,
-            "id_obj": reserva.actividad.id,
-            "titulo": reserva.actividad.nombre,
-            "horario": reserva.actividad.horasSemanales,
-            "dias": reserva.actividad.dias,
-            "pago": {
-                "coste": reserva.pago.coste,
-                "estadoPago": reserva.pago.estadoPago,
-            }
-        }
-
-        return Response(data)
-
-
 # Mostrar el foro y los canales, pero sin los mensajes
 class ForoView(APIView):
     permission_classes = [IsAuthenticated]
@@ -864,3 +839,29 @@ class GuardarAsistenciaView(APIView):
                 return Response({"respuesta": "Error al pasar lista"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response({"respuesta": "Resultados cambiados correctamente"}, status=status.HTTP_200_OK)
+    
+    
+class TarifaActividadView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, actividad_id):
+        actividad = get_object_or_404(Actividad, id=actividad_id)
+
+        precios = actividad.obtener_precios()
+        data = {
+            "tarifa": {
+                "tipo": actividad.tipoActividad,
+                "datos": precios
+            },
+            "descuentos": []
+        }
+
+        descuentos = Descuento.obtener_descuentos(actividad.deportes)
+        for descuento in descuentos:
+            data["descuentos"].append({
+                "id": descuento.id,
+                "nombre": descuento.nombre,
+                "porcentaje": descuento.porcentaje
+            })
+        
+        return Response(data)

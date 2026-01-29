@@ -20,7 +20,6 @@ class ReservaActividad(Reserva):
     """Modelo para representar una reserva en una actividad"""
 
     actividad = models.ForeignKey('Actividad', on_delete=models.CASCADE)
-    tarifa = models.ForeignKey('TarifaInstalacion', on_delete=models.PROTECT)
 
     def __str__(self):
         return f'Reserva de {self.actividad}'
@@ -37,7 +36,6 @@ class Alquiler(Reserva):
     
     instalacion = models.ForeignKey('Instalacion', on_delete=models.CASCADE)
     horario = models.ForeignKey('Horario', on_delete=models.RESTRICT)
-    tarifa = models.ForeignKey('TarifaActividad', on_delete=models.PROTECT)
 
     def __str__(self):
         return f'Alquiler de {self.instalacion}, en {self.fecha}'
