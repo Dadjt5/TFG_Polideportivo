@@ -5,7 +5,7 @@ from django.utils import timezone
 from django.core.exceptions import ValidationError
 
 from .constantes import TipoActividad, TipoReserva, Terreno, Estado, Periodo, Dia
-from tarifa_actividad import Fisioterapia, GrupoReducido, ActividadComun
+from .tarifa_actividad import Fisioterapia, GrupoReducido, ActividadComun
 
 class Actividad(models.Model):
     """Modelo para representar una actividad"""
@@ -54,29 +54,29 @@ class Actividad(models.Model):
     def obtener_precios(self):
         if self.tipoActividad == TipoActividad.OTROS:
             return {
-                "precioUAM": self.tarifa.precioUAM,
-                "precioOtros": self.tarifa.precioOtros,
-                "numeroHorasSemana": self.tarifa.numeroHorasSemana
+                "precioUAM": self.tarifa.actividadcomun.precioUAM,
+                "precioOtros": self.tarifa.actividadcomun.precioOtros,
+                "numeroHorasSemana": self.tarifa.actividadcomun.numeroHorasSemana
             }
         elif self.tipoActividad == TipoActividad.GRUPOS_REDUCIDOS:
             return {
-                "numeroHoras": self.tarifa.numeroHoras,
-                "numeroPersonas": self.tarifa.numeroPersonas,
-                "precio": self.tarifa.precio,
-                "precioCuatrimestre": self.tarifa.precioCuatrimestre,
-                "precioMensual": self.tarifa.precioMensual
+                "numeroHoras": self.tarifa.gruporeducido.numeroHoras,
+                "numeroPersonas": self.tarifa.gruporeducido.numeroPersonas,
+                "precio": self.tarifa.gruporeducido.precio,
+                "precioCuatrimestre": self.tarifa.gruporeducido.precioCuatrimestre,
+                "precioMensual": self.tarifa.gruporeducido.precioMensual
             }
         else:
             return {
-                "precioConsultaTDA": self.tarifa.precioConsultaTDA,
-                "precioConsultaUAM": self.tarifa.precioConsultaUAM,
-                "precioConsultaOtros": self.tarifa.precioConsultaOtros,
-                "precioSesiones1_5TDA": self.tarifa.precioSesiones1_5TDA,
-                "precioSesiones1_5UAM": self.tarifa.precioSesiones1_5UAM,
-                "precioSesiones1_5Otros": self.tarifa.precioSesiones1_5Otros,
-                "precioSesiones6TDA": self.tarifa.precioSesiones6TDA,
-                "precioSesiones6UAM": self.tarifa.precioSesiones6UAM,
-                "precioSesiones6Otros": self.tarifa.precioSesiones6Otros
+                "precioConsultaTDA": self.tarifa.fisioterapia.precioConsultaTDA,
+                "precioConsultaUAM": self.tarifa.fisioterapia.precioConsultaUAM,
+                "precioConsultaOtros": self.tarifa.fisioterapia.precioConsultaOtros,
+                "precioSesiones1_5TDA": self.tarifa.fisioterapia.precioSesiones1_5TDA,
+                "precioSesiones1_5UAM": self.tarifa.fisioterapia.precioSesiones1_5UAM,
+                "precioSesiones1_5Otros": self.tarifa.fisioterapia.precioSesiones1_5Otros,
+                "precioSesiones6TDA": self.tarifa.fisioterapia.precioSesiones6TDA,
+                "precioSesiones6UAM": self.tarifa.fisioterapia.precioSesiones6UAM,
+                "precioSesiones6Otros": self.tarifa.fisioterapia.precioSesiones6Otros
             }
 
     @property

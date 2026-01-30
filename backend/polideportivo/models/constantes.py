@@ -44,9 +44,9 @@ class TipoActividad(models.TextChoices):
     
     FISIOTERAPIA = 'Fisioterapia'
 
-    GRUPOS_REDUCIDOS = 'Actividades para grupos reducidos'
+    GRUPOS_REDUCIDOS = 'Grupos reducidos'
 
-    OTROS = 'Otros tipos de actividad'
+    OTROS = 'Otros'
 
 
 class Terreno(models.TextChoices):

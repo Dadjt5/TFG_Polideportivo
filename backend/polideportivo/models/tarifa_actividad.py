@@ -5,7 +5,7 @@ from .tarifa import Tarifa
 
 class TarifaActividad(Tarifa):
     """Modelo para representar una tarifa de una actividad"""
-    por_defecto = models.BooleanField(default=False)
+    pass
 
 
 class ActividadComun(TarifaActividad):
@@ -14,11 +14,12 @@ class ActividadComun(TarifaActividad):
     precioUAM = models.FloatField(default=0.0)
     precioOtros = models.FloatField(default=0.0)
     numeroHorasSemana = models.PositiveIntegerField(default=0)
-    
+    por_defecto = models.BooleanField(default=False)
+
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=[],
+                fields=["por_defecto"],
                 condition=models.Q(por_defecto=True),
                 name="unique_tarifa_comun_por_defecto"
             )
@@ -36,11 +37,12 @@ class GrupoReducido(TarifaActividad):
     precio = models.FloatField(default=0.0)
     precioCuatrimestre = models.FloatField(default=0.0)
     precioMensual = models.FloatField(default=0.0)
+    por_defecto = models.BooleanField(default=False)
 
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=[],
+                fields=["por_defecto"],
                 condition=models.Q(por_defecto=True),
                 name="unique_tarifa_grupo_reducido_por_defecto"
             )
@@ -62,11 +64,12 @@ class Fisioterapia(TarifaActividad):
     precioSesiones6TDA = models.FloatField(default=0.0)
     precioSesiones6UAM = models.FloatField(default=0.0)
     precioSesiones6Otros = models.FloatField(default=0.0)
+    por_defecto = models.BooleanField(default=False)
     
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=[],
+                fields=["por_defecto"],
                 condition=models.Q(por_defecto=True),
                 name="unique_tarifa_fisioterapia_por_defecto"
             )

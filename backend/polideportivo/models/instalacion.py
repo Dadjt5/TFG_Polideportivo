@@ -1,7 +1,6 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from .agenda import Agenda
 from .constantes import TipoInstalacion
 
 
@@ -28,15 +27,24 @@ class Instalacion(models.Model):
     aforoMaximo = models.PositiveIntegerField(default=50)
     luz = models.BooleanField(default=False)
     porcentajeTDA = models.FloatField(default=0.0)
-    
+
     pabellon = models.ForeignKey(Pabellon, on_delete=models.RESTRICT)
-    tarifa = models.ForeignKey('TarifaInstalacion', on_delete=models.PROTECT)
-    
+    tarifa = models.ForeignKey('TarifaInstalacion', on_delete=models.PROTECT, blank=True, null=True)
+
     tipoInstalacion = models.CharField(default=TipoInstalacion.SALA_MULTIUSOS, choices=TipoInstalacion.choices)
 
     def __str__(self):
         return f'{self.nombre}, ubicado en el {self.pabellon}'
     
+    def obtener_precios(self):
+        return {
+            "precioAbonado": self.tarifa.precioAbonado,
+            "precioUAM": self.tarifa.precioUAM,
+            "precioTDA": self.tarifa.precioTDA,
+            "precioOtros": self.tarifa.precioOtros
+        }
+        
+
     @classmethod
     def contar(cls):
         return cls.objects.count()

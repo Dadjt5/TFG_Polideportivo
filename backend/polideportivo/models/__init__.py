@@ -15,7 +15,7 @@ from .notificacion import Notificacion
 from .pago import Pago
 from .reserva import (Reserva, ReservaActividad, Alquiler)
 from .tarifa import (Tarifa, TarifaTDA)
-from .tarifa_actividad import TarifaActividad
+from .tarifa_actividad import (TarifaActividad, ActividadComun, GrupoReducido, Fisioterapia)
 from .tarifa_instalacion import TarifaInstalacion
 from .tda import TDA
 from .usuario import Usuario

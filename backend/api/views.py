@@ -537,7 +537,7 @@ class RegistroView(APIView):
 
         respuesta = UsuarioFinal.registrar_usuario(
             nombre=nombre, apellidos=apellidos, sexo=sexo, fechaNacimiento=fechaNacimiento,
-            dni=dni, telefono=telefono, correo=email, provincia=provincia,
+            dni=dni, telefono=telefono, email=email, provincia=provincia,
             municipio=municipio, localidad=localidad, codigoPostal=codigoPostal,
             password=password, cuentaBancaria=cuentaBancaria
         )
@@ -853,15 +853,51 @@ class TarifaActividadView(APIView):
                 "tipo": actividad.tipoActividad,
                 "datos": precios
             },
-            "descuentos": []
+            "descuento": {
+                "porcentaje_total": 0,
+                "aplicados": []
+            }
         }
 
-        descuentos = Descuento.obtener_descuentos(actividad.deportes)
-        for descuento in descuentos:
-            data["descuentos"].append({
-                "id": descuento.id,
-                "nombre": descuento.nombre,
-                "porcentaje": descuento.porcentaje
-            })
+        descuentos = Descuento.obtener_descuentos(actividad=actividad)
+        if descuentos:
+            data["descuento"]["porcentaje_total"] = descuentos["porcentaje_total"]
+            for d in descuentos["descuentos"]:
+                data["descuento"]["aplicados"].append({
+                    "id": d.id,
+                    "nombre": d.nombre,
+                    "porcentaje": d.porcentaje
+                })
+
+        return Response(data)
+
+
+class TarifaInstalacionView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, instalacion_id):
+        instalacion = get_object_or_404(Instalacion, id=instalacion_id)
+
+        precios = instalacion.obtener_precios()
+        data = {
+            "tarifa": {
+                "datos": precios
+            },
+            "descuento": {
+                "porcentaje_total": 0,
+                "aplicados": []
+            }
+        }
+
+        descuentos = Descuento.obtener_descuentos(instalacion=instalacion)
+        if descuentos:
+            data["descuento"]["porcentaje_total"] = descuentos["porcentaje_total"]
+            for d in descuentos["descuentos"]:
+                data["descuento"]["aplicados"].append({
+                    "id": d.id,
+                    "nombre": d.nombre,
+                    "porcentaje": d.porcentaje
+                })
+        
         
         return Response(data)

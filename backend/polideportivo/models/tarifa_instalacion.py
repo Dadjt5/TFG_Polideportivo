@@ -15,7 +15,7 @@ class TarifaInstalacion(Tarifa):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=[],
+                fields=["por_defecto"],
                 condition=models.Q(por_defecto=True),
                 name="unique_tarifa_instalacion_por_defecto"
             )
