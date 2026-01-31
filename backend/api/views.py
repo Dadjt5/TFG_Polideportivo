@@ -850,6 +850,9 @@ class TarifaActividadView(APIView):
         precios = actividad.obtener_precios()
         data = {
             "tarifa": {
+                "nombre": actividad.nombre,
+                "numeroHoras": actividad.calcularHorasSemanales(),
+                "horario": actividad.getHorario(),
                 "tipo": actividad.tipoActividad,
                 "datos": precios
             },

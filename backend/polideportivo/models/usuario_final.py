@@ -17,14 +17,22 @@ class UsuarioFinal(Usuario):
     municipio = models.CharField(max_length=64, default="")
     localidad = models.CharField(max_length=64, default="")
     codigoPostal = models.CharField(max_length=64, default="")
-    cuentaBancaria = models.CharField(max_length=64, default="")
+    cuentaBancaria = models.CharField(max_length=64, default="", blank=True)
     actividadesRealizadas = models.PositiveIntegerField(default=0)
+    esUAM = models.BooleanField(default=False)
 
     deportesFavoritos = models.ManyToManyField('Deporte', blank=True, related_name="usuariosFinales")
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="usuario_final")
 
     sexo = models.CharField(default=Sexo.NINGUNO, choices=Sexo.choices)
     rol = models.CharField(default=Rol.EXTERNO, choices=Rol.choices)
+    
+    def save(self, *args, **kwargs):
+        if self.rol == Rol.EXTERNO:
+            esUAM = False
+        else:
+            esUAM = True
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f'Usuario: {self.id}, nacido el {self.fechaNacimiento}'

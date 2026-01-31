@@ -224,6 +224,18 @@ export default {
   inactive: "Inactive",
   active: "Active",
 
+  /* Reservas */
+  monthly: "Monthly",
+  quarterly: "Quaterly",
+  fullPayment: "Full payment",
+  hours: "Hours",
+  people: "People",
+  initialConsultation: "Initial consultation",
+  sessions1to5: "Sessions 1st through 5th",
+  sessions6plus: "Sessions starting from the 6th",
+  paymentMethod: "Payment method",
+  sessionType: "Session type",
+
   /* Reservar actividad */
   activityBookingTitle: "Booking confirmation",
   activityBookingSubtitle: "Please review the details before proceeding to payment.",

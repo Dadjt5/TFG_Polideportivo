@@ -50,10 +50,10 @@ export const useUserStore = defineStore("user", {
       if (!s.tda) return false;
       const hoy = new Date();
       const fechaExpiracion = new Date(s.tda.fechaExpiracion);
-      return hoy <= fechaExpiracion;
+      return hoy <= fechaExpiracion;s
     },
     isUAM: (s) => {
-      return s.usuarioFinal.rol != 'Externo a la UAM';
+      return s.usuarioFinal.esUAM
     },
     hasAbono: (s) => {
       return !s.usuarioFinal.abono;

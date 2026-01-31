@@ -101,6 +101,21 @@ class Actividad(models.Model):
 
         return math.ceil(horas)
 
+    def getDias(self):
+        return ",".join(sesion.dia for sesion in self.sesiones.all()),
+    
+    def getHorario(self):
+        horario = []
+        
+        for sesion in self.sesiones.all():
+            horario.append({
+                "dia": sesion.dia,
+                "horaInicio": sesion.horario.horaInicio.strftime("%H:%M"),
+                "horaFin": sesion.horario.horaFin.strftime("%H:%M")
+            })
+        
+        return horario
+
     @classmethod
     def contar(cls):
         return cls.objects.count()
@@ -130,7 +145,7 @@ class Actividad(models.Model):
 class Sesion(models.Model):
     """Modelo para representar una sesion de una actividad"""
 
-    actividad = models.ForeignKey(Actividad, related_name="sesiones", on_delete=models.RESTRICT)
+    actividad = models.ForeignKey(Actividad, on_delete=models.RESTRICT, related_name="sesiones")
     horario = models.ForeignKey('Horario', on_delete=models.RESTRICT)    
 
     dia = models.CharField(default=Dia.SABADO, choices=Dia.choices)

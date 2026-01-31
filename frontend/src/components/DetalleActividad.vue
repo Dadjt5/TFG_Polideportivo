@@ -250,12 +250,7 @@ const facilityDetail = (id: number) => {
 const reservar = () => {
   router.push({
     name: 'reservar-actividad',
-    params: {
-      id: actividad.value.id,
-      nombre: actividad.value.nombre,
-      dias: actividad.value.dias,
-      horasSemanales: actividad.value.horasSemanales
-    }
+    params: { id: actividad.value.id }
   })
 }
 

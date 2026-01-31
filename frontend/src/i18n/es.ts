@@ -224,6 +224,18 @@ export default {
   inactive: "Inactiva",
   active: "Activa",
 
+  /* Reservas */
+  monthly: "Mensual",
+  quarterly: "Cuatrimestral",
+  fullPayment: "Pago total",
+  hours: "Horas",
+  people: "Personas",
+  initialConsultation: "Consulta inicial",
+  sessions1to5: "Sesiones de la 1º a la 5º",
+  sessions6plus: "Sesiones a partir de la 6º",
+  paymentMethod: "Método de pago",
+  sessionType: "Tipo de sesión",
+
   /* Reservar actividad */
   activityBookingTitle: "Confirmación de la reserva",
   activityBookingSubtitle: "Por favor, revise los detalles antes de proceder al pago.",

@@ -12,24 +12,30 @@
     <div class="card shadow-sm">
       <div class="card-body">
 
-        <h5 class="fw-bold mb-3">{{ props.nombre }}</h5>
+        <h5 class="fw-bold mb-3">{{ reserva.tarifa.nombre }}</h5>
 
         <ul class="list-group list-group-flush mb-4">
-          <li class="list-group-item d-flex justify-content-between">
-            <span>{{ t.days }}</span>
-            <span class="fw-semibold">{{ props.dias }}</span>
-          </li>
 
-          <li class="list-group-item d-flex justify-content-between">
-            <span>{{ t.timetable }}</span>
-            <span class="fw-semibold">{{ props.horasSemanales }}</span>
+          <li v-for="(h, index) in reserva.tarifa.horario" :key="index"
+            class="list-group-item d-flex justify-content-between align-items-center">
+            <!-- Día -->
+            <span class="fw-semibold">
+              <i class="bi bi-calendar-event me-2 text-muted"></i>
+              {{ h.dia }}
+            </span>
+
+            <!-- Horario -->
+            <span class="badge bg-primary-subtle text-primary fw-semibold px-3 py-2">
+              <i class="bi bi-clock me-1"></i>
+              {{ h.horaInicio }} – {{ h.horaFin }}
+            </span>
           </li>
         </ul>
 
         <!-- TARIFAS -->
         <h6 class="fw-bold mb-2">{{ t.tariff }}</h6>
 
-        <table v-if="reserva.tarifa.tipo === 'ACTIVIDAD_COMUN'" class="table table-sm mb-4">
+        <table v-if="reserva.tarifa.tipo === 'Otros'" class="table table-sm mb-4">
           <tbody>
             <tr :class="{ 'table-primary': usuarioFinalStore.isUAM }">
               <td>UAM</td>
@@ -47,8 +53,42 @@
           </tbody>
         </table>
 
-        <table v-else-if="reserva.tarifa.tipo === 'GRUPOS_REDUCIDOS'" class="table table-sm mb-4">
+        <table v-else-if="reserva.tarifa.tipo === 'Grupos reducidos'" class="table table-sm mb-4 align-middle">
           <tbody>
+
+            <tr>
+              <td>
+                <i class="bi bi-people me-2"></i>
+                {{ t.people }}
+              </td>
+
+              <td class="text-end" style="max-width: 120px">
+                <input type="number" class="form-control form-control-sm text-end"
+                  v-model.number="reserva.seleccion.personas" :min="1" :max="reserva.tarifa.datos.numeroPersonas" />
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <i class="bi bi-credit-card me-2"></i>
+                {{ t.paymentMethod }}
+              </td>
+
+              <td class="text-end">
+                <select class="form-select form-select-sm text-end" v-model="reserva.seleccion.modalidad">
+                  <option value="mensual">{{ t.monthly }}</option>
+                  <option value="cuatrimestral">{{ t.quarterly }}</option>
+                  <option value="total">{{ t.fullPayment }}</option>
+                </select>
+              </td>
+            </tr>
+
+            <tr>
+              <td colspan="2">
+                <hr class="my-2">
+              </td>
+            </tr>
+
             <tr>
               <td>{{ t.hours }}</td>
               <td class="text-end">
@@ -76,29 +116,52 @@
                 {{ reserva.tarifa.datos.precioCuatrimestre }} €
               </td>
             </tr>
+
+            <tr class="table-light fw-bold">
+              <td>{{ t.fullPayment }}</td>
+              <td class="text-end">
+                {{ reserva.tarifa.datos.precio }} €
+              </td>
+            </tr>
+
           </tbody>
         </table>
 
-        <table v-else-if="reserva.tarifa.tipo === 'FISIO'" class="table table-sm mb-4">
+
+        <table v-else-if="reserva.tarifa.tipo === 'Fisioterapia'" class="table table-sm mb-4">
           <tbody>
             <tr>
-              <td>{{ t.initialConsultation }}</td>
+              <td>
+                {{ t.sessionType }}
+              </td>
+
               <td class="text-end">
-                {{ reserva.tarifa.datos.precioConsultaUAM }} €
+                <select class="form-select form-select-sm text-end" v-model="reserva.seleccion.tipoSesion">
+                  <option value="consulta">{{ t.initialConsultation }}</option>
+                  <option value="sesiones1_5">{{ t.sessions1to5 }}</option>
+                  <option value="sesiones6">{{ t.sessions6plus }}</option>
+                </select>
               </td>
             </tr>
 
-            <tr>
-              <td>{{ t.sessions1to5 }}</td>
+            <tr :class="{ 'table-primary': usuarioFinalStore.hasTda }">
+              <td>TDA</td>
               <td class="text-end">
-                {{ reserva.tarifa.datos.precioSesiones1_5UAM }} €
+                {{ precioFisioTDA }} €
               </td>
             </tr>
 
-            <tr>
-              <td>{{ t.sessions6plus }}</td>
+            <tr :class="{ 'table-primary': usuarioFinalStore.isUAM }">
+              <td>UAM</td>
               <td class="text-end">
-                {{ reserva.tarifa.datos.precioSesiones6UAM }} €
+                {{ precioFisioUAM }} €
+              </td>
+            </tr>
+
+            <tr :class="{ 'table-primary': !usuarioFinalStore.isUAM && !usuarioFinalStore.hasTda }">
+              <td>{{ t.other }}</td>
+              <td class="text-end">
+                {{ precioFisioOtros }} €
               </td>
             </tr>
           </tbody>
@@ -158,9 +221,6 @@ import { useI18n } from "../useI18N";
 
 const props = defineProps<{
   id: string
-  nombre: string
-  dias: string
-  horasSemanales: string
 }>();
 
 const language = inject<Ref<Language>>("language")!;
@@ -173,10 +233,21 @@ const otroCaso = ref(true)
 
 const reserva = ref({
   tarifa: {
+    nombre: '',
+    numeroHoras: 0,
+    horario: [] as {
+      dia: '',
+      horaInicio: '',
+      horaFin: ''
+    }[],
     tipo: '',
     datos: {} as any
   },
-  seleccion: {},
+  seleccion: {
+    personas: 1,
+    modalidad: 'total',
+    tipoSesion: 'consulta'
+  },
   descuento: {
     porcentaje_total: 0,
     aplicados: [] as {
@@ -193,32 +264,68 @@ function obtenerPrecioComun(precios: any) {
     precio = precios.precioUAM;
   }
 
-  const horas = parseInt(props.horasSemanales);
+  const horas = reserva.value.tarifa.numeroHoras;
   const mult = horas / precios.numeroHorasSemana;
 
   return precio * mult;
 }
 
 function obtenerPrecioGrupo(precios: any, sel: any) {
-  let precio = precios.precioMensual;
-  if (!sel.mensual) {
-    precio = precios.precioCuatrimestre;
+  let precio = precios.precio;
+  if (sel.modalidad == "mensual") {
+    precio = precios.precioMensual;
+  } else if (sel.modalidad == "cuatrimestral") {
+    precio = precios.precioCuatrimestre
   }
 
   // Necesitamos calcular cuanto debe subir el precio o bajar en relacion a los parametros definidos en la tarifa
-  const horas = parseInt(props.horasSemanales);
+  const horas = reserva.value.tarifa.numeroHoras;
   const mult1 = horas / precios.numeroHoras;
-  const mult2 = precios.numeroPersonas / sel.numeroPersonas;
+  const mult2 = sel.personas / precios.numeroPersonas;
 
   return precio * mult1 * mult2;
 }
 
-function obtenerPrecioFisioterapia(precios: any) {
-  let precio = precios.precioOtros;
-  if (usuarioFinalStore.hasTda) {
-    precio = precios.precioTDA;
-  } else if (usuarioFinalStore.isUAM) {
-    precio = precios.precioUAM;
+const precioFisioUAM = ref(0)
+const precioFisioTDA = ref(0)
+const precioFisioOtros = ref(0)
+
+function obtenerPrecioFisioterapia(precios: any, sel: any) {
+  let precio = 0;
+
+  if (sel.tipoSesion == "consulta") {
+    precioFisioUAM.value = precios.precioConsultaUAM;
+    precioFisioTDA.value = precios.precioConsultaTDA;
+    precioFisioOtros.value = precios.precioConsultaOtros;
+
+    precio = precios.precioConsultaOtros;
+    if (usuarioFinalStore.hasTda) {
+      precio = precios.precioConsultaTDA;
+    } else if (usuarioFinalStore.isUAM) {
+        precio = precios.precioConsultaUAM;
+    }
+  } else if (sel.tipoSesion == "sesiones1_5") {
+    precioFisioUAM.value = precios.precioSesiones1_5UAM;
+    precioFisioTDA.value = precios.precioSesiones1_5TDA;
+    precioFisioOtros.value = precios.precioSesiones1_5Otros;
+
+    precio = precios.precioSesiones1_5Otros;
+    if (usuarioFinalStore.hasTda) {
+      precio = precios.precioSesiones1_5TDA;
+    } else if (usuarioFinalStore.isUAM) {
+        precio = precios.precioSesiones1_5UAM;
+    }
+  } else if (sel.tipoSesion == "sesiones6") {
+    precioFisioUAM.value = precios.precioSesiones6UAM;
+    precioFisioTDA.value = precios.precioSesiones6TDA;
+    precioFisioOtros.value = precios.precioSesiones6Otros;
+
+    precio = precios.precioSesiones6Otros;
+    if (usuarioFinalStore.hasTda) {
+      precio = precios.precioSesiones6TDA;
+    } else if (usuarioFinalStore.isUAM) {
+        precio = precios.precioSesiones6UAM;
+    }
   }
 
   return precio
@@ -229,7 +336,7 @@ const precioBase = computed(() => {
   const datos = reserva.value.tarifa.datos;
   const sel = reserva.value.seleccion;
 
-  if (tipo === 'Actividad comun') {
+  if (tipo === 'Otros') {
     return obtenerPrecioComun(datos);
   }
 
@@ -238,7 +345,7 @@ const precioBase = computed(() => {
   }
 
   if (tipo === 'Fisioterapia') {
-    return obtenerPrecioFisioterapia(datos)
+    return obtenerPrecioFisioterapia(datos, sel)
   }
 
   return 0
@@ -260,6 +367,9 @@ function cancelar() {
 
 onMounted(async () => {
   const id = parseInt(props.id);
-  reserva.value = await getTarifaDescuento(id);
+  const data = await getTarifaDescuento(id)
+
+  reserva.value.tarifa = data.tarifa
+  reserva.value.descuento = data.descuento
 });
 </script>

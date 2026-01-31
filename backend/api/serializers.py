@@ -298,7 +298,7 @@ class ActividadSimpleSerializer(serializers.ModelSerializer):
         return obj.calcularHorasSemanales()
 
     def get_dias(self, obj):
-        return ",".join(sesion.dia for sesion in obj.sesiones.all())
+        return obj.getDias()
 
 
 class ActividadSerializer(serializers.ModelSerializer):
