@@ -79,11 +79,11 @@ class Periodo(models.TextChoices):
     ANUAL = 'Todo el año'
 
 
-class TipoReserva(models.TextChoices):
+class FormaReserva(models.TextChoices):
     """
-    Clase para enumerar los tipos de reserva posibles a realizar
+    Clase para enumerar las formas de reserva posibles
 
-    Tipos de reserva:
+    Formas de reserva:
     - ONLINE, PRESENCIAL, AMBAS, NINGUNA
     """
     
@@ -94,6 +94,21 @@ class TipoReserva(models.TextChoices):
     AMBAS = 'Permite ambos tipos de reserva'
     
     NINGUNA = 'No permite ningún tipo de reserva'
+
+
+class TipoReserva(models.TextChoices):
+    """
+    Clase para enumerar los tipos de reserva
+
+    Tipos de reserva:
+    - LIBRE, ACTIVIDAD, USUARIO
+    """
+    
+    LIBRE = 'Libre'
+
+    ACTIVIDAD = 'Reserva actividad'
+
+    USUARIO = 'Reserva usuario'
 
 
 class Estado(models.TextChoices):

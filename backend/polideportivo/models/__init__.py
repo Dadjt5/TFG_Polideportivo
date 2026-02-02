@@ -1,6 +1,6 @@
 from .abono import (Abono, AbonoDeportivo, AbonoVerano, CompraAbono)
 from .actividad import (Actividad, Asistencia, Sesion)
-from .agenda import Agenda
+from .agenda import (Agenda, MapaReservas)
 from .bono import (Bono, CompraBono)
 from .configuracion import Configuracion
 from .deporte import Deporte

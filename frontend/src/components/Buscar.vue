@@ -173,7 +173,7 @@
           <div
             v-for="act in actividadesOrdenadas"
             :key="act.id"
-            class="col-12 col-sm-6 col-lg-4"
+            class="col-12 col-sm-6 col-lg-4 mt-3"
             @click="activityDetail(act.id)"
             v-else
           >
@@ -188,15 +188,15 @@
           <div
             v-for="inst in instalacionesOrdenadas"
             :key="inst.id"
-            class="col-12 col-sm-6 col-lg-4"
+            class="col-12 col-sm-6 col-lg-4 mt-3"
             @click="facilityDetail(inst.id)"
             v-else
           >
-          <FacilityCard
-            :icon="Building2"
-            :instalacion="inst"
-          />
-        </div>
+            <FacilityCard
+              :icon="Building2"
+              :instalacion="inst"
+            />
+          </div>
       </div>
     </main>
   </div>

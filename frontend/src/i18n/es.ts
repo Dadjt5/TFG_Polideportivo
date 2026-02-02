@@ -1,3 +1,5 @@
+import { m } from "vue-router/dist/router-CWoNjPRp.mjs";
+
 export default {
   /* Navbar */
   home: "Inicio",
@@ -235,6 +237,13 @@ export default {
   sessions6plus: "Sesiones a partir de la 6º",
   paymentMethod: "Método de pago",
   sessionType: "Tipo de sesión",
+  continue: "Continuar",
+  free: "Libre",
+  selected: "Seleccionado",
+  reserved: "Reservado",
+  facilityReservationTitle: "Reserva de instalación",
+  facilityReservationRule: "Selecciona un máximo de 2 horas consecutivas.",
+  selectedDate: "Fecha seleccionada",
 
   /* Reservar actividad */
   activityBookingTitle: "Confirmación de la reserva",

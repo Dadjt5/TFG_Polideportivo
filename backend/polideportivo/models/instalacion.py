@@ -3,6 +3,7 @@ from django.utils.translation import gettext_lazy as _
 
 from .constantes import TipoInstalacion
 
+from .agenda import Agenda
 
 class Pabellon(models.Model):
     """Modelo para representar un pabellon"""
@@ -44,6 +45,32 @@ class Instalacion(models.Model):
             "precioOtros": self.tarifa.precioOtros
         }
         
+    def get_horario(self, fecha):
+        agenda = Agenda.objects.filter(instalacion=self, fecha=fecha).first()
+
+        if agenda and agenda.abierto:
+            return agenda.horaApertura, agenda.horaCierre
+
+        return None, None
+
+    def get_reservas(self, fecha):
+        if not fecha:
+            return []
+
+        agenda = Agenda.objects.filter(instalacion=self, fecha=fecha, abierto=True).first()
+
+        if not agenda:
+            return []
+
+        reservas = []
+        for mapa in agenda.mapa_reservas.all():
+            reservas.append({
+                "horaInicio": mapa.horaInicio.strftime("%H:%M"),
+                "horaFin": mapa.horaFin.strftime("%H:%M"),
+                "estado": mapa.estado
+            })
+
+        return reservas
 
     @classmethod
     def contar(cls):

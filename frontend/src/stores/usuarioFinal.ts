@@ -56,7 +56,7 @@ export const useUserStore = defineStore("user", {
       return s.usuarioFinal.esUAM
     },
     hasAbono: (s) => {
-      return !s.usuarioFinal.abono;
+      return s.usuarioFinal.tieneAbono;
     },
     unreadCount: (state) =>
       state.notificaciones.filter(n => !n.leido).length,

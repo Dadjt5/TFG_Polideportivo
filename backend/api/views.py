@@ -6,6 +6,8 @@ from rest_framework.permissions import (
     AllowAny
 )
 from rest_framework import status
+from django.utils.dateparse import parse_date
+from datetime import date
 from django.shortcuts import get_object_or_404
 
 from .permissions import IsAdministrador, IsMonitor, IsUsuarioFinal
@@ -20,7 +22,8 @@ from .serializers import (
     PagoSerializer, ReservaActividadSerializer, AlquilerSerializer,
     TarifaTDASerializer, TarifaActividadSerializer, TarifaInstalacionSerializer,
     TDASerializer, UsuarioFinalSerializer, UserSerializer, AdministradorSerializer,
-    CompraBonoSerializer, CompraAbonoSerializer, MensajeSerializer, SesionSerializer
+    CompraBonoSerializer, CompraAbonoSerializer, MensajeSerializer, SesionSerializer,
+    MapaReservasSerializer
 )
 
 from polideportivo.models import (
@@ -29,7 +32,7 @@ from polideportivo.models import (
     EntradaListaEspera, TarifaTDA, Monitor, Notificacion, Pago, TarifaActividad, 
     TarifaInstalacion, TDA, UsuarioFinal, AbonoDeportivo, AbonoVerano, Pabellon, 
     ReservaActividad, Alquiler, Administrador, User, CompraBono, CompraAbono,
-    Mensaje, Sesion
+    Mensaje, Sesion, MapaReservas
 )
 
 
@@ -112,6 +115,11 @@ class AgendaViewSet(viewsets.ModelViewSet):
     serializer_class = AgendaSerializer
     permission_classes = [AllowAny]
 
+
+class MapaReservasViewSet(viewsets.ModelViewSet):
+    queryset = MapaReservas.objects.all()
+    serializer_class = MapaReservasSerializer
+    permission_classes = [AllowAny]
 
 # ----------------
 # Bonos
@@ -877,14 +885,27 @@ class TarifaActividadView(APIView):
 
 class TarifaInstalacionView(APIView):
     permission_classes = [IsAuthenticated]
-    
+
     def get(self, request, instalacion_id):
         instalacion = get_object_or_404(Instalacion, id=instalacion_id)
 
         precios = instalacion.obtener_precios()
+
+        fecha = request.query_params.get('fecha')
+        if not fecha:
+            fecha = date.today()
+
+        fecha = parse_date(fecha)
+        horaApertura, horaCierre = instalacion.get_horario(fecha)
+        mapaReservas = instalacion.get_reservas(fecha)
+
         data = {
             "tarifa": {
-                "datos": precios
+                "nombre": instalacion.nombre,
+                "horaApertura": horaApertura,
+                "horaCierre": horaCierre,
+                "datos": precios,
+                "reservas": mapaReservas
             },
             "descuento": {
                 "porcentaje_total": 0,
@@ -901,6 +922,5 @@ class TarifaInstalacionView(APIView):
                     "nombre": d.nombre,
                     "porcentaje": d.porcentaje
                 })
-        
-        
+
         return Response(data)

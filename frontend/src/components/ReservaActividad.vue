@@ -211,7 +211,7 @@
 import { computed, inject, type Ref, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { getTarifaDescuento } from '../services/reservaPagoService';
+import { getTarifaDescuentoActividad } from '../services/reservaPagoService';
 
 import { useUserStore } from '../stores/usuarioFinal'
 
@@ -228,8 +228,6 @@ const t = useI18n(language);
 
 const router = useRouter();
 const usuarioFinalStore = useUserStore();
-
-const otroCaso = ref(true)
 
 const reserva = ref({
   tarifa: {
@@ -367,7 +365,7 @@ function cancelar() {
 
 onMounted(async () => {
   const id = parseInt(props.id);
-  const data = await getTarifaDescuento(id)
+  const data = await getTarifaDescuentoActividad(id)
 
   reserva.value.tarifa = data.tarifa
   reserva.value.descuento = data.descuento

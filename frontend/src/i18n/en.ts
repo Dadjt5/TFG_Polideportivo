@@ -235,6 +235,13 @@ export default {
   sessions6plus: "Sessions starting from the 6th",
   paymentMethod: "Payment method",
   sessionType: "Session type",
+  continue: "Continue",
+  free: "Free",
+  selected: "Selected",
+  reserved: "Reserved",
+  facilityReservationTitle: "Installation reservation",
+  facilityReservationRule: "Select a maximum of 2 consecutive hours.",
+  selectedDate: "Selected date",
 
   /* Reservar actividad */
   activityBookingTitle: "Booking confirmation",

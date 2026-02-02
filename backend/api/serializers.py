@@ -9,7 +9,7 @@ from polideportivo.models import (
     EntradaListaEspera, TarifaTDA, Monitor, Notificacion, Pago, TarifaActividad, 
     TarifaInstalacion, TDA, UsuarioFinal, AbonoDeportivo, AbonoVerano, Pabellon, 
     ReservaActividad, Alquiler, Administrador, CompraBono, CompraAbono, Sesion,
-    Mensaje
+    Mensaje, MapaReservas
 )
 
 
@@ -382,6 +382,12 @@ class AsistenciaSerializer(serializers.ModelSerializer):
 class AgendaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Agenda
+        fields = '__all__'
+
+
+class MapaReservasSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MapaReservas
         fields = '__all__'
 
 

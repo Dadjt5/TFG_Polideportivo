@@ -4,7 +4,7 @@ import math
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 
-from .constantes import TipoActividad, TipoReserva, Terreno, Estado, Periodo, Dia
+from .constantes import TipoActividad, FormaReserva, Terreno, Estado, Periodo, Dia
 from .tarifa_actividad import Fisioterapia, GrupoReducido, ActividadComun
 
 class Actividad(models.Model):
@@ -28,7 +28,7 @@ class Actividad(models.Model):
     tarifa = models.ForeignKey('TarifaActividad', on_delete=models.PROTECT, blank=True, null=True)
 
     tipoActividad = models.CharField(default=TipoActividad.OTROS, choices=TipoActividad.choices)
-    tipoReserva = models.CharField(default=TipoReserva.NINGUNA, choices=TipoReserva.choices)
+    tipoReserva = models.CharField(default=FormaReserva.NINGUNA, choices=FormaReserva.choices)
     terreno = models.CharField(default=Terreno.PISTA, choices=Terreno.choices)
     estado = models.CharField(default=Estado.INDEFINIDO, choices=Estado.choices)
     periodo = models.CharField(default=Periodo.ANUAL, choices=Periodo.choices)
