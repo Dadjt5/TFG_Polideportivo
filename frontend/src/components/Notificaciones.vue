@@ -83,6 +83,7 @@ import { onBeforeRouteLeave } from 'vue-router'
 /* Importamos el store del usuario para manejar las notificaciones */
 import { useUserStore } from "../stores/usuarioFinal";
 import { useMonitorStore } from "../stores/monitor";
+import { useAdministradorStore } from "../stores/administrador";
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
 import type { Language } from "../useI18N";
@@ -95,13 +96,19 @@ const t = useI18n(language);
 const userStore = useAuthStore();
 const usuarioFinalStore = useUserStore();
 const monitorStore = useMonitorStore();
+const administradorStore = useAdministradorStore();
 
 const activeStore = computed(() => {
-  return userStore.role === "monitor"
-    ? monitorStore
-    : usuarioFinalStore;
-});
+  if(userStore.role == "usuario_final") {
+    return usuarioFinalStore;
+  }
 
+  if(userStore.role == "monitor") {
+    return monitorStore;
+  }
+
+  return administradorStore;
+});
 const markRead = (id: number) => activeStore.value.cambiarLeido(id);
 const togglePin = (id: number) => activeStore.value.cambiarFijado(id);
 const deleteNotif = (id: number) => activeStore.value.deleteNotificacion(id);

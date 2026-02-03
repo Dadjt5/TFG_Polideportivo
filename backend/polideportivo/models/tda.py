@@ -31,6 +31,9 @@ class TDA(models.Model):
         self.usuarioFinal = usuario_final
         self._codigo_secreto_hash = ""
         self.save()
+        
+        usuario_final.tieneTDA = True
+        usuario_final.save()
 
         return True
 

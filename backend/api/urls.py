@@ -77,5 +77,6 @@ urlpatterns = [
     path("actividades/<int:actividad_id>/sesiones/<int:sesion_id>/asistencia/", views.GuardarAsistenciaView.as_view(), name="guardar-asistencia"),
     path("tarifas/actividades/<int:actividad_id>/", views.TarifaActividadView.as_view(), name="tarifa-actividad"),
     path("tarifas/instalaciones/<int:instalacion_id>/", views.TarifaInstalacionView.as_view(), name="tarifa-instalacion"),
+    path("usuarios/", views.GestionUsuariosView.as_view(), name="obtener-usuarios"),
     path('', include(router.urls)),
 ]

@@ -21,6 +21,7 @@ class UsuarioFinal(Usuario):
     actividadesRealizadas = models.PositiveIntegerField(default=0)
     esUAM = models.BooleanField(default=False)
     tieneAbono = models.BooleanField(default=False)
+    tieneTDA = models.BooleanField(default=False)
 
     deportesFavoritos = models.ManyToManyField('Deporte', blank=True, related_name="usuariosFinales")
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="usuario_final")
@@ -33,7 +34,7 @@ class UsuarioFinal(Usuario):
             esUAM = False
         else:
             esUAM = True
-        
+
         super().save(*args, **kwargs)
 
     def __str__(self):

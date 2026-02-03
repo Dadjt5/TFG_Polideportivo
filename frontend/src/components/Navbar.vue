@@ -28,19 +28,19 @@
         </li>
 
         <li class="nav-item fs-5">
-          <router-link to="/foro" v-if="userStore.role === 'usuario_final'" class="nav-link px-3 text-white">
+          <router-link to="/foro" v-if="userStore.role === 'usuario_final' || userStore.role === 'admin'" class="nav-link px-3 text-white">
             {{ t.forum }}
           </router-link>
         </li>
 
         <li class="nav-item fs-5">
-          <router-link to="/contacto" class="nav-link px-3 text-white">
+          <router-link to="/contacto" v-if="userStore.role !== 'admin'" class="nav-link px-3 text-white">
             {{ t.contact }}
           </router-link>
         </li>
 
         <li class="nav-item fs-5">
-          <router-link to="/faq" class="nav-link px-3 text-white">
+          <router-link to="/faq" v-if="userStore.role !== 'admin'" class="nav-link px-3 text-white">
             {{ t.faq }}
           </router-link>
         </li>
@@ -88,6 +88,7 @@ import { useRouter } from "vue-router";
 import { useAuthStore } from "../stores/auth";
 import { useUserStore } from "../stores/usuarioFinal";
 import { useMonitorStore } from "../stores/monitor";
+import { useAdministradorStore } from "../stores/administrador";
 
 import type { Language } from "../useI18N";
 import { useI18n } from "../useI18N";
@@ -96,11 +97,18 @@ const router = useRouter();
 const userStore = useAuthStore();
 const usuarioFinalStore = useUserStore();
 const monitorStore = useMonitorStore();
+const administradorStore = useAdministradorStore();
 
 const activeStore = computed(() => {
-  return userStore.role === "monitor"
-    ? monitorStore
-    : usuarioFinalStore;
+  if(userStore.role == "usuario_final") {
+    return usuarioFinalStore;
+  }
+
+  if(userStore.role == "monitor") {
+    return monitorStore;
+  }
+
+  return administradorStore;
 });
 
 const language = inject<Ref<Language>>("language")!;

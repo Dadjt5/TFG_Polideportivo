@@ -23,7 +23,8 @@ from .serializers import (
     TarifaTDASerializer, TarifaActividadSerializer, TarifaInstalacionSerializer,
     TDASerializer, UsuarioFinalSerializer, UserSerializer, AdministradorSerializer,
     CompraBonoSerializer, CompraAbonoSerializer, MensajeSerializer, SesionSerializer,
-    MapaReservasSerializer
+    MapaReservasSerializer, AdministradorSimpleSerializer, MonitorSimpleSerializer,
+    UsuarioFinalSimpleSerializer
 )
 
 from polideportivo.models import (
@@ -922,5 +923,27 @@ class TarifaInstalacionView(APIView):
                     "nombre": d.nombre,
                     "porcentaje": d.porcentaje
                 })
+
+        return Response(data)
+
+
+class GestionUsuariosView(APIView):
+    permission_classes = [IsAdministrador]
+
+    def get(self, request):
+        usuariosFinales = UsuarioFinal.objects.all().order_by('nombre')
+        serializerUser = UsuarioFinalSimpleSerializer(usuariosFinales, many=True)
+
+        monitores = Monitor.objects.all().order_by('nombre')
+        serializerMonitores = MonitorSimpleSerializer(monitores, many=True)
+        
+        administradores = Administrador.objects.all().order_by('rol')
+        serializerAdministradores = AdministradorSimpleSerializer(administradores, many=True)
+
+        data = {
+            "usuariosFinales": serializerUser.data,
+            "monitores": serializerMonitores.data,
+            "administradores": serializerAdministradores.data
+        }
 
         return Response(data)

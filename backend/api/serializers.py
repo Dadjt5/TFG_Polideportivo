@@ -34,6 +34,11 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'first_name', 'last_name']
+        
+class UsuarioFinalSimpleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UsuarioFinal
+        fields = ('id', 'nombre', 'tieneAbono', 'tieneTDA', 'esUAM')
 
 
 class UsuarioFinalSerializer(serializers.ModelSerializer):
@@ -141,6 +146,12 @@ class MonitorSimpleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Monitor
         fields = ("id", "nombre")
+
+
+class AdministradorSimpleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Administrador
+        fields = ('id', 'nombre', 'rol')
 
 
 class AdministradorSerializer(serializers.ModelSerializer):

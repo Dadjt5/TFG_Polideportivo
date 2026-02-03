@@ -271,6 +271,30 @@ export default {
   /* Perfil Monitor */
   photo: "Fotografía",
 
+  /* Home administrador */
+  dashboardAdmin: "Panel principal del Administrador Raíz",
+  manageUsers: "Gestionar usuarios",
+  manageSpaces: "Gestionar espacios",
+  manageActivities: "Gestionar actividades",
+  manageRates: "Gestionar tarifas",
+  systemSettings: "Configuración del sistema",
+  reports: "Informes y estadísticas",
+
+  /* Gestiones */
+  usersHandle: "Gestionar usuarios",
+  admin: "Administrador",
+  admins: "Administradores",
+  finalUser: "Usuario final",
+  finalUsers: "Usuarios final",
+  monitors: "Monitores",
+  new: "Nuevo",
+
+  /* Detalle usuario final */
+  userDetail: "Detalles del usuario",
+  withoutFavouriteSports: "Sin deportes favoritos",
+  modifyUser: "Modificar usuario",
+  deleteUser: "Eliminar usuario",
+
   /* Contacto */
   contactTitle: "Contacto con el centro deportivo",
   contactSubtitle: "Información de contacto del edificio de administración",

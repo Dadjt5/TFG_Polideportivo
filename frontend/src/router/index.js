@@ -24,6 +24,7 @@ import HomeMonitor from '../components/HomeMonitor.vue'
 import DetalleSesion from '../components/DetalleSesion.vue'
 import ReservaActividad from '../components/ReservaActividad.vue'
 import Alquiler from '../components/Alquiler.vue'
+import HomeAdministrador from '../components/HomeAdministrador.vue'
 
 const routes = [
   { path: '/', redirect: '/home' },
@@ -41,6 +42,11 @@ const routes = [
     path: '/home-monitor',
     component: HomeMonitor,
     meta: { requiresAuth: true, role: 'monitor' }
+  },
+  {
+    path: '/home-administrador',
+    component: HomeAdministrador,
+    meta: { requiresAuth: true, role: 'administrador' }
   },
   {
     path: '/actividades/:id',
