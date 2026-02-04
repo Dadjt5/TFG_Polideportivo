@@ -1,0 +1,265 @@
+<template>
+  <div class="min-vh-100 bg-light">
+    <div class="container py-5" style="max-width: 1100px">
+      <h1 class="text-center fw-semibold mb-4">
+        {{ t.newUser }}
+      </h1>
+
+      <div class="card shadow-sm rounded-4">
+        <div class="card-body p-4 p-md-5">
+
+          <!-- DATOS PERSONALES -->
+          <h5 class="fw-semibold mb-3">{{ t.personalData }}</h5>
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <input
+                class="form-control"
+                :class="{ 'is-invalid': errores.nombre }"
+                :placeholder="t.name"
+                v-model="usuarioFinal.nombre"
+              />
+            </div>
+
+            <div class="col-md-6">
+              <input
+                class="form-control"
+                :class="{ 'is-invalid': errores.apellidos }"
+                :placeholder="t.surnames"
+                v-model="usuarioFinal.apellidos"
+              />
+            </div>
+
+            <div class="col-md-6">
+              <input
+                class="form-control"
+                :class="{ 'is-invalid': errores.DNI }"
+                placeholder="DNI"
+                v-model="usuarioFinal.DNI"
+              />
+            </div>
+
+            <div class="col-md-6">
+              <select
+                class="form-select"
+                :class="{ 'is-invalid': errores.sexo }"
+                v-model="usuarioFinal.sexo"
+              >
+                <option value="">{{ t.selectOption }}</option>
+                <option value="male">{{ t.male }}</option>
+                <option value="female">{{ t.female }}</option>
+                <option value="other">{{ t.other }}</option>
+              </select>
+            </div>
+
+            <div class="col-md-6">
+              <input
+                type="date"
+                class="form-control"
+                :class="{ 'is-invalid': errores.fechaNacimiento }"
+                v-model="usuarioFinal.fechaNacimiento"
+              />
+            </div>
+          </div>
+
+          <!-- CONTACTO -->
+          <h5 class="fw-semibold mb-3">{{ t.contact }}</h5>
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <input
+                class="form-control"
+                :class="{ 'is-invalid': errores.telefono }"
+                :placeholder="t.phoneNumber"
+                v-model="usuarioFinal.telefono"
+              />
+            </div>
+
+            <div class="col-md-6">
+              <input
+                class="form-control"
+                :class="{ 'is-invalid': errores.email }"
+                :placeholder="t.email"
+                v-model="usuarioFinal.email"
+              />
+            </div>
+          </div>
+
+          <!-- DIRECCIÓN -->
+          <h5 class="fw-semibold mb-3">{{ t.address }}</h5>
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <input
+                class="form-control"
+                :class="{ 'is-invalid': errores.provincia }"
+                :placeholder="t.province"
+                v-model="usuarioFinal.provincia"
+              />
+            </div>
+
+            <div class="col-md-6">
+              <input
+                class="form-control"
+                :class="{ 'is-invalid': errores.municipio }"
+                :placeholder="t.municipality"
+                v-model="usuarioFinal.municipio"
+              />
+            </div>
+
+            <div class="col-md-6">
+              <input
+                class="form-control"
+                :class="{ 'is-invalid': errores.localidad }"
+                :placeholder="t.locality"
+                v-model="usuarioFinal.localidad"
+              />
+            </div>
+
+            <div class="col-md-6">
+              <input
+                class="form-control"
+                :class="{ 'is-invalid': errores.codigoPostal }"
+                :placeholder="t.postalCode"
+                v-model="usuarioFinal.codigoPostal"
+              />
+            </div>
+          </div>
+
+          <!-- CREDENCIALES -->
+          <h5 class="fw-semibold mb-3">{{ t.credentials }}</h5>
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <input
+                type="password"
+                class="form-control"
+                :class="{ 'is-invalid': errores.password }"
+                :placeholder="t.passwordPlaceholder"
+                v-model="usuarioFinal.password"
+              />
+            </div>
+
+            <div class="col-md-6">
+              <input
+                type="password"
+                class="form-control"
+                :class="{ 'is-invalid': errores.confirmPassword }"
+                :placeholder="t.passwordConfirm"
+                v-model="usuarioFinal.confirmPassword"
+              />
+            </div>
+          </div>
+
+          <!-- MENSAJE -->
+          <p v-if="mensaje" class="text-center text-danger">
+            {{ mensaje }}
+          </p>
+
+          <!-- BOTONES -->
+          <div class="d-flex justify-content-center gap-4 mt-4">
+            <button class="btn btn-primary btn-lg px-5" @click="nuevoUsuario">
+              {{ t.newUser }}
+            </button>
+
+            <button class="btn btn-secondary btn-lg px-5" @click="router.back()">
+              {{ t.return }}
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, inject, Ref } from "vue";
+import { useRouter } from "vue-router";
+
+import type { Language } from "../useI18N";
+import { useI18n } from "../useI18N";
+
+import { registrarse } from "../services/loginService";
+
+const router = useRouter();
+
+const language = inject<Ref<Language>>("language")!;
+const t = useI18n(language);
+
+const usuarioFinal = ref({
+  nombre: '',
+  apellidos: '',
+  DNI: '',
+  sexo: '',
+  esMenor: false,
+  fechaNacimiento: '',
+  telefono: '',
+  email: '',
+  provincia: '',
+  municipio: '',
+  localidad: '',
+  codigoPostal: '',
+  pagoFraccionado: false,
+  cuentaBancaria: '',
+  password: '',
+  confirmPassword: '',
+});
+
+const errores = ref({
+  nombre: false,
+  apellidos: false,
+  sexo: false,
+  fechaNacimiento: false,
+  DNI: false,
+  telefono: false,
+  email: false,
+  provincia: false,
+  municipio: false,
+  localidad: false,
+  codigoPostal: false,
+	pagoFraccionado: false,
+  cuentaBancaria: false,
+  password: false,
+  confirmPassword: false,
+});
+
+const mensaje = ref('');
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function validarFormulario() {
+  let valido = true
+
+  errores.value.sexo = usuarioFinal.value.sexo === ''
+  errores.value.telefono = usuarioFinal.value.telefono === ''
+  errores.value.provincia = usuarioFinal.value.provincia === ''
+  errores.value.municipio = usuarioFinal.value.municipio === ''
+  errores.value.localidad = usuarioFinal.value.localidad === ''
+  errores.value.codigoPostal = usuarioFinal.value.codigoPostal === ''
+	errores.value.email =
+		usuarioFinal.value.email === '' ||
+		!emailRegex.test(usuarioFinal.value.email)
+  errores.value.cuentaBancaria =
+    usuarioFinal.value.cuentaBancaria !== '' &&
+    usuarioFinal.value.cuentaBancaria.length < 20
+  errores.value.password =
+    usuarioFinal.value.password === '' ||
+    usuarioFinal.value.password !== usuarioFinal.value.confirmPassword
+
+  for (const key in errores.value) {
+    if(errores.value[key]) {
+      valido = false
+    }
+  }
+
+  return valido
+}
+
+const nuevoUsuario = async () => {
+  if(!validarFormulario()) return
+
+	try {
+    const data = await registrarse(usuarioFinal.value);
+    mensaje.value = data.mensaje;
+    router.push({ name: 'gestion-usuarios' });
+  } catch (e) {
+    console.log("Error al registrar el usuario final", e)
+  }
+};
+</script>

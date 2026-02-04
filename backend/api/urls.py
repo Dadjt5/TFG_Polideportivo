@@ -56,6 +56,7 @@ router.register(r'tdas', views.TDAViewSet, basename="tda")
 
 router.register(r'usuariosFinales', views.UsuarioFinalViewSet, basename="usuario-final")
 router.register(r'monitores', views.MonitorViewSet, basename="monitor")
+router.register(r'administradores', views.AdministradorViewSet, basename="administrador")
 router.register(r'users', views.UserViewSet, basename="user")
 
 
@@ -65,6 +66,7 @@ urlpatterns = [
     path("buscar/", views.BuscarView.as_view(), name="busqueda"),
     path("registrarse/", views.RegistroView.as_view(), name="registro"),
     path("registrar/monitor/", views.RegistroMonitorView.as_view(), name="registrar-monitor"),
+    path("registrar/administrador/", views.RegistroAdministradorView.as_view(), name="registrar-administrador"),
     path("notificaciones/guardar/", views.GuardarNotificacionView.as_view(), name="modificar-notificacion"),
     path("tda/validar/", views.ValidarTDAView.as_view(), name="validar-tda"),
     path("marcar/favoritas/", views.AlterarFavoritosView.as_view(), name="marcar-favoritas"),

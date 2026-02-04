@@ -564,7 +564,7 @@ class RegistroView(APIView):
 
 # Registrar monitor
 class RegistroMonitorView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAdministrador]
     authentication_classes = []
 
     def post(self, request):
@@ -589,6 +589,32 @@ class RegistroMonitorView(APIView):
             status=sta
         )
 
+# Registrar administrador
+class RegistroAdministradorView(APIView):
+    permission_classes = [AllowAny]
+    authentication_classes = []
+
+    def post(self, request):
+        nombre = request.data.get('nombre')
+        rol = request.data.get('rol')
+        email = request.data.get('email')
+        dni = request.data.get('DNI')
+        password = request.data.get('password')
+
+        respuesta = Administrador.registrar_administrador(
+            nombre=nombre, rol=rol, dni=dni, 
+            email=email, password=password
+        )
+
+        if respuesta["error"]:
+            sta = status.HTTP_400_BAD_REQUEST
+        else:
+            sta = status.HTTP_201_CREATED
+
+        return Response(
+            {"mensaje": respuesta["respuesta"]},
+            status=sta
+        )
 
 # Guardar informacion de notificaciones
 class GuardarNotificacionView(APIView):

@@ -1,7 +1,7 @@
 <template>
   <div class="min-vh-100 bg-light">
     <main class="container py-4">
-      <h1 class="text-center fs-2 fw-bold mb-5">{{ t.dashboardAdmin }}</h1>
+      <h1 class="text-center fs-2 fw-bold mb-5">{{ t.monitorHomeTitle }} {{ administradorStore.administrador.nombre }}</h1>
 
        <div class="col-lg-12">
           <div class="card shadow-sm border-0 mb-4">
@@ -34,19 +34,96 @@
 
       <!-- Acciones rápidas -->
       <div class="row g-4">
-        <div
-          v-for="action in quickActions"
-          :key="action.id"
-          class="col-12 col-sm-6 col-lg-4"
-        >
-          <div
-            class="card shadow-sm border-0 p-4 d-flex align-items-center gap-3 cursor-pointer hover-shadow"
-            @click="action.action"
-          >
-            <component :is="action.icon" class="fs-3 text-primary" />
-            <span class="fw-medium">{{ action.label }}</span>
-          </div>
+        <div class="col-md-6">
+          <router-link to="/gestion/usuarios" class="text-decoration-none text-dark">
+            <div class="card shadow-sm h-100 option-card">
+              <div class="card-body">
+                <div class="d-flex align-items-center gap-3">
+                  <i class="bi bi-person-fill text-primary fs-3"></i>
+                  <div>
+                    <h6 class="mb-1">{{ t.manageUsers }}</h6>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </router-link>
         </div>
+
+        <div class="col-md-6">
+          <router-link to="/gestion/espacios" class="text-decoration-none text-dark">
+            <div class="card shadow-sm h-100 option-card">
+              <div class="card-body">
+                <div class="d-flex align-items-center gap-3">
+                  <i class="bi bi-building text-primary fs-3"></i>
+                  <div>
+                    <h6 class="mb-1">{{ t.manageSpaces }}</h6>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </router-link>
+        </div>
+
+        <div class="col-md-6">
+          <router-link to="/gestion/actividades" class="text-decoration-none text-dark">
+            <div class="card shadow-sm h-100 option-card">
+              <div class="card-body">
+                <div class="d-flex align-items-center gap-3">
+                  <i class="bi bi-activity text-primary fs-3"></i>
+                  <div>
+                    <h6 class="mb-1">{{ t.manageActivities }}</h6>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </router-link>
+        </div>
+
+        <div class="col-md-6">
+          <router-link to="/gestion/tarifas" class="text-decoration-none text-dark">
+            <div class="card shadow-sm h-100 option-card">
+              <div class="card-body">
+                <div class="d-flex align-items-center gap-3">
+                  <i class="bi bi-ticket-perforated text-primary fs-3"></i>
+                  <div>
+                    <h6 class="mb-1">{{ t.manageRates }}</h6>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </router-link>
+        </div>
+
+        <div class="col-md-6">
+          <router-link to="/configuracion/administrador" class="text-decoration-none text-dark">
+            <div class="card shadow-sm h-100 option-card">
+              <div class="card-body">
+                <div class="d-flex align-items-center gap-3">
+                  <i class="bi bi-nut text-primary fs-3"></i>
+                  <div>
+                    <h6 class="mb-1">{{ t.systemSettings }}</h6>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </router-link>
+        </div>
+
+        <div class="col-md-6">
+          <router-link to="/estadisticas/administrador" class="text-decoration-none text-dark">
+            <div class="card shadow-sm h-100 option-card">
+              <div class="card-body">
+                <div class="d-flex align-items-center gap-3">
+                  <i class="bi bi-bar-chart-fill text-primary fs-3"></i>
+                  <div>
+                    <h6 class="mb-1">{{ t.reports }}</h6>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </router-link>
+        </div>
+
       </div>
     </main>
   </div>
@@ -68,15 +145,6 @@ const t = useI18n(language);
 
 const userStore = useAuthStore();
 const administradorStore = useAdministradorStore();
-
-const quickActions = reactive([
-  { id: 1, label: t.value.manageUsers, icon: User, action: () => console.log("Gestionar usuarios") },
-  { id: 2, label: t.value.manageSpaces, icon: Building, action: () => console.log("Gestionar espacios") },
-  { id: 3, label: t.value.manageActivities, icon: Calendar, action: () => console.log("Gestionar actividades") },
-  { id: 4, label: t.value.manageRates, icon: Wallet, action: () => console.log("Gestionar tarifas") },
-  { id: 5, label: t.value.systemSettings, icon: Settings, action: () => console.log("Configuración avanzada") },
-  { id: 6, label: t.value.reports, icon: BarChart, action: () => console.log("Ver informes y estadísticas") },
-]);
 
 onMounted(async () => {
   if (!administradorStore.administrador) {

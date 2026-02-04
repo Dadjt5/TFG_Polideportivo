@@ -261,9 +261,6 @@ export default {
   monitorHomeTitle: "Panel principal de",
   weeklyActivities: "Actividades de la semana",
 
-  /* Nuevo monitor */
-  newMonitor: "Crear monitor",
-
   /* Pasar lista / Detalle sesion */
   save: "Guardar",
   participants: "Participantes",
@@ -280,7 +277,7 @@ export default {
   systemSettings: "Configuración del sistema",
   reports: "Informes y estadísticas",
 
-  /* Gestiones */
+  /* Gestion usuarios */
   usersHandle: "Gestionar usuarios",
   admin: "Administrador",
   admins: "Administradores",
@@ -288,12 +285,39 @@ export default {
   finalUsers: "Usuarios final",
   monitors: "Monitores",
   new: "Nuevo",
+  newFinalUser: "Nuevo usuario final",
 
   /* Detalle usuario final */
   userDetail: "Detalles del usuario",
   withoutFavouriteSports: "Sin deportes favoritos",
   modifyUser: "Modificar usuario",
   deleteUser: "Eliminar usuario",
+  madeActivities: "Actividades realizadas",
+  userStatus: "Estado del usuario",
+  UAMuser: "Usuario UAM",
+  externalUser: "Usuario externo",
+  hasSubscripcion: "Tiene abono",
+  hasntSubscripcion: "No tiene abono",
+  hasTDA: "Tiene TDA",
+  hasntTDA: "No tiene TDA",
+
+  /* Detalle monitor */
+  monitorDetail: "Detalles del monitor",
+
+  /* Detalle administracion */
+  adminDetail: "Detalles del administrador",
+
+  /* Nuevo monitor */
+  newMonitorTitle: "Nuevo monitor",
+  createMonitor: "Crear monitor",
+
+  /* Nuevo administrador */
+  newAdminTitle: "Nuevo Adminitrador",
+  createAdmin: "Crear administrador",
+  rootAdmin: "Administrador raíz",
+  spacesAdmin: "Administrador de espacios",
+  usersAdmin: "Administrador de usuarios",
+  tariffsAdmin: "Administrador de tarifas",
 
   /* Contacto */
   contactTitle: "Contacto con el centro deportivo",

@@ -29,7 +29,7 @@ export const useAuthStore = defineStore("auth", {
       if (!state.user) return null;
       if (state.user.is_usuario_final) return "usuario_final";
       if (state.user.is_monitor) return "monitor";
-      if (state.user.is_administrador) return "admin";
+      if (state.user.is_administrador) return "administrador";
       return null;
     },
   },

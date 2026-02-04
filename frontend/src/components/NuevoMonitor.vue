@@ -2,7 +2,7 @@
   <div class="min-vh-100 bg-light pb-5">
     <main class="container py-5">
       <h1 class="text-center fw-bold mb-5">
-        Crear nuevo monitor
+        {{ t.newMonitorTitle }}
       </h1>
 
       <div class="card shadow-sm border-0 rounded-4 p-4">
@@ -14,7 +14,7 @@
               type="text"
               class="form-control form-control-lg"
 							:class="{ 'is-invalid': errores.nombre }"
-              v-model="form.nombre"
+              v-model="monitor.nombre"
             />
           </div>
 
@@ -24,7 +24,7 @@
               type="text"
               class="form-control form-control-lg"
 							:class="{ 'is-invalid': errores.apellidos }"
-              v-model="form.apellidos"
+              v-model="monitor.apellidos"
             />
           </div>
 
@@ -34,7 +34,7 @@
               type="text"
               class="form-control form-control-lg"
 							:class="{ 'is-invalid': errores.dni }"
-              v-model="form.dni"
+              v-model="monitor.dni"
             />
           </div>
 
@@ -44,7 +44,7 @@
               type="email"
               class="form-control form-control-lg"
 							:class="{ 'is-invalid': errores.email }"
-              v-model="form.email"
+              v-model="monitor.email"
             />
           </div>
 
@@ -54,7 +54,7 @@
               type="password"
               class="form-control form-control-lg"
 							:class="{ 'is-invalid': errores.password }"
-              v-model="form.password"
+              v-model="monitor.password"
             />
           </div>
 
@@ -64,7 +64,7 @@
               type="password"
               class="form-control form-control-lg"
 							:class="{ 'is-invalid': errores.confirmPassword }"
-              v-model="form.confirmPassword"
+              v-model="monitor.confirmPassword"
             />
           </div>
         </div>
@@ -79,7 +79,7 @@
             class="btn btn-primary btn-lg px-5"
             @click="crearMonitor"
           >
-            {{ t.newMonitor }}
+            {{ t.createMonitor }}
           </button>
 
           <button
@@ -110,7 +110,7 @@ const t = useI18n(language);
 const router = useRouter();
 const continuar = ref(true);
 
-const form = ref({
+const monitor = ref({
   nombre: "",
   apellidos: "",
   dni: "",
@@ -130,60 +130,37 @@ const errores = ref({
 
 /* Expresion regular para comprobar el email */
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
 const mensaje = ref("")
 
-const crearMonitor = async () => {
-	continuar.value = true
+function validarFormulario() {
+  let valido = true
 
-	if(form.value.nombre == '') {
-    errores.value.nombre = true
-    continuar.value = false
-  } else {
-    errores.value.nombre = false
-  }
+	errores.value.nombre = monitor.value.nombre === ''
+  errores.value.apellidos = monitor.value.apellidos === ''
+	errores.value.dni = 
+		monitor.value.dni === '' ||
+		monitor.value.dni.length !== 9
+	errores.value.email =
+		monitor.value.email === '' ||
+		!emailRegex.test(monitor.value.email)
+  errores.value.password =
+    monitor.value.password === '' ||
+    monitor.value.password !== monitor.value.confirmPassword
 
-	if(form.value.apellidos == '') {
-    errores.value.apellidos = true
-    continuar.value = false
-  } else {
-    errores.value.apellidos = false
-  }
-
-	if(form.value.dni == '') {
-    errores.value.dni = true
-    continuar.value = false
-  } else {
-    errores.value.dni = false
-  }
-
-	if(form.value.email == '' || !emailRegex.test(form.value.email)) {
-      errores.value.email = true
-      continuar.value = false
-    } else {
-      errores.value.email = false
+  for (const key in errores.value) {
+    if(errores.value[key]) {
+      valido = false
     }
-
-	if(form.value.password == '') {
-    errores.value.password = true
-    continuar.value = false
-  } else {
-    errores.value.password = false
   }
 
-  if(form.value.confirmPassword == '' || form.value.password != form.value.confirmPassword) {
-    errores.value.confirmPassword = true
-    continuar.value = false
-  } else {
-    errores.value.confirmPassword = false
-  }
+  return valido
+}
 
-	if (!continuar.value) {
-    return
-  }
+const crearMonitor = async () => {
+	if(!validarFormulario()) return
 
 	try {
-    const data = await registrarMonitor(form.value);
+    const data = await registrarMonitor(monitor.value);
     mensaje.value = data.mensaje;
 
     router.push("/");

@@ -25,3 +25,9 @@ export const registrarMonitor = async (payload) => {
   const response = await api.post("api/v1/registrar/monitor/", payload);
   return response.data;
 };
+
+/* Función para realizar el registro del administrador por parte del admin encargado */
+export const registrarAdministrador = async (payload) => {
+  const response = await api.post("api/v1/registrar/administrador/", payload);
+  return response.data;
+};

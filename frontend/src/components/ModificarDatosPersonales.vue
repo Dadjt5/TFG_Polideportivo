@@ -42,7 +42,7 @@
           <div class="row g-3">
             <div class="col-md-4">
               <label class="form-label">{{ t.sex }}</label>
-              <select class="form-select" v-model="usuario.sexo">
+              <select class="form-select" :class="{ 'is-invalid': errores.sexo }" v-model="usuario.sexo">
                 <option value="male">{{ t.male }}</option>
                 <option value="female">{{ t.female }}</option>
                 <option value="other">{{ t.other }}</option>
@@ -51,44 +51,44 @@
 
             <div class="col-md-4">
               <label class="form-label">{{ t.phoneNumber }}</label>
-              <input type="text" class="form-control" v-model="usuario.telefono">
+              <input type="text" class="form-control" :class="{ 'is-invalid': errores.telefono }" v-model="usuario.telefono">
             </div>
 
             <div class="col-md-4">
               <label class="form-label">{{ t.province }}</label>
-              <input type="text" class="form-control" v-model="usuario.provincia">
+              <input type="text" class="form-control" :class="{ 'is-invalid': errores.provincia }" v-model="usuario.provincia">
             </div>
 
             <div class="col-md-4">
               <label class="form-label">{{ t.municipality }}</label>
-              <input type="text" class="form-control" v-model="usuario.municipio">
+              <input type="text" class="form-control" :class="{ 'is-invalid': errores.municipio }" v-model="usuario.municipio">
             </div>
 
             <div class="col-md-4">
               <label class="form-label">{{ t.locality }}</label>
-              <input type="text" class="form-control" v-model="usuario.localidad">
+              <input type="text" class="form-control" :class="{ 'is-invalid': errores.localidad }" v-model="usuario.localidad">
             </div>
 
             <div class="col-md-4 mt-3">
               <label class="form-label">{{ t.postalCode }}</label>
-              <input type="text" class="form-control" v-model="usuario.codigoPostal">
+              <input type="text" class="form-control" :class="{ 'is-invalid': errores.codigoPostal }" v-model="usuario.codigoPostal">
             </div>
 
             <div class="col-md-4 mt-3">
               <label class="form-label">{{ t.passwordPlaceholder }}</label>
-              <input type="password" class="form-control" :class="{ 'is-invalid': error }" v-model="usuario.password">
+              <input type="password" class="form-control" :class="{ 'is-invalid': errores.password }" v-model="usuario.password">
             </div>
 
             <div class="col-md-4 mt-3">
               <label class="form-label">{{ t.passwordConfirm }}</label>
-              <input type="password" class="form-control" :class="{ 'is-invalid': error }" v-model="usuario.confirmPassword">
+              <input type="password" class="form-control" :class="{ 'is-invalid': errores.password }" v-model="usuario.confirmPassword">
             </div>
           </div>
 
           <!-- CUENTA -->
           <div class="mb-4 mt-4">
             <h5 class="fw-semibold mb-3">{{ t.account }}</h5>
-            <input type="text" class="form-control" v-model="usuario.cuentaBancaria">
+            <input type="text" class="form-control" :class="{ 'is-invalid': errores.cuentaBancaria }" v-model="usuario.cuentaBancaria">
           </div>
         </div>
       </div>
@@ -187,7 +187,17 @@ const usuario = ref({
   deportesFavoritos: [] as number[],
 })
 
-const error = ref(false)
+const errores = ref({
+  sexo: false,
+  telefono: false,
+  provincia: false,
+  municipio: false,
+  localidad: false,
+  codigoPostal: false,
+  cuentaBancaria: false,
+  password: false,
+})
+
 const deportesRestantes = ref(5)
 
 const favoritosSeleccionados = computed(() => {
@@ -206,6 +216,33 @@ const removeFavorite = (deporte: any) => {
   usuario.value.deportesFavoritos = usuario.value.deportesFavoritos.filter(id => id !== deporte.id);
   deportesRestantes.value += 1
 };
+
+function validarFormulario() {
+  let valido = true
+
+  errores.value.sexo = usuario.value.sexo === ''
+  errores.value.telefono = usuario.value.telefono === ''
+  errores.value.provincia = usuario.value.provincia === ''
+  errores.value.municipio = usuario.value.municipio === ''
+  errores.value.localidad = usuario.value.localidad === ''
+  errores.value.codigoPostal = usuario.value.codigoPostal === ''
+
+  errores.value.cuentaBancaria =
+    usuario.value.cuentaBancaria !== '' &&
+    usuario.value.cuentaBancaria.length < 20
+
+  errores.value.password =
+    usuario.value.password === '' ||
+    usuario.value.password === usuario.value.confirmPassword
+
+  for (const key in errores.value) {
+    if(errores.value[key]) {
+      valido = false
+    }
+  }
+
+  return valido
+}
 
 /* Solo mandamos al backend para modificar los campos que se hayan modificado */
 function camposModificados() {
@@ -240,12 +277,7 @@ function camposModificados() {
   }
 
   if(usuario.value.password) {
-    if(usuario.value.password == usuario.value.confirmPassword) {
-      data["password"] = usuario.value.password
-      error.value = false
-    } else {
-      error.value = true
-    }
+    data["password"] = usuario.value.password
   }
 
   const favoritosActuales = ((usuarioFinalStore.usuarioFinal.deportes as {id: number, titulo: string}[]) || []).map(d => d.id).sort()
@@ -260,6 +292,8 @@ function camposModificados() {
 
 const guardarCambios = async () => {
   try {
+    if(!validarFormulario) return
+
     const data = camposModificados()
     if(Object.keys(data).length > 0) {
       await modificarUsuarioFinal(usuario.value.id, data)

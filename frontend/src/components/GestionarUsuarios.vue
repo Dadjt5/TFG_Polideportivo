@@ -29,7 +29,9 @@
             <div class="tab-pane fade show active" id="admins">
               <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="fw-semibold">{{ t.admins }}</h5>
-                <button class="btn btn-primary rounded-pill">{{ t.new }}</button>
+                <router-link to="/registrar/administrador" class="btn btn-primary rounded-pill">
+                  {{ t.newAdminTitle }}
+                </router-link>
               </div>
 
               <div class="list-group list-group-flush">
@@ -52,7 +54,9 @@
             <div class="tab-pane fade" id="monitores">
               <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="fw-semibold">{{ t.monitors }}</h5>
-                <button class="btn btn-primary rounded-pill">{{ t.new }}</button>
+                <router-link to="/registrar/monitor" class="btn btn-primary rounded-pill">
+                  {{ t.newMonitorTitle }}
+                </router-link>
               </div>
 
               <input
@@ -80,7 +84,9 @@
             <div class="tab-pane fade" id="usuarios">
               <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="fw-semibold">{{ t.finalUsers }}</h5>
-                <button class="btn btn-primary rounded-pill">{{ t.new }}</button>
+                <router-link to="/registrar/usuario" class="btn btn-primary rounded-pill">
+                  {{ t.newFinalUser }}
+                </router-link>
               </div>
 
               <input
@@ -98,10 +104,7 @@
                 >
 									<div class="text-primary fw-medium" style="cursor: pointer;"
                     @click="UsuarioFinalDetail(u.id)">
-      	            <span class="fw-medium">{{ u.nombre }}</span>
-    	              <span class="fw-medium">{{ u.tieneAbono }}</span>
-  	                <span class="fw-medium">{{ u.tieneTDA }}</span>
-	                  <span class="fw-medium">{{ u.esUAM }}</span>
+      	            <span class="fw-medium">{{ u.nombre }} {{ u.tieneAbono }} {{ u.tieneTDA }} {{ u.esUAM }}</span>
 									</div>
                 </div>
               </div>

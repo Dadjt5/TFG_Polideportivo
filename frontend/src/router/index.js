@@ -25,6 +25,12 @@ import DetalleSesion from '../components/DetalleSesion.vue'
 import ReservaActividad from '../components/ReservaActividad.vue'
 import Alquiler from '../components/Alquiler.vue'
 import HomeAdministrador from '../components/HomeAdministrador.vue'
+import NuevoAdministrador from '../components/NuevoAdministrador.vue'
+import NuevoUsuarioFinal from '../components/NuevoUsuarioFinal.vue'
+import GestionarUsuarios from '../components/GestionarUsuarios.vue'
+import DetalleUsuarioFinal from '../components/DetalleUsuarioFinal.vue'
+import DetalleMonitor from '../components/DetalleMonitor.vue'
+import DetalleAdministrador from '../components/DetalleAdministrador.vue'
 
 const routes = [
   { path: '/', redirect: '/home' },
@@ -33,6 +39,8 @@ const routes = [
   { path: '/login', component: Login, meta: { public: true } },
   { path: '/registrarse', component: Registro, meta: { public: true } },
   { path: '/registrar/monitor', component: NuevoMonitor, meta: { requiresAuth: true }},
+  { path: '/registrar/administrador', component: NuevoAdministrador, meta: { requiresAuth: true }},
+  { path: '/registrar/usuario', component: NuevoUsuarioFinal, meta: { requiresAuth: true }},
   {
     path: '/home-usuario',
     component: HomeUsuarioFinal,
@@ -61,6 +69,27 @@ const routes = [
     name: 'detalle-instalacion',
     props: true,
     meta: { public: true }
+  },
+  {
+    path: '/usuarioFinal/:id',
+    component: DetalleUsuarioFinal,
+    name: 'detalle-usuarioFinal',
+    props: true,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/monitor/:id',
+    component: DetalleMonitor,
+    name: 'detalle-monitor',
+    props: true,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/administrador/:id',
+    component: DetalleAdministrador,
+    name: 'detalle-administrador',
+    props: true,
+    meta: { requiresAuth: true }
   },
   {
     path: '/actividades/:idAct/sesiones/:idSesion',
@@ -94,6 +123,7 @@ const routes = [
     props: true,
     meta: { requiresAuth: true }
   },
+  { path: '/gestion/usuarios', component: GestionarUsuarios, name: 'gestion-usuarios', meta: { requiresAuth: true } },
 ]
 
 /* Cada vez que se accede a una página se redirige el scrollbar arriba */
@@ -116,7 +146,7 @@ router.beforeEach(async (to) => {
   if (to.path === '/home') {
     if (auth.role === 'usuario_final') return '/home-usuario';
     if (auth.role === 'monitor') return '/home-monitor';
-    if (auth.role === 'admin') return '/home-admin';
+    if (auth.role === 'administrador') return '/home-administrador';
   }
 
   if (to.meta.public) {

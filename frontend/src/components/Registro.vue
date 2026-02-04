@@ -278,7 +278,7 @@ const siguiente = () => {
       errores.value.fechaNacimiento = false
     }
 
-    if(formData.dni == '' && !formData.esMenor) {
+    if((formData.dni == '' || formData.dni.length != 9) && !formData.esMenor) {
       errores.value.dni = true
       continuar.value = false
     } else {
