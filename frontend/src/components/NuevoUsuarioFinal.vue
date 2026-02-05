@@ -158,7 +158,7 @@
               {{ t.newUser }}
             </button>
 
-            <button class="btn btn-secondary btn-lg px-5" @click="router.back()">
+            <button class="btn btn-secondary btn-lg px-5" @click="volver">
               {{ t.return }}
             </button>
           </div>
@@ -262,4 +262,8 @@ const nuevoUsuario = async () => {
     console.log("Error al registrar el usuario final", e)
   }
 };
+
+function volver() {
+  router.back()
+}
 </script>

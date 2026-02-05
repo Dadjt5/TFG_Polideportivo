@@ -25,6 +25,7 @@
           </ul>
 
           <div class="tab-content">
+
             <!-- ADMINISTRADORES -->
             <div class="tab-pane fade show active" id="admins">
               <div class="d-flex justify-content-between align-items-center mb-3">
@@ -35,16 +36,13 @@
               </div>
 
               <div class="list-group list-group-flush">
-                <div
-                  v-for="a in usuarios.administradores"
-                  :key="a.id"
-                  class="list-group-item d-flex justify-content-between align-items-center rounded-3 mb-2 shadow-sm"
-                >
+                <div v-for="a in usuarios.administradores" :key="a.id"
+                  class="list-group-item d-flex justify-content-between align-items-center rounded-3 mb-2 shadow-sm">
 
-                  <div class="text-primary fw-medium" style="cursor: pointer;"
-                    @click="AdministradorDetail(a.id)">
-                    <span class="fw-medium">{{ a.nombre }}</span>
-                    <span class="text-muted ms-2">({{ a.rol }})</span>
+                  <div class="text-primary fw-medium" style="cursor: pointer;" @click="AdministradorDetail(a.id)">
+                    <span class="fw-medium me-2">{{ a.nombre }}</span>
+                    <span class="fw-medium me-2">{{ a.DNI }}</span>
+                    <span class="text-muted">({{ a.rol }})</span>
                   </div>
                 </div>
               </div>
@@ -59,23 +57,15 @@
                 </router-link>
               </div>
 
-              <input
-                v-model="searchMonitores"
-                type="text"
-                class="form-control mb-3"
-                placeholder="Buscar monitor..."
-              />
+              <input v-model="searchMonitores" type="text" class="form-control mb-3" placeholder="Buscar monitor..." />
 
               <div class="list-group list-group-flush">
-                <div
-                  v-for="m in filteredMonitores"
-                  :key="m.id"
-                  class="list-group-item d-flex justify-content-between align-items-center rounded-3 mb-2 shadow-sm"
-                >
-									<div class="text-primary fw-medium" style="cursor: pointer;"
-                    @click="MonitorDetail(m.id)">
-                  	<span class="fw-medium">{{ m.nombre }}</span>
-									</div>
+                <div v-for="m in filteredMonitores" :key="m.id"
+                  class="list-group-item d-flex justify-content-between align-items-center rounded-3 mb-2 shadow-sm">
+                  <div class="text-primary fw-medium" style="cursor: pointer;" @click="MonitorDetail(m.id)">
+                    <span class="fw-medium me-2">{{ m.nombre }}</span>
+                    <span class="fw-medium">{{ m.DNI }}</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -89,23 +79,24 @@
                 </router-link>
               </div>
 
-              <input
-                v-model="searchUsuarios"
-                type="text"
-                class="form-control mb-3"
-                placeholder="Buscar usuario..."
-              />
+              <input v-model="searchUsuarios" type="text" class="form-control mb-3" placeholder="Buscar usuario..." />
 
               <div class="list-group list-group-flush">
-                <div
-                  v-for="u in filteredUsuarios"
-                  :key="u.id"
-                  class="list-group-item d-flex justify-content-between align-items-center rounded-3 mb-2 shadow-sm"
-                >
-									<div class="text-primary fw-medium" style="cursor: pointer;"
-                    @click="UsuarioFinalDetail(u.id)">
-      	            <span class="fw-medium">{{ u.nombre }} {{ u.tieneAbono }} {{ u.tieneTDA }} {{ u.esUAM }}</span>
-									</div>
+                <div v-for="u in filteredUsuarios" :key="u.id"
+                  class="list-group-item d-flex justify-content-between align-items-center rounded-3 mb-2 shadow-sm">
+                  <div class="text-primary fw-medium" style="cursor: pointer;" @click="UsuarioFinalDetail(u.id)">
+                    <span class="fw-medium me-2">{{ u.nombre }}</span>
+                    <span class="fw-medium me-2">{{ u.DNI }}</span>
+                      <span class="badge me-2" :class="u.esUAM ? 'bg-success' : 'bg-secondary'">
+                        {{ u.esUAM ? t.UAMuser : t.externalUser }} 
+                      </span>
+                      <span class="badge me-2" :class="u.tieneAbono ? 'bg-primary' : 'bg-secondary'">
+                        {{ u.tieneAbono ? t.hasSubscripcion : t.hasntSubscripcion }} 
+                      </span>
+                      <span class="badge" :class="u.tieneTDA ? 'bg-warning text-dark' : 'bg-secondary'">
+                        {{ u.tieneTDA ? t.hasTDA : t.hasntTDA }}
+                      </span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -138,6 +129,7 @@ const usuarios = ref({
   finales: [] as {
     id: 0,
     nombre: '',
+    DNI: '',
     tieneTDA: false,
     tieneAbono: false,
     esUAM: false
@@ -145,10 +137,12 @@ const usuarios = ref({
   monitores: [] as {
     id: 0,
     nombre: '',
+    DNI: '',
   }[],
   administradores: [] as {
     id: 0,
     nombre: '',
+    DNI: '',
     rol: ''
   }[]
 })

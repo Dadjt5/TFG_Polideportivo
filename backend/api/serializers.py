@@ -33,18 +33,19 @@ class DeporteSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'first_name', 'last_name']
+        fields = ('id', 'first_name', 'last_name', 'username', 'email')
         
 class UsuarioFinalSimpleSerializer(serializers.ModelSerializer):
     class Meta:
         model = UsuarioFinal
-        fields = ('id', 'nombre', 'tieneAbono', 'tieneTDA', 'esUAM')
+        fields = ('id', 'DNI', 'nombre', 'tieneAbono', 'tieneTDA', 'esUAM')
 
 
 class UsuarioFinalSerializer(serializers.ModelSerializer):
     # La contraseña no se pasa cuando se hace un get, solo para modificarla
     password = serializers.CharField(write_only=True, required=False, allow_blank=True)
     deportesFavoritos = DeporteSerializer(many=True, read_only=True)
+    email = serializers.SerializerMethodField()
     deportes_ids = serializers.PrimaryKeyRelatedField(
         many=True,
         queryset=Deporte.objects.all(),
@@ -74,10 +75,14 @@ class UsuarioFinalSerializer(serializers.ModelSerializer):
             "sexo",
             "rol",
             "user",
+            "email",
             "actividadesFavoritas",
             "instalacionesFavoritas",
             "password",
         )
+    
+    def get_email(self, obj):
+        return obj.user.email
 
     def get_actividadesFavoritas(self, obj):
         return list(
@@ -109,7 +114,7 @@ class UsuarioFinalSerializer(serializers.ModelSerializer):
 class MonitorSerializer(serializers.ModelSerializer):
     # La contraseña no se pasa cuando se hace un get, solo para modificarla
     password = serializers.CharField(write_only=True, required=False, allow_blank=True)
-    email = serializers.EmailField(source='user.email')
+    email = serializers.SerializerMethodField()
 
     class Meta:
         model = Monitor
@@ -122,6 +127,9 @@ class MonitorSerializer(serializers.ModelSerializer):
             "email",
             "password"
         )
+        
+    def get_email(self, obj):
+        return obj.user.email
         
     def update(self, instance, validated_data):
         user_data = validated_data.pop('user', {})
@@ -145,20 +153,24 @@ class MonitorSerializer(serializers.ModelSerializer):
 class MonitorSimpleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Monitor
-        fields = ("id", "nombre")
+        fields = ("id", 'DNI', "nombre")
 
 
 class AdministradorSimpleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Administrador
-        fields = ('id', 'nombre', 'rol')
+        fields = ('id', 'DNI', 'nombre', 'rol')
 
 
 class AdministradorSerializer(serializers.ModelSerializer):
+    email = serializers.SerializerMethodField()
+
     class Meta:
         model = Administrador
-        fields = '__all__'
+        fields = ('id', 'DNI', 'nombre', 'user', 'email', 'rol')
 
+    def get_email(self, obj):
+        return obj.user.email
 
 # --------------------
 # Abonos
@@ -206,6 +218,12 @@ class HorarioSerializer(serializers.ModelSerializer):
 # --------------------
 # Instalaciones
 # --------------------
+
+class PabellonSimpleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Pabellon
+        fields = ('id', 'nombre')
+
 
 class PabellonSerializer(serializers.ModelSerializer):
     class Meta:

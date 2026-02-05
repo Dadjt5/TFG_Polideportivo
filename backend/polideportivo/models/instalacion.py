@@ -10,6 +10,7 @@ class Pabellon(models.Model):
 
     nombre = models.CharField(max_length=256, blank=True)
     descripcion = models.CharField(max_length=1024, blank=True)
+    imagenURL = models.CharField(max_length=2048, blank=True)
     direccion = models.CharField(max_length=256, blank=True)
 
     def __str__(self):

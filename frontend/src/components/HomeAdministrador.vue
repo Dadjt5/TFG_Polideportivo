@@ -1,7 +1,7 @@
 <template>
   <div class="min-vh-100 bg-light">
     <main class="container py-4">
-      <h1 class="text-center fs-2 fw-bold mb-5">{{ t.monitorHomeTitle }} {{ administradorStore.administrador.nombre }}</h1>
+      <h1 class="text-center fs-2 fw-bold mb-5">{{ t.monitorHomeTitle }} {{ administradorStore.administrador?.nombre }}</h1>
 
        <div class="col-lg-12">
           <div class="card shadow-sm border-0 mb-4">
@@ -130,8 +130,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, type Ref, inject, reactive } from 'vue';
-import { User, Calendar, Settings, BarChart, Wallet, Building } from 'lucide-vue-next';
+import { onMounted, type Ref, inject } from 'vue';
 
 import { useAuthStore } from '../stores/auth';
 import { useAdministradorStore } from '../stores/administrador';
@@ -153,7 +152,6 @@ onMounted(async () => {
   if (administradorStore.notificaciones.length === 0) {
     await administradorStore.fetchNotificaciones();
   }
-
   administradorStore.comenzarIntervalo();
 });
 </script>

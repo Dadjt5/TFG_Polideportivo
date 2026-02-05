@@ -10,6 +10,7 @@ import Login from '../components/Login.vue'
 import Registro from '../components/Registro.vue'
 import DetalleActividad from '../components/DetalleActividad.vue'
 import DetalleInstalacion from '../components/DetalleInstalacion.vue'
+import DetallePabellon from '../components/DetallePabellon.vue'
 import Notificaciones from '../components/Notificaciones.vue'
 import Perfil from '../components/Perfil.vue'
 import ComprarAbonosBonos from '../components/ComprarAbonosBonos.vue'
@@ -31,6 +32,7 @@ import GestionarUsuarios from '../components/GestionarUsuarios.vue'
 import DetalleUsuarioFinal from '../components/DetalleUsuarioFinal.vue'
 import DetalleMonitor from '../components/DetalleMonitor.vue'
 import DetalleAdministrador from '../components/DetalleAdministrador.vue'
+import GestionarEspacios from '../components/GestionarEspacios.vue'
 
 const routes = [
   { path: '/', redirect: '/home' },
@@ -67,6 +69,13 @@ const routes = [
     path: '/instalaciones/:id',
     component: DetalleInstalacion,
     name: 'detalle-instalacion',
+    props: true,
+    meta: { public: true }
+  },
+  {
+    path: '/pabellones/:id',
+    component: DetallePabellon,
+    name: 'detalle-pabellon',
     props: true,
     meta: { public: true }
   },
@@ -124,6 +133,7 @@ const routes = [
     meta: { requiresAuth: true }
   },
   { path: '/gestion/usuarios', component: GestionarUsuarios, name: 'gestion-usuarios', meta: { requiresAuth: true } },
+  { path: '/gestion/espacios', component: GestionarEspacios, name: 'gestion-espacios', meta: { requiresAuth: true } },
 ]
 
 /* Cada vez que se accede a una página se redirige el scrollbar arriba */

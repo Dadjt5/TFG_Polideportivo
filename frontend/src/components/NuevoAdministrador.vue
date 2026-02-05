@@ -96,7 +96,7 @@
 
           <button
             class="btn btn-danger btn-lg px-5"
-            @click="router.back()"
+            @click="volver"
           >
             {{ t.return }}
           </button>
@@ -180,5 +180,9 @@ const crearAdministrador = async () => {
       mensaje.value = t.value.unexpectedError
     }
   }
+}
+
+function volver() {
+  router.back()
 }
 </script>

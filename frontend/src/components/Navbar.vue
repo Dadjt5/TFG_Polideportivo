@@ -28,19 +28,19 @@
         </li>
 
         <li class="nav-item fs-5">
-          <router-link to="/foro" v-if="userStore.role === 'usuario_final' || userStore.role === 'admin'" class="nav-link px-3 text-white">
+          <router-link to="/foro" v-if="userStore.role === 'usuario_final' || userStore.role === 'administrador'" class="nav-link px-3 text-white">
             {{ t.forum }}
           </router-link>
         </li>
 
         <li class="nav-item fs-5">
-          <router-link to="/contacto" v-if="userStore.role !== 'admin'" class="nav-link px-3 text-white">
+          <router-link to="/contacto" v-if="userStore.role !== 'administrador'" class="nav-link px-3 text-white">
             {{ t.contact }}
           </router-link>
         </li>
 
         <li class="nav-item fs-5">
-          <router-link to="/faq" v-if="userStore.role !== 'admin'" class="nav-link px-3 text-white">
+          <router-link to="/faq" v-if="userStore.role !== 'administrador'" class="nav-link px-3 text-white">
             {{ t.faq }}
           </router-link>
         </li>

@@ -80,5 +80,6 @@ urlpatterns = [
     path("tarifas/actividades/<int:actividad_id>/", views.TarifaActividadView.as_view(), name="tarifa-actividad"),
     path("tarifas/instalaciones/<int:instalacion_id>/", views.TarifaInstalacionView.as_view(), name="tarifa-instalacion"),
     path("usuarios/", views.GestionUsuariosView.as_view(), name="obtener-usuarios"),
+    path("espacios/", views.GestionEspaciosView.as_view(), name="obtener-espacios"),
     path('', include(router.urls)),
 ]

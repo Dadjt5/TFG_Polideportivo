@@ -24,7 +24,7 @@ from .serializers import (
     TDASerializer, UsuarioFinalSerializer, UserSerializer, AdministradorSerializer,
     CompraBonoSerializer, CompraAbonoSerializer, MensajeSerializer, SesionSerializer,
     MapaReservasSerializer, AdministradorSimpleSerializer, MonitorSimpleSerializer,
-    UsuarioFinalSimpleSerializer
+    UsuarioFinalSimpleSerializer, PabellonSimpleSerializer
 )
 
 from polideportivo.models import (
@@ -292,7 +292,11 @@ class MonitorViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Monitor.objects.filter(user=self.request.user)
+        user = self.request.user
+        if user.is_monitor:
+            return Monitor.objects.filter(user=self.request.user)
+        elif user.is_administrador:
+            return Monitor.objects.all()
 
     def update(self, request, *args, **kwargs):
         monitor = self.get_queryset().first()
@@ -970,6 +974,24 @@ class GestionUsuariosView(APIView):
             "usuariosFinales": serializerUser.data,
             "monitores": serializerMonitores.data,
             "administradores": serializerAdministradores.data
+        }
+
+        return Response(data)
+
+
+class GestionEspaciosView(APIView):
+    permission_classes = [IsAdministrador]
+
+    def get(self, request):
+        pabellones = Pabellon.objects.all().order_by('nombre')
+        serializerPabellon = PabellonSimpleSerializer(pabellones, many=True)
+
+        instalaciones = Instalacion.objects.all().order_by('nombre')
+        serializerInstalaciones = MonitorSimpleSerializer(instalaciones, many=True)
+
+        data = {
+            "pabellones": serializerPabellon.data,
+            "instalaciones": serializerInstalaciones.data
         }
 
         return Response(data)

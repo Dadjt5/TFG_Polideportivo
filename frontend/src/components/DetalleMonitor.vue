@@ -1,10 +1,8 @@
 <template>
   <div class="min-vh-100 bg-light pb-5">
     <main class="container py-5" style="max-width: 900px">
-
-      <!-- CABECERA -->
       <div class="d-flex justify-content-between align-items-center mb-4">
-        <button class="btn btn-secondary rounded-pill" @click="$router.back()">
+        <button class="btn btn-secondary rounded-pill" @click="volver">
           ← {{ t.return }}
         </button>
 
@@ -13,7 +11,6 @@
         <div style="width: 100px"></div>
       </div>
 
-      <!-- CARD PRINCIPAL -->
       <div class="card shadow-sm rounded-4">
         <div class="card-body p-4 p-md-5">
 
@@ -76,6 +73,14 @@
               />
               <p v-else class="form-control-plaintext">
                 {{ monitor.DNI || '-' }}
+              </p>
+            </div>
+
+            <!-- Correo -->
+            <div class="col-md-4">
+              <label class="form-label">{{ t.email }}</label>
+              <p class="form-control-plaintext">
+                {{ monitor.email }}
               </p>
             </div>
 
@@ -148,7 +153,8 @@ const monitor = ref({
   id: 0,
   nombre: '',
   apellidos: '',
-  DNI: ''
+  DNI: '',
+  email:''
 })
 
 const monitorOriginal = ref<any>(null)
@@ -224,13 +230,18 @@ async function guardarCambios() {
   }
 }
 
+function volver() {
+  router.back()
+}
+
 onMounted(async () => {
+  const id = parseInt(props.id)
+
   try {
-    const id = parseInt(props.id)
     monitor.value = await getMonitor(id)
     monitorOriginal.value = JSON.parse(JSON.stringify(monitor.value))
   } catch (e) {
-    console.error('Error al cargar el monitor', e)
+    console.error('Error al obtener informacion del monitor', e)
   }
 })
 </script>

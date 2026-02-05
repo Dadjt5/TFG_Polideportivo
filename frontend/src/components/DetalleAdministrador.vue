@@ -2,9 +2,8 @@
   <div class="min-vh-100 bg-light pb-5">
     <main class="container py-5" style="max-width: 900px">
 
-      <!-- CABECERA -->
       <div class="d-flex justify-content-between align-items-center mb-4">
-        <button class="btn btn-secondary rounded-pill" @click="$router.back()">
+        <button class="btn btn-secondary rounded-pill" @click="volver">
           ← {{ t.return }}
         </button>
 
@@ -13,16 +12,13 @@
         <div style="width: 100px"></div>
       </div>
 
-      <!-- CARD -->
       <div class="card shadow-sm rounded-4">
         <div class="card-body p-4 p-md-5">
 
           <!-- ADMIN -->
           <div class="d-flex flex-column flex-md-row align-items-center gap-4 mb-4">
-            <div
-              class="rounded-circle bg-danger bg-opacity-10 d-flex align-items-center justify-content-center"
-              style="width:96px;height:96px"
-            >
+            <div class="rounded-circle bg-danger bg-opacity-10 d-flex align-items-center justify-content-center"
+              style="width:96px;height:96px">
               <i class="bi bi-shield-lock-fill text-danger fs-1"></i>
             </div>
 
@@ -40,12 +36,8 @@
             <!-- NOMBRE -->
             <div class="col-md-4">
               <label class="form-label">{{ t.name }}</label>
-              <input
-                v-if="isEditing"
-                class="form-control"
-                v-model="admin.nombre"
-                :class="{ 'is-invalid': errores.nombre }"
-              />
+              <input v-if="isEditing" class="form-control" v-model="admin.nombre"
+                :class="{ 'is-invalid': errores.nombre }" />
               <p v-else class="form-control-plaintext">
                 {{ admin.nombre || '-' }}
               </p>
@@ -54,12 +46,7 @@
             <!-- DNI -->
             <div class="col-md-4">
               <label class="form-label">DNI</label>
-              <input
-                v-if="isEditing"
-                class="form-control"
-                v-model="admin.DNI"
-                :class="{ 'is-invalid': errores.DNI }"
-              />
+              <input v-if="isEditing" class="form-control" v-model="admin.DNI" :class="{ 'is-invalid': errores.DNI }" />
               <p v-else class="form-control-plaintext">
                 {{ admin.DNI || '-' }}
               </p>
@@ -68,19 +55,25 @@
             <!-- ROL -->
             <div class="col-md-4">
               <label class="form-label">{{ t.role }}</label>
-              <select
-                v-if="isEditing"
-                class="form-select"
-                v-model="admin.rol"
-                :class="{ 'is-invalid': errores.rol }"
-              >
-                <option value="USUARIOS">Usuarios</option>
-                <option value="RESERVAS">Reservas</option>
-                <option value="TOTAL">Total</option>
+              <select v-if="isEditing" class="form-select form-select-lg" :class="{ 'is-invalid': errores.rol }"
+                v-model="admin.rol">
+                <option value="" disabled>{{ t.selectOption }}</option>
+                <option value="RAIZ">{{ t.rootAdmin }}</option>
+                <option value="USUARIOS">{{ t.usersAdmin }}</option>
+                <option value="ESPACIOS">{{ t.spacesAdmin }}</option>
+                <option value="TARIFAS">{{ t.tariffsAdmin }}</option>
               </select>
 
               <p v-else class="form-control-plaintext">
                 {{ admin.rol || '-' }}
+              </p>
+            </div>
+
+            <!-- Correo -->
+            <div class="col-md-4">
+              <label class="form-label">{{ t.email }}</label>
+              <p class="form-control-plaintext">
+                {{ admin.email }}
               </p>
             </div>
 
@@ -89,36 +82,23 @@
           <!-- ACCIONES -->
           <div class="d-flex justify-content-center gap-4 mt-5">
 
-            <button
-              v-if="!isEditing"
-              class="btn btn-primary btn-lg rounded-pill"
-              @click="activarEdicion"
-            >
+            <button v-if="!isEditing" class="btn btn-primary btn-lg rounded-pill" @click="activarEdicion">
               <i class="bi bi-pencil me-2"></i>
               {{ t.modifyUser }}
             </button>
 
             <template v-else>
-              <button
-                class="btn btn-success btn-lg rounded-pill"
-                @click="guardarCambios"
-              >
+              <button class="btn btn-success btn-lg rounded-pill" @click="guardarCambios">
                 <i class="bi bi-check-lg me-2"></i>
                 {{ t.saveChanges }}
               </button>
 
-              <button
-                class="btn btn-secondary btn-lg rounded-pill"
-                @click="cancelarEdicion"
-              >
+              <button class="btn btn-secondary btn-lg rounded-pill" @click="cancelarEdicion">
                 {{ t.cancel }}
               </button>
             </template>
 
-            <button
-              v-if="!isEditing"
-              class="btn btn-danger btn-lg rounded-pill"
-            >
+            <button v-if="!isEditing" class="btn btn-danger btn-lg rounded-pill">
               <i class="bi bi-trash me-2"></i>
               {{ t.deleteUser }}
             </button>
@@ -152,6 +132,7 @@ const admin = ref({
   id: 0,
   nombre: '',
   DNI: '',
+  email: '',
   rol: ''
 })
 
@@ -226,6 +207,10 @@ async function guardarCambios() {
   } catch (e) {
     console.error('Error al modificar el administrador', e)
   }
+}
+
+function volver() {
+  router.back()
 }
 
 onMounted(async () => {

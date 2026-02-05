@@ -1,10 +1,8 @@
 <template>
   <div class="min-vh-100 bg-light pb-5">
     <main class="container py-5" style="max-width: 1100px">
-
-      <!-- CABECERA -->
       <div class="d-flex justify-content-between align-items-center mb-4">
-        <button class="btn btn-secondary rounded-pill">
+        <button class="btn btn-secondary rounded-pill" @click="volver">
           ← {{ t.return }}
         </button>
 
@@ -13,7 +11,6 @@
         <div style="width: 100px"></div>
       </div>
 
-      <!-- CARD PRINCIPAL -->
       <div class="card shadow-sm rounded-4">
         <div class="card-body p-4 p-md-5">
 
@@ -195,6 +192,14 @@
                 {{ usuario.actividadesRealizadas }}
               </p>
             </div>
+
+            <!-- Correo -->
+            <div class="col-md-4">
+              <label class="form-label">{{ t.email }}</label>
+              <p class="form-control-plaintext">
+                {{ usuario.email }}
+              </p>
+            </div>
           </div>
 
           <!-- ESTADOS -->
@@ -278,6 +283,7 @@
 
 <script setup lang="ts">
 import { type Ref, ref, inject, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 
 import { getUsuarioFinal, modificarUsuarioFinal } from '../services/usuarioFinalService';
 
@@ -290,6 +296,7 @@ const props = defineProps<{ id: string }>();
 const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);
 
+const router = useRouter()
 const isEditing = ref(false);
 
 const usuario = ref({
@@ -297,6 +304,7 @@ const usuario = ref({
   nombre: '',
   apellidos: '',
   DNI: '',
+  email: '',
   sexo: '',
   fechaNacimiento: '',
   telefono: '',
@@ -327,7 +335,7 @@ const errores = ref({
 })
 
 
-const usuarioModificado = ref<any>(null);
+const usuarioOriginal = ref<any>(null);
 
 function validarFormulario() {
   let valido = true
@@ -359,13 +367,13 @@ function validarFormulario() {
 }
 
 function activarEdicion() {
-  usuarioModificado.value = JSON.parse(JSON.stringify(usuario.value))
+  usuarioOriginal.value = JSON.parse(JSON.stringify(usuario.value))
 	Object.keys(errores.value).forEach(k => errores.value[k] = false)
   isEditing.value = true
 }
 
 function cancelarEdicion() {
-  usuarioModificado.value = JSON.parse(JSON.stringify(usuario.value))
+  usuarioOriginal.value = JSON.parse(JSON.stringify(usuario.value))
   isEditing.value = false
 }
 
@@ -373,47 +381,47 @@ function cancelarEdicion() {
 function camposModificados() {
   const data: any = {}
 
-	if(usuarioModificado.value.nombre != usuario.value.nombre) {
+	if(usuarioOriginal.value.nombre != usuario.value.nombre) {
       data["nombre"] = usuario.value.nombre
   }
 
-	if(usuarioModificado.value.apellidos != usuario.value.apellidos) {
+	if(usuarioOriginal.value.apellidos != usuario.value.apellidos) {
       data["apellidos"] = usuario.value.apellidos
   }
 
-	if(usuarioModificado.value.DNI != usuario.value.DNI) {
+	if(usuarioOriginal.value.DNI != usuario.value.DNI) {
       data["DNI"] = usuario.value.DNI
   }
 
-  if(usuarioModificado.value.sexo != usuario.value.sexo) {
+  if(usuarioOriginal.value.sexo != usuario.value.sexo) {
       data["sexo"] = usuario.value.sexo
   }
 
-  if(usuarioModificado.value.telefono != usuario.value.telefono) {
+  if(usuarioOriginal.value.telefono != usuario.value.telefono) {
     data["telefono"] = usuario.value.telefono
   }
 
-  if(usuarioModificado.value.provincia != usuario.value.provincia) {
+  if(usuarioOriginal.value.provincia != usuario.value.provincia) {
     data["provincia"] = usuario.value.provincia
   }
 
-  if(usuarioModificado.value.municipio != usuario.value.municipio) {
+  if(usuarioOriginal.value.municipio != usuario.value.municipio) {
     data["municipio"] = usuario.value.municipio
   }
 
-  if(usuarioModificado.value.localidad != usuario.value.localidad) {
+  if(usuarioOriginal.value.localidad != usuario.value.localidad) {
     data["localidad"] = usuario.value.localidad
   }
 
-  if(usuarioModificado.value.codigoPostal != usuario.value.codigoPostal) {
+  if(usuarioOriginal.value.codigoPostal != usuario.value.codigoPostal) {
     data["codigoPostal"] = usuario.value.codigoPostal
   }
 
-  if(usuarioModificado.value.cuentaBancaria != usuario.value.cuentaBancaria) {
+  if(usuarioOriginal.value.cuentaBancaria != usuario.value.cuentaBancaria) {
     data["cuentaBancaria"] = usuario.value.cuentaBancaria
   }
 
-  const favoritosActuales = ((usuarioModificado.value.deportes as {id: number, titulo: string}[]) || []).map(d => d.id).sort()
+  const favoritosActuales = ((usuarioOriginal.value.deportes as {id: number, titulo: string}[]) || []).map(d => d.id).sort()
   const favoritosNuevosIds = [...usuario.value.deportesFavoritos].sort()
 
   if(JSON.stringify(favoritosActuales) !== JSON.stringify(favoritosNuevosIds)) {
@@ -436,12 +444,16 @@ const guardarCambios = async () => {
   }
 }
 
+function volver() {
+  router.back()
+}
+
 onMounted(async () => {
   const id = parseInt(props.id);
 
 	try {
 	  usuario.value = await getUsuarioFinal(id);
-		usuarioModificado.value = JSON.parse(JSON.stringify(usuario.value))
+		usuarioOriginal.value = JSON.parse(JSON.stringify(usuario.value))
 	} catch(e) {
 		console.log("Error al obtener informacion del usuario final", e);
 	}

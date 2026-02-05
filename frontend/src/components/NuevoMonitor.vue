@@ -84,6 +84,7 @@
 
           <button
             class="btn btn-danger btn-lg px-5"
+            @click="volver"
           >
             {{ t.return }}
           </button>
@@ -172,4 +173,8 @@ const crearMonitor = async () => {
     }
   }
 };
+
+function volver() {
+  router.back()
+}
 </script>
