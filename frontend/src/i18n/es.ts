@@ -139,13 +139,18 @@ export default {
   monitorName: "Nombre del monitor",
   return: "Volver",
 
-  /* DetalleInstalacion */
+  /* Detalle instalacion */
   capacity: "Capacidad",
   light: "Luz",
   tdaPercent: "Porcentaje de TDA",
   yes: "Si",
   openHour: "Hora de apertura",
   closeHour: "Hora de cierre",
+
+  /* Detalle pabellon */
+  pavilionDetail: "Detalles del pabellón",
+  description: "Descripción",
+  noDescription: "Sin descripción",
 
   /* Notificaciones */
   notSubtitle: "Consulta y gestiona tus avisos del polideportivo",
@@ -318,6 +323,12 @@ export default {
   spacesAdmin: "Administrador de espacios",
   usersAdmin: "Administrador de usuarios",
   tariffsAdmin: "Administrador de tarifas",
+
+  /* Gestion espacios */
+  newPavilion: "Nuevo pabellon",
+  newFacility: "Nueva instalacion",
+  modifyPavilion: "Editar pabellón",
+  modifyFacility: "Editar instalación",
 
   /* Contacto */
   contactTitle: "Contacto con el centro deportivo",

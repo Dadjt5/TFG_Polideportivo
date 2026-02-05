@@ -166,10 +166,15 @@ const reservar = () => {
 
 const volver = () => {
   router.back();
-}
+};
 
 onMounted(async () => {
   const id = parseInt(props.id);
-  instalacion.value = await getInstalacionDetalle(id);
+
+  try {
+    instalacion.value = await getInstalacionDetalle(id);
+  } catch(e) {
+    console.log("Error al obtener la informacion de instalaciones", e);
+  }
 });
 </script>

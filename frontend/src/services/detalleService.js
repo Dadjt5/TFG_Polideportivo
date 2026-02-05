@@ -6,11 +6,53 @@ export const getActividadDetalle = async (id) => {
   return response.data;
 };
 
+/* Función para editar los campos indicados de una actividad */
+export const modificarActividad = async (id, data) => {
+  const response = await api.patch(`api/v1/actividades/${id}/`, data)
+  return response.data
+}
+
+/* Función para eliminar una actividad */
+export const eliminarActividad = async (id) => {
+  const response = await api.delete(`api/v1/actividades/${id}/`)
+  return response.data
+}
+
 /* Función para obtener la informacion de una instalacion */
 export const getInstalacionDetalle = async (id) => {
   const response = await api.get(`/api/v1/instalaciones/${id}/`);
   return response.data;
 };
+
+/* Función para editar los campos indicados de una instalacion */
+export const modificarInstalacion = async (id, data) => {
+  const response = await api.patch(`api/v1/instalaciones/${id}/`, data)
+  return response.data
+}
+
+/* Función para eliminar una instalacion */
+export const eliminarInstalacion = async (id) => {
+  const response = await api.delete(`api/v1/instalaciones/${id}/`)
+  return response.data
+}
+
+/* Función para obtener la informacion de un pabellon */
+export const getPabellon = async (id) => {
+  const response = await api.get(`/api/v1/pabellones/${id}/`);
+  return response.data;
+};
+
+/* Función para editar los campos indicados de un pabellón */
+export const modificarPabellon = async (id, data) => {
+  const response = await api.patch(`api/v1/pabellones/${id}/`, data)
+  return response.data
+}
+
+/* Función para eliminar un pabellón */
+export const eliminarPabellon = async (id) => {
+  const response = await api.delete(`api/v1/pabellones/${id}/`)
+  return response.data
+}
 
 /* Función para obtener la informacion de instalaciones y actividades indicadas */
 export const getActividadesInstalaciones = async (payload) => {

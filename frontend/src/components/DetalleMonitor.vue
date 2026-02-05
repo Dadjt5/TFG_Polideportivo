@@ -118,6 +118,7 @@
             <button
               v-if="!isEditing"
               class="btn btn-danger btn-lg rounded-pill"
+              @click="eliminar"
             >
               <i class="bi bi-trash me-2"></i>
               {{ t.deleteUser }}
@@ -135,7 +136,7 @@
 import { ref, inject, onMounted, type Ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { getMonitor, modificarMonitor } from '../services/monitorService'
+import { getMonitor, modificarMonitor, eliminarMonitor } from '../services/monitorService'
 
 import type { Language } from '../useI18N'
 import { useI18n } from '../useI18N'
@@ -227,6 +228,14 @@ async function guardarCambios() {
     isEditing.value = false
   } catch (e) {
     console.error('Error al modificar el monitor', e)
+  }
+}
+
+const eliminar = async () => {
+  try {
+    await eliminarMonitor(monitor.value.id)
+  } catch (e) {
+    console.error("Error al eliminar el monitor", e);
   }
 }
 

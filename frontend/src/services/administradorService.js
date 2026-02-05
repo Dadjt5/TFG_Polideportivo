@@ -10,4 +10,10 @@ export const getAdministrador = async (id) => {
 export const modificarAdministrador = async (id, data) => {
   const response = await api.patch(`api/v1/administradores/${id}/`, data)
   return response.data
-}
+};
+
+/* Función para eliminar un administrador */
+export const eliminarAdministrador = async (id) => {
+  const response = await api.patch(`api/v1/administradores/${id}/`)
+  return response.data
+};

@@ -11,11 +11,11 @@
           <!-- PABELLONES -->
           <div class="mb-5">
             <div class="d-flex justify-content-between align-items-center mb-3">
-              <h5 class="fw-semibold text-primary">
+              <h5 class="fw-semibold text-success">
                 <i class="bi bi-building me-2"></i>{{ t.pavilions }}
               </h5>
               <button class="btn btn-primary rounded-pill">
-                <i class="bi bi-plus-lg me-1"></i> {{ t.new }}
+                <i class="bi bi-plus-lg me-1"></i> {{ t.newPavilion }}
               </button>
             </div>
 
@@ -25,12 +25,9 @@
                 :key="p.id"
                 class="list-group-item d-flex justify-content-between align-items-center rounded-3 mb-2 shadow-sm"
               >
-                <span class="fw-medium">{{ p.nombre }}</span>
-                <button
-                  class="btn btn-success btn-sm rounded-pill"
-                  @click="verPabellon(p.id)"
-                >
-                </button>
+                <div class="text-primary fw-medium" style="cursor: pointer;" @click="PabellonDetail(p.id)">
+                  <span class="fw-medium">{{ p.nombre }}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -42,7 +39,7 @@
                 <i class="bi bi-geo-alt me-2"></i>{{ t.facilities }}
               </h5>
               <button class="btn btn-primary rounded-pill">
-                <i class="bi bi-plus-lg me-1"></i> {{ t.new }}
+                <i class="bi bi-plus-lg me-1"></i> {{ t.newFacility }}
               </button>
             </div>
 
@@ -52,12 +49,10 @@
                 :key="i.id"
                 class="list-group-item d-flex justify-content-between align-items-center rounded-3 mb-2 shadow-sm"
               >
-                <span class="fw-medium">{{ i.nombre }}</span>
-                <button
-                  class="btn btn-success btn-sm rounded-pill"
-                  @click="verInstalacion(i.id)"
-                >
-                </button>
+								<div class="text-primary fw-medium" style="cursor: pointer;" @click="InstalacionDetail(i.id)">
+                  <span class="fw-medium">{{ i.nombre }}</span>
+                </div>
+
               </div>
             </div>
           </div>
@@ -93,14 +88,14 @@ const espacios = ref({
   }[],
 })
 
-const verPabellon = (id: number) => {
+const PabellonDetail = (id: number) => {
   router.push({
     name: "detalle-pabellon",
     params: { id }
   })
 }
 
-const verInstalacion = (id: number) => {
+const InstalacionDetail = (id: number) => {
   router.push({
     name: "detalle-instalacion",
     params: { id }

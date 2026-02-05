@@ -137,13 +137,18 @@ export default {
   monitorName: "Monitor name",
   return: "Return",
 
-  /* DetalleInstalacion */
+  /* Detalle instalacion */
   capacity: "Capacity",
   light: "Light",
   tdaPercent: "TDA percentage",
   yes: "Yes",
   openHour: "Opening time",
   closeHour: "Closing time",
+
+  /* Detalle pabellon */
+  pavilionDetail: "Pavilion detail",
+  description: "Description",
+  noDescription: "No description",
 
   /* Notificaciones */
   notSubtitle: "Check and manage your sports center alerts",
@@ -316,6 +321,12 @@ export default {
   spacesAdmin: "Space manager",
   usersAdmin: "User manager",
   tariffsAdmin: "Tariff manager",
+
+  /* Gestion espacios */
+  newPavilion: "New pavilion",
+  newFacility: "New facility",
+  modifyPavilion: "Modify pavilion",
+  modifyFacility: "Modify facility",
 
   /* Contacto */
   contactTitle: "Sports Center Contact",

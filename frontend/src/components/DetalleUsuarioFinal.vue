@@ -268,6 +268,7 @@
             <button
               v-if="!isEditing"
               class="btn btn-danger btn-lg rounded-pill"
+              @click="eliminar"
             >
               <i class="bi bi-trash me-2"></i>
               {{ t.deleteUser }}
@@ -285,7 +286,7 @@
 import { type Ref, ref, inject, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { getUsuarioFinal, modificarUsuarioFinal } from '../services/usuarioFinalService';
+import { getUsuarioFinal, modificarUsuarioFinal, eliminarUsuarioFinal } from '../services/usuarioFinalService';
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
 import type { Language } from "../useI18N";
@@ -441,6 +442,14 @@ const guardarCambios = async () => {
     }
   } catch (e) {
     console.error("Error al modificar el usuario final", e);
+  }
+}
+
+const eliminar = async () => {
+  try {
+    await eliminarUsuarioFinal(usuario.value.id)
+  } catch (e) {
+    console.error("Error al eliminar el usuario final", e);
   }
 }
 

@@ -12,6 +12,12 @@ export const modificarUsuarioFinal = async (id, data) => {
   return response.data
 }
 
+/* Función para eliminar un usuario final */
+export const eliminarUsuarioFinal = async (id) => {
+  const response = await api.patch(`api/v1/usuariosFinales/${id}/`)
+  return response.data
+}
+
 /* Función para recuperar la TDA */
 export const getTDA = async () => {
   const response = await api.get('api/v1/tdas/')

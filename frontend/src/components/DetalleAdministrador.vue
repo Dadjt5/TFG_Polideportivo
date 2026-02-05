@@ -98,7 +98,7 @@
               </button>
             </template>
 
-            <button v-if="!isEditing" class="btn btn-danger btn-lg rounded-pill">
+            <button v-if="!isEditing" class="btn btn-danger btn-lg rounded-pill" @click="eliminar">
               <i class="bi bi-trash me-2"></i>
               {{ t.deleteUser }}
             </button>
@@ -114,7 +114,7 @@
 import { ref, inject, onMounted, type Ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { getAdministrador, modificarAdministrador } from '../services/administradorService'
+import { getAdministrador, modificarAdministrador, eliminarAdministrador } from '../services/administradorService'
 
 import type { Language } from '../useI18N'
 import { useI18n } from '../useI18N'
@@ -206,6 +206,14 @@ async function guardarCambios() {
     isEditing.value = false
   } catch (e) {
     console.error('Error al modificar el administrador', e)
+  }
+}
+
+const eliminar = async () => {
+  try {
+    await eliminarAdministrador(admin.value.id)
+  } catch (e) {
+    console.error("Error al eliminar el administrador", e);
   }
 }
 
