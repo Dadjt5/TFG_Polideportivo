@@ -835,6 +835,7 @@ class DetalleSesionView(APIView):
         sesion = get_object_or_404(Sesion, id=sesion_id, actividad=actividad)
 
         data = {
+            "id": sesion.id,
             "dia": sesion.dia,
             "horaInicio": sesion.horario.horaInicio,
             "horaFin": sesion.horario.horaFin,

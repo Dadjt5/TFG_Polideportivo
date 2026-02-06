@@ -65,3 +65,15 @@ export const getSesionDetalle = async (idActividad, idSesion) => {
   const response = await api.get(`/api/v1/actividades/${idActividad}/sesiones/${idSesion}/`);
   return response.data;
 };
+
+/* Función para editar los campos indicados de una sesion */
+export const modificarSesion = async (id, data) => {
+  const response = await api.patch(`api/v1/sesiones/${id}/`, data)
+  return response.data
+}
+
+/* Función para eliminar una sesion */
+export const eliminarSesion = async (id) => {
+  const response = await api.delete(`api/v1/sesiones/${id}/`)
+  return response.data
+}

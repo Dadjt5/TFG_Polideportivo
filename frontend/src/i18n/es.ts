@@ -119,7 +119,7 @@ export default {
   unexpectedError: "Ha ocurrido un error, pruebe mas tarde",
   registerSuccess: "Registro completado",
 
-  /* DetalleActividad */
+  /* Detalle Actividad */
   activityDetails: "Detalles de la actividad",
   facilityDetails: "Detalles de la instalación",
   sessions: "Sesiones",
@@ -130,6 +130,7 @@ export default {
   status: "Estado",
   minimumAge: "Edad mínima",
   availablePlaces: "Plazas disponibles",
+  reservedPlaces: "Plazas reservadas",
   level: "Nivel",
   reserveType: "Tipo de reserva",
   terrainType: "Tipo de terreno",

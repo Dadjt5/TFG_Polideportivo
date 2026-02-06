@@ -33,6 +33,9 @@ import DetalleUsuarioFinal from '../components/DetalleUsuarioFinal.vue'
 import DetalleMonitor from '../components/DetalleMonitor.vue'
 import DetalleAdministrador from '../components/DetalleAdministrador.vue'
 import GestionarEspacios from '../components/GestionarEspacios.vue'
+import EditarInstalacion from '../components/EditarInstalacion.vue'
+import EditarActividad from '../components/EditarActividad.vue'
+import EditarSesion from '../components/EditarSesion.vue'
 
 const routes = [
   { path: '/', redirect: '/home' },
@@ -66,11 +69,25 @@ const routes = [
     meta: { public: true }
   },
   {
+    path: '/admin/actividades/:id',
+    component: EditarActividad,
+    name: 'editar-actividad',
+    props: true,
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/instalaciones/:id',
     component: DetalleInstalacion,
     name: 'detalle-instalacion',
     props: true,
     meta: { public: true }
+  },
+  {
+    path: '/admin/instalaciones/:id/',
+    component: EditarInstalacion,
+    name: 'editar-instalacion',
+    props: true,
+    meta: { requiresAuth: true }
   },
   {
     path: '/pabellones/:id',
@@ -104,6 +121,13 @@ const routes = [
     path: '/actividades/:idAct/sesiones/:idSesion',
     component: DetalleSesion,
     name: 'detalle-sesion',
+    props: true,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/admin/actividades/:idAct/sesiones/:idSesion',
+    component: EditarSesion,
+    name: 'editar-sesion',
     props: true,
     meta: { requiresAuth: true }
   },

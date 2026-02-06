@@ -117,7 +117,7 @@ export default {
     unexpectedError: "Something has gone wrong, try again later",
   registerSuccess: "Registration completed",
 
-  /* DetalleActividad */
+  /* Detalle Actividad */
   activityDetails: "Activity details",
   facilityDetails: "Facility details",
   sessions: "Sessions",
@@ -128,6 +128,7 @@ export default {
   status: "Status",
   minimumAge: "Minimum age",
   availablePlaces: "Available places",
+  reservedPlaces: "Reserved places",
   level: "Level",
   reserveType: "Reservation type",
   terrainType: "Terrain type",

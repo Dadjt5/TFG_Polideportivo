@@ -90,14 +90,14 @@ const espacios = ref({
 
 const PabellonDetail = (id: number) => {
   router.push({
-    name: "detalle-pabellon",
+    name: "editar-pabellon",
     params: { id }
   })
 }
 
 const InstalacionDetail = (id: number) => {
   router.push({
-    name: "detalle-instalacion",
+    name: "editar-instalacion",
     params: { id }
   })
 }
