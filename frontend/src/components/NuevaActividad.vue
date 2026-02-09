@@ -227,7 +227,7 @@ import { ref, inject, type Ref, onMounted } from "vue"
 import { useRouter } from "vue-router"
 
 import { nuevaActividad } from "../services/crearRecursos"
-import { getInstalacionesSimples, getMonitores } from "../services/listadoService"
+import { getInstalacionesSimples, getMonitoresSimples } from "../services/listadoService"
 
 import { useTiposStore } from "../stores/tipos"
 
@@ -320,6 +320,6 @@ const volver = () => router.back()
 
 onMounted(async () => {
   instalaciones.value = await getInstalacionesSimples()
-  monitores.value = await getMonitores()
+  monitores.value = await getMonitoresSimples()
 })
 </script>

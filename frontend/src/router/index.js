@@ -41,6 +41,7 @@ import NuevoPabellon from '../components/NuevoPabellon.vue'
 import NuevaSesion from '../components/NuevaSesion.vue'
 import NuevaActividad from '../components/NuevaActividad.vue'
 import GestionarActividades from '../components/GestionarActividades.vue'
+import GestionarTarifas from '../components/GestionarTarifas.vue'
 
 const routes = [
   { path: '/', redirect: '/home' },
@@ -165,9 +166,14 @@ const routes = [
   { path: '/crear/instalacion', component: NuevaInstalacion, name: 'crear-instalacion', meta: { requiresAuth: true } },
   { path: '/crear/actividad', component: NuevaActividad, name: 'crear-actividad', meta: { requiresAuth: true } },
   { path: '/crear/sesion', component: NuevaSesion, name: 'crear-sesion', meta: { requiresAuth: true } },
+  { path: '/crear/tarifa/instalacion', component: NuevaTarifaInstalacion, name: 'crear-tarifa-instalacion', meta: { requiresAuth: true } },
+  { path: '/crear/tarifa/comun', component: NuevaTarifaActividadComun, name: 'crear-tarifa-actividad-comun', meta: { requiresAuth: true } },
+  { path: '/crear/tarifa/grupos', component: NuevaTarifaGruposReducidos, name: 'crear-tarifa-grupo-reducido', meta: { requiresAuth: true } },
+  { path: '/crear/tarifa/fisioterapia', component: NuevaTarifaFisioterapia, name: 'crear-tarifa-fisioterapia', meta: { requiresAuth: true } },
   { path: '/gestion/usuarios', component: GestionarUsuarios, name: 'gestionar-usuarios', meta: { requiresAuth: true } },
   { path: '/gestion/espacios', component: GestionarEspacios, name: 'gestionar-espacios', meta: { requiresAuth: true } },
   { path: '/gestion/actividades', component: GestionarActividades, name: 'gestionar-actividades', meta: { requiresAuth: true } },
+  { path: '/gestion/tarifas', component: GestionarTarifas, name: 'gestionar-tarifas', meta: { requiresAuth: true } },
 ]
 
 /* Cada vez que se accede a una página se redirige el scrollbar arriba */

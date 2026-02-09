@@ -352,6 +352,26 @@ export default {
   createSession: "Crear sesión",
   day: "Día",
 
+  /* Gestion tarifas */
+  facilityTariff: "Tarifas de instalaciones",
+  commonActivityTariff: "Tarifas de actividades comunes",
+  smallGroupsTariff: "Tarifas de grupos reducidos",
+  physiotherapyTariff: "Tarifa de fisioterapia",
+  newTariff: "Nueva tarifa",
+
+  /* Configuracion */
+  configurationTitle: "Configuración del sistema",
+  configurationPlaceholder: "Escribe aquí la notificación...",
+  tabParams: "Parámetros",
+  tabNotifs: "Notificaciones",
+  notificationTitle: "Textos de notificaciones",
+  rfc2: "Aviso antes actividad",
+  rfc3: "Cambios o cancelaciones",
+  rfc4: "Material especial",
+  rfc5: "Problemas de pago",
+  rfc6: "Ausencias acumuladas",
+  rfc8: "Salida lista de espera",
+
   /* Contacto */
   contactTitle: "Contacto con el centro deportivo",
   contactSubtitle: "Información de contacto del edificio de administración",

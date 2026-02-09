@@ -49,8 +49,11 @@ router.register(r'reservasActividad', views.ReservaActividadViewSet, basename="r
 router.register(r'alquileres', views.AlquilerViewSet, basename="alquiler-instalacion")
 
 router.register(r'tarifasTDA', views.TarifaTDAViewSet, basename="tarifa-tda")
-router.register(r'tarifasActividad', views.TarifaActividadViewSet, basename="tarifa-actividad")
 router.register(r'tarifasInstalacion', views.TarifaInstalacionViewSet, basename="tarifa-instalacion")
+router.register(r'tarifasActividad', views.TarifaActividadViewSet, basename="tarifa-actividad")
+router.register(r'actividadesComunes', views.ActividadComunViewSet, basename="tarifa-actividad-comun")
+router.register(r'gruposReducidos', views.GrupoReducidoViewSet, basename="tarifa-grupo-reducido")
+router.register(r'fisioterapias', views.FisioterapiaViewSet, basename="tarifa-fisioterapia")
 
 router.register(r'tdas', views.TDAViewSet, basename="tda")
 
@@ -83,6 +86,7 @@ urlpatterns = [
     path("pabellones/simple/", views.PabellonSimpleViewSet.as_view(), name="pabellones-simple"),
     path("instalaciones/simple/", views.InstalacionSimpleViewSet.as_view(), name="instalaciones-simple"),
     path("actividades/simple/", views.ActividadSimpleViewSet.as_view(), name="actividades-simple"),
+    path("monitores/simple/", views.MonitorSimpleViewSet.as_view(), name="monitores-simple"),
     path("usuarios/", views.GestionUsuariosView.as_view(), name="obtener-usuarios"),
     path("espacios/", views.GestionEspaciosView.as_view(), name="obtener-espacios"),
     path('', include(router.urls)),

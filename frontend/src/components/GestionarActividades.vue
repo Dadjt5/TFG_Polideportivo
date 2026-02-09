@@ -14,9 +14,9 @@
               <h5 class="fw-semibold text-success">
                 <i class="bi bi-dumbbell me-2"></i>{{ t.activities }}
               </h5>
-              <button class="btn btn-primary rounded-pill">
+              <router-link to="/crear/actividad" class="btn btn-primary rounded-pill">
                 <i class="bi bi-plus-lg me-1"></i> {{ t.newActivity }}
-              </button>
+              </router-link>
             </div>
 
             <!-- BUSCADOR -->

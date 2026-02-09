@@ -9,7 +9,7 @@ from polideportivo.models import (
     EntradaListaEspera, TarifaTDA, Monitor, Notificacion, Pago, TarifaActividad, 
     TarifaInstalacion, TDA, UsuarioFinal, AbonoDeportivo, AbonoVerano, Pabellon, 
     ReservaActividad, Alquiler, Administrador, CompraBono, CompraAbono, Sesion,
-    Mensaje, MapaReservas
+    Mensaje, MapaReservas, GrupoReducido, ActividadComun, Fisioterapia
 )
 
 
@@ -639,15 +639,33 @@ class TarifaTDASerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class TarifaInstalacionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TarifaInstalacion
+        fields = '__all__'
+
+
 class TarifaActividadSerializer(serializers.ModelSerializer):
     class Meta:
         model = TarifaActividad
         fields = '__all__'
 
 
-class TarifaInstalacionSerializer(serializers.ModelSerializer):
+class ActividadComunSerializer(serializers.ModelSerializer):
     class Meta:
-        model = TarifaInstalacion
+        model = ActividadComun
+        fields = '__all__'
+
+
+class GrupoReduvidoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GrupoReducido
+        fields = '__all__'
+
+
+class FisioterapiaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Fisioterapia
         fields = '__all__'
 
 

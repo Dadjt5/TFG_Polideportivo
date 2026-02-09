@@ -14,9 +14,9 @@
               <h5 class="fw-semibold text-success">
                 <i class="bi bi-building me-2"></i>{{ t.pavilions }}
               </h5>
-              <button class="btn btn-primary rounded-pill">
+              <router-link to="/crear/pabellon" class="btn btn-primary rounded-pill">
                 <i class="bi bi-plus-lg me-1"></i> {{ t.newPavilion }}
-              </button>
+              </router-link>
             </div>
 
             <div class="list-group list-group-flush">
@@ -38,9 +38,9 @@
               <h5 class="fw-semibold text-success">
                 <i class="bi bi-geo-alt me-2"></i>{{ t.facilities }}
               </h5>
-              <button class="btn btn-primary rounded-pill">
+              <router-link to="/crear/instalacion" class="btn btn-primary rounded-pill">
                 <i class="bi bi-plus-lg me-1"></i> {{ t.newFacility }}
-              </button>
+              </router-link>
             </div>
 
             <div class="list-group list-group-flush">
@@ -86,21 +86,21 @@ const espacios = ref({
     id: 0,
     nombre: '',
   }[],
-})
+});
 
 const PabellonDetail = (id: number) => {
   router.push({
     name: "editar-pabellon",
     params: { id }
   })
-}
+};
 
 const InstalacionDetail = (id: number) => {
   router.push({
     name: "editar-instalacion",
     params: { id }
   })
-}
+};
 
 onMounted(async () => {
   const data = await getEspacios();

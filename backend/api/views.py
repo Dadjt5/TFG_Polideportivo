@@ -25,7 +25,8 @@ from .serializers import (
     CompraBonoSerializer, CompraAbonoSerializer, MensajeSerializer, SesionSerializer,
     MapaReservasSerializer, AdministradorSimpleSerializer, MonitorSimpleSerializer,
     UsuarioFinalSimpleSerializer, PabellonSimpleSerializer, ActividadSimpleSerializer,
-    InstalacionSimpleSerializer
+    InstalacionSimpleSerializer, ActividadComunSerializer, GrupoReducidoSerializer,
+    FisioterapiaSerializer
 )
 
 from polideportivo.models import (
@@ -35,7 +36,7 @@ from polideportivo.models import (
     TarifaInstalacion, TDA, UsuarioFinal, AbonoDeportivo, AbonoVerano, Pabellon, 
     ReservaActividad, Alquiler, Administrador, User, CompraBono, CompraAbono,
     Mensaje, Sesion, MapaReservas, TipoActividad, TipoInstalacion, TipoReserva,
-    Terreno, Estado, Dia
+    Terreno, Estado, Dia, ActividadComun, GrupoReducido, Fisioterapia
 )
 
 
@@ -328,6 +329,14 @@ class MonitorViewSet(viewsets.ModelViewSet):
         serializer.save()
         return Response(serializer.data)
 
+
+class MonitorSimpleViewSet(viewsets.ModelViewSet):
+    queryset = Monitor.objects.all()
+    serializer_class = MonitorSimpleSerializer
+    permission_classes = [IsAuthenticated]
+    authentication_classes = []
+
+
 # ----------------
 # Notificaciones
 # ----------------
@@ -390,16 +399,34 @@ class TarifaTDAViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
 
-class TarifaActividadViewSet(viewsets.ModelViewSet):
-    queryset = TarifaActividad.objects.all()
-    serializer_class = TarifaActividadSerializer
-    permission_classes = [IsAuthenticated]
-
-
 class TarifaInstalacionViewSet(viewsets.ModelViewSet):
     queryset = TarifaInstalacion.objects.all()
     serializer_class = TarifaInstalacionSerializer
     permission_classes = [IsAuthenticated]
+
+
+class TarifaActividadViewSet(viewsets.ModelViewSet):
+    queryset = TarifaActividad.objects.all()
+    serializer_class = TarifaActividadSerializer
+    permission_classes = [IsAdministrador]
+
+
+class ActividadComunViewSet(viewsets.ModelViewSet):
+    queryset = ActividadComun.objects.all()
+    serializer_class = ActividadComunSerializer
+    permission_classes = [IsAdministrador]
+
+
+class GrupoReducidoViewSet(viewsets.ModelViewSet):
+    queryset = GrupoReducido.objects.all()
+    serializer_class = GrupoReducidoSerializer
+    permission_classes = [IsAdministrador]
+
+
+class FisioterapiaViewSet(viewsets.ModelViewSet):
+    queryset = Fisioterapia.objects.all()
+    serializer_class = FisioterapiaSerializer
+    permission_classes = [IsAdministrador]
 
 
 # ----------------

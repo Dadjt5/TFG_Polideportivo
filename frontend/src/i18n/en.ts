@@ -114,7 +114,7 @@ export default {
   missing: "Missing or incorrect fields",
   duplicatedDNI: "There is already a user with that ID number.",
   duplicatedEmail: "There is already a user with that email.",
-    unexpectedError: "Something has gone wrong, try again later",
+  unexpectedError: "Something has gone wrong, try again later",
   registerSuccess: "Registration completed",
 
   /* Detalle Actividad */
@@ -332,7 +332,7 @@ export default {
   /* Nueva instalacion */
   maxCapacity: "Max capacity",
   createFacility: "Create facility",
- 
+
   /* Gestion de actividades */
   searchActivities: "Search for activities...",
 
@@ -349,6 +349,26 @@ export default {
   newSession: "New session",
   createSession: "Create session",
   day: "Day",
+
+  /* Gestion tarifas */
+  facilityTariff: "Facility tariff",
+  commonActivityTariff: "Common activities tariff",
+  smallGroupsTariff: "Small groups tariff",
+  physiotherapyTariff: "Physiotherapy tariff",
+  newTariff: "New tariff",
+
+  /* Configuracion */
+  configurationTitle: "System configuration",
+  configurationPlaceholder: "Write the notification message here...",
+  tabParams: "Settings",
+  tabNotifs: "Notifications",
+  notificationTitle: "Notification templates",
+  rfc2: "Activity reminder",
+  rfc3: "Changes or cancellations",
+  rfc4: "Special material",
+  rfc5: "Payment issues",
+  rfc6: "Accumulated absences",
+  rfc8: "Waitlist exit",
 
   /* Contacto */
   contactTitle: "Sports Center Contact",

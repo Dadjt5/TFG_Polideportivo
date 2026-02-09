@@ -7,59 +7,36 @@
 
       <div class="card shadow-sm border-0 rounded-4 p-4">
         <div class="row g-4">
-
-          <!-- HORARIO -->
-          <div class="col-md-6">
-            <label class="form-label fw-semibold">{{ t.schedule }}</label>
-            <select
-              class="form-select form-select-lg"
-              :class="{ 'is-invalid': errores.horario }"
-              v-model="sesion.horario"
-            >
+          <!-- DÍA -->
+          <div class="col-md-12">
+            <label class="form-label fw-semibold">{{ t.day }}</label>
+            <select class="form-select form-select-lg" :class="{ 'is-invalid': errores.dia }" v-model="sesion.dia">
               <option value="">{{ t.selectOption }}</option>
-              <option
-                v-for="h in horarios"
-                :key="h.id"
-                :value="h.id"
-              >
-                {{ h.horaInicio }} - {{ h.horaFin }}
+              <option v-for="d in tipoStore.dias" :key="d" :value="d">
+                {{ d }}
               </option>
             </select>
           </div>
 
-          <!-- DÍA -->
-          <div class="col-md-12">
-            <label class="form-label fw-semibold">{{ t.day }}</label>
-            <select
-              class="form-select form-select-lg"
-              :class="{ 'is-invalid': errores.dia }"
-              v-model="sesion.dia"
-            >
-              <option value="">{{ t.selectOption }}</option>
-              <option
-                v-for="d in tipoStore.dias"
-                :key="d"
-                :value="d"
-              >
-                {{ d }}
-              </option>
-            </select>
+          <!-- HORARIO -->
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">{{ t.schedule }}</label>
+            <div class="d-flex gap-2">
+              <input type="time" class="form-control" v-model="sesion.horaInicio"
+                :class="{ 'is-invalid': errores.horario }" />
+              <input type="time" class="form-control" v-model="sesion.horaFin"
+                :class="{ 'is-invalid': errores.horario }" />
+            </div>
           </div>
         </div>
 
         <!-- BOTONES -->
         <div class="d-flex justify-content-center gap-3 mt-5">
-          <button
-            class="btn btn-primary btn-lg px-5"
-            @click="crearSesion"
-          >
+          <button class="btn btn-primary btn-lg px-5" @click="crearSesion">
             {{ t.newSession }}
           </button>
 
-          <button
-            class="btn btn-danger btn-lg px-5"
-            @click="volver"
-          >
+          <button class="btn btn-danger btn-lg px-5" @click="volver">
             {{ t.return }}
           </button>
         </div>
@@ -91,15 +68,16 @@ const tipoStore = useTiposStore();
 const router = useRouter()
 
 const sesion = ref({
-  actividad: "",
-  horario: "",
-  dia: ""
+  dia: "",
+  horaInicio: "",
+  horaFin: "",
+  actividad: null as number | null
 })
 
 const errores = ref({
-  actividad: false,
-  horario: false,
-  dia: false
+  dia: false,
+  horaInicio: false,
+  horaFin: false
 })
 
 const actividades = ref<any[]>([])
@@ -108,9 +86,11 @@ const horarios = ref<any[]>([])
 function validarFormulario() {
   let valido = true
 
-  errores.value.actividad = sesion.value.actividad === ""
-  errores.value.horario = sesion.value.horario === ""
   errores.value.dia = sesion.value.dia === ""
+  errores.value.horaInicio = sesion.value.horaInicio === ""
+  errores.value.horaFin =
+    sesion.value.horaFin === "" ||
+    sesion.value.horaFin <= sesion.value.horaInicio
 
   for (const key in errores.value) {
     if (errores.value[key]) valido = false
@@ -126,9 +106,14 @@ const crearSesion = async () => {
   const id = parseInt(props.id);
 
   try {
-    sesion.value.actividad = id
-
-    await nuevaSesion(sesion.value)
+    await nuevaSesion({
+      ...sesion.value,
+      horario: {
+        horaInicio: sesion.value.horaInicio,
+        horaFin: sesion.value.horaFin
+      },
+      actividad: Number(props.id)
+    })
     router.back()
   } catch (e) {
     console.error("Error al crear la sesión", e)
