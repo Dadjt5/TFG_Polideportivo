@@ -67,7 +67,7 @@ import ActivityTypeFilter from "./filters/ActivityTypeFilter.vue";
 import TimeRangeFilter from "./filters/TimeRangeFilter.vue";
 import ActivityCard from './filters/ActivityCard.vue'
 
-import { getActividades } from "../services/buscarService"
+import { getActividades } from "../services/listadoService"
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
 import type { Language } from "../useI18N";

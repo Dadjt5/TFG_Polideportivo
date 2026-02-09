@@ -24,8 +24,8 @@
                 v-for="p in espacios.pabellones"
                 :key="p.id"
                 class="list-group-item d-flex justify-content-between align-items-center rounded-3 mb-2 shadow-sm"
-              >
-                <div class="text-primary fw-medium" style="cursor: pointer;" @click="PabellonDetail(p.id)">
+                @click="PabellonDetail(p.id)">
+                <div class="text-primary fw-medium" style="cursor: pointer;">
                   <span class="fw-medium">{{ p.nombre }}</span>
                 </div>
               </div>
@@ -48,8 +48,8 @@
                 v-for="i in espacios.instalaciones"
                 :key="i.id"
                 class="list-group-item d-flex justify-content-between align-items-center rounded-3 mb-2 shadow-sm"
-              >
-								<div class="text-primary fw-medium" style="cursor: pointer;" @click="InstalacionDetail(i.id)">
+                @click="InstalacionDetail(i.id)">
+								<div class="text-primary fw-medium" style="cursor: pointer;">
                   <span class="fw-medium">{{ i.nombre }}</span>
                 </div>
 

@@ -329,6 +329,27 @@ export default {
   modifyPavilion: "Modify pavilion",
   modifyFacility: "Modify facility",
 
+  /* Nueva instalacion */
+  maxCapacity: "Max capacity",
+  createFacility: "Create facility",
+ 
+  /* Gestion de actividades */
+  searchActivities: "Search for activities...",
+
+  /* Detalle actividad */
+  noSession: "No sessions",
+
+  /* Nueva actividad */
+  createActivity: "Create activity",
+  maxPlaces: "Max places",
+  outdoor: "Outdoor",
+  newActivity: "Nueva actividad",
+
+  /* Nueva sesion */
+  newSession: "New session",
+  createSession: "Create session",
+  day: "Day",
+
   /* Contacto */
   contactTitle: "Sports Center Contact",
   contactSubtitle: "Contact information of the administration building",

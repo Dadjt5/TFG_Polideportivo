@@ -2,25 +2,53 @@
   <div class="min-vh-100 bg-light">
     <main class="container py-4">
 
-			<!-- Titulo -->
+      <!-- TÍTULO -->
       <div class="d-flex justify-content-between align-items-center mb-4">
         <button class="btn btn-secondary rounded-pill" @click="volver">
           ← {{ t.return }}
         </button>
 
-        <h1 class="fw-semibold">
+        <h1 class="fw-semibold mb-0">
           {{ sesion.actividad.nombre }}
         </h1>
 
-        <span class="badge bg-primary fs-6">
+        <!-- BADGE HORARIO -->
+        <span class="badge bg-primary fs-6" v-if="!editando">
           {{ sesion.dia }} · {{ sesion.horaInicio }} - {{ sesion.horaFin }}
         </span>
+
+        <div v-else class="d-flex gap-2 align-items-center">
+          <input
+            type="text"
+            class="form-control form-control-sm text-center"
+            v-model="sesion.dia"
+            style="width: 110px"
+						:class="{ 'is-invalid': errores.dia }"
+          />
+
+          <input
+            type="time"
+            class="form-control form-control-sm"
+            v-model="sesion.horaInicio"
+						:class="{ 'is-invalid': errores.horaInicio }"
+          />
+
+          <span>—</span>
+
+          <input
+            type="time"
+            class="form-control form-control-sm"
+            v-model="sesion.horaFin"
+						:class="{ 'is-invalid': errores.horaFin }"
+          />
+        </div>
+
         <div style="width: 100px"></div>
       </div>
 
       <div class="row g-4">
 
-        <!-- DETALLES -->
+        <!-- DETALLES ACTIVIDAD -->
         <div class="col-lg-6">
           <div class="bg-white rounded-3 shadow-sm p-4 h-100">
 
@@ -41,11 +69,14 @@
               </div>
 
               <div class="col-6">
-                <span class="fw-medium">{{ t.facility }}: </span>
-                <span class="text-primary fw-medium" style="cursor: pointer;"
-                    @click="facilityDetail(sesion.actividad.instalacion.id)">
-                    {{ sesion.actividad.instalacion.nombre }}
-                  </span>
+                <span class="fw-medium">{{ t.facility }}:</span>
+                <span
+                  class="text-primary fw-medium"
+                  style="cursor: pointer"
+                  @click="facilityDetail(sesion.actividad.instalacion.id)"
+                >
+                  {{ sesion.actividad.instalacion.nombre }}
+                </span>
               </div>
 
               <div class="col-6">
@@ -56,7 +87,7 @@
           </div>
         </div>
 
-        <!-- PASAR LISTA -->
+        <!-- PARTICIPANTES -->
         <div class="col-lg-6">
           <div class="bg-white rounded-3 shadow-sm p-4 h-100">
 
@@ -77,7 +108,7 @@
         </div>
       </div>
 
-            <!-- ACCIONES -->
+      <!-- ACCIONES -->
       <div class="d-flex justify-content-center gap-4 mt-5">
 
         <button
@@ -120,6 +151,7 @@
     </main>
   </div>
 </template>
+
 
 
 <script setup lang="ts">
@@ -218,7 +250,6 @@ function camposModificados() {
 
   return data;
 }
-
 
 const guardarCambios = async () => {
   try {

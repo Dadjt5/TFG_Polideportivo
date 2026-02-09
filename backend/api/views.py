@@ -24,7 +24,8 @@ from .serializers import (
     TDASerializer, UsuarioFinalSerializer, UserSerializer, AdministradorSerializer,
     CompraBonoSerializer, CompraAbonoSerializer, MensajeSerializer, SesionSerializer,
     MapaReservasSerializer, AdministradorSimpleSerializer, MonitorSimpleSerializer,
-    UsuarioFinalSimpleSerializer, PabellonSimpleSerializer
+    UsuarioFinalSimpleSerializer, PabellonSimpleSerializer, ActividadSimpleSerializer,
+    InstalacionSimpleSerializer
 )
 
 from polideportivo.models import (
@@ -33,7 +34,8 @@ from polideportivo.models import (
     EntradaListaEspera, TarifaTDA, Monitor, Notificacion, Pago, TarifaActividad, 
     TarifaInstalacion, TDA, UsuarioFinal, AbonoDeportivo, AbonoVerano, Pabellon, 
     ReservaActividad, Alquiler, Administrador, User, CompraBono, CompraAbono,
-    Mensaje, Sesion, MapaReservas
+    Mensaje, Sesion, MapaReservas, TipoActividad, TipoInstalacion, TipoReserva,
+    Terreno, Estado, Dia
 )
 
 
@@ -75,7 +77,6 @@ class CompraAbonoViewSet(viewsets.ModelViewSet):
 # Actividades
 # ----------------
 
-# Es necesario modificar algo get_queryset para mostrar las diferentes actividades
 class ActividadViewSet(viewsets.ModelViewSet):
     serializer_class = ActividadSerializer
     permission_classes = [AllowAny]
@@ -87,6 +88,13 @@ class ActividadViewSet(viewsets.ModelViewSet):
             return Actividad.objects.filter(monitor__user=user)
 
         return Actividad.objects.all()
+
+
+class ActividadSimpleViewSet(viewsets.ModelViewSet):
+    queryset = Actividad.objects.all()
+    serializer_class = ActividadSimpleSerializer
+    permission_classes = [AllowAny]
+    authentication_classes = []
 
 
 class AsistenciaViewSet(viewsets.ModelViewSet):
@@ -254,10 +262,21 @@ class InstalacionViewSet(viewsets.ModelViewSet):
     authentication_classes = []
 
 
+class InstalacionSimpleViewSet(viewsets.ModelViewSet):
+    queryset = Instalacion.objects.all()
+    serializer_class = InstalacionSimpleSerializer
+    permission_classes = [AllowAny]
+    authentication_classes = []
+
 
 class PabellonViewSet(viewsets.ModelViewSet):
     queryset = Pabellon.objects.all()
     serializer_class = PabellonSerializer
+    permission_classes = [AllowAny]
+
+class PabellonSimpleViewSet(viewsets.ModelViewSet):
+    queryset = Pabellon.objects.all()
+    serializer_class = PabellonSimpleSerializer
     permission_classes = [AllowAny]
 
 
@@ -466,23 +485,12 @@ class meAPIView(APIView):
         return Response(data)
 
 
-# Estadisticas de home
+# Estadisticas para el usuario
 class EstadisticasView(APIView):
     permission_classes = [AllowAny]
     authentication_classes = []
 
-    def get(self, request):
-        tiposActividad = []
-        tiposInstalacion = []
-
-        for act in Actividad.objects.all():
-            if act.tipoActividad not in tiposActividad:
-                tiposActividad.append(act.tipoActividad)
-
-        for inst in Instalacion.objects.all():
-            if inst.tipoInstalacion not in tiposInstalacion:
-                tiposInstalacion.append(inst.tipoInstalacion)
-                
+    def get(self, request):                
         deportes = list(Deporte.objects.values("id", "titulo"))
 
         data = {
@@ -491,9 +499,26 @@ class EstadisticasView(APIView):
             "pabellones": Pabellon.contar(),
             "deportes": Deporte.contar(),
             "usuarios": UsuarioFinal.contar(),
-            "tiposActividad": tiposActividad,
-            "tiposInstalacion": tiposInstalacion,
+            "tiposActividad": TipoActividad.choices,
+            "tiposInstalacion": TipoInstalacion.choices,
             "tiposDeporte": deportes
+        }
+
+        return Response(data)
+
+
+# Informacion con los tipos de cada grupo necesario: reservas, actividades, terrenos, etc
+class TiposViews(APIView):
+    permission_classes = [IsAdministrador]
+
+    def get(self, request):
+        data = {
+            "tiposActividad": TipoActividad.choices,
+            "tiposInstalacion": TipoInstalacion.choices,
+            "tiposReserva": TipoReserva.choices,
+            "terrenos": Terreno.choices,
+            "estados": Estado.choices,
+            "dias": Dia.choices
         }
 
         return Response(data)

@@ -3,6 +3,7 @@ from .actividad import (Actividad, Asistencia, Sesion)
 from .agenda import (Agenda, MapaReservas)
 from .bono import (Bono, CompraBono)
 from .configuracion import Configuracion
+from .constantes import *
 from .deporte import Deporte
 from .descuento import Descuento
 from .favorito import Favorito

@@ -9,9 +9,3 @@ export const getBusqueda = async (params) => {
   })
   return response.data
 }
-
-/* Función para obtener las actividades del sistema */
-export const getActividades = async () => {
-  const response = await api.get(`/api/v1/actividades/`);
-  return response.data;
-};

@@ -36,6 +36,11 @@ import GestionarEspacios from '../components/GestionarEspacios.vue'
 import EditarInstalacion from '../components/EditarInstalacion.vue'
 import EditarActividad from '../components/EditarActividad.vue'
 import EditarSesion from '../components/EditarSesion.vue'
+import NuevaInstalacion from '../components/NuevaInstalacion.vue'
+import NuevoPabellon from '../components/NuevoPabellon.vue'
+import NuevaSesion from '../components/NuevaSesion.vue'
+import NuevaActividad from '../components/NuevaActividad.vue'
+import GestionarActividades from '../components/GestionarActividades.vue'
 
 const routes = [
   { path: '/', redirect: '/home' },
@@ -156,8 +161,13 @@ const routes = [
     props: true,
     meta: { requiresAuth: true }
   },
-  { path: '/gestion/usuarios', component: GestionarUsuarios, name: 'gestion-usuarios', meta: { requiresAuth: true } },
-  { path: '/gestion/espacios', component: GestionarEspacios, name: 'gestion-espacios', meta: { requiresAuth: true } },
+  { path: '/crear/pabellon', component: NuevoPabellon, name: 'crear-pabellon', meta: { requiresAuth: true } },
+  { path: '/crear/instalacion', component: NuevaInstalacion, name: 'crear-instalacion', meta: { requiresAuth: true } },
+  { path: '/crear/actividad', component: NuevaActividad, name: 'crear-actividad', meta: { requiresAuth: true } },
+  { path: '/crear/sesion', component: NuevaSesion, name: 'crear-sesion', meta: { requiresAuth: true } },
+  { path: '/gestion/usuarios', component: GestionarUsuarios, name: 'gestionar-usuarios', meta: { requiresAuth: true } },
+  { path: '/gestion/espacios', component: GestionarEspacios, name: 'gestionar-espacios', meta: { requiresAuth: true } },
+  { path: '/gestion/actividades', component: GestionarActividades, name: 'gestionar-actividades', meta: { requiresAuth: true } },
 ]
 
 /* Cada vez que se accede a una página se redirige el scrollbar arriba */

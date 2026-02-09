@@ -14,6 +14,7 @@
             v-else
             v-model="instalacion.nombre"
             class="form-control text-center fw-semibold"
+            :class="{ 'is-invalid': errores.nombre }"
           />
         </h1>
 
@@ -46,6 +47,7 @@
                   min="1"
                   class="form-control"
                   v-model.number="instalacion.aforoMaximo"
+                  :class="{ 'is-invalid': errores.aforoMaximo }"
                 />
               </div>
 
@@ -85,6 +87,7 @@
                   max="100"
                   class="form-control"
                   v-model.number="instalacion.porcentajeTDA"
+                  :class="{ 'is-invalid': errores.porcentajeTDA }"
                 />
               </div>
 
@@ -130,6 +133,7 @@
                   type="time"
                   class="form-control"
                   v-model="instalacion.horaApertura"
+                  :class="{ 'is-invalid': errores.horaApertura }"
                 />
               </div>
 
@@ -142,6 +146,7 @@
                   type="time"
                   class="form-control"
                   v-model="instalacion.horaCierre"
+                  :class="{ 'is-invalid': errores.horaCierre }"
                 />
               </div>
 

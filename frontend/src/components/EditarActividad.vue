@@ -9,19 +9,14 @@
 
         <h1 class="fw-semibold mb-0 w-50 text-center">
           <span v-if="!editando">{{ actividad.nombre }}</span>
-          <input
-            v-else
-            v-model="actividad.nombre"
-            class="form-control text-center fw-semibold"
-            :class="{ 'is-invalid': errores.nombre }"
-          />
+          <input v-else v-model="actividad.nombre" class="form-control text-center fw-semibold"
+            :class="{ 'is-invalid': errores.nombre }" />
         </h1>
 
         <div style="width: 100px"></div>
       </div>
 
       <div class="row g-4">
-        <!-- IZQUIERDA -->
         <div class="col-lg-6">
           <div class="bg-white rounded-3 shadow-sm p-4 h-100">
             <h4 class="mb-3 d-flex align-items-center">
@@ -35,125 +30,80 @@
               <div class="col-12 col-sm-4">
                 <span class="fw-medium">{{ t.period }}:</span>
                 <span v-if="!editando"> {{ actividad.periodo }}</span>
-                <input
-                  v-else
-                  v-model="actividad.periodo"
-                  class="form-control"
-                  :class="{ 'is-invalid': errores.periodo }"
-                />
+                <input v-else v-model="actividad.periodo" class="form-control"
+                  :class="{ 'is-invalid': errores.periodo }" />
               </div>
 
               <!-- ESTADO -->
               <div class="col-12 col-sm-4">
                 <span class="fw-medium">{{ t.status }}:</span>
                 <span v-if="!editando"> {{ actividad.estado }}</span>
-                <input
-                  v-else
-                  v-model="actividad.estado"
-                  class="form-control"
-                  :class="{ 'is-invalid': errores.estado }"
-                />
+                <input v-else v-model="actividad.estado" class="form-control"
+                  :class="{ 'is-invalid': errores.estado }" />
               </div>
 
               <!-- EDAD MINIMA -->
               <div class="col-12 col-sm-4">
                 <span class="fw-medium">{{ t.minimumAge }}:</span>
                 <span v-if="!editando"> {{ actividad.edadMinima }}</span>
-                <input
-                  v-else
-                  type="number"
-                  v-model.number="actividad.edadMinima"
-                  class="form-control"
-                  :class="{ 'is-invalid': errores.edadMinima }"
-                />
+                <input v-else type="number" v-model.number="actividad.edadMinima" class="form-control"
+                  :class="{ 'is-invalid': errores.edadMinima }" />
               </div>
 
               <!-- PLAZAS MAX -->
               <div class="col-12 col-sm-4">
                 <span class="fw-medium">{{ t.availablePlaces }}:</span>
                 <span v-if="!editando"> {{ actividad.plazasMaximas }}</span>
-                <input
-                  v-else
-                  type="number"
-                  v-model.number="actividad.plazasMaximas"
-                  class="form-control"
-                  :class="{ 'is-invalid': errores.plazasMaximas }"
-                />
+                <input v-else type="number" v-model.number="actividad.plazasMaximas" class="form-control"
+                  :class="{ 'is-invalid': errores.plazasMaximas }" />
               </div>
 
               <!-- PLAZAS RESERVADAS -->
               <div class="col-12 col-sm-4">
                 <span class="fw-medium">{{ t.reservedPlaces }}:</span>
                 <span v-if="!editando"> {{ actividad.plazasReservadas }}</span>
-                <input
-                  v-else
-                  type="number"
-                  v-model.number="actividad.plazasReservadas"
-                  class="form-control"
-                  :class="{ 'is-invalid': errores.plazasReservadas }"
-                />
+                <input v-else type="number" v-model.number="actividad.plazasReservadas" class="form-control"
+                  :class="{ 'is-invalid': errores.plazasReservadas }" />
               </div>
 
               <!-- TIPO ACTIVIDAD -->
               <div class="col-12 col-sm-4">
                 <span class="fw-medium">{{ t.activityType }}:</span>
                 <span v-if="!editando"> {{ actividad.tipoActividad }}</span>
-                <input
-                  v-else
-                  v-model="actividad.tipoActividad"
-                  class="form-control"
-                  :class="{ 'is-invalid': errores.tipoActividad }"
-                />
+                <input v-else v-model="actividad.tipoActividad" class="form-control"
+                  :class="{ 'is-invalid': errores.tipoActividad }" />
               </div>
 
               <!-- TERRENO -->
               <div class="col-12 col-sm-4">
                 <span class="fw-medium">{{ t.terrainType }}:</span>
                 <span v-if="!editando"> {{ actividad.terreno }}</span>
-                <input
-                  v-else
-                  v-model="actividad.terreno"
-                  class="form-control"
-                  :class="{ 'is-invalid': errores.terreno }"
-                />
+                <input v-else v-model="actividad.terreno" class="form-control"
+                  :class="{ 'is-invalid': errores.terreno }" />
               </div>
 
               <!-- TIPO RESERVA -->
               <div class="col-12 col-sm-4">
                 <span class="fw-medium">{{ t.reserveType }}:</span>
                 <span v-if="!editando"> {{ actividad.tipoReserva }}</span>
-                <input
-                  v-else
-                  v-model="actividad.tipoReserva"
-                  class="form-control"
-                  :class="{ 'is-invalid': errores.tipoReserva }"
-                />
+                <input v-else v-model="actividad.tipoReserva" class="form-control"
+                  :class="{ 'is-invalid': errores.tipoReserva }" />
               </div>
 
               <!-- CREDITOS -->
               <div class="col-12 col-sm-4">
                 <span class="fw-medium">{{ t.credits }}:</span>
                 <span v-if="!editando"> {{ actividad.numeroCreditos }}</span>
-                <input
-                  v-else
-                  type="number"
-                  v-model.number="actividad.numeroCreditos"
-                  class="form-control"
-                  :class="{ 'is-invalid': errores.numeroCreditos }"
-                />
+                <input v-else type="number" v-model.number="actividad.numeroCreditos" class="form-control"
+                  :class="{ 'is-invalid': errores.numeroCreditos }" />
               </div>
 
               <!-- AÑO -->
               <div class="col-12 col-sm-4">
                 <span class="fw-medium">{{ t.academicYear }}:</span>
                 <span v-if="!editando"> {{ actividad.año }}</span>
-                <input
-                  v-else
-                  type="number"
-                  v-model.number="actividad.año"
-                  class="form-control"
-                  :class="{ 'is-invalid': errores.año }"
-                />
+                <input v-else type="number" v-model.number="actividad.año" class="form-control"
+                  :class="{ 'is-invalid': errores.año }" />
               </div>
 
             </div>
@@ -179,24 +129,43 @@
 
           <!-- SESIONES -->
           <div class="bg-white rounded-3 shadow-sm p-4">
-            <h4 class="mb-3 d-flex align-items-center gap-2">
-              <i class="bi bi-calendar-event text-primary"></i>
-              {{ t.sessions }}
-            </h4>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h4 class="mb-0 d-flex align-items-center gap-2">
+                <i class="bi bi-calendar-event text-primary"></i>
+                {{ t.sessions }}
+              </h4>
 
-            <div
-              v-for="s in actividad.sesiones"
-              :key="s.id"
-              class="d-flex justify-content-between align-items-center p-3 mb-2 border rounded-3 bg-light"
-            >
-              <div>
-                <div class="fw-semibold">{{ s.dia }}</div>
-                <div class="text-muted">
-                  {{ s.horario.horaInicio }} - {{ s.horario.horaFin }}
+              <button class="btn btn-primary btn-sm rounded-pill" @click="nuevaSesion(actividad.id)">
+                <i class="bi bi-plus-lg me-1"></i>
+                {{ t.newSession }}
+              </button>
+            </div>
+
+            <!-- LISTADO -->
+            <div v-if="actividad.sesiones.length > 0">
+              <div v-for="s in actividad.sesiones" :key="s.id"
+                class="d-flex justify-content-between align-items-center p-3 mb-2 border rounded-3 bg-light"
+                style="cursor: pointer" @click="sesionDetail(s.id)">
+                <div>
+                  <div class="fw-semibold">
+                    {{ s.dia }}
+                  </div>
+                  <div class="text-muted small">
+                    {{ s.horario.horaInicio }} - {{ s.horario.horaFin }}
+                  </div>
                 </div>
+
+                <i class="bi bi-chevron-right text-muted"></i>
               </div>
             </div>
+
+            <!-- EMPTY STATE -->
+            <div v-else class="text-muted text-center py-4">
+              <i class="bi bi-calendar-x fs-4 d-block mb-2"></i>
+              {{ t.noSession }}
+            </div>
           </div>
+
 
         </div>
       </div>
@@ -204,37 +173,23 @@
       <!-- ACCIONES -->
       <div class="d-flex justify-content-center gap-4 mt-5">
 
-        <button
-          v-if="!editando"
-          class="btn btn-primary btn-lg rounded-pill"
-          @click="activarEdicion"
-        >
+        <button v-if="!editando" class="btn btn-primary btn-lg rounded-pill" @click="activarEdicion">
           <i class="bi bi-pencil me-2"></i>
           {{ t.modifyUser }}
         </button>
 
         <template v-else>
-          <button
-            class="btn btn-success btn-lg rounded-pill"
-            @click="guardarCambios"
-          >
+          <button class="btn btn-success btn-lg rounded-pill" @click="guardarCambios">
             <i class="bi bi-check-lg me-2"></i>
             {{ t.saveChanges }}
           </button>
 
-          <button
-            class="btn btn-secondary btn-lg rounded-pill"
-            @click="cancelarEdicion"
-          >
+          <button class="btn btn-secondary btn-lg rounded-pill" @click="cancelarEdicion">
             {{ t.cancel }}
           </button>
         </template>
 
-        <button
-          v-if="!editando"
-          class="btn btn-danger btn-lg rounded-pill"
-          @click="eliminar"
-        >
+        <button v-if="!editando" class="btn btn-danger btn-lg rounded-pill" @click="eliminar">
           <i class="bi bi-trash me-2"></i>
           {{ t.deleteUser }}
         </button>
@@ -320,25 +275,25 @@ const añoActual = new Date().getFullYear()
 const actividadOriginal = ref<any>(null);
 
 function validarFormulario() {
-	let valido = true
+  let valido = true
 
-	errores.value.nombre = actividad.value.nombre === ''
-	errores.value.plazasMaximas = actividad.value.plazasMaximas <= 0
-	errores.value.plazasReservadas = 
-		actividad.value.plazasReservadas <= 0 ||
-		actividad.value.plazasReservadas > actividad.value.plazasMaximas
-	errores.value.tipoActividad = actividad.value.tipoActividad === ''
-	errores.value.edadMinima = actividad.value.edadMinima <= 0
-	errores.value.año = actividad.value.año < añoActual
-	errores.value.numeroCreditos = actividad.value.numeroCreditos <= 0
-	errores.value.tipoReserva = actividad.value.tipoReserva === ''
-	errores.value.terreno = actividad.value.terreno === ''
-	errores.value.periodo = actividad.value.periodo === ''
-	errores.value.estado = actividad.value.estado === ''
+  errores.value.nombre = actividad.value.nombre === ''
+  errores.value.plazasMaximas = actividad.value.plazasMaximas <= 0
+  errores.value.plazasReservadas =
+    actividad.value.plazasReservadas <= 0 ||
+    actividad.value.plazasReservadas > actividad.value.plazasMaximas
+  errores.value.tipoActividad = actividad.value.tipoActividad === ''
+  errores.value.edadMinima = actividad.value.edadMinima <= 0
+  errores.value.año = actividad.value.año < añoActual
+  errores.value.numeroCreditos = actividad.value.numeroCreditos <= 0
+  errores.value.tipoReserva = actividad.value.tipoReserva === ''
+  errores.value.terreno = actividad.value.terreno === ''
+  errores.value.periodo = actividad.value.periodo === ''
+  errores.value.estado = actividad.value.estado === ''
 
 
   for (const key in errores.value) {
-    if(errores.value[key]) {
+    if (errores.value[key]) {
       valido = false
     }
   }
@@ -348,7 +303,7 @@ function validarFormulario() {
 
 function activarEdicion() {
   actividadOriginal.value = JSON.parse(JSON.stringify(actividad.value))
-	Object.keys(errores.value).forEach(k => errores.value[k] = false)
+  Object.keys(errores.value).forEach(k => errores.value[k] = false)
   editando.value = true
 }
 
@@ -411,10 +366,10 @@ function camposModificados() {
 
 const guardarCambios = async () => {
   try {
-		if (!validarFormulario()) return
+    if (!validarFormulario()) return
 
-		const data = camposModificados();
-    if(Object.keys(data).length > 0) {
+    const data = camposModificados();
+    if (Object.keys(data).length > 0) {
       await modificarActividad(actividad.value.id, data);
     }
   } catch (e) {
@@ -430,9 +385,16 @@ const eliminar = async () => {
   }
 }
 
-const facilityDetail = (id: number) => {
+const sesionDetail = (id: number) => {
   router.push({
-    name: 'editar-instalacion',
+    name: 'editar-sesion',
+    params: { id }
+  });
+}
+
+const nuevaSesion = (id: number) => {
+  router.push({
+    name: 'crear-sesion',
     params: { id }
   });
 }
@@ -447,7 +409,7 @@ onMounted(async () => {
   try {
     actividad.value = await getActividadDetalle(id);
     actividadOriginal.value = JSON.parse(JSON.stringify(actividad.value))
-  } catch(e) {
+  } catch (e) {
     console.log("Error al obtener la informacion de la actividad", e);
   }
 });

@@ -63,6 +63,7 @@ router.register(r'users', views.UserViewSet, basename="user")
 urlpatterns = [
     path("me/", views.meAPIView.as_view(), name="me"),
     path("estadisticas/", views.EstadisticasView.as_view(), name="estadisticas"),
+    path("tipos/", views.TiposViews.as_view(), name="tipos"),
     path("buscar/", views.BuscarView.as_view(), name="busqueda"),
     path("registrarse/", views.RegistroView.as_view(), name="registro"),
     path("registrar/monitor/", views.RegistroMonitorView.as_view(), name="registrar-monitor"),
@@ -79,6 +80,9 @@ urlpatterns = [
     path("actividades/<int:actividad_id>/sesiones/<int:sesion_id>/asistencia/", views.GuardarAsistenciaView.as_view(), name="guardar-asistencia"),
     path("tarifas/actividades/<int:actividad_id>/", views.TarifaActividadView.as_view(), name="tarifa-actividad"),
     path("tarifas/instalaciones/<int:instalacion_id>/", views.TarifaInstalacionView.as_view(), name="tarifa-instalacion"),
+    path("pabellones/simple/", views.PabellonSimpleViewSet.as_view(), name="pabellones-simple"),
+    path("instalaciones/simple/", views.InstalacionSimpleViewSet.as_view(), name="instalaciones-simple"),
+    path("actividades/simple/", views.ActividadSimpleViewSet.as_view(), name="actividades-simple"),
     path("usuarios/", views.GestionUsuariosView.as_view(), name="obtener-usuarios"),
     path("espacios/", views.GestionEspaciosView.as_view(), name="obtener-espacios"),
     path('', include(router.urls)),

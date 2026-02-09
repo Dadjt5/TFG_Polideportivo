@@ -134,6 +134,7 @@ import { onMounted, type Ref, inject } from 'vue';
 
 import { useAuthStore } from '../stores/auth';
 import { useAdministradorStore } from '../stores/administrador';
+import { useTiposStore } from '../stores/tipos';
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
 import type { Language } from "../useI18N";
@@ -144,6 +145,7 @@ const t = useI18n(language);
 
 const userStore = useAuthStore();
 const administradorStore = useAdministradorStore();
+const tiposStore = useTiposStore();
 
 onMounted(async () => {
   if (!administradorStore.administrador) {
@@ -153,6 +155,10 @@ onMounted(async () => {
     await administradorStore.fetchNotificaciones();
   }
   administradorStore.comenzarIntervalo();
+
+  if (!tiposStore.modificado) {
+    tiposStore.obtenerTipos();
+  }
 });
 </script>
 

@@ -37,9 +37,10 @@
 
               <div class="list-group list-group-flush">
                 <div v-for="a in usuarios.administradores" :key="a.id"
-                  class="list-group-item d-flex justify-content-between align-items-center rounded-3 mb-2 shadow-sm">
+                  class="list-group-item d-flex justify-content-between align-items-center rounded-3 mb-2 shadow-sm"
+                  @click="AdministradorDetail(a.id)">
 
-                  <div class="text-primary fw-medium" style="cursor: pointer;" @click="AdministradorDetail(a.id)">
+                  <div class="text-primary fw-medium" style="cursor: pointer;">
                     <span class="fw-medium me-2">{{ a.nombre }}</span>
                     <span class="fw-medium me-2">{{ a.DNI }}</span>
                     <span class="text-muted">({{ a.rol }})</span>
@@ -61,8 +62,9 @@
 
               <div class="list-group list-group-flush">
                 <div v-for="m in filteredMonitores" :key="m.id"
-                  class="list-group-item d-flex justify-content-between align-items-center rounded-3 mb-2 shadow-sm">
-                  <div class="text-primary fw-medium" style="cursor: pointer;" @click="MonitorDetail(m.id)">
+                  class="list-group-item d-flex justify-content-between align-items-center rounded-3 mb-2 shadow-sm"
+                  @click="MonitorDetail(m.id)">
+                  <div class="text-primary fw-medium" style="cursor: pointer;">
                     <span class="fw-medium me-2">{{ m.nombre }}</span>
                     <span class="fw-medium">{{ m.DNI }}</span>
                   </div>
@@ -83,8 +85,9 @@
 
               <div class="list-group list-group-flush">
                 <div v-for="u in filteredUsuarios" :key="u.id"
-                  class="list-group-item d-flex justify-content-between align-items-center rounded-3 mb-2 shadow-sm">
-                  <div class="text-primary fw-medium" style="cursor: pointer;" @click="UsuarioFinalDetail(u.id)">
+                  class="list-group-item d-flex justify-content-between align-items-center rounded-3 mb-2 shadow-sm"
+                  @click="UsuarioFinalDetail(u.id)">
+                  <div class="text-primary fw-medium" style="cursor: pointer;">
                     <span class="fw-medium me-2">{{ u.nombre }}</span>
                     <span class="fw-medium me-2">{{ u.DNI }}</span>
                       <span class="badge me-2" :class="u.esUAM ? 'bg-success' : 'bg-secondary'">
