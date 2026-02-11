@@ -85,13 +85,13 @@ import { inject, type Ref, computed } from "vue";
 import { useRouter } from "vue-router";
 
 /* Importamos las comunicaciones con el backend a traves de nuestro Store para usar el usuario */
-import { useAuthStore } from "../stores/auth";
-import { useUserStore } from "../stores/usuarioFinal";
-import { useMonitorStore } from "../stores/monitor";
-import { useAdministradorStore } from "../stores/administrador";
+import { useAuthStore } from "@/stores/auth";
+import { useUserStore } from "@/stores/usuarioFinal";
+import { useMonitorStore } from "@/stores/monitor";
+import { useAdministradorStore } from "@/stores/administrador";
 
-import type { Language } from "../useI18N";
-import { useI18n } from "../useI18N";
+import type { Language } from "@/useI18N";
+import { useI18n } from "@/useI18N";
 
 const router = useRouter();
 const userStore = useAuthStore();

@@ -145,12 +145,12 @@ import { useRouter } from "vue-router";
 import QRCodeVue3 from 'qrcode-vue3';
 
 /* Importamos las comunicaciones con el backend a traves de nuestro Store para guardar el usuario final */
-import { useAuthStore } from '../../stores/auth';
-import { useUserStore } from '../../stores/usuarioFinal';
+import { useAuthStore } from "@/stores/auth";
+import { useUserStore } from "@/stores/usuarioFinal";
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
-import type { Language } from "../../useI18N";
-import { useI18n } from "../../useI18N";
+import type { Language } from "@/useI18N";
+import { useI18n } from "@/useI18N";
 
 const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);

@@ -67,11 +67,11 @@ import ActivityTypeFilter from "./filters/ActivityTypeFilter.vue";
 import TimeRangeFilter from "./filters/TimeRangeFilter.vue";
 import ActivityCard from './filters/ActivityCard.vue'
 
-import { getActividades } from "../services/listadoService"
+import { getActividades } from "@/services/listadoService"
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
-import type { Language } from "../useI18N";
-import { useI18n } from "../useI18N";
+import type { Language } from "@/useI18N";
+import { useI18n } from "@/useI18N";
 
 const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { type Ref, inject } from 'vue';
-import type { Language } from "../../useI18N";
-import { useI18n } from "../../useI18N";
+import type { Language } from "@/useI18N";
+import { useI18n } from "@/useI18N";
 
-import { useUserStore } from '../../stores/usuarioFinal';
+import { useUserStore } from '@/stores/usuarioFinal';
 
 const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);

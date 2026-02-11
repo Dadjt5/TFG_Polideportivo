@@ -108,14 +108,14 @@
 import { onMounted, inject, type Ref, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
-import { useAuthStore } from '../../stores/auth';
-import { useMonitorStore } from '../../stores/monitor';
+import { useAuthStore } from "@/stores/auth";
+import { useMonitorStore } from "@/stores/monitor";
 
-import { modificarMonitor } from '../../services/monitorService';
+import { modificarMonitor } from "@/services/monitorService";
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
-import type { Language } from "../../useI18N";
-import { useI18n } from "../../useI18N";
+import type { Language } from "@/useI18N";
+import { useI18n } from "@/useI18N";
 
 const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);

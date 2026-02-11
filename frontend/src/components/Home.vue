@@ -223,11 +223,11 @@ import TimeRangeFilter from "./filters/TimeRangeFilter.vue";
 import FacilityTypeFilter from "./filters/FacilityTypeFilter.vue";
 
 /* Importamos las comunicaciones con el backend a traves de nuestro Store para guardar las estadisticas */
-import { useEstadisticasStore } from "../stores/estadisticas";
+import { useEstadisticasStore } from "@/stores/estadisticas";
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
-import type { Language } from "../useI18N";
-import { useI18n } from "../useI18N";
+import type { Language } from "@/useI18N";
+import { useI18n } from "@/useI18N";
 
 const router = useRouter()
 const textoBusqueda = ref('')

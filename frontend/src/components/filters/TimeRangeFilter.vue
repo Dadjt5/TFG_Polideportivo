@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { watch, type Ref, ref, inject } from 'vue';
-import Modal from "../ui/Modal.vue";
-import type { Language } from "../../useI18N";
-import { useI18n } from "../../useI18N";
+import Modal from "@/components/ui/Modal.vue";
+import type { Language } from "@/useI18N";
+import { useI18n } from "@/useI18N";
 
 const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);

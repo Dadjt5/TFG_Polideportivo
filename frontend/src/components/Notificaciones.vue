@@ -81,14 +81,15 @@ import { inject, type Ref, onMounted, computed } from "vue";
 import { onBeforeRouteLeave } from 'vue-router'
 
 /* Importamos el store del usuario para manejar las notificaciones */
-import { useUserStore } from "../stores/usuarioFinal";
-import { useMonitorStore } from "../stores/monitor";
-import { useAdministradorStore } from "../stores/administrador";
+import { useUserStore } from "@/stores/usuarioFinal";
+import { useMonitorStore } from "@/stores/monitor";
+import { useAdministradorStore } from "@/stores/administrador";
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
-import type { Language } from "../useI18N";
-import { useI18n } from "../useI18N";
-import { useAuthStore } from "../stores/auth";
+import type { Language } from "@/useI18N";
+import { useI18n } from "@/useI18N";
+
+import { useAuthStore } from "@/stores/auth";
 
 const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);

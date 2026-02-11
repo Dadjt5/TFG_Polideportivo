@@ -94,12 +94,12 @@ import { ref, inject, Ref } from "vue";
 import { useRouter } from "vue-router";
 
 /* Importamos el fichero para realizar el login y redirigir a la pantalla indicada guardando el usuario */
-import { login } from "../services/loginService"
-import { useAuthStore } from "../stores/auth";
+import { login } from "@/services/loginService"
+import { useAuthStore } from "@/stores/auth";
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
-import type { Language } from "../useI18N";
-import { useI18n } from "../useI18N";
+import type { Language } from "@/useI18N";
+import { useI18n } from "@/useI18N";
 
 const router = useRouter();
 

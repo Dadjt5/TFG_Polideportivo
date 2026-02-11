@@ -99,13 +99,13 @@
 import { ref, inject, type Ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { useAuthStore } from '../../stores/auth';
-import { useAdministradorStore } from '../../stores/administrador';
-import { modificarAdministrador } from '../../services/administradorService';
+import { useAuthStore } from "@/stores/auth";
+import { useAdministradorStore } from "@/stores/administrador";
+import { modificarAdministrador } from "@/services/administradorService";
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
-import type { Language } from "../../useI18N";
-import { useI18n } from "../../useI18N";
+import type { Language } from "@/useI18N";
+import { useI18n } from "@/useI18N";
 
 const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);
