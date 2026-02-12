@@ -119,6 +119,8 @@
 <script setup lang="ts">
 import { type Ref, ref, inject, onMounted } from "vue";
 
+import { getConfiguracion } from "@/services/administradorService";
+
 import type { Language } from "@/useI18N"
 import { useI18n } from "@/useI18N"
 
@@ -127,32 +129,19 @@ const t = useI18n(language)
 
 const activeTab = ref<"params" | "notifs">("params");
 
-/* CONFIGURACIÓN */
-const config = ref({
-  cancelacionDias: 0,
-  deportesFavoritosMax: 0,
-  ventanaReserva: { min: 0, max: 0 },
-  antelacionNotificaciones: 0,
-  decisionMaxDias: 0,
+const configuracion = ref({
+  max_deportes_por_usuario: 0,
+  dias_minimo_reserva_actividad: 0,
+  dias_máximo_reserva_actividad: 0,
+  dias_minimo_cancelación: 0,
+  horas_previas_notificacion: 0,
+  texto_cambios_cancelaciones: '',
+  texto_avisos_actividades: '',
+  texto_problemas_pago: '',
+  texto_salida_lista_espera: '',
+  texto_ausencias: '',
+  texto_material_especial: ''
 });
-
-const parametros = [
-  { key: "cancelacionDias", label: "Tiempo cancelación actividad (días)" },
-  { key: "deportesFavoritosMax", label: "Deportes favoritos (máx.)" },
-  {
-    key: "ventanaReserva",
-    label: "Ventana reserva (horas)",
-    range: true,
-  },
-  {
-    key: "antelacionNotificaciones",
-    label: "Antelación notificaciones (horas)",
-  },
-  {
-    key: "decisionMaxDias",
-    label: "Tiempo máximo para decidir (días)",
-  },
-];
 
 const notifications = ref({
   rfc2: "",
@@ -170,4 +159,12 @@ const guardarParametros = () => {
 const guardarNotificaciones = () => {
   console.log("Guardar notificaciones", notifications.value);
 };
+
+onMounted(async () => {
+  try {
+    confiuracion.value = await getConfiguracion();
+  } catch(e) {
+    console.log("Error al obtener la configuracion", e)
+  }
+});
 </script>

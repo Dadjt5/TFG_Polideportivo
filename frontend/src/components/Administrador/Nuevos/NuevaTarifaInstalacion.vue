@@ -2,7 +2,7 @@
   <div class="min-vh-100 bg-light pb-5">
     <main class="container py-5">
       <h1 class="text-center fw-bold mb-5">
-        {{ t.newInstallationRate }}
+        {{ t.newFacilityTariff }}
       </h1>
 
       <div class="card shadow-sm border-0 rounded-4 p-4">
@@ -10,7 +10,7 @@
 
           <!-- PRECIO ABONADO -->
           <div class="col-md-6">
-            <label class="form-label fw-semibold">{{ t.priceSubscriber }}</label>
+            <label class="form-label fw-semibold">{{ t.priceSubscripcion }}</label>
             <input
               type="number"
               step="0.01"
@@ -66,7 +66,7 @@
                 v-model="tarifa.por_defecto"
               />
               <label class="form-check-label fw-semibold" for="porDefecto">
-                {{ t.defaultRate }}
+                {{ t.defaultTariff }}
               </label>
             </div>
           </div>
@@ -98,7 +98,7 @@
 import { ref, inject, type Ref } from "vue"
 import { useRouter } from "vue-router"
 
-import { nuevaTarifaInstalacion } from "@/services/crearRecursos"
+import { nuevaTarifaInstalacion } from "@/services/crearRecursosService"
 
 import type { Language } from "@/useI18N"
 import { useI18n } from "@/useI18N"

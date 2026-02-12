@@ -638,11 +638,21 @@ class TarifaTDASerializer(serializers.ModelSerializer):
         model = TarifaTDA
         fields = '__all__'
 
+class TarifaTDASimpleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TarifaTDA
+        fields = ('id', 'titulo')
+
 
 class TarifaInstalacionSerializer(serializers.ModelSerializer):
     class Meta:
         model = TarifaInstalacion
         fields = '__all__'
+        
+class TarifaInstalacionSimpleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TarifaInstalacion
+        fields = ('id', 'titulo')
 
 
 class TarifaActividadSerializer(serializers.ModelSerializer):
@@ -656,17 +666,32 @@ class ActividadComunSerializer(serializers.ModelSerializer):
         model = ActividadComun
         fields = '__all__'
 
+class ActividadComunSimpleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ActividadComun
+        fields = ('id', 'titulo')
 
-class GrupoReduvidoSerializer(serializers.ModelSerializer):
+
+class GrupoReducidoSerializer(serializers.ModelSerializer):
     class Meta:
         model = GrupoReducido
         fields = '__all__'
+
+class GrupoReducidoSimpleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GrupoReducido
+        fields = ('id', 'titulo')
 
 
 class FisioterapiaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Fisioterapia
         fields = '__all__'
+
+class FisioterapiaSimpleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Fisioterapia
+        fields = ('id', 'titulo')
 
 
 # --------------------

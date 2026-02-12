@@ -83,7 +83,7 @@
 import { ref, inject, type Ref } from "vue"
 import { useRouter } from "vue-router"
 
-import { nuevoPabellon } from "@/services/crearRecursos"
+import { nuevoPabellon } from "@/services/crearRecursosService"
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
 import type { Language } from "@/useI18N"

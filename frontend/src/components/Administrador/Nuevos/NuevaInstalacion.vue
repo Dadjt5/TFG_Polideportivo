@@ -158,7 +158,7 @@
 import { ref, inject, type Ref, onMounted } from "vue"
 import { useRouter } from "vue-router"
 
-import { nuevaInstalacion } from "@/services/crearRecursos"
+import { nuevaInstalacion } from "@/services/crearRecursosService"
 import { getPabellonesSimples, getTarifasInstalacion } from "@/services/listadoService"
 
 import { useTiposStore } from "@/stores/tipos"

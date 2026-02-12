@@ -212,13 +212,13 @@ import {
   Clock,
   Building2
 } from 'lucide-vue-next';
-import FilterCard from "./filters/FilterCard.vue";
-import FacilityCard from "./filters/FacilityCard.vue";
-import ActivityCard from "./filters/ActivityCard.vue";
-import DayOfWeekFilter from "./filters/DayOfWeekFilter.vue";
-import ActivityTypeFilter from "./filters/ActivityTypeFilter.vue";
-import TimeRangeFilter from "./filters/TimeRangeFilter.vue";
-import FacilityTypeFilter from "./filters/FacilityTypeFilter.vue";
+import FilterCard from "@/components/filters/FilterCard.vue";
+import FacilityCard from "@/components/filters/FacilityCard.vue";
+import ActivityCard from "@/components/filters/ActivityCard.vue";
+import DayOfWeekFilter from "@/components/filters/DayOfWeekFilter.vue";
+import ActivityTypeFilter from "@/components/filters/ActivityTypeFilter.vue";
+import TimeRangeFilter from "@/components/filters/TimeRangeFilter.vue";
+import FacilityTypeFilter from "@/components/filters/FacilityTypeFilter.vue";
 
 /* Importamos las comunicaciones con el backend */
 import { getBusqueda } from "@/services/buscarService";

@@ -11,3 +11,9 @@ export const getEspacios = async () => {
   const response = await api.get('api/v1/espacios/')
   return response.data;
 }
+
+/* Función para obtener las tarifas del sistema */
+export const getTarifas = async () => {
+  const response = await api.get('api/v1/tarifas/')
+  return response.data;
+}

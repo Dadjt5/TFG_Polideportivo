@@ -89,5 +89,6 @@ urlpatterns = [
     path("monitores/simple/", views.MonitorSimpleViewSet.as_view(), name="monitores-simple"),
     path("usuarios/", views.GestionUsuariosView.as_view(), name="obtener-usuarios"),
     path("espacios/", views.GestionEspaciosView.as_view(), name="obtener-espacios"),
+    path("tarifas/", views.GestionTarifasView.as_view(), name="obtener-tarifas"),
     path('', include(router.urls)),
 ]

@@ -2,7 +2,7 @@
 	<div class="min-vh-100 bg-light pb-5">
 		<main class="container py-5">
 			<h1 class="text-center fw-bold mb-5">
-				{{ t.newReducedGroupRate }}
+				{{ t.newSmallGroupsTariff }}
 			</h1>
 
 			<div class="card shadow-sm border-0 rounded-4 p-4">
@@ -58,15 +58,11 @@
 						<div class="form-check form-switch mt-3">
 							<input class="form-check-input" type="checkbox" id="porDefecto" v-model="tarifa.por_defecto" />
 							<label class="form-check-label fw-semibold" for="porDefecto">
-								{{ t.defaultRate }}
+								{{ t.defaultTariff }}
 							</label>
 						</div>
 					</div>
 				</div>
-
-				<p v-if="mensaje" class="text-center text-danger mt-4">
-					{{ mensaje }}
-				</p>
 
 				<!-- BOTONES -->
 				<div class="d-flex justify-content-center gap-3 mt-5">
@@ -87,7 +83,7 @@
 import { ref, inject, type Ref } from "vue"
 import { useRouter } from "vue-router"
 
-import { crearTarifaGrupoReducido } from "@/services/tarifasService"
+import { nuevaTarifaGrupoReducido } from "@/services/crearRecursosService"
 
 import type { Language } from "@/useI18N"
 import { useI18n } from "@/useI18N"
@@ -135,7 +131,7 @@ const crearTarifa = async () => {
 	if (!validarFormulario()) return
 
 	try {
-		await crearTarifaGrupoReducido(tarifa.value)
+		await nuevaTarifaGrupoReducido(tarifa.value)
 		router.back()
 	} catch (e) {
 		console.log("Error al crear la tarifa para grupos reducidos", e)

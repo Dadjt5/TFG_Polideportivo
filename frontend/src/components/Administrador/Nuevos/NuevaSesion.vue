@@ -50,7 +50,7 @@
 import { ref, inject, type Ref, onMounted } from "vue"
 import { useRouter } from "vue-router"
 
-import { nuevaSesion } from "@/services/crearRecursos"
+import { nuevaSesion } from "@/services/crearRecursosService"
 
 import { useTiposStore } from "@/stores/tipos"
 

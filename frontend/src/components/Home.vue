@@ -216,11 +216,11 @@ import {
   Clock,
   Building2
 } from 'lucide-vue-next';
-import FilterCard from "./filters/FilterCard.vue";
-import DayOfWeekFilter from "./filters/DayOfWeekFilter.vue";
-import ActivityTypeFilter from "./filters/ActivityTypeFilter.vue";
-import TimeRangeFilter from "./filters/TimeRangeFilter.vue";
-import FacilityTypeFilter from "./filters/FacilityTypeFilter.vue";
+import FilterCard from "@/components/filters/FilterCard.vue";
+import DayOfWeekFilter from "@/components/filters/DayOfWeekFilter.vue";
+import ActivityTypeFilter from "@/components/filters/ActivityTypeFilter.vue";
+import TimeRangeFilter from "@/components/filters/TimeRangeFilter.vue";
+import FacilityTypeFilter from "@/components/filters/FacilityTypeFilter.vue";
 
 /* Importamos las comunicaciones con el backend a traves de nuestro Store para guardar las estadisticas */
 import { useEstadisticasStore } from "@/stores/estadisticas";

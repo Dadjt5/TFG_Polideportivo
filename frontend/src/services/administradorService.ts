@@ -17,3 +17,9 @@ export const eliminarAdministrador = async (id: number) => {
   const response = await api.patch(`api/v1/administradores/${id}/`)
   return response.data
 };
+
+/* Función para obtener la configuracion del sistema */
+export const getConfiguracion = async () => {
+  const response = await api.patch(`api/v1/configuraciones/`)
+  return response.data
+};

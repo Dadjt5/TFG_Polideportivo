@@ -354,10 +354,39 @@ export default {
 
   /* Gestion tarifas */
   facilityTariff: "Tarifas de instalaciones",
+  TDATariff: "Tarifa de la TDA",
   commonActivityTariff: "Tarifas de actividades comunes",
   smallGroupsTariff: "Tarifas de grupos reducidos",
   physiotherapyTariff: "Tarifa de fisioterapia",
   newTariff: "Nueva tarifa",
+  repositionPrice: "Precio de reposición",
+
+  /* Nuevas tarifas */
+  newFacilityTariff: "Nueva tarifa de instalación",
+  newTDATariff: "Nueva tarifa de la TDA",
+  newCommonActivityTariff: "Nueva tarifa de actividades comunes",
+  newSmallGroupsTariff: "Nueva tarifa de grupos reducidos",
+  newPhysiotherapyTariff: "Nueva tarifa de fisioterapia",
+  priceSubscripcion: "Precio para abonados",
+  priceUAM: "Precio para miembros de la UAM",
+  priceTDA: "Precio al tener la TDA",
+  priceOthers: "Precio para el resto de casos",
+  defaultTariff: "Por defecto",
+  numberOfHours: "Número de horas",
+  numberOfPeople: "Número de participantes",
+  basePrice: "Precio base",
+  monthlyPrice: "Precio mensual",
+  quarterPrice: "Precio cuatrimestral",
+  consultationPrice: "Precio de consulta",
+
+  /* Editar tarifas */
+  tariffDetail: "Detalles de la tarifa",
+  modifyFacilityTariff: "Modificar tarifa de instalaciones",
+  modifyTDATariff: "Modificar tarifa de la TDA",
+  modifyCommonActivityTariff: "Modificar tarifa de actividades comunes",
+  modifySmallGroupsTariff: "Modificar tarifa de grupos reducidos",
+  modifyPhysiotherapyTariff: "Modificar tarifa de fisioterapia",
+  tariffName: "Nombre de la tarifa...",
 
   /* Configuracion */
   configurationTitle: "Configuración del sistema",

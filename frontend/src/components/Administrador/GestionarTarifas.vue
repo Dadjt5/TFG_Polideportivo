@@ -40,6 +40,38 @@
             </div>
           </div>
 
+          <!-- TARIFAS TDA -->
+          <div class="mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="fw-semibold text-success">
+                <i class="bi bi-geo-alt me-2"></i>{{ t.TDATariff }}
+              </h5>
+							<router-link to="/crear/tarifa/TDA" class="btn btn-primary rounded-pill">
+                <i class="bi bi-plus-lg me-1"></i> {{ t.newTariff }}
+              </router-link>
+            </div>
+
+            <div class="list-group list-group-flush">
+              <div
+                v-for="tarifa in tarifasTDA"
+                :key="tarifa.id"
+                class="list-group-item rounded-3 mb-2 shadow-sm d-flex justify-content-between align-items-center"
+                @click="tarifaTDADetail(tarifa.id)"
+              >
+                <div>
+                  <div class="fw-medium text-primary">
+                    {{ tarifa.titulo }}
+                  </div>
+                  <div class="text-muted small">
+                    UAM: {{ tarifa.precioUAM }}€ ·
+                    {{ t.other }}: {{ tarifa.precioOtros }}€
+                    {{ t.repositionPrice }}: {{ tarifa.precioReposicion }}€
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- ACTIVIDAD COMÚN -->
           <div class="mb-5">
             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -134,10 +166,7 @@
 import { ref, inject, type Ref, onMounted } from "vue"
 import { useRouter } from "vue-router"
 
-import {
-    getTarifasActividadComun, getTarifasGrupoReducido,
-    getTarifasFisioterapia, getTarifasInstalacion
-    } from "@/services/listadoService"
+import { getTarifas } from "@/services/gestionService"
 
 import type { Language } from "@/useI18N"
 import { useI18n } from "@/useI18N"
@@ -148,13 +177,22 @@ const t = useI18n(language);
 const router = useRouter();
 
 const tarifasInstalacion = ref<any[]>([]);
+const tarifasTDA = ref<any[]>([]);
 const tarifasActividadComun = ref<any[]>([]);
 const tarifasGrupoReducido = ref<any[]>([]);
 const tarifasFisioterapia = ref<any[]>([]);
 
+
 const tarifaInstalacionDetail = (id: number) => {
   router.push({
     name: "editar-tarifa-instalacion",
+    params: { id }
+  })
+};
+
+const tarifaTDADetail = (id: number) => {
+  router.push({
+    name: "editar-tarifa-TDA",
     params: { id }
   })
 };
@@ -181,9 +219,16 @@ const tarifaFisioterapiaDetail = (id: number) => {
 };
 
 onMounted(async () => {
-  tarifasInstalacion.value = await getTarifasInstalacion()
-  tarifasActividadComun.value = await getTarifasActividadComun()
-  tarifasGrupoReducido.value = await getTarifasGrupoReducido()
-  tarifasFisioterapia.value = await getTarifasFisioterapia()
+  try {
+    const data = await getTarifas();
+
+    tarifasInstalacion.value = data.tarifasInstalacion
+    tarifasTDA.value = data.tarifasTDA
+    tarifasActividadComun.value = data.tarifasActividadComun
+    tarifasGrupoReducido.value = data.tarifasGrupoReducido
+    tarifasFisioterapia.value = data.tarifasFisioterapia
+  } catch(e) {
+    console.log("Error al obtener las tarifas", e);
+  }
 });
 </script>

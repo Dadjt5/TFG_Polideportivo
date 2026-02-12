@@ -26,7 +26,8 @@ from .serializers import (
     MapaReservasSerializer, AdministradorSimpleSerializer, MonitorSimpleSerializer,
     UsuarioFinalSimpleSerializer, PabellonSimpleSerializer, ActividadSimpleSerializer,
     InstalacionSimpleSerializer, ActividadComunSerializer, GrupoReducidoSerializer,
-    FisioterapiaSerializer
+    FisioterapiaSerializer, TarifaInstalacionSimpleSerializer, TarifaTDASimpleSerializer,
+    ActividadComunSimpleSerializer, GrupoReducidoSimpleSerializer, FisioterapiaSimpleSerializer
 )
 
 from polideportivo.models import (
@@ -808,7 +809,7 @@ class ForoView(APIView):
 
         if user.is_usuario_final:
             canales = []
-            
+
             for canal in foro.canal.all():
                 usuarioCanal = UsuarioCanal.objects.filter(canal=canal, usuarioFinal=user.usuario_final).first()
                 if not canal.oculto and not usuarioCanal.expulsado:
@@ -820,11 +821,11 @@ class ForoView(APIView):
                         "secreto": canal.secreto,
                         "silenciado": usuarioCanal.silenciado
                     })
-                
+
             return Response(canales)
         elif user.id_administrador:
             return Response(foro)
-    
+
         return Response("Usuario incorrecto")
 
 
@@ -1040,11 +1041,42 @@ class GestionEspaciosView(APIView):
         serializerPabellon = PabellonSimpleSerializer(pabellones, many=True)
 
         instalaciones = Instalacion.objects.all().order_by('nombre')
-        serializerInstalaciones = MonitorSimpleSerializer(instalaciones, many=True)
+        serializerInstalaciones = InstalacionSimpleSerializer(instalaciones, many=True)
 
         data = {
             "pabellones": serializerPabellon.data,
             "instalaciones": serializerInstalaciones.data
+        }
+
+        return Response(data)
+    
+
+class GestionTarifasView(APIView):
+    permission_classes = [IsAdministrador]
+
+    def get(self, request):
+        tarifasInstalacion = TarifaInstalacion.objects.all().order_by('titulo')
+        serializerTarInst = PabellonSimpleSerializer(tarifasInstalacion, many=True)
+
+        tarifasTDA = TarifaTDA.objects.all().order_by('titulo')
+        serializerTarTDA = TarifaTDASimpleSerializer(tarifasTDA, many=True)
+        
+        tarifaActividadComun = ActividadComun.objects.all().order_by('titulo')
+        serializerTarActCom = ActividadComunSimpleSerializer(tarifaActividadComun, many=True)
+        
+        tarifasGrupoReducido = GrupoReducido.objects.all().order_by('titulo')
+        serializerTarGruRed = GrupoReducidoSimpleSerializer(tarifasGrupoReducido, many=True)
+
+        tarifasFisio = Fisioterapia.objects.all().order_by('titulo')
+        serializerTarFisio = FisioterapiaSimpleSerializer(tarifasFisio, many=True)
+
+        data = {
+            "tarifasInstalacion": serializerTarInst.data,
+            "tarifasTDA": serializerTarTDA.data,
+            "tarifasActividadComun": serializerTarActCom.data,
+            "tarifasActividadComun": serializerTarActCom.data,
+            "tarifasGrupoReducido": serializerTarGruRed.data,
+            "tarifasFisioterapia": serializerTarFisio.data
         }
 
         return Response(data)

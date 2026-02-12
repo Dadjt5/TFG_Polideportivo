@@ -2,7 +2,7 @@
   <div class="min-vh-100 bg-light pb-5">
     <main class="container py-5">
       <h1 class="text-center fw-bold mb-5">
-        {{ t.newPhysiotherapyRate }}
+        {{ t.newPhysiotherapyTariff }}
       </h1>
 
       <div class="card shadow-sm border-0 rounded-4 p-4">
@@ -81,7 +81,7 @@
           </div>
 
           <!-- SESIONES 6+ -->
-          <h5 class="fw-semibold mt-4">{{ t.sessionsFrom6 }}</h5>
+          <h5 class="fw-semibold mt-4">{{ t.sessions6plus }}</h5>
 
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.priceTDA }}</label>
@@ -126,7 +126,7 @@
                 v-model="tarifa.por_defecto"
               />
               <label class="form-check-label fw-semibold" for="porDefecto">
-                {{ t.defaultRate }}
+                {{ t.defaultTariff }}
               </label>
             </div>
           </div>
@@ -155,7 +155,7 @@
 import { ref, inject, type Ref } from "vue"
 import { useRouter } from "vue-router"
 
-import { crearTarifaFisioterapia } from "@/services/tarifasService"
+import { nuevaTarifaFisioterapia } from "@/services/crearRecursosService"
 
 import type { Language } from "@/useI18N"
 import { useI18n } from "@/useI18N"
@@ -206,7 +206,7 @@ const crearTarifa = async () => {
   if (!validarFormulario()) return
 
   try {
-    await crearTarifaFisioterapia(tarifa.value)
+    await nuevaTarifaFisioterapia(tarifa.value)
     router.back()
   } catch (e) {
     console.log("Error al crear la tarifa para fisioterapia", e)

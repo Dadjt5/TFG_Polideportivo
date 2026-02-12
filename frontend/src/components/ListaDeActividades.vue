@@ -61,11 +61,11 @@ import {
   Clock,
   Calendar
 } from "lucide-vue-next";
-import FilterCard from "./filters/FilterCard.vue";
-import DayOfWeekFilter from "./filters/DayOfWeekFilter.vue";
-import ActivityTypeFilter from "./filters/ActivityTypeFilter.vue";
-import TimeRangeFilter from "./filters/TimeRangeFilter.vue";
-import ActivityCard from './filters/ActivityCard.vue'
+import FilterCard from "@/components/filters/FilterCard.vue";
+import DayOfWeekFilter from "@/components/filters/DayOfWeekFilter.vue";
+import ActivityTypeFilter from "@/components/filters/ActivityTypeFilter.vue";
+import TimeRangeFilter from "@/components/filters/TimeRangeFilter.vue";
+import ActivityCard from '@/components/filters/ActivityCard.vue'
 
 import { getActividades } from "@/services/listadoService"
 

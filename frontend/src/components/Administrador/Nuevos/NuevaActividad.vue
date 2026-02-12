@@ -226,7 +226,7 @@
 import { ref, inject, type Ref, onMounted } from "vue"
 import { useRouter } from "vue-router"
 
-import { nuevaActividad } from "@/services/crearRecursos"
+import { nuevaActividad } from "@/services/crearRecursosService"
 import { getInstalacionesSimples, getMonitoresSimples } from "@/services/listadoService"
 
 import { useTiposStore } from "@/stores/tipos"
