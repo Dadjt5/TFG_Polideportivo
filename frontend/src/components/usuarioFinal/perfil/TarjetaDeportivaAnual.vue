@@ -12,8 +12,8 @@ import { onMounted } from 'vue';
 /* Importamos el usuario final guardado para ver si tiene TDA */
 import { useUserStore } from '@/stores/usuarioFinal';
 
-import TDAVacia from '@/components/tarjeta/TDAVacia.vue';
-import TDAActiva from '@/components/tarjeta/TDAActiva.vue';
+import TDAVacia from '@/components/usuarioFinal/perfil/tarjeta/TDAVacia.vue';
+import TDAActiva from '@/components/usuarioFinal/perfil/tarjeta/TDAActiva.vue';
 
 const usuarioFinalStore = useUserStore();
 

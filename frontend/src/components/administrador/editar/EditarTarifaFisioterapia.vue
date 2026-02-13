@@ -97,7 +97,7 @@
 
 				<button v-if="!editando" class="btn btn-primary btn-lg rounded-pill" @click="activarEdicion">
 					<i class="bi bi-pencil me-2"></i>
-					{{ t.modifyPhysiotherapyTariff }}
+					{{ t.modifyTariff }}
 				</button>
 
 				<template v-else>
@@ -113,7 +113,7 @@
 
 				<button v-if="!editando" class="btn btn-danger btn-lg rounded-pill" @click="eliminar">
 					<i class="bi bi-trash me-2"></i>
-					{{ t.delete }}
+					{{ t.deleteTariff }}
 				</button>
 
 			</div>

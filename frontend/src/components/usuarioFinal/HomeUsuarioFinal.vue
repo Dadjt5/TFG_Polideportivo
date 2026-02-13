@@ -184,13 +184,13 @@ import {
   Clock,
   Calendar
 } from "lucide-vue-next";
-import FilterCard from "./filters/FilterCard.vue";
-import DayOfWeekFilter from "./filters/DayOfWeekFilter.vue";
-import ActivityTypeFilter from "./filters/ActivityTypeFilter.vue";
-import TimeRangeFilter from "./filters/TimeRangeFilter.vue";
-import FacilityTypeFilter from "./filters/FacilityTypeFilter.vue";
-import FacilityCard from './filters/FacilityCard.vue'
-import ActivityCard from './filters/ActivityCard.vue'
+import FilterCard from "@/components/filters/FilterCard.vue";
+import DayOfWeekFilter from "@/components/filters/DayOfWeekFilter.vue";
+import ActivityTypeFilter from "@/components/filters/ActivityTypeFilter.vue";
+import TimeRangeFilter from "@/components/filters/TimeRangeFilter.vue";
+import FacilityTypeFilter from "@/components/filters/FacilityTypeFilter.vue";
+import FacilityCard from '@/components/filters/FacilityCard.vue'
+import ActivityCard from '@/components/filters/ActivityCard.vue'
 
 /* Importamos las comunicaciones con el backend a traves de nuestro Store para guardar las estadisticas y el usuario */
 import { useAuthStore } from "@/stores/auth";

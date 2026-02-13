@@ -37,7 +37,7 @@ export const eliminarInstalacion = async (id: number) => {
 };
 
 /* Función para obtener la informacion de un pabellon */
-export const getPabellon = async (id: number) => {
+export const getPabellonDetalle = async (id: number) => {
   const response = await api.get(`/api/v1/pabellones/${id}/`);
   return response.data;
 };
@@ -61,19 +61,19 @@ export const getActividadesInstalaciones = async (payload: any) => {
 };
 
 /* Función para obtener la informacion de una sesión */
-export const getSesionDetalle = async (idActividad: number, idSesion: number) => {
+export const getSesionDetalle = async (idActividad: string, idSesion: string) => {
   const response = await api.get(`/api/v1/actividades/${idActividad}/sesiones/${idSesion}/`);
   return response.data;
 };
 
 /* Función para editar los campos indicados de una sesion */
-export const modificarSesion = async (id: number, data: any) => {
+export const modificarSesion = async (id: string, data: any) => {
   const response = await api.patch(`api/v1/sesiones/${id}/`, data);
   return response.data;
 };
 
 /* Función para eliminar una sesion */
-export const eliminarSesion = async (id: number) => {
+export const eliminarSesion = async (id: string) => {
   const response = await api.delete(`api/v1/sesiones/${id}/`);
   return response.data;
 };

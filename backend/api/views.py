@@ -1056,7 +1056,7 @@ class GestionTarifasView(APIView):
 
     def get(self, request):
         tarifasInstalacion = TarifaInstalacion.objects.all().order_by('titulo')
-        serializerTarInst = PabellonSimpleSerializer(tarifasInstalacion, many=True)
+        serializerTarInst = TarifaInstalacionSimpleSerializer(tarifasInstalacion, many=True)
 
         tarifasTDA = TarifaTDA.objects.all().order_by('titulo')
         serializerTarTDA = TarifaTDASimpleSerializer(tarifasTDA, many=True)

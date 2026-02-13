@@ -93,7 +93,7 @@ import { useRouter } from "vue-router"
 
 import { useAuthStore } from "@/stores/auth"
 
-import { getPabellon, modificarPabellon, eliminarPabellon } from "@/services/detalleService"
+import { getPabellonDetalle, modificarPabellon, eliminarPabellon } from "@/services/detalleService"
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
 import type { Language } from "@/useI18N"

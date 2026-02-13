@@ -145,7 +145,7 @@
             <div v-if="actividad.sesiones.length > 0">
               <div v-for="s in actividad.sesiones" :key="s.id"
                 class="d-flex justify-content-between align-items-center p-3 mb-2 border rounded-3 bg-light"
-                style="cursor: pointer" @click="sesionDetail(s.id)">
+                style="cursor: pointer" @click="sesionDetail(actividad.id, s.id)">
                 <div>
                   <div class="fw-semibold">
                     {{ s.dia }}
@@ -175,7 +175,7 @@
 
         <button v-if="!editando" class="btn btn-primary btn-lg rounded-pill" @click="activarEdicion">
           <i class="bi bi-pencil me-2"></i>
-          {{ t.modifyUser }}
+          {{ t.modifyActivity }}
         </button>
 
         <template v-else>
@@ -191,7 +191,7 @@
 
         <button v-if="!editando" class="btn btn-danger btn-lg rounded-pill" @click="eliminar">
           <i class="bi bi-trash me-2"></i>
-          {{ t.deleteUser }}
+          {{ t.deleteActivity }}
         </button>
 
       </div>
@@ -385,10 +385,10 @@ const eliminar = async () => {
   }
 }
 
-const sesionDetail = (id: number) => {
+const sesionDetail = (idAct: number, idSesion: number) => {
   router.push({
     name: 'editar-sesion',
-    params: { id }
+    params: { idAct, idSesion }
   });
 }
 

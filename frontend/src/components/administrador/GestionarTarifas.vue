@@ -30,11 +30,6 @@
                   <div class="fw-medium text-primary">
                     {{ tarifa.titulo }}
                   </div>
-                  <div class="text-muted small">
-                    UAM: {{ tarifa.precioUAM }}€ ·
-                    {{ t.subscription }}: {{ tarifa.precioAbonado }}€ ·
-                    {{ t.other }}: {{ tarifa.precioOtros }}€
-                  </div>
                 </div>
               </div>
             </div>
@@ -62,11 +57,6 @@
                   <div class="fw-medium text-primary">
                     {{ tarifa.titulo }}
                   </div>
-                  <div class="text-muted small">
-                    UAM: {{ tarifa.precioUAM }}€ ·
-                    {{ t.other }}: {{ tarifa.precioOtros }}€
-                    {{ t.repositionPrice }}: {{ tarifa.precioReposicion }}€
-                  </div>
                 </div>
               </div>
             </div>
@@ -91,11 +81,8 @@
                 @click="tarifaActividadComunDetail(tarifa.id)"
               >
                 <div class="fw-medium text-primary">
-                   {{ t.weekHours }}: {{ tarifa.numeroHorasSemana }}h
-                </div>
-                <div class="text-muted small">
-                  UAM: {{ tarifa.precioUAM }}€ · {{ t.other }}: {{ tarifa.precioOtros }}€
-                </div>
+                    {{ tarifa.titulo }}
+                  </div>
               </div>
             </div>
           </div>
@@ -119,11 +106,8 @@
                 @click="tarifaGrupoReducidoDetail(tarifa.id)"
               >
                 <div class="fw-medium text-primary">
-                  {{ tarifa.numeroPersonas }} {{ t.people }} · {{ tarifa.numeroHoras }}h
-                </div>
-                <div class="text-muted small">
-                  {{ t.price }}: {{ tarifa.precio }}€
-                </div>
+                    {{ tarifa.titulo }}
+                  </div>
               </div>
             </div>
           </div>
@@ -147,10 +131,7 @@
                 @click="tarifaFisioterapiaDetail(tarifa.id)"
               >
                 <div class="fw-medium text-primary">
-                  {{ t.physiotherapyTariff }}
-                </div>
-                <div class="text-muted small">
-                  UAM: {{ tarifa.precioConsultaUAM }}€ · {{ t.other }}: {{ tarifa.precioConsultaOtros }}€
+                    {{ tarifa.titulo }}
                 </div>
               </div>
             </div>
@@ -199,14 +180,14 @@ const tarifaTDADetail = (id: number) => {
 
 const tarifaActividadComunDetail = (id: number) => {
   router.push({
-    name: "editar-tarifa-actividad-comun",
+    name: "editar-tarifa-comun",
     params: { id }
   })
 };
 
 const tarifaGrupoReducidoDetail = (id: number) => {
   router.push({
-    name: "editar-tarifa-grupo-reducido",
+    name: "editar-tarifa-grupos",
     params: { id }
   })
 };

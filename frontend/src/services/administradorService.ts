@@ -20,6 +20,12 @@ export const eliminarAdministrador = async (id: number) => {
 
 /* Función para obtener la configuracion del sistema */
 export const getConfiguracion = async () => {
-  const response = await api.patch(`api/v1/configuraciones/`)
+  const response = await api.get(`api/v1/configuraciones/`)
+  return response.data
+};
+
+/* Función para editar la configuracion del sistema */
+export const editarConfiguracion = async (id: number, data: any) => {
+  const response = await api.patch(`api/v1/administradores/${id}/`, data)
   return response.data
 };

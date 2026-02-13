@@ -328,6 +328,8 @@ export default {
   newFacility: "New facility",
   modifyPavilion: "Modify pavilion",
   modifyFacility: "Modify facility",
+  deletePavilion: "Delete pavilion",
+  deleteFacility: "Delete facility",
 
   /* Nueva instalacion */
   maxCapacity: "Max capacity",
@@ -335,6 +337,10 @@ export default {
 
   /* Gestion de actividades */
   searchActivities: "Search for activities...",
+  modifyActivity: "Modify activity",
+  deleteActivity: "Delete activity",
+  modifySession: "Modify session",
+  deleteSession: "Delete session",
 
   /* Detalle actividad */
   noSession: "No sessions",
@@ -379,11 +385,8 @@ export default {
 
   /* Editar tarifas */
   tariffDetail: "Tariff detail",
-  modifyFacilityTariff: "Modify facility tariff",
-  modifyTDATariff: "Modify TDA tariff",
-  modifyCommonActivityTariff: "Modify common activity tariff",
-  modifySmallGroupsTariff: "Modify small groups tariff",
-  modifyPhysiotherapyTariff: "Modify physiotherapy tariff",
+  modifyTariff: "Modify tariff",
+  deleteTariff: "Delete tariff",
   tariffName: "Tariff name...",
 
   /* Configuracion */
@@ -392,12 +395,16 @@ export default {
   tabParams: "Settings",
   tabNotifs: "Notifications",
   notificationTitle: "Notification templates",
-  rfc2: "Activity reminder",
-  rfc3: "Changes or cancellations",
-  rfc4: "Special material",
-  rfc5: "Payment issues",
-  rfc6: "Accumulated absences",
-  rfc8: "Waitlist exit",
+  textActivityNotices: "Activity reminder",
+  textChangesCancellations: "Changes or cancellations",
+  textSpecialMaterial: "Special material",
+  textPaymentProblems: "Payment issues",
+  textAbsences: "Accumulated absences",
+  textWaitingListExit: "Waitlist exit",
+  minDaysActivityReservation: "Minimum number of days to book the activity",
+  maxDaysActivityReservation: "Maximum number of days to book the activity",
+  minCancellationDays: "Minimum number of days required to cancel a reservation",
+  previousNotificationHours: "Hours in advance to send a notification",
 
   /* Contacto */
   contactTitle: "Sports Center Contact",

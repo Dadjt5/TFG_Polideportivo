@@ -62,6 +62,10 @@ router.register(r'monitores', views.MonitorViewSet, basename="monitor")
 router.register(r'administradores', views.AdministradorViewSet, basename="administrador")
 router.register(r'users', views.UserViewSet, basename="user")
 
+router.register(r'pabellonesSimple', views.PabellonSimpleViewSet, basename="pabellones-simple")
+router.register(r'instalacionesSimple', views.InstalacionSimpleViewSet, basename="instalaciones-simple")
+router.register(r'actividadesSimple', views.ActividadSimpleViewSet, basename="actividades-simple")
+router.register(r'monitoresSimple', views.MonitorSimpleViewSet, basename="monitores-simple")
 
 urlpatterns = [
     path("me/", views.meAPIView.as_view(), name="me"),
@@ -83,10 +87,6 @@ urlpatterns = [
     path("actividades/<int:actividad_id>/sesiones/<int:sesion_id>/asistencia/", views.GuardarAsistenciaView.as_view(), name="guardar-asistencia"),
     path("tarifas/actividades/<int:actividad_id>/", views.TarifaActividadView.as_view(), name="tarifa-actividad"),
     path("tarifas/instalaciones/<int:instalacion_id>/", views.TarifaInstalacionView.as_view(), name="tarifa-instalacion"),
-    path("pabellones/simple/", views.PabellonSimpleViewSet.as_view(), name="pabellones-simple"),
-    path("instalaciones/simple/", views.InstalacionSimpleViewSet.as_view(), name="instalaciones-simple"),
-    path("actividades/simple/", views.ActividadSimpleViewSet.as_view(), name="actividades-simple"),
-    path("monitores/simple/", views.MonitorSimpleViewSet.as_view(), name="monitores-simple"),
     path("usuarios/", views.GestionUsuariosView.as_view(), name="obtener-usuarios"),
     path("espacios/", views.GestionEspaciosView.as_view(), name="obtener-espacios"),
     path("tarifas/", views.GestionTarifasView.as_view(), name="obtener-tarifas"),

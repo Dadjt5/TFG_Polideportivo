@@ -124,7 +124,7 @@
           @click="activarEdicion"
         >
           <i class="bi bi-pencil me-2"></i>
-          {{ t.modifyFacilityTariff }}
+          {{ t.modifyTariff }}
         </button>
 
         <template v-else>
@@ -150,7 +150,7 @@
           @click="eliminar"
         >
           <i class="bi bi-trash me-2"></i>
-          {{ t.delete }}
+          {{ t.deleteTariff }}
         </button>
       </div>
     </main>

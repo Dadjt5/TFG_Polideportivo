@@ -27,58 +27,86 @@
         <div class="col-lg-6">
           <div class="bg-white rounded-3 shadow-sm p-4 h-100">
             <h4 class="mb-3 d-flex align-items-center">
-              <i class="bi bi-currency-euro text-primary me-2"></i>
+              <i class="bi bi-people-fill text-primary me-2"></i>
               {{ t.tariffDetail }}
             </h4>
 
             <div class="row g-3">
 
-              <!-- PRECIO UAM -->
+              <!-- NUMERO HORAS -->
               <div class="col-12 col-sm-6">
-                <span class="fw-medium">{{ t.priceUAM }}:</span>
-                <p v-if="!editando">{{ tarifa.precioUAM }} €</p>
+                <span class="fw-medium">{{ t.numberOfHours }}:</span>
+                <p v-if="!editando">{{ tarifa.numeroHoras }}</p>
+                <input
+                  v-else
+                  type="number"
+                  min="0"
+                  class="form-control"
+                  v-model.number="tarifa.numeroHoras"
+                  :class="{ 'is-invalid': errores.numeroHoras }"
+                />
+              </div>
+
+              <!-- NUMERO PERSONAS -->
+              <div class="col-12 col-sm-6">
+                <span class="fw-medium">{{ t.numberOfPeople }}:</span>
+                <p v-if="!editando">{{ tarifa.numeroPersonas }}</p>
+                <input
+                  v-else
+                  type="number"
+                  min="1"
+                  class="form-control"
+                  v-model.number="tarifa.numeroPersonas"
+                  :class="{ 'is-invalid': errores.numeroPersonas }"
+                />
+              </div>
+
+              <!-- PRECIO BASE -->
+              <div class="col-12 col-sm-6">
+                <span class="fw-medium">{{ t.price }}:</span>
+                <p v-if="!editando">{{ tarifa.precio }} €</p>
                 <input
                   v-else
                   type="number"
                   min="0"
                   step="0.01"
                   class="form-control"
-                  v-model.number="tarifa.precioUAM"
-                  :class="{ 'is-invalid': errores.precioUAM }"
+                  v-model.number="tarifa.precio"
+                  :class="{ 'is-invalid': errores.precio }"
                 />
               </div>
 
-              <!-- PRECIO OTROS -->
+              <!-- PRECIO CUATRIMESTRE -->
               <div class="col-12 col-sm-6">
-                <span class="fw-medium">{{ t.priceOthers }}:</span>
-                <p v-if="!editando">{{ tarifa.precioOtros }} €</p>
+                <span class="fw-medium">{{ t.quarterPrice }}:</span>
+                <p v-if="!editando">{{ tarifa.precioCuatrimestre }} €</p>
                 <input
                   v-else
                   type="number"
                   min="0"
                   step="0.01"
                   class="form-control"
-                  v-model.number="tarifa.precioOtros"
-                  :class="{ 'is-invalid': errores.precioOtros }"
+                  v-model.number="tarifa.precioCuatrimestre"
+                  :class="{ 'is-invalid': errores.precioCuatrimestre }"
                 />
               </div>
 
-              <!-- PRECIO REPOSICIÓN -->
+              <!-- PRECIO MENSUAL -->
               <div class="col-12 col-sm-6">
-                <span class="fw-medium">{{ t.repositionPrice }}:</span>
-                <p v-if="!editando">{{ tarifa.precioReposicion }} €</p>
+                <span class="fw-medium">{{ t.monthlyPrice }}:</span>
+                <p v-if="!editando">{{ tarifa.precioMensual }} €</p>
                 <input
                   v-else
                   type="number"
                   min="0"
                   step="0.01"
                   class="form-control"
-                  v-model.number="tarifa.precioReposicion"
-                  :class="{ 'is-invalid': errores.precioReposicion }"
+                  v-model.number="tarifa.precioMensual"
+                  :class="{ 'is-invalid': errores.precioMensual }"
                 />
               </div>
 
-							<!-- POR DEFECTO -->
+              <!-- POR DEFECTO -->
               <div class="col-12">
                 <span class="fw-medium">{{ t.defaultTariff }}:</span>
                 <p v-if="!editando">{{ tarifa.por_defecto ? t.yes : 'No' }}</p>
@@ -110,7 +138,7 @@
           @click="activarEdicion"
         >
           <i class="bi bi-pencil me-2"></i>
-          {{ t.modifyTDATariff }}
+          {{ t.modifyTariff }}
         </button>
 
         <template v-else>
@@ -136,11 +164,10 @@
           @click="eliminar"
         >
           <i class="bi bi-trash me-2"></i>
-          {{ t.delete }}
+          {{ t.deleteTariff }}
         </button>
 
       </div>
-
     </main>
   </div>
 </template>
@@ -150,9 +177,9 @@ import { ref, inject, onMounted, type Ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 import {
-  getTarifaTDADetalle,
-  modificarTarifaTDA,
-  eliminarTarifaTDA
+  getTarifaGrupoReducidoDetalle,
+  modificarTarifaGrupoReducido,
+  eliminarTarifaGrupoReducido
 } from '@/services/detalleTarifaService'
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
@@ -170,17 +197,21 @@ const editando = ref(false)
 const tarifa = ref({
   id: 0,
   nombre: '',
-  precioUAM: 0,
-  precioOtros: 0,
-  precioReposicion: 0,
-	por_defecto: false
+  numeroHoras: 0,
+  numeroPersonas: 0,
+  precio: 0,
+  precioCuatrimestre: 0,
+  precioMensual: 0,
+  por_defecto: false
 })
 
 const errores = ref({
-  nombre: false,
-  precioUAM: false,
-  precioOtros: false,
-  precioReposicion: false
+	nombre: false,
+  numeroHoras: false,
+  numeroPersonas: false,
+  precio: false,
+  precioCuatrimestre: false,
+  precioMensual: false
 })
 
 const tarifaOriginal = ref<any>(null)
@@ -188,9 +219,11 @@ const tarifaOriginal = ref<any>(null)
 function validarFormulario() {
   let valido = true
 
-  errores.value.precioUAM = tarifa.value.precioUAM < 0
-  errores.value.precioOtros = tarifa.value.precioOtros < 0
-  errores.value.precioReposicion = tarifa.value.precioReposicion < 0
+  errores.value.numeroHoras = tarifa.value.numeroHoras < 0
+  errores.value.numeroPersonas = tarifa.value.numeroPersonas <= 0
+  errores.value.precio = tarifa.value.precio < 0
+  errores.value.precioCuatrimestre = tarifa.value.precioCuatrimestre < 0
+  errores.value.precioMensual = tarifa.value.precioMensual < 0
 
   for (const key in errores.value) {
     if (errores.value[key]) valido = false
@@ -225,14 +258,14 @@ const guardarCambios = async () => {
 
   const data = camposModificados()
   if (Object.keys(data).length > 0) {
-    await modificarTarifaTDA(tarifa.value.id, data)
+    await modificarTarifaGrupoReducido(tarifa.value.id, data)
     tarifaOriginal.value = JSON.parse(JSON.stringify(tarifa.value))
     editando.value = false
   }
 }
 
 const eliminar = async () => {
-  await eliminarTarifaTDA(tarifa.value.id)
+  await eliminarTarifaGrupoReducido(tarifa.value.id)
   router.back()
 }
 
@@ -240,7 +273,7 @@ const volver = () => router.back()
 
 onMounted(async () => {
   const id = parseInt(props.id)
-  tarifa.value = await getTarifaTDADetalle(id)
+  tarifa.value = await getTarifaGrupoReducidoDetalle(id)
   tarifaOriginal.value = JSON.parse(JSON.stringify(tarifa.value))
 })
 </script>

@@ -330,6 +330,8 @@ export default {
   newFacility: "Nueva instalacion",
   modifyPavilion: "Editar pabellón",
   modifyFacility: "Editar instalación",
+  deletePavilion: "Eliminar pabellón",
+  deleteFacility: "Eliminar instalación",
 
   /* Nueva instalacion */
   maxCapacity: "Capacidad máxima",
@@ -337,6 +339,10 @@ export default {
 
   /* Gestion de actividades */
   searchActivities: "Buscar actividades...",
+  modifyActivity: "Editar actividad",
+  deleteActivity: "Eliminar actividad",
+  modifySession: "Editar sesión",
+  deleteSession: "Eliminar sesión",
 
   /* Detalle actividad */
   noSession: "Sin sesiones",
@@ -381,11 +387,8 @@ export default {
 
   /* Editar tarifas */
   tariffDetail: "Detalles de la tarifa",
-  modifyFacilityTariff: "Modificar tarifa de instalaciones",
-  modifyTDATariff: "Modificar tarifa de la TDA",
-  modifyCommonActivityTariff: "Modificar tarifa de actividades comunes",
-  modifySmallGroupsTariff: "Modificar tarifa de grupos reducidos",
-  modifyPhysiotherapyTariff: "Modificar tarifa de fisioterapia",
+  modifyTariff: "Modificar tarifa",
+  deleteTariff: "Eliminar tarifa",
   tariffName: "Nombre de la tarifa...",
 
   /* Configuracion */
@@ -394,12 +397,16 @@ export default {
   tabParams: "Parámetros",
   tabNotifs: "Notificaciones",
   notificationTitle: "Textos de notificaciones",
-  rfc2: "Aviso antes actividad",
-  rfc3: "Cambios o cancelaciones",
-  rfc4: "Material especial",
-  rfc5: "Problemas de pago",
-  rfc6: "Ausencias acumuladas",
-  rfc8: "Salida lista de espera",
+  textActivityNotices: "Aviso antes actividad",
+  textChangesCancellations: "Cambios o cancelaciones",
+  textSpecialMaterial: "Material especial",
+  textPaymentProblems: "Problemas de pago",
+  textAbsences: "Ausencias acumuladas",
+  textWaitingListExit: "Salida lista de espera",
+  minDaysActivityReservation: "Cantidad mínima de días para reservar la actividad",
+  maxDaysActivityReservation: "Cantidad máxima de días para reservar la actividad",
+  minCancellationDays: "Cantidad de días mínima para cancelar la reserva",
+  previousNotificationHours: "Horas previas para enviar una notificación",
 
   /* Contacto */
   contactTitle: "Contacto con el centro deportivo",

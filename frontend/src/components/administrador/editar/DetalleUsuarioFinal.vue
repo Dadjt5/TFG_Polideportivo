@@ -423,7 +423,7 @@ function camposModificados() {
   }
 
   const favoritosActuales = ((usuarioOriginal.value.deportes as {id: number, titulo: string}[]) || []).map(d => d.id).sort()
-  const favoritosNuevosIds = [@.usuario.value.deportesFavoritos].sort()
+  const favoritosNuevosIds = [...usuario.value.deportesFavoritos].sort()
 
   if(JSON.stringify(favoritosActuales) !== JSON.stringify(favoritosNuevosIds)) {
     data["deportes_ids"] = favoritosNuevosIds;

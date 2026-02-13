@@ -167,6 +167,24 @@
             </select>
           </div>
 
+          <!-- TARIFA -->
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">{{ t.tariff }}</label>
+            <select
+              class="form-select form-select-lg"
+              v-model="actividad.tarifa"
+            >
+              <option value="">--</option>
+              <option
+                v-for="t in tarifas"
+                :key="t.id"
+                :value="t.id"
+              >
+                {{ t.nombre }}
+              </option>
+            </select>
+          </div>
+
           <!-- RESERVA -->
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.reserveType }}</label>
@@ -223,11 +241,11 @@
 
 
 <script setup lang="ts">
-import { ref, inject, type Ref, onMounted } from "vue"
+import { watch, inject, type Ref, ref, onMounted } from "vue"
 import { useRouter } from "vue-router"
 
 import { nuevaActividad } from "@/services/crearRecursosService"
-import { getInstalacionesSimples, getMonitoresSimples } from "@/services/listadoService"
+import { getInstalacionesSimples, getMonitoresSimples, getTarifasActividadComun, getTarifasFisioterapia, getTarifasGrupoReducido } from "@/services/listadoService"
 
 import { useTiposStore } from "@/stores/tipos"
 
@@ -258,6 +276,7 @@ const actividad = ref({
   instalacion: "",
   monitor: "",
   tipoActividad: "",
+  tarifa: null,
   tipoReserva: "",
   terreno: "",
   estado: "",
@@ -280,6 +299,7 @@ const errores = ref({
 
 const instalaciones = ref<any[]>([])
 const monitores = ref<any[]>([])
+const tarifas = ref<any[]>([])
 
 function validarFormulario() {
   let ok = true
@@ -317,6 +337,24 @@ const crearActividad = async () => {
 }
 
 const volver = () => router.back()
+
+watch(
+  () => actividad.value.tipoActividad,
+  async (nuevoTipo: string) => {
+    if (!nuevoTipo) {
+      tarifas.value = []
+      return
+    }
+
+    if (nuevoTipo === "Otros") {
+      tarifas.value = await getTarifasActividadComun()
+    } else if (nuevoTipo === "Grupos reducidos") {
+      tarifas.value = await getTarifasGrupoReducido()
+    } else if (nuevoTipo === "Fisioterapia") {
+      tarifas.value = await getTarifasFisioterapia()
+    }
+  }
+)
 
 onMounted(async () => {
   instalaciones.value = await getInstalacionesSimples()

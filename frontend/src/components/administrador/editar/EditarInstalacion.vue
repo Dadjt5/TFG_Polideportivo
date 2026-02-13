@@ -191,7 +191,7 @@
           @click="activarEdicion"
         >
           <i class="bi bi-pencil me-2"></i>
-          {{ t.modifyUser }}
+          {{ t.modifyFacility }}
         </button>
 
         <template v-else>
@@ -217,7 +217,7 @@
           @click="eliminar"
         >
           <i class="bi bi-trash me-2"></i>
-          {{ t.deleteUser }}
+          {{ t.deleteFacility }}
         </button>
 
       </div>

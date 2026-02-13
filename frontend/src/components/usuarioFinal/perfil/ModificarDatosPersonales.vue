@@ -154,6 +154,7 @@ import { useRouter } from 'vue-router'
 
 import { useUserStore } from '@/stores/usuarioFinal'
 import { useEstadisticasStore } from '@/stores/estadisticas';
+import { useConfiguracionStore } from "@/stores/configuracion";
 
 import { modificarUsuarioFinal } from '@/services/usuarioFinalService';
 
@@ -166,6 +167,7 @@ const t = useI18n(language);
 
 const usuarioFinalStore = useUserStore()
 const estadisticasStore = useEstadisticasStore()
+const configuracionStore = useConfiguracionStore()
 
 const router = useRouter()
 
@@ -198,7 +200,7 @@ const errores = ref({
   password: false,
 })
 
-const deportesRestantes = ref(5)
+const deportesRestantes = ref(configuracionStore.max_deportes_por_usuario)
 
 const favoritosSeleccionados = computed(() => {
   return Object.values(estadisticasStore.data.tiposDeporte)

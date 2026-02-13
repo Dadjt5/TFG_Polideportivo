@@ -95,7 +95,7 @@
         </div>
 
         <div class="col-md-6">
-          <router-link to="/configuracion/administrador" class="text-decoration-none text-dark">
+          <router-link to="/configuracion" class="text-decoration-none text-dark">
             <div class="card shadow-sm h-100 option-card">
               <div class="card-body">
                 <div class="d-flex align-items-center gap-3">

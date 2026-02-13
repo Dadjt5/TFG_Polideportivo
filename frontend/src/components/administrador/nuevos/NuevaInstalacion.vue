@@ -129,10 +129,6 @@
 
         </div>
 
-        <p v-if="mensaje" class="text-center text-danger mt-4">
-          {{ mensaje }}
-        </p>
-
         <!-- BOTONES -->
         <div class="d-flex justify-content-center gap-3 mt-5">
           <button
@@ -180,7 +176,7 @@ const instalacion = ref({
   luz: false,
   porcentajeTDA: 0,
   pabellon: "",
-  tarifa: "",
+  tarifa: null,
   tipoInstalacion: ""
 })
 
@@ -192,8 +188,6 @@ const errores = ref({
   pabellon: false,
   tipoInstalacion: false
 })
-
-const mensaje = ref("")
 
 const pabellones = ref<any[]>([])
 const tarifas = ref<any[]>([])
