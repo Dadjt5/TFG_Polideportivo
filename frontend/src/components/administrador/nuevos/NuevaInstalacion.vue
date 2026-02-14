@@ -30,10 +30,10 @@
               <option value="" disabled>--</option>
               <option
                 v-for="t in tiposStore.tiposInstalacion"
-                :key="t"
-                :value="t"
+                :key="t[0]"
+                :value="t[0]"
               >
-                {{ t }}
+                {{ t[1] }}
               </option>
             </select>
           </div>

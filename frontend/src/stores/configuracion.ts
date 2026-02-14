@@ -7,8 +7,8 @@ export const useConfiguracionStore = defineStore("configuracion", {
 		id: 0,
 		max_deportes_por_usuario: 0,
 		dias_minimo_reserva_actividad: 0,
-		dias_máximo_reserva_actividad: 0,
-		dias_minimo_cancelación: 0,
+		dias_maximo_reserva_actividad: 0,
+		dias_minimo_cancelacion: 0,
 		horas_previas_notificacion: 0,
 		texto_cambios_cancelaciones: '',
 		texto_avisos_actividades: '',
@@ -27,8 +27,8 @@ export const useConfiguracionStore = defineStore("configuracion", {
 				this.id = data.id;
 				this.max_deportes_por_usuario = data.max_deportes_por_usuario;
 				this.dias_minimo_reserva_actividad = data.dias_minimo_reserva_actividad;
-				this.dias_máximo_reserva_actividad = data.dias_máximo_reserva_actividad;
-				this.dias_minimo_cancelación = data.dias_minimo_cancelación;
+				this.dias_maximo_reserva_actividad = data.dias_maximo_reserva_actividad;
+				this.dias_minimo_cancelacion = data.dias_minimo_cancelacion;
 				this.horas_previas_notificacion = data.horas_previas_notificacion;
 
 				this.texto_cambios_cancelaciones = data.texto_cambios_cancelaciones;
@@ -51,8 +51,8 @@ export const useConfiguracionStore = defineStore("configuracion", {
 				const payload = {
 					max_deportes_por_usuario: this.max_deportes_por_usuario,
 					dias_minimo_reserva_actividad: this.dias_minimo_reserva_actividad,
-					dias_máximo_reserva_actividad: this.dias_máximo_reserva_actividad,
-					dias_minimo_cancelación: this.dias_minimo_cancelación,
+					dias_maximo_reserva_actividad: this.dias_maximo_reserva_actividad,
+					dias_minimo_cancelacion: this.dias_minimo_cancelacion,
 					horas_previas_notificacion: this.horas_previas_notificacion,
 					texto_cambios_cancelaciones: this.texto_cambios_cancelaciones,
 					texto_avisos_actividades: this.texto_avisos_actividades,
@@ -62,7 +62,7 @@ export const useConfiguracionStore = defineStore("configuracion", {
 					texto_material_especial: this.texto_material_especial,
 				};
 
-				const data = await editarConfiguracion(this.id, payload);
+				const data = await editarConfiguracion(payload);
 
 				Object.assign(this, data);
 				this.guardarEnLocalStorage();
@@ -78,8 +78,8 @@ export const useConfiguracionStore = defineStore("configuracion", {
 				id: this.id,
 				max_deportes_por_usuario: this.max_deportes_por_usuario,
 				dias_minimo_reserva_actividad: this.dias_minimo_reserva_actividad,
-				dias_máximo_reserva_actividad: this.dias_máximo_reserva_actividad,
-				dias_minimo_cancelación: this.dias_minimo_cancelación,
+				dias_maximo_reserva_actividad: this.dias_maximo_reserva_actividad,
+				dias_minimo_cancelacion: this.dias_minimo_cancelacion,
 				horas_previas_notificacion: this.horas_previas_notificacion,
 				texto_cambios_cancelaciones: this.texto_cambios_cancelaciones,
 				texto_avisos_actividades: this.texto_avisos_actividades,

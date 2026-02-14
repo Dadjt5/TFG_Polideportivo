@@ -20,8 +20,6 @@ router.register(r'agendas', views.AgendaViewSet, basename="agenda")
 
 router.register(r'bonos', views.BonoViewSet, basename="bono")
 
-router.register(r'configuraciones', views.ConfiguracionViewSet, basename="configuracion")
-
 router.register(r'deportes', views.DeporteViewSet, basename="deporte")
 
 router.register(r'descuentos', views.DescuentoViewSet, basename="descuento")
@@ -82,6 +80,7 @@ urlpatterns = [
     path("reservas/", views.ReservasView.as_view(), name="Reservas-favoritas"),
     path("foro/", views.ForoView.as_view(), name="Foro"),
     path("canales/<int:canal_id>/mensajes/", views.MensajesCanalView.as_view(), name="mensajes-canal"),
+    path("canales/<int:canal_id>/modificar/<int:usuario_id>/", views.GestionarUsuarioCanal.as_view(), name="gestionar-usuario-canal"),
     path("monitores/<int:monitor_id>/sesiones/", views.SesionesMonitorView.as_view(), name="sesiones-monitor"),
     path("actividades/<int:actividad_id>/sesiones/<int:sesion_id>/", views.DetalleSesionView.as_view(), name="detalle-sesion"),
     path("actividades/<int:actividad_id>/sesiones/<int:sesion_id>/asistencia/", views.GuardarAsistenciaView.as_view(), name="guardar-asistencia"),
@@ -90,5 +89,6 @@ urlpatterns = [
     path("usuarios/", views.GestionUsuariosView.as_view(), name="obtener-usuarios"),
     path("espacios/", views.GestionEspaciosView.as_view(), name="obtener-espacios"),
     path("tarifas/", views.GestionTarifasView.as_view(), name="obtener-tarifas"),
+    path("configuracion/", views.ObtenerConfiguracionView.as_view(), name="obtener-configuracion"),
     path('', include(router.urls)),
 ]

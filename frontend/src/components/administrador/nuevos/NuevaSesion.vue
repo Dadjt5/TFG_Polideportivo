@@ -12,8 +12,8 @@
             <label class="form-label fw-semibold">{{ t.day }}</label>
             <select class="form-select form-select-lg" :class="{ 'is-invalid': errores.dia }" v-model="sesion.dia">
               <option value="">{{ t.selectOption }}</option>
-              <option v-for="d in tipoStore.dias" :key="d" :value="d">
-                {{ d }}
+              <option v-for="d in tipoStore.dias" :key="d[0]" :value="d[0]">
+                {{ d[1] }}
               </option>
             </select>
           </div>

@@ -36,7 +36,7 @@ from polideportivo.models import (
     EntradaListaEspera, TarifaTDA, Monitor, Notificacion, Pago, TarifaActividad, 
     TarifaInstalacion, TDA, UsuarioFinal, AbonoDeportivo, AbonoVerano, Pabellon, 
     ReservaActividad, Alquiler, Administrador, User, CompraBono, CompraAbono,
-    Mensaje, Sesion, MapaReservas, TipoActividad, TipoInstalacion, TipoReserva,
+    Mensaje, Sesion, MapaReservas, TipoActividad, TipoInstalacion, FormaReserva,
     Terreno, Estado, Dia, ActividadComun, GrupoReducido, Fisioterapia
 )
 
@@ -335,7 +335,6 @@ class MonitorSimpleViewSet(viewsets.ModelViewSet):
     queryset = Monitor.objects.all()
     serializer_class = MonitorSimpleSerializer
     permission_classes = [IsAuthenticated]
-    authentication_classes = []
 
 
 # ----------------
@@ -543,7 +542,7 @@ class TiposViews(APIView):
         data = {
             "tiposActividad": TipoActividad.choices,
             "tiposInstalacion": TipoInstalacion.choices,
-            "tiposReserva": TipoReserva.choices,
+            "tiposReserva": FormaReserva.choices,
             "terrenos": Terreno.choices,
             "estados": Estado.choices,
             "dias": Dia.choices
@@ -850,7 +849,26 @@ class MensajesCanalView(APIView):
         if resultado:
             return Response({"respuesta": "Mensaje enviado"}, status=status.HTTP_201_CREATED)
 
-        return Response({"respuesta": "No puedes escribir en este canal"}, status=status.HTTP_403_FORBIDDEN)
+        return Response({"respuesta": "No puedes escribir en este canal"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class GestionUsuarioCanalView(APIView):
+    permission_classes = [IsAdministrador]
+
+    def patch(self, request, canal_id, usuario_id):
+        accion = request.data.get("accion")
+        canal = get_object_or_404(Canal, id=canal_id)
+        usuarioFinal = get_object_or_404(UsuarioFinal, id=usuario_id)
+
+        if accion == "silenciar":
+            canal.cambiarSilencioUsuario(usuarioFinal)
+            return Response({"respuesta": "Exito"}, status=status.HTTP_201_CREATED)
+
+        elif accion == "expulsar":
+            canal.expulsarUsuario(usuarioFinal)
+            return Response({"respuesta": "Exito"}, status=status.HTTP_201_CREATED)
+
+        return Response({"respuesta": "Accion invalida"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Mostrar las sesiones del monitor
@@ -1080,3 +1098,22 @@ class GestionTarifasView(APIView):
         }
 
         return Response(data)
+
+
+class ObtenerConfiguracionView(APIView):
+    permission_classes = [IsAdministrador]
+
+    def get(self, request):
+        configuracion = Configuracion.objects.first()
+        serializer = ConfiguracionSerializer(configuracion)
+        return Response(serializer.data)
+
+    def patch(self, request):
+        configuracion = Configuracion.objects.first()
+
+        resultado = configuracion.editar(request.data)
+        
+        if resultado:
+            return Response({"respuesta": "Resultados cambiados correctamente"}, status=status.HTTP_200_OK)
+        
+        return Response({"respuesta": "Error al modificar la configuracion"}, status=status.HTTP_400_BAD_REQUEST)

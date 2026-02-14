@@ -1,5 +1,8 @@
 import api from "./api";
 
+/* Tipo genérico para payloads */
+type Payload = Record<string, any>
+
 /* Función para obtener el foro y los canales del backend */
 export const getForo = async () => {
   const response = await api.get('/api/v1/foro/');
@@ -17,3 +20,15 @@ export const enviarMensaje = async (idCanal: number, data: any) => {
   const response = await api.post(`api/v1/canales/${idCanal}/mensajes/`, data)
   return response.data
 }
+
+/* Función para crear un nuevo canal en el foro */
+export const nuevoCanal = async (payload: Payload): Promise<any> => {
+  const response = await api.post("api/v1/canales/", payload)
+  return response.data
+}
+
+/* Funcion para silenciar o expulsar a un usuario de un canal */
+export const modificarUsuarioFinal = async (idCanal: number, idUsuario: number, accion: any) => {
+  const response = await api.get(`api/v1/canales/${idCanal}/modificar/${idUsuario}`, accion)
+  return response.data;
+};

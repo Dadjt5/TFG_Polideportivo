@@ -406,6 +406,13 @@ export default {
   minCancellationDays: "Minimum number of days required to cancel a reservation",
   previousNotificationHours: "Hours in advance to send a notification",
 
+  /* Foro administrador */
+  channelName: "Channel name...",
+  newChannel: "New channel",
+  channelUsers: "Channel users",
+  kick: "Expel",
+  mute: "Mute",
+
   /* Contacto */
   contactTitle: "Sports Center Contact",
   contactSubtitle: "Contact information of the administration building",

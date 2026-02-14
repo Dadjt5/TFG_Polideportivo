@@ -39,7 +39,7 @@
               v-model="actividad.estado"
             >
               <option disabled value="">--</option>
-              <option v-for="e in tiposStore.estados" :key="e" :value="e">{{ e }}</option>
+              <option v-for="e in tiposStore.estados" :key="e[0]" :value="e[0]">{{ e[1] }}</option>
             </select>
           </div>
 
@@ -163,7 +163,7 @@
               :class="{ 'is-invalid': errores.tipoActividad }"
               v-model="actividad.tipoActividad"
             >
-              <option v-for="t in tiposStore.tiposActividad" :key="t" :value="t">{{ t }}</option>
+              <option v-for="t in tiposStore.tiposActividad" :key="t[0]" :value="t[0]">{{ t[1] }}</option>
             </select>
           </div>
 
@@ -173,6 +173,7 @@
             <select
               class="form-select form-select-lg"
               v-model="actividad.tarifa"
+              :key="tarifas.length"
             >
               <option value="">--</option>
               <option
@@ -193,7 +194,7 @@
               :class="{ 'is-invalid': errores.tipoReserva }"
               v-model="actividad.tipoReserva"
             >
-              <option v-for="r in tiposStore.tiposReserva" :key="r" :value="r">{{ r }}</option>
+              <option v-for="r in tiposStore.tiposReserva" :key="r[0]" :value="r[0]">{{ r[1] }}</option>
             </select>
           </div>
 
@@ -205,7 +206,7 @@
               :class="{ 'is-invalid': errores.terreno }"
               v-model="actividad.terreno"
             >
-              <option v-for="t in tiposStore.terrenos" :key="t" :value="t">{{ t }}</option>
+              <option v-for="t in tiposStore.terrenos" :key="t[0]" :value="t[0]">{{ t[1] }}</option>
             </select>
           </div>
 
@@ -275,7 +276,7 @@ const actividad = ref({
   exterior: false,
   instalacion: "",
   monitor: "",
-  tipoActividad: "",
+  tipoActividad: "OTROS",
   tarifa: null,
   tipoReserva: "",
   terreno: "",
@@ -319,7 +320,9 @@ function validarFormulario() {
   errores.value.instalacion = actividad.value.instalacion === ""
 
   for (const k in errores.value) {
-    if (errores.value[k]) ok = false
+    if (errores.value[k]) {
+      ok = false
+    }
   }
 
   return ok
@@ -341,16 +344,17 @@ const volver = () => router.back()
 watch(
   () => actividad.value.tipoActividad,
   async (nuevoTipo: string) => {
+    actividad.value.tarifa = null
     if (!nuevoTipo) {
       tarifas.value = []
       return
     }
 
-    if (nuevoTipo === "Otros") {
+    if (nuevoTipo === "OTROS") {
       tarifas.value = await getTarifasActividadComun()
-    } else if (nuevoTipo === "Grupos reducidos") {
+    } else if (nuevoTipo === "GRUPOS_REDUCIDOS") {
       tarifas.value = await getTarifasGrupoReducido()
-    } else if (nuevoTipo === "Fisioterapia") {
+    } else if (nuevoTipo === "FISIOTERAPIA") {
       tarifas.value = await getTarifasFisioterapia()
     }
   }
@@ -359,5 +363,6 @@ watch(
 onMounted(async () => {
   instalaciones.value = await getInstalacionesSimples()
   monitores.value = await getMonitoresSimples()
+  tarifas.value = await getTarifasActividadComun()
 })
 </script>

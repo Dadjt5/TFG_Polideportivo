@@ -7,8 +7,8 @@ class Configuracion(models.Model):
     
     max_deportes_por_usuario = models.PositiveIntegerField(default=5)
     dias_minimo_reserva_actividad = models.PositiveIntegerField(default=1)
-    dias_máximo_reserva_actividad = models.PositiveIntegerField(default=7)
-    dias_minimo_cancelación = models.PositiveIntegerField(default=1)
+    dias_maximo_reserva_actividad = models.PositiveIntegerField(default=7)
+    dias_minimo_cancelacion = models.PositiveIntegerField(default=1)
     horas_previas_notificacion = models.PositiveIntegerField(default=1)
     texto_cambios_cancelaciones = models.CharField(max_length=1024, blank=True)
     texto_avisos_actividades = models.CharField(max_length=1024, blank=True)
@@ -25,3 +25,15 @@ class Configuracion(models.Model):
 
     def __str__(self):
         return "Configuración global de la aplicación"
+    
+    def editar(self, data):
+        try:
+            for campo, valor in data.items():
+                print(campo, valor)
+                if hasattr(self, campo):
+                    setattr(self, campo, valor)
+            self.save()
+            return True
+        except Exception as e:
+            print("Error al editar configuración:", e)
+            return False

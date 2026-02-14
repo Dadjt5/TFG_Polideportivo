@@ -27,7 +27,7 @@
           <div class="card h-100 shadow-sm">
             <div class="card-body">
               <h5 class="card-title">{{ t.sportsMaxNumber }}</h5>
-              <input type="number" class="form-control" v-model.number="configuracion.max_deportes_por_usuario" />
+              <input type="number" class="form-control" v-model.number="configuracionStore.max_deportes_por_usuario" />
             </div>
           </div>
         </div>
@@ -37,7 +37,7 @@
           <div class="card h-100 shadow-sm">
             <div class="card-body">
               <h5 class="card-title">{{ t.minDaysActivityReservation }}</h5>
-              <input type="number" class="form-control" v-model.number="configuracion.dias_minimo_reserva_actividad" />
+              <input type="number" class="form-control" v-model.number="configuracionStore.dias_minimo_reserva_actividad" />
             </div>
           </div>
         </div>
@@ -47,7 +47,7 @@
           <div class="card h-100 shadow-sm">
             <div class="card-body">
               <h5 class="card-title">{{ t.maxDaysActivityReservation }}</h5>
-              <input type="number" class="form-control" v-model.number="configuracion.dias_máximo_reserva_actividad" />
+              <input type="number" class="form-control" v-model.number="configuracionStore.dias_maximo_reserva_actividad" />
             </div>
           </div>
         </div>
@@ -57,7 +57,7 @@
           <div class="card h-100 shadow-sm">
             <div class="card-body">
               <h5 class="card-title">{{ t.minCancellationDays }}</h5>
-              <input type="number" class="form-control" v-model.number="configuracion.dias_minimo_cancelación" />
+              <input type="number" class="form-control" v-model.number="configuracionStore.dias_minimo_cancelacion" />
             </div>
           </div>
         </div>
@@ -67,7 +67,7 @@
           <div class="card h-100 shadow-sm">
             <div class="card-body">
               <h5 class="card-title">{{ t.previousNotificationHours }}</h5>
-              <input type="number" class="form-control" v-model.number="configuracion.horas_previas_notificacion" />
+              <input type="number" class="form-control" v-model.number="configuracionStore.horas_previas_notificacion" />
             </div>
           </div>
         </div>
@@ -83,32 +83,32 @@
 
         <div class="mb-4">
           <label class="form-label fw-semibold">{{ t.textChangesCancellations }}</label>
-          <textarea class="form-control" rows="3" v-model="configuracion.texto_cambios_cancelaciones" />
+          <textarea class="form-control" rows="3" v-model="configuracionStore.texto_cambios_cancelaciones" />
         </div>
 
         <div class="mb-4">
           <label class="form-label fw-semibold">{{ t.textActivityNotices }}</label>
-          <textarea class="form-control" rows="3" v-model="configuracion.texto_avisos_actividades" />
+          <textarea class="form-control" rows="3" v-model="configuracionStore.texto_avisos_actividades" />
         </div>
 
         <div class="mb-4">
           <label class="form-label fw-semibold">{{ t.textPaymentProblems }}</label>
-          <textarea class="form-control" rows="3" v-model="configuracion.texto_problemas_pago" />
+          <textarea class="form-control" rows="3" v-model="configuracionStore.texto_problemas_pago" />
         </div>
 
         <div class="mb-4">
           <label class="form-label fw-semibold">{{ t.textWaitingListExit }}</label>
-          <textarea class="form-control" rows="3" v-model="configuracion.texto_salida_lista_espera" />
+          <textarea class="form-control" rows="3" v-model="configuracionStore.texto_salida_lista_espera" />
         </div>
 
         <div class="mb-4">
           <label class="form-label fw-semibold">{{ t.textAbsences }}</label>
-          <textarea class="form-control" rows="3" v-model="configuracion.texto_ausencias" />
+          <textarea class="form-control" rows="3" v-model="configuracionStore.texto_ausencias" />
         </div>
 
         <div class="mb-4">
           <label class="form-label fw-semibold">{{ t.textSpecialMaterial }}</label>
-          <textarea class="form-control" rows="3" v-model="configuracion.texto_material_especial" />
+          <textarea class="form-control" rows="3" v-model="configuracionStore.texto_material_especial" />
         </div>
       </div>
     </div>
@@ -135,21 +135,6 @@ const t = useI18n(language)
 
 const configuracionStore = useConfiguracionStore();
 const activeTab = ref<"params" | "notifs">("params");
-
-const configuracion = ref({
-  id: 0,
-  max_deportes_por_usuario: 0,
-  dias_minimo_reserva_actividad: 0,
-  dias_máximo_reserva_actividad: 0,
-  dias_minimo_cancelación: 0,
-  horas_previas_notificacion: 0,
-  texto_cambios_cancelaciones: '',
-  texto_avisos_actividades: '',
-  texto_problemas_pago: '',
-  texto_salida_lista_espera: '',
-  texto_ausencias: '',
-  texto_material_especial: ''
-});
 
 const guardarConfiguracion = async () => {
   configuracionStore.editarConfiguracion()
