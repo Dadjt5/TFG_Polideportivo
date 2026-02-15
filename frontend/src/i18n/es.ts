@@ -176,6 +176,11 @@ export default {
   cantWriteMessage: "No puedes escribir en este canal.",
   send: "Enviar",
 
+  /* Canal */
+  hidden: "Oculto",
+  secret: "Secreto",
+  theme: "Tema",
+
   /* Abonos y bonos */
   ticketsTitle: "Comprar abonos y bonos",
   bonus: "Bonos",
@@ -409,7 +414,7 @@ export default {
   previousNotificationHours: "Horas previas para enviar una notificación",
 
   /* Foro administrador */
-  channelName: "Nombre del canal...",
+  channelName: "Nombre del canal",
   newChannel: "Nuevo canal",
   channelUsers: "Usuarios del canal",
   kick: "Expulsar",

@@ -16,7 +16,7 @@ from .serializers import (
     AbonoDeportivoSerializer, AbonoVeranoSerializer, BonoSerializer,
     ActividadSerializer, AsistenciaSerializer, AgendaSerializer,
     ConfiguracionSerializer, DeporteSerializer, DescuentoSerializer,
-    FavoritoSerializer, ForoSerializer, CanalSerializer, UsuarioCanalSerializer,
+    FavoritoSerializer, ForoSerializer, CanalUsuarioFinalSerializer,
     HorarioSerializer, InstalacionSerializer, PabellonSerializer, ListaEsperaSerializer,
     EntradaListaEsperaSerializer, MonitorSerializer, NotificacionSerializer,
     PagoSerializer, ReservaActividadSerializer, AlquilerSerializer,
@@ -27,7 +27,8 @@ from .serializers import (
     UsuarioFinalSimpleSerializer, PabellonSimpleSerializer, ActividadSimpleSerializer,
     InstalacionSimpleSerializer, ActividadComunSerializer, GrupoReducidoSerializer,
     FisioterapiaSerializer, TarifaInstalacionSimpleSerializer, TarifaTDASimpleSerializer,
-    ActividadComunSimpleSerializer, GrupoReducidoSimpleSerializer, FisioterapiaSimpleSerializer
+    ActividadComunSimpleSerializer, GrupoReducidoSimpleSerializer, FisioterapiaSimpleSerializer,
+    CanalAdministradorSerializer
 )
 
 from polideportivo.models import (
@@ -211,36 +212,6 @@ class FavoritoViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Favorito.objects.filter(usuarioFinal__user=self.request.user)
-
-
-# ----------------
-# Foro
-# ----------------
-
-class ForoViewSet(viewsets.ModelViewSet):
-    queryset = Foro.objects.all()
-    serializer_class = ForoSerializer
-    permission_classes = [IsAuthenticated]
-
-
-class CanalViewSet(viewsets.ModelViewSet):
-    queryset = Canal.objects.all()
-    serializer_class = CanalSerializer
-    permission_classes = [IsAuthenticated]
-
-
-class UsuarioCanalViewSet(viewsets.ModelViewSet):
-    serializer_class = UsuarioCanalSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        return UsuarioCanal.objects.filter(usuarioFinal__user=self.request.user)
-
-
-class MensajeViewSet(viewsets.ModelViewSet):
-    queryset = Mensaje.objects.all()
-    serializer_class = MensajeSerializer
-    permission_classes = [IsAuthenticated]
 
 
 # ----------------
@@ -803,32 +774,48 @@ class ForoView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        user = request.user
-        foro = Foro.objects.all().first()
+        foro = Foro.objects.first()
 
-        if user.is_usuario_final:
-            canales = []
+        if request.user.is_usuario_final:
+            canales = Canal.objects.filter(
+                foro=foro,
+                oculto=False,
+                usuarioFinal__usuarioFinal=request.user.usuario_final,
+                usuarioFinal__expulsado=False
+            ).distinct()
 
-            for canal in foro.canal.all():
-                usuarioCanal = UsuarioCanal.objects.filter(canal=canal, usuarioFinal=user.usuario_final).first()
-                if not canal.oculto and not usuarioCanal.expulsado:
-                    canales.append({
-                        "id": canal.id,
-                        "titulo": canal.titulo,
-                        "numeroParticipantes": canal.numeroParticipantes,
-                        "tema": canal.tema,
-                        "secreto": canal.secreto,
-                        "silenciado": usuarioCanal.silenciado
-                    })
+            serializer = CanalUsuarioFinalSerializer(
+                canales,
+                many=True,
+                context={"request": request}
+            )
+            return Response(serializer.data)
 
-            return Response(canales)
-        elif user.id_administrador:
-            return Response(foro)
+        elif request.user.is_administrador:
+            serializer = ForoSerializer(foro)
+            return Response(serializer.data)
 
-        return Response("Usuario incorrecto")
+        return Response({"respuesta": "Usuario incorrecto"}, status=status.HTTP_400_BAD_REQUEST)
 
 
-# Mostrar los mensajes del un canal
+# Modificar los canales, creando nuevos por ejemplo
+class CanalesView(APIView):
+    permission_classes = [IsAdministrador]
+
+    def post(self, request, foro_id):
+        foro = get_object_or_404(Foro, id=foro_id)
+        titulo = request.query_params.get('titulo')
+        tema = request.query_params.get('tiempoInicioInstalacion')
+        oculto = request.query_params.get('tiempoFinInstalacion')
+        secreto = request.query_params.get('tiempoInicioActividad')
+
+        foro.nuevoCanal(titulo, tema, secreto, oculto)
+        print(foro.canales)
+
+        return Response({"respuesta": "Exito al crear el canal"}, status=status.HTTP_200_OK)
+
+
+# Mostrar los mensajes de un canal o escribir nuevos
 class MensajesCanalView(APIView):
     permission_classes = [IsAuthenticated]
     
@@ -844,7 +831,7 @@ class MensajesCanalView(APIView):
     def post(self, request, canal_id):
         canal = get_object_or_404(Canal, id=canal_id)
 
-        resultado = canal.nuevoMensaje(request.user.usuario_final, request.data.get("texto", ""))
+        resultado = canal.nuevoMensaje(request.user, request.data.get("texto", ""))
 
         if resultado:
             return Response({"respuesta": "Mensaje enviado"}, status=status.HTTP_201_CREATED)
@@ -852,7 +839,7 @@ class MensajesCanalView(APIView):
         return Response({"respuesta": "No puedes escribir en este canal"}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class GestionUsuarioCanalView(APIView):
+class GestionarUsuarioCanalView(APIView):
     permission_classes = [IsAdministrador]
 
     def patch(self, request, canal_id, usuario_id):
@@ -861,14 +848,14 @@ class GestionUsuarioCanalView(APIView):
         usuarioFinal = get_object_or_404(UsuarioFinal, id=usuario_id)
 
         if accion == "silenciar":
-            canal.cambiarSilencioUsuario(usuarioFinal)
-            return Response({"respuesta": "Exito"}, status=status.HTTP_201_CREATED)
+            if canal.cambiarSilencioUsuario(usuarioFinal):
+                return Response({"respuesta": "Usuario silenciado con exito"}, status=status.HTTP_201_CREATED)
 
         elif accion == "expulsar":
-            canal.expulsarUsuario(usuarioFinal)
-            return Response({"respuesta": "Exito"}, status=status.HTTP_201_CREATED)
+            if canal.cambiarExpulsionUsuario(usuarioFinal):
+                return Response({"respuesta": "Usuario expulsado con exito"}, status=status.HTTP_201_CREATED)
 
-        return Response({"respuesta": "Accion invalida"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"respuesta": "Error"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Mostrar las sesiones del monitor

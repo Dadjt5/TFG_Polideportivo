@@ -6,6 +6,7 @@ import Home from '@/components/Home.vue'
 import Login from '@/components/Login.vue'
 import ListaDeActividades from '@/components/ListaDeActividades.vue'
 import Perfil from '@/components/Perfil.vue'
+import Foro from '@/components/Foro.vue'
 import Notificaciones from '@/components/Notificaciones.vue'
 import Contacto from '@/components/Contacto.vue'
 import FAQ from '@/components/FAQ.vue'
@@ -14,7 +15,6 @@ import FAQ from '@/components/FAQ.vue'
 import HomeUsuarioFinal from '@/components/usuarioFinal/HomeUsuarioFinal.vue'
 import Buscar from '@/components/usuarioFinal/Buscar.vue'
 import Registro from '@/components/usuarioFinal/Registro.vue'
-import Foro from '@/components/usuarioFinal/Foro.vue'
 
 // Detalles
 import DetallePabellon from '@/components/usuarioFinal/detalles/DetallePabellon.vue'
@@ -56,6 +56,7 @@ import NuevoPabellon from '@/components/administrador/nuevos/NuevoPabellon.vue'
 import NuevaInstalacion from '@/components/administrador/nuevos/NuevaInstalacion.vue'
 import NuevaActividad from '@/components/administrador/nuevos/NuevaActividad.vue'
 import NuevaSesion from '@/components/administrador/nuevos/NuevaSesion.vue'
+import NuevoCanal from '@/components/administrador/nuevos/NuevoCanal.vue'
 
 import NuevaTarifaTDA from '@/components/administrador/nuevos/NuevaTarifaTDA.vue'
 import NuevaTarifaInstalacion from '@/components/administrador/nuevos/NuevaTarifaInstalacion.vue'
@@ -88,6 +89,7 @@ const routes = [
   { path: '/login', component: Login, meta: { public: true } },
   { path: '/buscar', component: Buscar, meta: { public: true } },
   { path: '/actividades', component: ListaDeActividades, meta: { public: true } },
+  { path: '/foro', component: Foro, meta: { requiresAuth: true } },
   { path: '/contacto', component: Contacto, meta: { public: true } },
   { path: '/faq', component: FAQ, meta: { public: true } },
 
@@ -98,7 +100,6 @@ const routes = [
     component: HomeUsuarioFinal,
     meta: { requiresAuth: true, role: 'usuario_final' }
   },
-  { path: '/foro', component: Foro, meta: { requiresAuth: true } },
   { path: '/notificaciones', component: Notificaciones, meta: { requiresAuth: true } },
   { path: '/registrarse', component: Registro, meta: { public: true } },
 
@@ -144,6 +145,7 @@ const routes = [
   { path: '/crear/instalacion', component: NuevaInstalacion, name: 'crear-instalacion', meta: { requiresAuth: true } },
   { path: '/crear/actividad', component: NuevaActividad, name: 'crear-actividad', meta: { requiresAuth: true } },
   { path: '/crear/sesion', component: NuevaSesion, name: 'crear-sesion', meta: { requiresAuth: true } },
+  { path: '/crear/canal/:id', component: NuevoCanal, props: true, name: 'crear-canal', meta: { requiresAuth: true } },
 
   { path: '/crear/tarifa/tda', component: NuevaTarifaTDA, meta: { requiresAuth: true } },
   { path: '/crear/tarifa/instalacion', component: NuevaTarifaInstalacion, meta: { requiresAuth: true } },

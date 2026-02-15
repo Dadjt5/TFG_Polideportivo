@@ -557,41 +557,81 @@ class FavoritoSerializer(serializers.ModelSerializer):
 # Foro
 # --------------------
 
-class ForoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Foro
-        fields = '__all__'
 
+class CanalUsuarioFinalSerializer(serializers.ModelSerializer):
+    silenciado = serializers.SerializerMethodField()
 
-class CanalSerializer(serializers.ModelSerializer):
     class Meta:
         model = Canal
-        fields = '__all__'
+        fields = (
+            "id", 
+            "titulo", 
+            "numeroParticipantes", 
+            "tema", 
+            "secreto",
+            "silenciado"
+        )
+        
+    def get_silenciado(self, obj):
+        user = self.context["request"].user.usuario_final
+        usuario = UsuarioCanal.objects.filter(canal=obj, usuarioFinal=user).first()
+        
+        if usuario:
+            return usuario.silenciado
+
+        return False
 
 
 class UsuarioCanalSerializer(serializers.ModelSerializer):
+    nombre = serializers.SerializerMethodField()
+
     class Meta:
         model = UsuarioCanal
-        fields = '__all__'
+        fields = ("usuarioFinal", "nombre", "silenciado", "expulsado", "fechaEntrada")
+
+    def get_nombre(self, obj):
+        return obj.usuarioFinal.nombre
+
+
+class CanalAdministradorSerializer(serializers.ModelSerializer):
+    usuarios = UsuarioCanalSerializer(source="usuarioFinal", many=True, read_only=True)
+
+    class Meta:
+        model = Canal
+        fields = ("id", "foro", "titulo", "numeroParticipantes", "tema", "secreto", "oculto", "usuarios")
+
+
+class ForoSerializer(serializers.ModelSerializer):
+    canales = CanalAdministradorSerializer(source="canal", many=True)
+
+    class Meta:
+        model = Foro
+        fields = ("id", "numeroParticipantes", "canales")
 
 
 class MensajeSerializer(serializers.ModelSerializer):
-    nombreUsuario = serializers.SerializerMethodField()
+    es_admin = serializers.SerializerMethodField()
+    nombre = serializers.SerializerMethodField()
+
     class Meta:
         model = Mensaje
         fields = (
             "id",
             "texto",
             "fechaEnvio",
-            "nombreUsuario"
+            "nombre",
+            "es_admin"
         )
+        
+    def get_es_admin(self, obj):
+        if obj.usuario.is_administrador:
+            return True
+        return False
 
-    def get_nombreUsuario(self, obj):
-        usuarioFinal = obj.usuarioFinal
-
-        if usuarioFinal:
-            return usuarioFinal.nombre
-        return None
+    def get_nombre(self, obj):
+        if obj.usuario.is_administrador:
+            return "Administrador"
+        return obj.usuario.username
 
 
 # --------------------
