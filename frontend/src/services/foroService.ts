@@ -19,9 +19,27 @@ export const enviarMensaje = async (idCanal: number, data: any) => {
   return response.data
 }
 
+/* Función para obtener la informacion del canal para el administrador */
+export const getCanalAdministrador = async (id: number) => {
+  const response = await api.get(`api/v1/canales/${id}/admin/`)
+  return response.data
+}
+
 /* Función para crear un nuevo canal en el foro */
 export const nuevoCanal = async (id: number, payload: any) => {
-  const response = await api.post(`api/v1/foro/${id}/canales/`, payload)
+  const response = await api.post(`api/v1/foros/${id}/canal/`, payload)
+  return response.data
+}
+
+/* Función para editar un canal en el foro */
+export const editarCanal = async (id: number, payload: any) => {
+  const response = await api.patch(`api/v1/canales/${id}/`, payload)
+  return response.data
+}
+
+/* Función para eliminar un canal en el foro */
+export const eliminarCanal = async (id: number) => {
+  const response = await api.delete(`api/v1/canales/${id}/`)
   return response.data
 }
 

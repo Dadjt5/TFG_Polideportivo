@@ -4,9 +4,6 @@
 
       <!-- CABECERA -->
       <div class="d-flex justify-content-between align-items-center mb-4">
-        <button class="btn btn-secondary rounded-pill" @click="volver">
-          ← Volver
-        </button>
         <h2 class="fw-bold m-0">Estadísticas Generales</h2>
       </div>
 
@@ -67,7 +64,7 @@
             <table class="table align-middle">
               <thead class="table-light">
                 <tr>
-                  <th>Pabellón</th>
+                  <th>{{ t.pavilion }}</th>
                   <th>Horas reservadas</th>
                   <th>Ocupación</th>
                 </tr>
@@ -94,23 +91,30 @@
         </div>
       </div>
 
+      <button class="btn btn-secondary rounded-pill" @click="volver">
+        {{ t.return }}
+      </button>
+
     </main>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { inject, type Ref, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+
+/* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
+import type { Language } from "@/useI18N";
+import { useI18n } from "@/useI18N";
+
+const language = inject<Ref<Language>>('language')!;
+const t = useI18n(language);
 
 const router = useRouter()
 
 const volver = () => {
   router.back()
 }
-
-/* ======================
-   KPIs
-====================== */
 
 const kpis = ref([
   { title: 'Usuarios', value: 0 },
@@ -121,26 +125,16 @@ const kpis = ref([
   { title: 'Ingresos (mes)', value: '0 €' }
 ])
 
-/* ======================
-   Uso Pabellones
-====================== */
-
 const usoPabellones = ref([
   { nombre: 'Pabellón A', horas: 120, ocupacion: 75 },
   { nombre: 'Pabellón B', horas: 90, ocupacion: 60 }
 ])
 
-/* ======================
-   Carga de datos
-====================== */
-
 const cargarEstadisticas = async () => {
   try {
-    // Aquí iría tu llamada real al backend
     // const response = await api.get('/estadisticas/admin/')
     // const data = response.data
 
-    // Simulación temporal
     kpis.value = [
       { title: 'Usuarios', value: 150 },
       { title: 'Monitores', value: 12 },

@@ -417,6 +417,11 @@ export default {
   channelUsers: "Channel users",
   kick: "Expel",
   mute: "Mute",
+  title: "Title",
+  unkick: "unkick",
+  unmute: "unmute",
+  modifyChannel: "Modify channel",
+  channelDetail: "Channel details",
 
   /* Contacto */
   contactTitle: "Sports Center Contact",

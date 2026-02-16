@@ -4,7 +4,6 @@ from django.db import transaction
 from django.conf import settings
 
 from .usuario_final import UsuarioFinal
-from .constantes import Tematica
 
 class Foro(models.Model):
     """Modelo para representar el foro"""
@@ -36,7 +35,7 @@ class UsuarioCanal(models.Model):
     expulsado = models.BooleanField(default=False)
     
     usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.RESTRICT, related_name="canales")
-    canal = models.ForeignKey('Canal', on_delete=models.RESTRICT, related_name="usuarioFinal")
+    canal = models.ForeignKey('Canal', on_delete=models.CASCADE, related_name="usuarioFinal")
 
     class Meta:
         unique_together = ('usuarioFinal', 'canal')
@@ -51,7 +50,7 @@ class Canal(models.Model):
     oculto = models.BooleanField(default=False)
     secreto = models.BooleanField(default=False)
 
-    foro = models.ForeignKey(Foro, on_delete=models.RESTRICT, related_name="canales")
+    foro = models.ForeignKey(Foro, on_delete=models.RESTRICT, related_name="canal")
 
     def __str__(self):
         return f'Canal para {self.titulo} con {self.numeroParticipantes} participantes'
@@ -67,7 +66,7 @@ class Canal(models.Model):
         if not usuario:
             return False
         
-        if usuario.is_staff or hasattr(usuario, "id_administrador"):
+        if usuario.is_administrador:
             Mensaje.objects.create(canal=self, usuario=usuario, texto=texto)
             return True
 
@@ -81,7 +80,7 @@ class Canal(models.Model):
         if not relacion:
             return False
 
-        Mensaje.objects.create(canal=self, usuarioFinal=usuario, texto=texto)
+        Mensaje.objects.create(canal=self, usuario=usuario, texto=texto)
         return True
 
     def cambiarExpulsionUsuario(self, usuarioFinal):

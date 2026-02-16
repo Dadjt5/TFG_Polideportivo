@@ -14,7 +14,10 @@ router.register(r'compraAbono', views.CompraAbonoViewSet, basename="compra-abono
 router.register(r'compraBono', views.CompraBonoViewSet, basename="compra-bono")
 
 router.register(r'actividades', views.ActividadViewSet, basename="actividad")
+router.register(r'sesiones', views.SesionViewSet, basename="sesion")
 router.register(r'asistencias', views.AsistenciaViewSet, basename="asistencia")
+
+router.register(r'canales', views.CanalViewSet, basename="canal")
 
 router.register(r'agendas', views.AgendaViewSet, basename="agenda")
 
@@ -74,8 +77,9 @@ urlpatterns = [
     path("obtener/favoritas/", views.ObtenerActividadesInstalaciones.as_view(), name="favoritas"),
     path("reservas/", views.ReservasView.as_view(), name="Reservas-favoritas"),
     path("foro/", views.ForoView.as_view(), name="Foro"),
-    path("foro/<int:foro_id>/canales/", views.CanalesView.as_view(), name="canales-foro"),
+    path("foros/<int:foro_id>/canal/", views.NuevoCanalView.as_view(), name="crear-canal"),
     path("canales/<int:canal_id>/mensajes/", views.MensajesCanalView.as_view(), name="mensajes-canal"),
+    path("canales/<int:canal_id>/admin/", views.CanalAdministradorView.as_view(), name="detalles-canal-admin"),
     path("canales/<int:canal_id>/modificar/<int:usuario_id>/", views.GestionarUsuarioCanalView.as_view(), name="gestionar-usuario-canal"),
     path("monitores/<int:monitor_id>/sesiones/", views.SesionesMonitorView.as_view(), name="sesiones-monitor"),
     path("actividades/<int:actividad_id>/sesiones/<int:sesion_id>/", views.DetalleSesionView.as_view(), name="detalle-sesion"),

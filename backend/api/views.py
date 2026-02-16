@@ -28,7 +28,7 @@ from .serializers import (
     InstalacionSimpleSerializer, ActividadComunSerializer, GrupoReducidoSerializer,
     FisioterapiaSerializer, TarifaInstalacionSimpleSerializer, TarifaTDASimpleSerializer,
     ActividadComunSimpleSerializer, GrupoReducidoSimpleSerializer, FisioterapiaSimpleSerializer,
-    CanalAdministradorSerializer
+    CanalSerializer, CanalAdministradorSerializer
 )
 
 from polideportivo.models import (
@@ -132,6 +132,27 @@ class MapaReservasViewSet(viewsets.ModelViewSet):
     queryset = MapaReservas.objects.all()
     serializer_class = MapaReservasSerializer
     permission_classes = [AllowAny]
+
+
+# ----------------
+# Canales
+# ----------------
+
+class CanalViewSet(viewsets.ModelViewSet):
+    queryset = Canal.objects.all()
+    serializer_class = CanalSerializer
+    permission_classes = [IsAdministrador]
+    
+
+# ----------------
+# Sesiones
+# ----------------
+
+class SesionViewSet(viewsets.ModelViewSet):
+    queryset = Sesion.objects.all()
+    serializer_class = SesionSerializer
+    permission_classes = [IsAdministrador]
+
 
 # ----------------
 # Bonos
@@ -798,21 +819,35 @@ class ForoView(APIView):
         return Response({"respuesta": "Usuario incorrecto"}, status=status.HTTP_400_BAD_REQUEST)
 
 
-# Modificar los canales, creando nuevos por ejemplo
-class CanalesView(APIView):
+# Mostrar la informacion de un canal para el admin
+class CanalAdministradorView(APIView):
+    permission_classes = [IsAdministrador]
+
+    def get(self, request, canal_id):
+        canal = get_object_or_404(Canal, id=canal_id)
+
+        serializer = CanalAdministradorSerializer(canal)
+        return Response(serializer.data)
+
+
+# Crear nuevos canales en el foro
+class NuevoCanalView(APIView):
     permission_classes = [IsAdministrador]
 
     def post(self, request, foro_id):
         foro = get_object_or_404(Foro, id=foro_id)
-        titulo = request.query_params.get('titulo')
-        tema = request.query_params.get('tiempoInicioInstalacion')
-        oculto = request.query_params.get('tiempoFinInstalacion')
-        secreto = request.query_params.get('tiempoInicioActividad')
 
-        foro.nuevoCanal(titulo, tema, secreto, oculto)
-        print(foro.canales)
+        titulo = request.data.get('titulo')
+        tema = request.data.get('tema')
+        secreto = request.data.get('secreto')
+        oculto = request.data.get('oculto')
 
-        return Response({"respuesta": "Exito al crear el canal"}, status=status.HTTP_200_OK)
+        respuesta = foro.nuevoCanal(titulo, tema, secreto, oculto)
+        
+        if respuesta:
+            return Response({"respuesta": "Exito al crear el canal"}, status=status.HTTP_200_OK)
+
+        return Response({"respuesta": "No se ha podido crear el canal"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Mostrar los mensajes de un canal o escribir nuevos
@@ -827,7 +862,7 @@ class MensajesCanalView(APIView):
         serializer = MensajeSerializer(mensajes, many=True)
 
         return Response(serializer.data)
-    
+
     def post(self, request, canal_id):
         canal = get_object_or_404(Canal, id=canal_id)
 
@@ -843,7 +878,7 @@ class GestionarUsuarioCanalView(APIView):
     permission_classes = [IsAdministrador]
 
     def patch(self, request, canal_id, usuario_id):
-        accion = request.data.get("accion")
+        accion = request.data
         canal = get_object_or_404(Canal, id=canal_id)
         usuarioFinal = get_object_or_404(UsuarioFinal, id=usuario_id)
 

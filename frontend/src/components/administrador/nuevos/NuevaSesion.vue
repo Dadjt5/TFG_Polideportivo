@@ -102,7 +102,6 @@ const volver = () => router.back()
 
 const crearSesion = async () => {
   if (!validarFormulario()) return
-  const id = parseInt(props.id);
 
   try {
     await nuevaSesion({

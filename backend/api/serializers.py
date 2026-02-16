@@ -598,15 +598,28 @@ class CanalAdministradorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Canal
-        fields = ("id", "foro", "titulo", "numeroParticipantes", "tema", "secreto", "oculto", "usuarios")
+        fields = ("id", "titulo", "numeroParticipantes", "tema", "secreto", "oculto", "usuarios")
+
+
+class CanalSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Canal
+        fields = '__all__'
+
+
+class CanalSimpleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Canal
+        fields = ("id", "titulo")
 
 
 class ForoSerializer(serializers.ModelSerializer):
-    canales = CanalAdministradorSerializer(source="canal", many=True)
+    canales = CanalSimpleSerializer(source="canal", many=True)
 
     class Meta:
         model = Foro
         fields = ("id", "numeroParticipantes", "canales")
+
 
 
 class MensajeSerializer(serializers.ModelSerializer):
@@ -631,7 +644,7 @@ class MensajeSerializer(serializers.ModelSerializer):
     def get_nombre(self, obj):
         if obj.usuario.is_administrador:
             return "Administrador"
-        return obj.usuario.username
+        return obj.usuario.usuario_final.nombre
 
 
 # --------------------

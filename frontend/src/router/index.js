@@ -46,6 +46,7 @@ import GestionarEspacios from '@/components/administrador/GestionarEspacios.vue'
 import GestionarActividades from '@/components/administrador/GestionarActividades.vue'
 import GestionarTarifas from '@/components/administrador/GestionarTarifas.vue'
 import Configuracion from '@/components/administrador/Configuracion.vue'
+import EstadisticasAdministrador from '@/components/administrador/EstadisticasAdministrador.vue'
 
 // Nuevos
 import NuevoUsuarioFinal from '@/components/administrador/nuevos/NuevoUsuarioFinal.vue'
@@ -73,6 +74,7 @@ import EditarPabellon from '@/components/administrador/editar/EditarPabellon.vue
 import EditarInstalacion from '@/components/administrador/editar/EditarInstalacion.vue'
 import EditarActividad from '@/components/administrador/editar/EditarActividad.vue'
 import EditarSesion from '@/components/administrador/editar/EditarSesion.vue'
+import EditarCanal from '@/components/administrador/editar/EditarCanal.vue'
 
 import EditarTarifaTDA from '@/components/administrador/editar/EditarTarifaTDA.vue'
 import EditarTarifaInstalacion from '@/components/administrador/editar/EditarTarifaInstalacion.vue'
@@ -135,6 +137,7 @@ const routes = [
   { path: '/gestion/actividades', component: GestionarActividades, meta: { requiresAuth: true } },
   { path: '/gestion/tarifas', component: GestionarTarifas, meta: { requiresAuth: true } },
   { path: '/configuracion', component: Configuracion, meta: { requiresAuth: true } },
+  { path: '/estadisticas/administrador', component: EstadisticasAdministrador, meta: { requiresAuth: true } },
 
   /* Nuevo */
   { path: '/registrar/usuario', component: NuevoUsuarioFinal, meta: { requiresAuth: true } },
@@ -162,6 +165,7 @@ const routes = [
   { path: '/admin/instalaciones/:id', component: EditarInstalacion, props: true, name: 'editar-instalacion', meta: { requiresAuth: true } },
   { path: '/admin/actividades/:id', component: EditarActividad, props: true, name: 'editar-actividad', meta: { requiresAuth: true } },
   { path: '/admin/actividades/:idAct/sesiones/:idSesion', component: EditarSesion, props: true, name: 'editar-sesion', meta: { requiresAuth: true } },
+  { path: '/admin/foros/:idForo/canales/:idCanal', component: EditarCanal, props: true, name: 'editar-canal', meta: { requiresAuth: true } },
 
   { path: '/editar/tarifa/tda/:id', component: EditarTarifaTDA, props: true, name: 'editar-tarifa-tda', meta: { requiresAuth: true } },
   { path: '/editar/tarifa/instalacion/:id', component: EditarTarifaInstalacion, props: true, name: 'editar-tarifa-instalacion', meta: { requiresAuth: true } },

@@ -45,10 +45,10 @@
             <div
               v-for="m in mensajes"
               :key="m.id"
-              class="bg-white border rounded-3 p-3 mb-2"
-            >
-              <p class="fw-medium mb-1">{{ m.nombreUsuario }}</p>
-              <p class="mb-0 text-secondary">{{ m.texto }}</p>
+              class="border rounded-3 p-3 mb-2"
+              :class="m.es_admin ? 'bg-primary text-white' : 'bg-white text-secondary'">
+              <p class="fw-medium mb-1">{{ m.nombre }}</p>
+              <p class="mb-0">{{ m.texto }}</p>
             </div>
           </div>
 
@@ -69,7 +69,7 @@
             :placeholder="canalSeleccionado.silenciado === false ? t.writeMessage : t.cantWriteMessage"
           />
           <span v-if="!canalSeleccionado.silenciado">
-            <button class="btn btn-primary px-4 rounded-3" @click="enviar(canalSeleccionado.id)">
+            <button class="btn btn-primary px-4 rounded-3" @keyup.enter="enviar(canalSeleccionado.id)" @click="enviar(canalSeleccionado.id)">
               {{ t.send }}
             </button>
           </span>
@@ -104,7 +104,8 @@ type Mensaje = {
   id: number,
   texto: string,
   fechaEnvio: string,
-  nombreUsuario: string
+  nombre: string,
+  es_admin: boolean
 }
 
 const canales = ref<Canal[]>([]);
