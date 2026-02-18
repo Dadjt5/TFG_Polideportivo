@@ -165,12 +165,25 @@ class EstadoPago(models.TextChoices):
     Clase para enumerar los estados de pago
 
     Estado del pago:
-    - PENDIENTE, PAGADA, CANCELADA
+    - PENDIENTE, PAGADO, CANCELADO
     """
     
     PENDIENTE = 'PENDIENTE', 'Pendiente de pago'
-    PAGADA = 'PAGADA', 'Pagado'
-    CANCELADA = 'CANCELADA', 'Pago cancelado'
+    PAGADO = 'PAGADO', 'Pagado'
+    CANCELADO = 'CANCELADO', 'Pago cancelado'
+
+
+class EstadoReserva(models.TextChoices):
+    """
+    Clase para enumerar los estados de la reserva
+
+    Estado de la reserva:
+    - PENDIENTE, CONFIRMADA, CANCELADO
+    """
+    
+    PENDIENTE = 'PENDIENTE', 'Pendiente de pago'
+    CONFIRMADA = 'CONFIRMADA', 'Confirmada'
+    CANCELADO = 'CANCELADO', 'Reserva cancelada'
 
 
 class RolAdministrador(models.TextChoices):

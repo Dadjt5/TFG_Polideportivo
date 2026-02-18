@@ -8,6 +8,14 @@
 			<div class="card shadow-sm border-0 rounded-4 p-4">
 				<div class="row g-4">
 
+					<div class="col-12">
+						<label class="form-label fw-semibold">
+							{{ t.title }}
+						</label>
+						<input type="text" class="form-control form-control-lg"
+							:class="{ 'is-invalid': errores.titulo }" v-model="tarifa.titulo" />
+					</div>
+
 					<!-- Nº HORAS -->
 					<div class="col-md-6">
 						<label class="form-label fw-semibold">
@@ -95,6 +103,7 @@ const router = useRouter()
 const mensaje = ref("")
 
 const tarifa = ref({
+	titulo: '',
 	numeroHoras: 0,
 	numeroPersonas: 0,
 	precio: 0,
@@ -104,6 +113,7 @@ const tarifa = ref({
 })
 
 const errores = ref({
+	titulo: false,
 	numeroHoras: false,
 	numeroPersonas: false,
 	precio: false,
@@ -114,6 +124,7 @@ const errores = ref({
 function validarFormulario() {
 	let valido = true
 
+	errores.value.titulo = tarifa.value.titulo === ''
 	errores.value.numeroHoras = tarifa.value.numeroHoras <= 0
 	errores.value.numeroPersonas = tarifa.value.numeroPersonas <= 0
 	errores.value.precio = tarifa.value.precio < 0

@@ -116,7 +116,9 @@ const routes = [
   { path: '/reservas-realizadas', component: ReservasRealizadas, meta: { requiresAuth: true } },
 
   { path: '/actividad/:id/reservar', component: ReservaActividad, name: 'reservar-actividad', props: true, meta: { requiresAuth: true } },
-  { path: '/instalacion/:id/reservar', component: Alquiler, name: 'reservar-instalacion', rops: true, meta: { requiresAuth: true } },
+  { path: '/instalacion/:id/reservar', component: Alquiler, name: 'reservar-instalacion', props: true, meta: { requiresAuth: true } },
+
+  { path: '/pago', component: Pago, name: 'pasarela-pago', meta: { requiresAuth: true }},
 
   /* Detalle */
   { path: '/pabellones/:id', component: DetallePabellon, name: 'detalle-pabellon', props: true, meta: { public: true } },
@@ -147,7 +149,7 @@ const routes = [
   { path: '/crear/pabellon', component: NuevoPabellon, name: 'crear-pabellon', meta: { requiresAuth: true } },
   { path: '/crear/instalacion', component: NuevaInstalacion, name: 'crear-instalacion', meta: { requiresAuth: true } },
   { path: '/crear/actividad', component: NuevaActividad, name: 'crear-actividad', meta: { requiresAuth: true } },
-  { path: '/crear/sesion', component: NuevaSesion, name: 'crear-sesion', meta: { requiresAuth: true } },
+  { path: '/crear/sesion/:id', component: NuevaSesion, props: true, name: 'crear-sesion', meta: { requiresAuth: true } },
   { path: '/crear/canal/:id', component: NuevoCanal, props: true, name: 'crear-canal', meta: { requiresAuth: true } },
 
   { path: '/crear/tarifa/tda', component: NuevaTarifaTDA, meta: { requiresAuth: true } },

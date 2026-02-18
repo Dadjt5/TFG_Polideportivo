@@ -16,9 +16,9 @@
 
         <ul class="list-group list-group-flush mb-4">
 
-          <li v-for="(h, index) in reserva.tarifa.horario" :key="index"
+          <li v-if="reserva.tarifa.horario.length != 0" v-for="(h, index) in reserva.tarifa.horario" :key="index"
             class="list-group-item d-flex justify-content-between align-items-center">
-            <!-- Día -->
+            <!-- Días -->
             <span class="fw-semibold">
               <i class="bi bi-calendar-event me-2 text-muted"></i>
               {{ h.dia }}
@@ -30,12 +30,16 @@
               {{ h.horaInicio }} – {{ h.horaFin }}
             </span>
           </li>
+
+          <span v-else>
+            <p class="fs-5">{{ t.noSession }}</p>
+          </span>
         </ul>
 
         <!-- TARIFAS -->
         <h6 class="fw-bold mb-2">{{ t.tariff }}</h6>
 
-        <table v-if="reserva.tarifa.tipo === 'Otros'" class="table table-sm mb-4">
+        <table v-if="reserva.tarifa.tipo === 'OTROS'" class="table table-sm mb-4">
           <tbody>
             <tr :class="{ 'table-primary': usuarioFinalStore.isUAM }">
               <td>UAM</td>
@@ -53,7 +57,7 @@
           </tbody>
         </table>
 
-        <table v-else-if="reserva.tarifa.tipo === 'Grupos reducidos'" class="table table-sm mb-4 align-middle">
+        <table v-else-if="reserva.tarifa.tipo === 'GRUPOS_REDUCIDOS'" class="table table-sm mb-4 align-middle">
           <tbody>
 
             <tr>
@@ -128,7 +132,7 @@
         </table>
 
 
-        <table v-else-if="reserva.tarifa.tipo === 'Fisioterapia'" class="table table-sm mb-4">
+        <table v-else-if="reserva.tarifa.tipo === 'FISIOTERAPIA'" class="table table-sm mb-4">
           <tbody>
             <tr>
               <td>
@@ -211,7 +215,7 @@
 import { computed, inject, type Ref, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { getTarifaDescuentoActividad } from '@/services/reservaPagoService';
+import { getTarifaDescuentoActividad, reservarActividad } from '@/services/reservaPagoService';
 
 import { useUserStore } from '@/stores/usuarioFinal'
 
@@ -231,6 +235,7 @@ const usuarioFinalStore = useUserStore();
 
 const reserva = ref({
   tarifa: {
+    idActividad: 0,
     nombre: '',
     numeroHoras: 0,
     horario: [] as {
@@ -334,15 +339,15 @@ const precioBase = computed(() => {
   const datos = reserva.value.tarifa.datos;
   const sel = reserva.value.seleccion;
 
-  if (tipo === 'Otros') {
+  if (tipo === 'OTROS') {
     return obtenerPrecioComun(datos);
   }
 
-  if (tipo === 'Grupos reducidos') {
+  if (tipo === 'GRUPOS_REDUCIDOS') {
     return obtenerPrecioGrupo(datos, sel)
   }
 
-  if (tipo === 'Fisioterapia') {
+  if (tipo === 'FISIOTERAPIA') {
     return obtenerPrecioFisioterapia(datos, sel)
   }
 
@@ -355,8 +360,15 @@ const total = computed(() => {
   return base - descuento
 })
 
-function continuarPago() {
-  router.push('/pago')
+const continuarPago = async () => {
+  const response = await reservarActividad(reserva.value.tarifa.idActividad)
+
+  const idReserva = response.data.id
+
+  router.push({
+    name: 'Pago',
+    query: { reserva_id: idReserva }
+  })
 }
 
 function cancelar() {
@@ -366,6 +378,8 @@ function cancelar() {
 onMounted(async () => {
   const id = parseInt(props.id);
   const data = await getTarifaDescuentoActividad(id)
+
+  console.log(data)
 
   reserva.value.tarifa = data.tarifa
   reserva.value.descuento = data.descuento

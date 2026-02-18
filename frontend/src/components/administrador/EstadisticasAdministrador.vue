@@ -91,17 +91,22 @@
         </div>
       </div>
 
-      <button class="btn btn-secondary rounded-pill" @click="volver">
-        {{ t.return }}
-      </button>
+      <div class="text-center">
+        <button class="btn btn-primary fs-4 mt-4 rounded-pill" @click="volver">
+          {{ t.return }}
+        </button>
+      </div>
 
     </main>
   </div>
 </template>
 
+
 <script setup lang="ts">
 import { inject, type Ref, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+
+import { useEstadisticasStore } from "@/stores/estadisticas";
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
 import type { Language } from "@/useI18N";
@@ -110,11 +115,12 @@ import { useI18n } from "@/useI18N";
 const language = inject<Ref<Language>>('language')!;
 const t = useI18n(language);
 
-const router = useRouter()
+const estadisticasStore = useEstadisticasStore();
+const router = useRouter();
 
 const volver = () => {
   router.back()
-}
+};
 
 const kpis = ref([
   { title: 'Usuarios', value: 0 },
@@ -126,31 +132,29 @@ const kpis = ref([
 ])
 
 const usoPabellones = ref([
-  { nombre: 'Pabellón A', horas: 120, ocupacion: 75 },
-  { nombre: 'Pabellón B', horas: 90, ocupacion: 60 }
+  { nombre: 'Pabellón A', horas: 0, ocupacion: 0 },
+  { nombre: 'Pabellón B', horas: 0, ocupacion: 0 }
 ])
 
-const cargarEstadisticas = async () => {
+
+onMounted(async () => {
   try {
-    // const response = await api.get('/estadisticas/admin/')
-    // const data = response.data
+    if(!estadisticasStore.data.modificado) {
+      await estadisticasStore.cargarEstadisticas();
+    }
 
     kpis.value = [
-      { title: 'Usuarios', value: 150 },
-      { title: 'Monitores', value: 12 },
-      { title: 'Pabellones', value: 5 },
-      { title: 'Sesiones', value: 34 },
-      { title: 'Reservas (mes)', value: 87 },
-      { title: 'Ingresos (mes)', value: '2.450 €' }
+      { title: 'Usuarios', value: estadisticasStore.data.usuarios },
+      { title: 'Monitores', value: 0 },
+      { title: 'Pabellones', value: estadisticasStore.data.pabellones },
+      { title: 'Sesiones', value: 0 },
+      { title: 'Reservas (mes)', value: 0 },
+      { title: 'Ingresos (mes)', value: '0 €' }
     ]
 
-  } catch (error) {
-    console.error('Error cargando estadísticas', error)
+  } catch (e) {
+    console.error('Error cargando estadísticas', e)
   }
-}
-
-onMounted(() => {
-  cargarEstadisticas()
 })
 </script>
 

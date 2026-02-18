@@ -17,13 +17,14 @@ export const nuevaInstalacion = async (payload: Payload): Promise<any> => {
 
 /* Función para crear una actividad */
 export const nuevaActividad = async (payload: Payload): Promise<any> => {
+  console.log(payload)
   const response = await api.post("api/v1/actividades/", payload)
   return response.data
 }
 
 /* Función para crear una sesion */
-export const nuevaSesion = async (payload: Payload): Promise<any> => {
-  const response = await api.post("api/v1/sesiones/", payload)
+export const nuevaSesion = async (id: number, payload: Payload): Promise<any> => {
+  const response = await api.post(`api/v1/actividades/${id}/sesion/`, payload)
   return response.data
 }
 

@@ -238,7 +238,8 @@ class InstalacionSimpleSerializer(serializers.ModelSerializer):
 
 
 class InstalacionSerializer(serializers.ModelSerializer):
-    pabellon = PabellonSerializer(read_only=True)
+    pabellon_id = serializers.PrimaryKeyRelatedField(queryset=Pabellon.objects.all(), source="pabellon", write_only=True)
+    pabellon = PabellonSimpleSerializer(read_only=True)
     horaApertura = serializers.SerializerMethodField()
     horaCierre = serializers.SerializerMethodField()
     imagenURL = serializers.SerializerMethodField()
@@ -254,6 +255,7 @@ class InstalacionSerializer(serializers.ModelSerializer):
             "imagenURL",
             "porcentajeTDA",
             "pabellon",
+            "pabellon_id",
             "horaApertura",
             "horaCierre",
         )
@@ -298,14 +300,13 @@ class InstalacionSerializer(serializers.ModelSerializer):
 # --------------------
 
 class SesionSerializer(serializers.ModelSerializer):
-    horario = HorarioSerializer(read_only=True)
-
     class Meta:
         model = Sesion
         fields = (
             "id",
             "dia",
-            "horario"
+            "horaInicio",
+            "horaFin"
         )
 
 
@@ -331,8 +332,12 @@ class ActividadSimpleSerializer(serializers.ModelSerializer):
 
 
 class ActividadSerializer(serializers.ModelSerializer):
+    instalacion_id = serializers.PrimaryKeyRelatedField(queryset=Instalacion.objects.all(), source="instalacion", write_only=True)
+    monitor_id = serializers.PrimaryKeyRelatedField(queryset=Monitor.objects.all(), source="monitor", write_only=True)
+
     instalacion = InstalacionSimpleSerializer(read_only=True)
     monitor = MonitorSimpleSerializer(read_only=True)
+
     sesiones = SesionSerializer(many=True, read_only=True)
     horasSemanales = serializers.SerializerMethodField()
     dias = serializers.SerializerMethodField()
@@ -361,7 +366,9 @@ class ActividadSerializer(serializers.ModelSerializer):
             "horasSemanales",
             "dias",
             "instalacion",
+            "instalacion_id",
             "monitor",
+            "monitor_id",
             "sesiones"
         )
 

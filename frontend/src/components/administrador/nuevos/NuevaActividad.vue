@@ -132,7 +132,7 @@
             <select
               class="form-select form-select-lg"
               :class="{ 'is-invalid': errores.instalacion }"
-              v-model="actividad.instalacion"
+              v-model="actividad.instalacion_id"
             >
               <option disabled value="">--</option>
               <option v-for="i in instalaciones" :key="i.id" :value="i.id">
@@ -146,7 +146,8 @@
             <label class="form-label fw-semibold">{{ t.monitorName }}</label>
             <select
               class="form-select form-select-lg"
-              v-model="actividad.monitor"
+              :class="{ 'is-invalid': errores.monitor }"
+              v-model="actividad.monitor_id"
             >
               <option disabled value="">--</option>
               <option v-for="m in monitores" :key="m.id" :value="m.id">
@@ -181,7 +182,7 @@
                 :key="t.id"
                 :value="t.id"
               >
-                {{ t.nombre }}
+                {{ t.titulo }}
               </option>
             </select>
           </div>
@@ -274,8 +275,8 @@ const actividad = ref({
   nivel: "",
   material: "",
   exterior: false,
-  instalacion: "",
-  monitor: "",
+  instalacion_id: null,
+  monitor_id: null,
   tipoActividad: "OTROS",
   tarifa: null,
   tipoReserva: "",
@@ -295,7 +296,8 @@ const errores = ref({
   tipoReserva: false,
   terreno: false,
   estado: false,
-  instalacion: false
+  instalacion: false,
+  monitor: false
 })
 
 const instalaciones = ref<any[]>([])
@@ -317,7 +319,8 @@ function validarFormulario() {
   errores.value.tipoReserva = actividad.value.tipoReserva === ""
   errores.value.terreno = actividad.value.terreno === ""
   errores.value.estado = actividad.value.estado === ""
-  errores.value.instalacion = actividad.value.instalacion === ""
+  errores.value.instalacion = actividad.value.instalacion_id === ""
+  errores.value.monitor = actividad.value.monitor_id === ""
 
   for (const k in errores.value) {
     if (errores.value[k]) {

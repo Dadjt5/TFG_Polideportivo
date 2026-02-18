@@ -8,6 +8,14 @@
       <div class="card shadow-sm border-0 rounded-4 p-4">
         <div class="row g-4">
 
+          <div class="col-12">
+						<label class="form-label fw-semibold">
+							{{ t.title }}
+						</label>
+						<input type="text" class="form-control form-control-lg"
+							:class="{ 'is-invalid': errores.titulo }" v-model="tarifa.titulo" />
+					</div>
+
           <!-- PRECIO ABONADO -->
           <div class="col-md-6">
             <label class="form-label fw-semibold">{{ t.priceSubscripcion }}</label>
@@ -109,6 +117,7 @@ const t = useI18n(language)
 const router = useRouter()
 
 const tarifa = ref({
+  titulo: '',
   precioAbonado: 0,
   precioUAM: 0,
   precioTDA: 0,
@@ -117,6 +126,7 @@ const tarifa = ref({
 })
 
 const errores = ref({
+  titulo: false,
   precioAbonado: false,
   precioUAM: false,
   precioTDA: false,
@@ -126,6 +136,7 @@ const errores = ref({
 function validarFormulario() {
   let valido = true
 
+  errores.value.titulo = tarifa.value.titulo === ''
   errores.value.precioAbonado = tarifa.value.precioAbonado < 0
   errores.value.precioUAM = tarifa.value.precioUAM < 0
   errores.value.precioTDA = tarifa.value.precioTDA < 0

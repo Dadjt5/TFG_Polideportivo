@@ -8,6 +8,14 @@
       <div class="card shadow-sm border-0 rounded-4 p-4">
         <div class="row g-4">
 
+          <div class="col-12">
+						<label class="form-label fw-semibold">
+							{{ t.title }}
+						</label>
+						<input type="text" class="form-control form-control-lg"
+							:class="{ 'is-invalid': errores.titulo }" v-model="tarifa.titulo" />
+					</div>
+
           <!-- CONSULTA -->
           <h5 class="fw-semibold mt-3">{{ t.consultationPrice }}</h5>
 
@@ -167,6 +175,7 @@ const router = useRouter()
 const mensaje = ref("")
 
 const tarifa = ref({
+  titulo: '',
   precioConsultaTDA: 0,
   precioConsultaUAM: 0,
   precioConsultaOtros: 0,
@@ -180,6 +189,7 @@ const tarifa = ref({
 })
 
 const errores = ref({
+  titulo: false,
   precioConsultaTDA: false,
   precioConsultaUAM: false,
   precioConsultaOtros: false,
@@ -193,6 +203,8 @@ const errores = ref({
 
 function validarFormulario() {
   let valido = true
+
+  errores.value.titulo = tarifa.value.titulo === ''
 
   for (const key in errores.value) {
     errores.value[key] = tarifa.value[key] < 0

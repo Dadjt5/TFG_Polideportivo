@@ -38,7 +38,7 @@ from polideportivo.models import (
     TarifaInstalacion, TDA, UsuarioFinal, AbonoDeportivo, AbonoVerano, Pabellon, 
     ReservaActividad, Alquiler, Administrador, User, CompraBono, CompraAbono,
     Mensaje, Sesion, MapaReservas, TipoActividad, TipoInstalacion, FormaReserva,
-    Terreno, Estado, Dia, ActividadComun, GrupoReducido, Fisioterapia
+    Terreno, Estado, Dia, ActividadComun, GrupoReducido, Fisioterapia, EstadoReserva
 )
 
 
@@ -716,6 +716,25 @@ class ObtenerActividadesInstalaciones(APIView):
         }
 
         return Response(data)
+    
+
+# Crear nuevas sesiones en una actividad
+class NuevaSesionView(APIView):
+    permission_classes = [IsAdministrador]
+
+    def post(self, request, actividad_id):
+        actividad = get_object_or_404(Actividad, id=actividad_id)
+
+        dia = request.data.get('dia')
+        horaInicio = request.data.get('horaInicio')
+        horaFin = request.data.get('horaFin')
+
+        respuesta = actividad.nuevaSesion(dia, horaInicio, horaFin)
+        
+        if respuesta:
+            return Response({"respuesta": "Exito al crear la sesion"}, status=status.HTTP_200_OK)
+
+        return Response({"respuesta": "No se ha podido crear la sesion"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Marcar o desmarcar actividades o instalaciones como favoritos
@@ -762,7 +781,7 @@ class ReservasView(APIView):
                 "fechaInicio": alquiler.horario.fecha_inicio,
                 "id_obj": alquiler.instalacion.id,
                 "titulo": alquiler.instalacion.nombre,
-                "horario": f"{alquiler.horario.horaInicio} - {alquiler.horario.horaFin}",
+                "horario": f"{alquiler.horaInicio} - {alquiler.horaFin}",
                 "dias": "",
                 "pago": {
                     "coste": alquiler.pago.coste,
@@ -910,8 +929,8 @@ class SesionesMonitorView(APIView):
                         "idSesion": sesion.id,
                         "nombre": actividad.nombre,
                         "dia": sesion.dia,
-                        "horaInicio": sesion.horario.horaInicio,
-                        "horaFin": sesion.horario.horaFin
+                        "horaInicio": sesion.horaInicio,
+                        "horaFin": sesion.horaFin
                     })
 
         return Response(sesiones)
@@ -930,8 +949,8 @@ class DetalleSesionView(APIView):
         data = {
             "id": sesion.id,
             "dia": sesion.dia,
-            "horaInicio": sesion.horario.horaInicio,
-            "horaFin": sesion.horario.horaFin,
+            "horaInicio": sesion.horaInicio,
+            "horaFin": sesion.horaFin,
             "actividad": {
                 "nombre": actividad.nombre,
                 "periodo": actividad.periodo,
@@ -983,6 +1002,7 @@ class TarifaActividadView(APIView):
         precios = actividad.obtener_precios()
         data = {
             "tarifa": {
+                "idActividad": actividad.id,
                 "nombre": actividad.nombre,
                 "numeroHoras": actividad.calcularHorasSemanales(),
                 "horario": actividad.getHorario(),
@@ -1049,6 +1069,22 @@ class TarifaInstalacionView(APIView):
                 })
 
         return Response(data)
+
+
+class ReservarActividad(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request, actividad_id):
+        actividad = get_object_or_404(Actividad, id=actividad_id)
+        ReservaActividad.nuevaReserva(request.user.usuario_final, actividad)
+
+
+class ReservaInstalacion(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request, instalacion_id):
+        instalacion = get_object_or_404(Instalacion, id=instalacion_id)
+        #Alquiler.nuevaReserva(request.user.usuario_final, instalacion)
 
 
 class GestionUsuariosView(APIView):

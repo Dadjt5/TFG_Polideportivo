@@ -309,6 +309,7 @@ export default {
   hasntSubscripcion: "No subscripcion",
   hasTDA: "Has TDA",
   hasntTDA: "No TDA",
+  newUserNoQues: "New final user",
 
   /* Detalle monitor */
   monitorDetail: "Monitor detail",

@@ -44,7 +44,7 @@
             <select
               class="form-select form-select-lg"
               :class="{ 'is-invalid': errores.pabellon }"
-              v-model="instalacion.pabellon"
+              v-model="instalacion.pabellon_id"
             >
               <option value="" disabled>--</option>
               <option
@@ -70,7 +70,7 @@
                 :key="t.id"
                 :value="t.id"
               >
-                {{ t.nombre }}
+                {{ t.titulo }}
               </option>
             </select>
           </div>
@@ -175,7 +175,7 @@ const instalacion = ref({
   aforoMaximo: 50,
   luz: false,
   porcentajeTDA: 0,
-  pabellon: "",
+  pabellon_id: null,
   tarifa: null,
   tipoInstalacion: ""
 })
@@ -201,7 +201,7 @@ function validarFormulario() {
   errores.value.porcentajeTDA =
     instalacion.value.porcentajeTDA < 0 ||
     instalacion.value.porcentajeTDA > 100
-  errores.value.pabellon = instalacion.value.pabellon === ""
+  errores.value.pabellon = instalacion.value.pabellon_id === ""
   errores.value.tipoInstalacion = instalacion.value.tipoInstalacion === ""
 
   for (const k in errores.value) {

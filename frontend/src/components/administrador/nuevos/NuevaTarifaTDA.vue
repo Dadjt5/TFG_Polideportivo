@@ -8,18 +8,21 @@
 			<div class="card shadow-sm border-0 rounded-4 p-4">
 				<div class="row g-4">
 
+					<div class="col-12">
+						<label class="form-label fw-semibold">
+							{{ t.title }}
+						</label>
+						<input type="text" class="form-control form-control-lg"
+							:class="{ 'is-invalid': errores.titulo }" v-model="tarifa.titulo" />
+					</div>
+
 					<!-- PRECIO UAM -->
 					<div class="col-md-4">
 						<label class="form-label fw-semibold">
 							{{ t.priceUAM }}
 						</label>
-						<input
-							type="number"
-							step="0.01"
-							class="form-control form-control-lg"
-							:class="{ 'is-invalid': errores.precioUAM }"
-							v-model.number="tarifa.precioUAM"
-						/>
+						<input type="number" step="0.01" class="form-control form-control-lg"
+							:class="{ 'is-invalid': errores.precioUAM }" v-model.number="tarifa.precioUAM" />
 					</div>
 
 					<!-- PRECIO OTROS -->
@@ -27,13 +30,8 @@
 						<label class="form-label fw-semibold">
 							{{ t.priceOthers }}
 						</label>
-						<input
-							type="number"
-							step="0.01"
-							class="form-control form-control-lg"
-							:class="{ 'is-invalid': errores.precioOtros }"
-							v-model.number="tarifa.precioOtros"
-						/>
+						<input type="number" step="0.01" class="form-control form-control-lg"
+							:class="{ 'is-invalid': errores.precioOtros }" v-model.number="tarifa.precioOtros" />
 					</div>
 
 					<!-- PRECIO REPOSICION -->
@@ -41,19 +39,16 @@
 						<label class="form-label fw-semibold">
 							{{ t.repositionPrice }}
 						</label>
-						<input
-							type="number"
-							step="0.01"
-							class="form-control form-control-lg"
+						<input type="number" step="0.01" class="form-control form-control-lg"
 							:class="{ 'is-invalid': errores.precioReposicion }"
-							v-model.number="tarifa.precioReposicion"
-						/>
+							v-model.number="tarifa.precioReposicion" />
 					</div>
 
-                    <!-- POR DEFECTO -->
+					<!-- POR DEFECTO -->
 					<div class="col-12">
 						<div class="form-check form-switch mt-3">
-							<input class="form-check-input" type="checkbox" id="porDefecto" v-model="tarifa.por_defecto" />
+							<input class="form-check-input" type="checkbox" id="porDefecto"
+								v-model="tarifa.por_defecto" />
 							<label class="form-check-label fw-semibold" for="porDefecto">
 								{{ t.defaultTariff }}
 							</label>
@@ -64,17 +59,11 @@
 
 				<!-- BOTONES -->
 				<div class="d-flex justify-content-center gap-3 mt-5">
-					<button
-						class="btn btn-primary btn-lg px-5"
-						@click="crearTarifa"
-					>
+					<button class="btn btn-primary btn-lg px-5" @click="crearTarifa">
 						{{ t.save }}
 					</button>
 
-					<button
-						class="btn btn-danger btn-lg px-5"
-						@click="volver"
-					>
+					<button class="btn btn-danger btn-lg px-5" @click="volver">
 						{{ t.return }}
 					</button>
 				</div>
@@ -98,13 +87,15 @@ const t = useI18n(language)
 const router = useRouter()
 
 const tarifa = ref({
+	titulo: '',
 	precioUAM: 0,
 	precioOtros: 0,
 	precioReposicion: 0,
-    por_defecto: false
+	por_defecto: false
 })
 
 const errores = ref({
+	titulo: false,
 	precioUAM: false,
 	precioOtros: false,
 	precioReposicion: false
@@ -113,6 +104,7 @@ const errores = ref({
 function validarFormulario() {
 	let valido = true
 
+	errores.value.titulo = tarifa.value.titulo === ''
 	errores.value.precioUAM = tarifa.value.precioUAM < 0
 	errores.value.precioOtros = tarifa.value.precioOtros < 0
 	errores.value.precioReposicion = tarifa.value.precioReposicion < 0

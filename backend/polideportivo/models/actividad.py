@@ -3,6 +3,9 @@ from django.utils.translation import gettext_lazy as _
 import math
 from django.utils import timezone
 from django.core.exceptions import ValidationError
+from datetime import time
+from django.db import transaction
+from django.http import Http404
 
 from .constantes import TipoActividad, FormaReserva, Terreno, Estado, Periodo, Dia
 from .tarifa_actividad import Fisioterapia, GrupoReducido, ActividadComun
@@ -66,7 +69,7 @@ class Actividad(models.Model):
                 "precioCuatrimestre": self.tarifa.gruporeducido.precioCuatrimestre,
                 "precioMensual": self.tarifa.gruporeducido.precioMensual
             }
-        else:
+        elif self.tipoActividad == TipoActividad.FISIOTERAPIA:
             return {
                 "precioConsultaTDA": self.tarifa.fisioterapia.precioConsultaTDA,
                 "precioConsultaUAM": self.tarifa.fisioterapia.precioConsultaUAM,
@@ -78,6 +81,8 @@ class Actividad(models.Model):
                 "precioSesiones6UAM": self.tarifa.fisioterapia.precioSesiones6UAM,
                 "precioSesiones6Otros": self.tarifa.fisioterapia.precioSesiones6Otros
             }
+            
+        raise Http404("Tipo de actividad no válido")
 
     @property
     def activa(self):
@@ -97,7 +102,7 @@ class Actividad(models.Model):
     def calcularHorasSemanales(self):
         horas = 0.0
         for sesion in self.sesiones.all():
-            horas += sesion.horario.numeroHoras
+            horas += sesion.numeroHoras
 
         return math.ceil(horas)
 
@@ -110,11 +115,27 @@ class Actividad(models.Model):
         for sesion in self.sesiones.all():
             horario.append({
                 "dia": sesion.dia,
-                "horaInicio": sesion.horario.horaInicio.strftime("%H:%M"),
-                "horaFin": sesion.horario.horaFin.strftime("%H:%M")
+                "horaInicio": sesion.horaInicio.strftime("%H:%M"),
+                "horaFin": sesion.horaFin.strftime("%H:%M")
             })
         
         return horario
+    
+    def nuevaSesion(self, dia, horaInicio, horaFin):
+        try:
+            with transaction.atomic():
+                if isinstance(horaInicio, str):
+                    h, m = map(int, horaInicio.split(":"))
+                    horaInicio = time(h, m)
+                if isinstance(horaFin, str):
+                    h, m = map(int, horaFin.split(":"))
+                    horaFin = time(h, m)
+
+                sesion = Sesion.objects.create(dia=dia, horaInicio=horaInicio, horaFin=horaFin, actividad=self, numeroHoras=0.0)
+
+            return True
+        except Exception:
+            return False
 
     @classmethod
     def contar(cls):
@@ -146,7 +167,9 @@ class Sesion(models.Model):
     """Modelo para representar una sesion de una actividad"""
 
     actividad = models.ForeignKey(Actividad, on_delete=models.RESTRICT, related_name="sesiones")
-    horario = models.ForeignKey('Horario', on_delete=models.RESTRICT)    
+    horaInicio = models.TimeField()
+    horaFin = models.TimeField() 
+    numeroHoras = models.FloatField(default=0.0)
 
     dia = models.CharField(default=Dia.SABADO, choices=Dia.choices)
     
@@ -177,6 +200,14 @@ class Sesion(models.Model):
             return True
         except:
             return False
+        
+    def save(self, *args, **kwargs):
+        t1 = self.horaInicio.hour*3600 + self.horaInicio.minute*60 + self.horaInicio.second
+        t2 = self.horaFin.hour*3600 + self.horaFin.minute*60 + self.horaFin.second
+        horas = (t2-t1)/3600
+        self.numeroHoras = horas
+        
+        super().save(*args, **kwargs)
 
     @classmethod
     def contar(cls):

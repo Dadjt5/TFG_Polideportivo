@@ -16,7 +16,7 @@
         </li>
 
         <li class="nav-item fs-5">
-          <router-link to="/actividades" class="nav-link px-3 text-white">
+          <router-link to="/actividades" v-if="userStore.role === 'usuario_final'" class="nav-link px-3 text-white">
             {{ t.activities }}
           </router-link>
         </li>

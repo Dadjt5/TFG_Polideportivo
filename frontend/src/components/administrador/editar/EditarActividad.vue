@@ -151,7 +151,7 @@
                     {{ s.dia }}
                   </div>
                   <div class="text-muted small">
-                    {{ s.horario.horaInicio }} - {{ s.horario.horaFin }}
+                    {{ s.horaInicio }} - {{ s.horaFin }}
                   </div>
                 </div>
 
@@ -405,7 +405,6 @@ const volver = () => {
 
 onMounted(async () => {
   const id = parseInt(props.id);
-
   try {
     actividad.value = await getActividadDetalle(id);
     actividadOriginal.value = JSON.parse(JSON.stringify(actividad.value))

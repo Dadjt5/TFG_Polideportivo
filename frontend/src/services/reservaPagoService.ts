@@ -9,7 +9,7 @@ export const getTarifaDescuentoActividad = async (id: number) => {
 /* Función para obtener la tarifa y descuentos de una instalacion */
 export const getTarifaDescuentoInstalacion = async (id: number, fecha: string) => {
   const response = await api.get(`api/v1/tarifas/instalaciones/${id}/`, {
-    params: { fecha }  // aquí mandamos la fecha como query param
+    params: { fecha }
   });
   return response.data;
 }
@@ -19,3 +19,9 @@ export const getReservaActividad = async (id: number) => {
   const response = await api.get(`api/v1/reservasActividad/${id}/`)
   return response.data;
 };
+
+/* Función para reservar la actividad */
+export const reservarActividad = async(id: number) => {
+  const response = await api.post(`api/v1/actividades/${id}/reservar/`)
+  return response.data;
+}

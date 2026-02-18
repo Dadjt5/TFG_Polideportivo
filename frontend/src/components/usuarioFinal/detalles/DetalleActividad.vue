@@ -156,7 +156,7 @@
               <div>
                 <div class="fw-semibold">{{ s.dia }}</div>
                 <div class="text-muted">
-                  {{ s.horario.horaInicio }} - {{ s.horario.horaFin }}
+                  {{ s.horaInicio }} - {{ s.horaFin }}
                 </div>
               </div>
             </div>

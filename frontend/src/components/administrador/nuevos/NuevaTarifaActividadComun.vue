@@ -8,6 +8,14 @@
 			<div class="card shadow-sm border-0 rounded-4 p-4">
 				<div class="row g-4">
 
+					<div class="col-12">
+						<label class="form-label fw-semibold">
+							{{ t.title }}
+						</label>
+						<input type="text" class="form-control form-control-lg"
+							:class="{ 'is-invalid': errores.titulo }" v-model="tarifa.titulo" />
+					</div>
+
 					<!-- PRECIO UAM -->
 					<div class="col-md-6">
 						<label class="form-label fw-semibold">{{ t.priceUAM }}</label>
@@ -70,9 +78,9 @@ const language = inject<Ref<Language>>("language")!
 const t = useI18n(language)
 
 const router = useRouter()
-const mensaje = ref("")
 
 const tarifa = ref({
+	titulo: '',
 	precioUAM: 0,
 	precioOtros: 0,
 	numeroHorasSemana: 0,
@@ -80,6 +88,7 @@ const tarifa = ref({
 })
 
 const errores = ref({
+	titulo: false,
 	precioUAM: false,
 	precioOtros: false,
 	numeroHorasSemana: false
@@ -88,6 +97,7 @@ const errores = ref({
 function validarFormulario() {
 	let valido = true
 
+	errores.value.titulo = tarifa.value.titulo === ''
 	errores.value.precioUAM = tarifa.value.precioUAM < 0
 	errores.value.precioOtros = tarifa.value.precioOtros < 0
 	errores.value.numeroHorasSemana = tarifa.value.numeroHorasSemana <= 0

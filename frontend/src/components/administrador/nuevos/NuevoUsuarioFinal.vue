@@ -2,7 +2,7 @@
   <div class="min-vh-100 bg-light">
     <div class="container py-5" style="max-width: 1100px">
       <h1 class="text-center fw-semibold mb-4">
-        {{ t.newUser }}
+        {{ t.newUserNoQues }}
       </h1>
 
       <div class="card shadow-sm rounded-4">
@@ -155,7 +155,7 @@
           <!-- BOTONES -->
           <div class="d-flex justify-content-center gap-4 mt-4">
             <button class="btn btn-primary btn-lg px-5" @click="nuevoUsuario">
-              {{ t.newUser }}
+              {{ t.newUserNoQues }}
             </button>
 
             <button class="btn btn-secondary btn-lg px-5" @click="volver">

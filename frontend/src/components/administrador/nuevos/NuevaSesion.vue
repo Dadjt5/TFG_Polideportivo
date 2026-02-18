@@ -70,7 +70,6 @@ const sesion = ref({
   dia: "",
   horaInicio: "",
   horaFin: "",
-  actividad: null as number | null
 })
 
 const errores = ref({
@@ -78,9 +77,6 @@ const errores = ref({
   horaInicio: false,
   horaFin: false
 })
-
-const actividades = ref<any[]>([])
-const horarios = ref<any[]>([])
 
 function validarFormulario() {
   let valido = true
@@ -102,20 +98,12 @@ const volver = () => router.back()
 
 const crearSesion = async () => {
   if (!validarFormulario()) return
-
+  console.log(props.id)
   try {
-    await nuevaSesion({
-      ...sesion.value,
-      horario: {
-        horaInicio: sesion.value.horaInicio,
-        horaFin: sesion.value.horaFin
-      },
-      actividad: Number(props.id)
-    })
+    await nuevaSesion(Number(props.id), sesion.value)
     router.back()
   } catch (e) {
     console.error("Error al crear la sesión", e)
   }
 }
-
 </script>
