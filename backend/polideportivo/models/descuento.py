@@ -50,7 +50,6 @@ class Descuento(models.Model):
             
             return cls._filtrar_descuentos(descuentos)
 
-
     @staticmethod
     def _filtrar_descuentos(descuentos):
         if not descuentos.exists():

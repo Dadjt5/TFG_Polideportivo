@@ -46,6 +46,17 @@ class Instalacion(models.Model):
             "precioOtros": self.tarifa.precioOtros
         }
         
+    def calcular_precio(self, usuario):
+        precio = self.tarifa.precioOtros
+        if usuario.tieneAbono:
+            precio = self.tarifa.precioAbonado
+        elif usuario.esUAM:
+            precio = self.tarifa.precioUAM
+        elif usuario.tieneTDA:
+            precio = self.tarifa.precioTDA
+        
+        return precio
+
     def get_horario(self, fecha):
         agenda = Agenda.objects.filter(instalacion=self, fecha=fecha).first()
 

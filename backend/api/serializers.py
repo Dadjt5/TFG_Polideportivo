@@ -758,9 +758,25 @@ class FisioterapiaSimpleSerializer(serializers.ModelSerializer):
 # Reservas
 # --------------------
 
+class ReservaActividadSimpleSerializer(serializers.ModelSerializer):
+    nombreActividad = serializers.SerializerMethodField()
+    pago = PagoSerializer(read_only=True)
+
+    class Meta:
+        model = ReservaActividad
+        fields = (
+            "id",
+            "estado",
+            "pago",
+            "nombre"
+        )
+
+    def get_nombre(self, obj):
+        return obj.actividad.nombre
+
+
 class ReservaActividadSerializer(serializers.ModelSerializer):
     actividad = ActividadSimpleSerializer(read_only=True)
-    descuento = DescuentoSimpleSerializer(read_only=True)
     pago = PagoSerializer(read_only=True)
     tarifa = TarifaActividadSerializer(read_only=True)
 
@@ -768,6 +784,7 @@ class ReservaActividadSerializer(serializers.ModelSerializer):
         model = ReservaActividad
         fields = (
             "id",
+            "estado",
             "tarifa",
             "pago",
             "descuento",
@@ -777,8 +794,6 @@ class ReservaActividadSerializer(serializers.ModelSerializer):
 
 class AlquilerSerializer(serializers.ModelSerializer):
     instalacion = InstalacionSimpleSerializer(read_only=True)
-    horario = HorarioSerializer(read_only=True)
-    descuento = DescuentoSerializer(read_only=True)
     pago = PagoSerializer(read_only=True)
 
     class Meta:
@@ -789,9 +804,27 @@ class AlquilerSerializer(serializers.ModelSerializer):
             "tarifa",
             "pago",
             "instalacion",
-            "horario",
-            "descuento",
         )
+
+
+class AlquilerSimpleSerializer(serializers.ModelSerializer):
+    nombreInstalacion = serializers.SerializerMethodField()
+    pago = PagoSerializer(read_only=True)
+
+    class Meta:
+        model = Alquiler
+        fields = (
+            "id",
+            "fecha",
+            "horaInicio",
+            "horaFin",
+            "numeroHoras",
+            "pago",
+            "nombre"
+        )
+
+    def get_nombre(self, obj):
+        return obj.instalacion.nombre
 
 
 # --------------------

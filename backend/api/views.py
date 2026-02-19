@@ -6,9 +6,11 @@ from rest_framework.permissions import (
     AllowAny
 )
 from rest_framework import status
+import stripe
 from django.utils.dateparse import parse_date
 from datetime import date
 from django.shortcuts import get_object_or_404
+from django.conf import settings
 
 from .permissions import IsAdministrador, IsMonitor, IsUsuarioFinal
 
@@ -28,7 +30,8 @@ from .serializers import (
     InstalacionSimpleSerializer, ActividadComunSerializer, GrupoReducidoSerializer,
     FisioterapiaSerializer, TarifaInstalacionSimpleSerializer, TarifaTDASimpleSerializer,
     ActividadComunSimpleSerializer, GrupoReducidoSimpleSerializer, FisioterapiaSimpleSerializer,
-    CanalSerializer, CanalAdministradorSerializer
+    CanalSerializer, CanalAdministradorSerializer, ReservaActividadSimpleSerializer,
+    AlquilerSimpleSerializer
 )
 
 from polideportivo.models import (
@@ -368,6 +371,18 @@ class ReservaActividadViewSet(viewsets.ModelViewSet):
         return ReservaActividad.objects.filter(usuarioFinal__user=self.request.user)
 
 
+class ReservaActividadSimpleViewSet(viewsets.ModelViewSet):
+    serializer_class = ReservaActividadSimpleSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        usuario_final = UsuarioFinal.objects.get(user=self.request.user)
+        serializer.save(usuarioFinal=usuario_final)
+
+    def get_queryset(self):
+        return ReservaActividad.objects.filter(usuarioFinal__user=self.request.user)
+
+
 class AlquilerViewSet(viewsets.ModelViewSet):
     serializer_class = AlquilerSerializer
     permission_classes = [IsAuthenticated]
@@ -376,6 +391,17 @@ class AlquilerViewSet(viewsets.ModelViewSet):
         usuario_final = UsuarioFinal.objects.get(user=self.request.user)
         serializer.save(usuarioFinal=usuario_final)
 
+    def get_queryset(self):
+        return Alquiler.objects.filter(usuarioFinal__user=self.request.user)
+
+
+class AlquilerSimpleViewSet(viewsets.ModelViewSet):
+    serializer_class = AlquilerSimpleSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def perform_create(self, serializer):
+        usuario_final = UsuarioFinal.objects.get(user=self.request.user)
+        serializer.save(usuarioFinal=usuario_final)
 
     def get_queryset(self):
         return Alquiler.objects.filter(usuarioFinal__user=self.request.user)
@@ -775,36 +801,12 @@ class ReservasView(APIView):
         actividades = ReservaActividad.objects.filter(usuarioFinal__user=user)
 
         for alquiler in alquileres:
-            reservas.append({
-                "id": alquiler.id,
-                "tipo": "alquiler",
-                "fechaInicio": alquiler.horario.fecha_inicio,
-                "id_obj": alquiler.instalacion.id,
-                "titulo": alquiler.instalacion.nombre,
-                "horario": f"{alquiler.horaInicio} - {alquiler.horaFin}",
-                "dias": "",
-                "pago": {
-                    "coste": alquiler.pago.coste,
-                    "estadoPago": alquiler.pago.estadoPago,
-                }
-            })
+            serializer = AlquilerSerializer(alquiler)
+            reservas.append(serializer.data)
 
         for reserva in actividades:
-            reservas.append({
-                "id": reserva.id,
-                "tipo": "actividad",
-                "fechaInicio": reserva.actividad.fecha_inicio,
-                "id_obj": reserva.actividad.id,
-                "titulo": reserva.actividad.nombre,
-                "horario": reserva.actividad.horasSemanales,
-                "dias": reserva.actividad.dias,
-                "pago": {
-                    "coste": reserva.pago.coste,
-                    "estadoPago": reserva.pago.estadoPago,
-                }
-            })
-
-        reservas.sort(key=lambda r: r["fechaInicio"])
+            serializer = ReservaActividadSerializer(reserva)
+            reservas.append(serializer.data)
 
         return Response(reservas)
 
@@ -1071,20 +1073,45 @@ class TarifaInstalacionView(APIView):
         return Response(data)
 
 
-class ReservarActividad(APIView):
+class ReservarActividadView(APIView):
     permission_classes = [IsAuthenticated]
     
     def post(self, request, actividad_id):
         actividad = get_object_or_404(Actividad, id=actividad_id)
-        ReservaActividad.nuevaReserva(request.user.usuario_final, actividad)
+
+        res = ReservaActividad.nuevaReserva(request.user.usuario_final, actividad)
+        Pago.nuevoPago("Pago por reserva de la actividad", request.user.usuario_final, reservaActividad=res)
+
+        if res:
+            serializer = ReservaActividadSerializer(res)
+            return Response(serializer.data)
+
+        return Response({"respuesta": "Error al reservar"}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class ReservaInstalacion(APIView):
+class ReservaInstalacionView(APIView):
     permission_classes = [IsAuthenticated]
     
     def post(self, request, instalacion_id):
         instalacion = get_object_or_404(Instalacion, id=instalacion_id)
-        #Alquiler.nuevaReserva(request.user.usuario_final, instalacion)
+
+        res = Alquiler.nuevaReserva(request.user.usuario_final, instalacion)
+        Pago.nuevoPago("Pago por el alquiler de una instalación", request.user.usuario_final, alquiler=res)
+
+        if res:
+            serializer = AlquilerSerializer(res)
+            return Response(serializer.data)
+
+        return Response({"respuesta": "Error al alquilar"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ComprarAbonoView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request, abono_id):
+        instalacion = get_object_or_404(Instalacion, id=instalacion_id)
+        
+        return Response({"respuesta": "Error al comprar el abono"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class GestionUsuariosView(APIView):
@@ -1175,3 +1202,51 @@ class ObtenerConfiguracionView(APIView):
             return Response({"respuesta": "Resultados cambiados correctamente"}, status=status.HTTP_200_OK)
         
         return Response({"respuesta": "Error al modificar la configuracion"}, status=status.HTTP_400_BAD_REQUEST)
+    
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
+
+# Realizar un intento de pago
+class CrearIntentoPagoView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        reserva_id = request.data.get("reserva_id")
+        reserva = get_object_or_404(ReservaActividad, id=reserva_id)
+
+        if reserva.estado != EstadoReserva.PENDIENTE:
+            return Response({"respuesta": "Reserva incorrecta"}, status=status.HTTP_400_BAD_REQUEST)
+
+        intent = stripe.PaymentIntent.create(
+            amount=int(reserva.pago.coste * 100), # En centimos
+            currency="eur",
+            metadata={
+                "reserva_id": reserva.id,
+                "usuario_id": request.user.id
+            }
+        )
+
+        reserva.stripe_payment_intent = intent.id
+        reserva.save()
+
+        return Response({
+            "client_secret": intent.client_secret
+        })
+
+
+# Confirmar un pago
+class ConfirmarPagoView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        reserva_id = request.data.get("reserva_id")
+        reserva = get_object_or_404(ReservaActividad, id=reserva_id)
+
+        intent = stripe.PaymentIntent.retrieve(reserva.stripe_payment_intent)
+
+        if intent.status == "succeeded":
+            reserva.estado = EstadoReserva.CONFIRMADA
+            reserva.save()
+            return Response({"ok": True})
+        else:
+            return Response({"error": "Pago no válido"}, status=400)

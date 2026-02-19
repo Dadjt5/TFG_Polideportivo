@@ -1,8 +1,11 @@
 <template>
-  <div class="min-vh-100 bg-light">
+<div class="min-vh-100 position-relative">
+  <div
+    class="position-absolute top-0 start-0 w-100 h-100"
+    style="background: url('/images/Home2.jpg') center/cover no-repeat; filter: brightness(0.6);"
+  ></div>
 
-    <!-- MAIN -->
-    <main class="container-fluid mt-2 px-5 py-1">
+  <main class="position-relative container-fluid mt-2 px-5 py-1">
 
       <!-- INTRO -->
       <div class="text-center mt-5 mb-4">
@@ -374,3 +377,12 @@ onMounted(async () => {
   }
 })
 </script>
+
+<style scoped>
+.home-background {
+  background-image: url('/images/Home2.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+</style>

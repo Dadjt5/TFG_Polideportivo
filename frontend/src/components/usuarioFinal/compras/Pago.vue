@@ -3,21 +3,27 @@
     <div class="card shadow-lg p-4" style="width: 500px;">
 
       <!-- Título -->
-      <h3 class="text-center mb-4">Finalizar pago</h3>
+      <h3 class="text-center mb-4">{{ t.paymentTitle }}</h3>
 
-      <!-- Resumen reserva -->
+      <!-- Resumen pago -->
       <div class="mb-3">
-        <h5>Resumen</h5>
+        <h5>{{ t.reservationSummary }}</h5>
+
+        <!-- Nombre del recurso: puede ser actividad, instalación, abono, bono o TDA -->
         <p class="mb-1">
-          <strong>Actividad:</strong> {{ resumen.actividad }}
+          {{ resumen.nombre }}
         </p>
+
+        <!-- Descuento aplicado -->
         <p class="mb-1">
-          <strong>Fecha:</strong> {{ resumen.fecha }}
+          <strong>{{ t.discount }}:</strong> {{ resumen.pago.descuentoAplicado }} %
         </p>
+
+        <!-- Precio final a pagar -->
         <p class="mb-1">
-          <strong>Precio final:</strong>
+          <strong>{{ t.price }}:</strong>
           <span class="text-success fw-bold">
-            {{ resumen.precio }} €
+            {{ resumen.pago.costeFinal.toFixed(2) }} €
           </span>
         </p>
       </div>
@@ -28,7 +34,7 @@
       <form @submit.prevent="pagar">
 
         <div class="mb-3">
-          <label class="form-label">Datos de la tarjeta</label>
+          <label class="form-label">{{ t.cardInfo }}</label>
           <div id="card-element" class="form-control p-2"></div>
         </div>
 
@@ -38,13 +44,12 @@
         </div>
 
         <!-- Botón pagar -->
-        <button
-          type="submit"
-          class="btn btn-primary w-100 mt-3"
-          :disabled="loading"
-        >
+        <button type="submit" class="btn btn-primary w-100 mt-3" :disabled="loading">
           <span v-if="loading" class="spinner-border spinner-border-sm me-2"></span>
-          {{ loading ? "Procesando..." : `Pagar ${resumen.precio} €` }}
+          {{ loading 
+            ? `${t.processing}...` 
+            : `${t.payment} ${resumen.pago.costeFinal.toFixed(2)} €` 
+          }}
         </button>
 
       </form>
@@ -53,19 +58,37 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { onMounted, ref } from "vue"
-import { loadStripe } from "@stripe/stripe-js"
-import { useRoute, useRouter } from "vue-router"
-import axios from "axios"
 
-const route = useRoute()
+<script setup lang="ts">
+import { onMounted, type Ref, ref, inject } from "vue"
+import { useRouter } from "vue-router"
+import { loadStripe } from "@stripe/stripe-js"
+
+import { confirmarPago, intentarPago, getReservaActividadSimplificado } from "@/services/reservaPagoService";
+
+/* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
+import type { Language } from "@/useI18N";
+import { useI18n } from "@/useI18N";
+
+const props = defineProps<{ id: string }>();
+
+const language = inject<Ref<Language>>("language")!;
+const t = useI18n(language);
+
 const router = useRouter()
 
 const resumen = ref({
-  actividad: "",
-  fecha: "",
-  precio: 0
+	id: 0,
+	estado: '',
+	nombre: '',
+	pago: {
+		concepto: '',
+    coste: 0.0,
+    costeFinal: 0.0,
+    descuentoAplicado: 0.0,
+    fecha: '',
+    estadoPago: '',    
+	}
 })
 
 const loading = ref(false)
@@ -78,51 +101,51 @@ let clientSecret = ""
 const tiempoRestante = ref(900)
 
 const countdown = setInterval(() => {
-  tiempoRestante.value -= 1
-  if (tiempoRestante.value <= 0) {
-    clearInterval(countdown)
-    error.value = "Se ha cancelado la reserva por tiempo agotado."
-  }
+	tiempoRestante.value -= 1
+	if (tiempoRestante.value <= 0) {
+		clearInterval(countdown)
+		error.value = "Se ha cancelado la reserva por tiempo agotado."
+	}
 }, 1000)
 
 const pagar = async () => {
-  loading.value = true
-  error.value = ""
+	loading.value = true
+	error.value = ""
 
-  const result = await stripe.confirmCardPayment(clientSecret, {
-    payment_method: {
-      card: cardElement
-    }
-  })
+	const result = await stripe.confirmCardPayment(clientSecret, {
+		payment_method: {
+			card: cardElement
+		}
+	})
 
-  if (result.error) {
-    error.value = result.error.message
-    loading.value = false
-  } else {
-    await axios.post("/api/confirmar-pago/", {
-      reserva_id: route.query.reserva_id
-    })
-
-    router.push("/reserva-confirmada")
-  }
+	if (result.error) {
+		error.value = result.error.message
+		loading.value = false
+	} else {
+		await confirmarPago(parseInt(props.id))
+		router.push("/pago-finalizado")
+	}
 }
 
 onMounted(async () => {
-  const reservaId = route.query.reserva_id
+	const reservaId = parseInt(props.id)
 
-  const resumenResponse = await axios.get(`/api/reserva/${reservaId}/`)
-  resumen.value = resumenResponse.data
+	const resumenResponse = await getReservaActividadSimplificado(reservaId)
+	resumen.value = resumenResponse.data
 
-  const pagoResponse = await axios.post("/api/crear-intento-pago/", {
-    reserva_id: reservaId
-  })
+	if (resumen.value.estado !== "PENDIENTE") {
+		router.replace("/")
+		return
+	}
 
-  clientSecret = pagoResponse.data.client_secret
+	const pagoResponse = await intentarPago(reservaId)
 
-  stripe = await loadStripe("pk_test_TU_PUBLIC_KEY")
+	clientSecret = pagoResponse.data.client_secret
 
-  const elements = stripe.elements()
-  cardElement = elements.create("card")
-  cardElement.mount("#card-element")
+	stripe = await loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY)
+
+	const elements = stripe.elements()
+	cardElement = elements.create("card")
+	cardElement.mount("#card-element")
 })
 </script>

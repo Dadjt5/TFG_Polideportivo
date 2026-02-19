@@ -81,8 +81,62 @@ class Actividad(models.Model):
                 "precioSesiones6UAM": self.tarifa.fisioterapia.precioSesiones6UAM,
                 "precioSesiones6Otros": self.tarifa.fisioterapia.precioSesiones6Otros
             }
-            
+
         raise Http404("Tipo de actividad no válido")
+
+
+    def calcular_precio(self, usuario, numeroHorasSemana=0, numeroPersonas=0, tipoPago='', tipoSesion=''):
+        if self.tipoActividad == TipoActividad.OTROS:
+            if self.tarifa.actividadcomun.numeroHorasSemana == 0:
+                raise ValueError("El número de horas no puede ser 0")
+
+            precio = self.tarifa.actividadcomun.precioOtros
+            if usuario.esUAM:
+                precio = self.tarifa.actividadcomun.precioUAM
+
+            return precio * (self.calcularHorasSemanales()/self.tarifa.actividadcomun.numeroHorasSemana)
+
+        elif self.tipoActividad == TipoActividad.GRUPOS_REDUCIDOS:
+            if self.tarifa.gruporeducido.numeroHoras == 0 or self.tarifa.gruporeducido.numeroPersonas == 0:
+                raise ValueError("Ni el número de horas ni el número de personas puede ser 0")
+
+            precio = self.tarifa.gruporeducido.precio
+            if tipoPago.lower() == "mensual":
+                precio = self.tarifa.gruporeducido.precioMensual
+            elif tipoPago.lower() == "cuatrimestral":
+                precio = self.tarifa.gruporeducido.precioCuatrimestre
+            
+            precio = precio * (numeroHorasSemana/self.tarifa.gruporeducido.numeroHoras)
+            return precio * (numeroPersonas/self.tarifa.gruporeducido.numeroPersonas)
+
+        elif self.tipoActividad == TipoActividad.FISIOTERAPIA:
+            precio = self.tarifa.fisioterapia.precioConsultaOtros
+            if usuario.tieneTDA:
+                if tipoSesion.lower() == "consulta":
+                    precio = self.tarifa.fisioterapia.precioConsultaTDA
+                elif tipoSesion.lower() == "sesiones1_5":
+                    precio = self.tarifa.fisioterapia.precioSesiones1_5TDA
+                elif tipoSesion.lower() == "sesiones6":
+                    precio = self.tarifa.fisioterapia.precioSesiones6TDA
+
+            elif usuario.esUAM:
+                if tipoSesion.lower() == "consulta":
+                    precio = self.tarifa.fisioterapia.precioConsultaUAM
+                elif tipoSesion.lower() == "sesiones1_5":
+                    precio = self.tarifa.fisioterapia.precioSesiones1_5UAM
+                elif tipoSesion.lower() == "sesiones6":
+                    precio = self.tarifa.fisioterapia.precioSesiones6UAM
+
+            else:
+                if tipoSesion.lower() == "sesiones1_5":
+                    precio = self.tarifa.fisioterapia.precioSesiones1_5Otros
+                elif tipoSesion.lower() == "sesiones6":
+                    precio = self.tarifa.fisioterapia.precioSesiones6Otros
+
+            return precio
+
+        raise Http404("Tipo de actividad no válido")
+
 
     @property
     def activa(self):

@@ -32,6 +32,7 @@ import ComprarAbonosBonos from '@/components/usuarioFinal/compras/ComprarAbonosB
 import ReservaActividad from '@/components/usuarioFinal/compras/ReservaActividad.vue'
 import Alquiler from '@/components/usuarioFinal/compras/Alquiler.vue'
 import ReservasRealizadas from '@/components/usuarioFinal/compras/ReservasRealizadas.vue'
+import Pago from '@/components/usuarioFinal/compras/Pago.vue'
 
 
 /*********** Monitor ***********/
@@ -118,7 +119,8 @@ const routes = [
   { path: '/actividad/:id/reservar', component: ReservaActividad, name: 'reservar-actividad', props: true, meta: { requiresAuth: true } },
   { path: '/instalacion/:id/reservar', component: Alquiler, name: 'reservar-instalacion', props: true, meta: { requiresAuth: true } },
 
-  { path: '/pago', component: Pago, name: 'pasarela-pago', meta: { requiresAuth: true }},
+  { path: '/pago/:id', component: Pago, props: true, name: 'pasarela-pago', meta: { requiresAuth: true }},
+  { path: '/pago/finalizado/:id', component: Pago, props: true, name: 'pago-finalizado', meta: { requiresAuth: true }},
 
   /* Detalle */
   { path: '/pabellones/:id', component: DetallePabellon, name: 'detalle-pabellon', props: true, meta: { public: true } },

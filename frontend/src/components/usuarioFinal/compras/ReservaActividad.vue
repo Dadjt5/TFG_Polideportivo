@@ -44,14 +44,14 @@
             <tr :class="{ 'table-primary': usuarioFinalStore.isUAM }">
               <td>UAM</td>
               <td class="text-end">
-                {{ reserva.tarifa.datos.precioUAM }} €
+                {{ reserva.tarifa.datos.precioUAM }} € / {{ reserva.tarifa.datos.numeroHorasSemana }} {{ t.weekHours }}
               </td>
             </tr>
 
             <tr :class="{ 'table-primary': !usuarioFinalStore.isUAM }">
               <td>{{ t.other }}</td>
               <td class="text-end">
-                {{ reserva.tarifa.datos.precioOtros }} €
+                {{ reserva.tarifa.datos.precioOtros }} € / {{ reserva.tarifa.datos.numeroHorasSemana }} {{ t.weekHours }}
               </td>
             </tr>
           </tbody>
@@ -223,9 +223,7 @@ import { useUserStore } from '@/stores/usuarioFinal'
 import type { Language } from "@/useI18N";
 import { useI18n } from "@/useI18N";
 
-const props = defineProps<{
-  id: string
-}>();
+const props = defineProps<{id: string}>();
 
 const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);
@@ -363,11 +361,11 @@ const total = computed(() => {
 const continuarPago = async () => {
   const response = await reservarActividad(reserva.value.tarifa.idActividad)
 
-  const idReserva = response.data.id
+  const idReserva = response.id
 
   router.push({
-    name: 'Pago',
-    query: { reserva_id: idReserva }
+    name: 'pasarela-pago',
+    query: { id: idReserva }
   })
 }
 
@@ -378,8 +376,6 @@ function cancelar() {
 onMounted(async () => {
   const id = parseInt(props.id);
   const data = await getTarifaDescuentoActividad(id)
-
-  console.log(data)
 
   reserva.value.tarifa = data.tarifa
   reserva.value.descuento = data.descuento

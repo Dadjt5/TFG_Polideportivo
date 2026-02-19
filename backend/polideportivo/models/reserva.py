@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
+from django.db import transaction
 
 from .constantes import EstadoReserva
 from .descuento import Descuento
@@ -11,11 +12,20 @@ class Reserva(models.Model):
 
     usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.RESTRICT)
     descuentos = models.ManyToManyField('Descuento', blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     estado = models.CharField(default=EstadoReserva.PENDIENTE, choices=EstadoReserva.choices)
 
     class Meta:
         abstract = True
+        
+    def calcularDescuento(self):
+        porcentaje = 0.0
+
+        for descuento in self.descuentos.all():
+            porcentaje += descuento.porcentaje
+
+        return porcentaje
 
 
 class ReservaActividad(Reserva):
@@ -32,23 +42,36 @@ class ReservaActividad(Reserva):
     
     @classmethod
     def nuevaReserva(cls, usuario, actividad):
-        if actividad.plazasReservadas >= actividad.plazasMaximas:
-            raise ValueError("No hay plazas disponibles") # Lista de espera
+        with transaction.atomic():
+            actividad.refresh_from_db()
 
-        descuentos = Descuento.obtener_descuentos(actividad=actividad)
+            if actividad.plazasReservadas >= actividad.plazasMaximas:
+                raise ValueError("No hay plazas disponibles") # hay que hacer la lista de espera
 
-        reserva = cls.objects.create(
-            usuarioFinal=usuario,
-            actividad=actividad,
-            estadoReserva=EstadoReserva.PENDIENTE
-        )
+            descuentos = Descuento.obtener_descuentos(actividad=actividad)
 
-        reserva.descuentos.set(descuentos["descuento"]["aplicados"])
+            if cls.objects.filter(usuarioFinal=usuario, actividad=actividad, estado=EstadoReserva.CONFIRMADA).exists():
+                return None
+        
+            reservasPrevias = cls.objects.filter(usuarioFinal=usuario, actividad=actividad, estado=EstadoReserva.PENDIENTE)
 
-        actividad.plazasReservadas += 1
-        actividad.save()
+            for r in reservasPrevias:
+                r.estado = 'CANCELADA'
+                r.save()
 
-        return reserva
+            reserva = cls.objects.create(
+                usuarioFinal=usuario,
+                actividad=actividad,
+                estado=EstadoReserva.PENDIENTE
+            )
+
+            if descuentos:
+                reserva.descuentos.set(descuentos["descuento"]["aplicados"])
+
+            actividad.plazasReservadas = cls.objects.filter(actividad=actividad, estado__in=[EstadoReserva.PENDIENTE, EstadoReserva.CONFIRMADA]).count()
+            actividad.save()
+
+            return reserva
 
 
 class Alquiler(Reserva):
@@ -67,6 +90,33 @@ class Alquiler(Reserva):
     @classmethod
     def contar(cls):
         return cls.objects.count()
+    
+    @classmethod
+    def nuevaReserva(cls, usuario, instalacion):
+        with transaction.atomic():
+            instalacion.refresh_from_db()
+
+            descuentos = Descuento.obtener_descuentos(instalacion=instalacion)
+
+            if cls.objects.filter(usuarioFinal=usuario, instalacion=instalacion, estado=EstadoReserva.CONFIRMADA).exists():
+                return None
+        
+            reservasPrevias = cls.objects.filter(usuarioFinal=usuario, instalacion=instalacion, estado=EstadoReserva.PENDIENTE)
+
+            for r in reservasPrevias:
+                r.estado = 'CANCELADA'
+                r.save()
+
+            reserva = cls.objects.create(
+                usuarioFinal=usuario,
+                instalacion=instalacion,
+                estado=EstadoReserva.PENDIENTE
+            )
+
+            if descuentos:
+                reserva.descuentos.set(descuentos["descuento"]["aplicados"])
+
+            return reserva
 
     def save(self, *args, **kwargs):
         t1 = self.horaInicio.hour*3600 + self.horaInicio.minute*60 + self.horaInicio.second

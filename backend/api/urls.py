@@ -44,6 +44,9 @@ router.register(r'pagos', views.PagoViewSet, basename="pago")
 router.register(r'reservasActividad', views.ReservaActividadViewSet, basename="reservas-actividad")
 router.register(r'alquileres', views.AlquilerViewSet, basename="alquiler-instalacion")
 
+router.register(r'reservasActividadSimple', views.ReservaActividadSimpleViewSet, basename="reservas-actividad-simple")
+router.register(r'alquileresSimple', views.AlquilerSimpleViewSet, basename="alquiler-instalacion-simple")
+
 router.register(r'tarifasTDA', views.TarifaTDAViewSet, basename="tarifa-tda")
 router.register(r'tarifasInstalacion', views.TarifaInstalacionViewSet, basename="tarifa-instalacion")
 router.register(r'tarifasActividad', views.TarifaActividadViewSet, basename="tarifa-actividad")
@@ -85,12 +88,14 @@ urlpatterns = [
     path("actividades/<int:actividad_id>/sesiones/<int:sesion_id>/", views.DetalleSesionView.as_view(), name="detalle-sesion"),
     path("actividades/<int:actividad_id>/sesion/", views.NuevaSesionView.as_view(), name="crear-sesion"),
     path("actividades/<int:actividad_id>/sesiones/<int:sesion_id>/asistencia/", views.GuardarAsistenciaView.as_view(), name="guardar-asistencia"),
-    path("actividades/<int:actividad_id/reservar/", views.ReservarActividad.as_view(), name="reservar-actividad"),
+    path("actividades/<int:actividad_id>/reservar/", views.ReservarActividadView.as_view(), name="reservar-actividad"),
     path("tarifas/actividades/<int:actividad_id>/", views.TarifaActividadView.as_view(), name="tarifa-actividad"),
     path("tarifas/instalaciones/<int:instalacion_id>/", views.TarifaInstalacionView.as_view(), name="tarifa-instalacion"),
     path("usuarios/", views.GestionUsuariosView.as_view(), name="obtener-usuarios"),
     path("espacios/", views.GestionEspaciosView.as_view(), name="obtener-espacios"),
     path("tarifas/", views.GestionTarifasView.as_view(), name="obtener-tarifas"),
     path("configuracion/", views.ObtenerConfiguracionView.as_view(), name="obtener-configuracion"),
+    path("pago/comenzar/", views.CrearIntentoPagoView.as_view(), name="intentar-pago"),
+    path("pago/confirmar/", views.ConfirmarPagoView.as_view(), name="confirmar-pago"),
     path('', include(router.urls)),
 ]

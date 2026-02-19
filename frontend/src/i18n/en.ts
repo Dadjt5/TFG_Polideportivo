@@ -266,6 +266,13 @@ export default {
   payContinue: "Proceed with payment",
   prices: "Prices",
 
+  /* Pasarela de pago */
+  processing: "Processing",
+  reservationSummary: "Reservation summary",
+  paymentTitle: "Complete payment",
+  reservationConfirmed: "Reservation confirmed",
+  thankYouMessage: "Thank you very much for your purchase",
+
   /* Home Monitor */
   monitorHomeTitle: "Dashboard of",
   weeklyActivities: "Weekly activities",

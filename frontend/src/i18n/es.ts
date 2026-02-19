@@ -268,6 +268,13 @@ export default {
   payContinue: "Continuar con el pago",
   prices: "Precios",
 
+  /* Pasarela de pago */
+  processing: "Procesando",
+  reservationSummary: "Resumen de la reserva",
+  paymentTitle: "Finalizar el pago",
+  reservationConfirmed: "Reserva confirmada",
+  thankYouMessage: "Muchas gracias por su compra",
+
   /* Home Monitor */
   monitorHomeTitle: "Panel principal de",
   weeklyActivities: "Actividades de la semana",
