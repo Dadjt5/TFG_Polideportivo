@@ -1,26 +1,45 @@
 <script setup lang="ts">
-defineProps<{
+import { watch, type Ref, ref, inject, computed } from 'vue';
+
+const props = defineProps<{
   title: string;
   subtitle?: string;
   icon: any;
+  theme?: 'light' | 'dark';
 }>();
+
+const titleClass = computed(() =>
+  props.theme === 'dark' ? 'fs-5 fw-medium text-white mb-0' : 'fs-5 fw-medium text-dark mb-0'
+);
+
+const subtitleClass = computed(() =>
+  props.theme === 'dark'
+    ? 'text-sm text-white text-opacity-75 text-center'
+    : 'text-sm text-dark text-opacity-75 text-center'
+);
+
+const cardClass = computed(() =>
+  props.theme === 'dark'
+    ? 'card text-center h-100 bg-white bg-opacity-10 backdrop-blur border border-white border-opacity-25 rounded-4 p-4 transition cursor-pointer'
+    : 'card text-center h-100 bg-light bg-opacity-50 border border-dark border-opacity-25 rounded-4 p-4 transition cursor-pointer'
+);
 </script>
 
 <template>
-  <div
-    class="card text-center h-100 shadow-sm border cursor-pointer">
+  <div :class="cardClass">
+
     <div class="card-body d-flex flex-column align-items-center justify-content-center gap-3 p-4">
       <component
         v-if="icon"
         :is="icon"
-        class="text-primary"
+        :class="props.theme === 'dark' ? 'text-primary' : 'text-primary'"
         style="width: 32px; height: 32px;"
       />
 
-      <p class="fs-5 fw-medium text-secondary mb-0">
+      <p :class="titleClass">
         {{ title }}
       </p>
-      <p v-if="subtitle" class="text-sm text-secondary text-center">
+      <p v-if="subtitle" :class="subtitleClass">
         {{ subtitle }}
       </p>
     </div>

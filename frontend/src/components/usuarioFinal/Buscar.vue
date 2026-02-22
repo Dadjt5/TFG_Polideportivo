@@ -58,6 +58,7 @@
                   :title="t.dayOfWeek"
                   :subtitle="orderedSelectedDays.join(', ')"
                   @click="activar('A1')"
+                  :theme="'light'"
                 />
               </div>
 
@@ -67,6 +68,7 @@
                 :title="t.activityType"
                 :subtitle="selectedActivityTypes.join(', ')"
                 @click="activar('A2')"
+                :theme="'light'"
               />
             </div>
 
@@ -76,6 +78,7 @@
                 :title="t.sessionTime"
                 :subtitle="activityStartTime || activityEndTime ? `${activityStartTime} - ${activityEndTime}`: ''"
                 @click="activar('A3')"
+                :theme="'light'"
               />
             </div>
           </div>
@@ -92,6 +95,7 @@
                 :title="t.facilityType"
                 :subtitle="selectedFacilityTypes.join(', ')"
                 @click="activar('I1')"
+                :theme="'light'"
               />
             </div>
 
@@ -101,6 +105,7 @@
                 :title="t.openingHours"
                 :subtitle="facilityStartTime || facilityEndTime ? `${facilityStartTime} - ${facilityEndTime}`: ''"
                 @click="activar('I2')"
+                :theme="'light'"
               />
             </div>
           </div>
@@ -112,6 +117,7 @@
         @update:open="dayFilterOpen = $event"
         :selectedDays="selectedDays"
         @apply="selectedDays = $event"
+        :theme="'light'"
       />
 
       <ActivityTypeFilter
@@ -120,6 +126,7 @@
         :selectedTypes="selectedActivityTypes"
         @apply="selectedActivityTypes = $event"
         :tiposActividad="estadisticas.tiposActividad"
+        :theme="'light'"
       />
 
       <TimeRangeFilter
@@ -130,6 +137,7 @@
         @apply="({ start, end }) => { activityStartTime = start; activityEndTime = end }"
         title="Horario de sesión"
         description="Selecciona el rango horario."
+        :theme="'light'"
       />
 
       <FacilityTypeFilter
@@ -138,6 +146,7 @@
         :selectedTypes="selectedFacilityTypes"
         @apply="selectedFacilityTypes = $event"
         :tiposInstalacion="estadisticas.tiposInstalacion"
+        :theme="'light'"
       />
 
       <TimeRangeFilter
@@ -148,6 +157,7 @@
         @apply="({ start, end }) => { facilityStartTime = start; facilityEndTime = end }"
         title="Horario de apertura"
         description="Selecciona el horario de la instalación."
+        :theme="'light'"
       />
 
       <div class="mt-4">
@@ -180,6 +190,7 @@
           <ActivityCard
             :icon="Activity"
             :actividad="act"
+            :theme="'light'"
           />
           </div>
 
@@ -195,6 +206,7 @@
             <FacilityCard
               :icon="Building2"
               :instalacion="inst"
+              :theme="'light'"
             />
           </div>
       </div>

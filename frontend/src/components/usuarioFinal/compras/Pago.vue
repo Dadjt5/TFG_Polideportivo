@@ -21,7 +21,7 @@
 
         <!-- Precio final a pagar -->
         <p class="mb-1">
-          <strong>{{ t.price }}:</strong>
+          <strong>{{ t.price }}: </strong>
           <span class="text-success fw-bold">
             {{ resumen.pago.costeFinal.toFixed(2) }} €
           </span>
@@ -30,12 +30,25 @@
 
       <hr />
 
+      <!-- Tiempo restante -->
+<div class="mb-3">
+  <div 
+    class="alert"
+    :class="tiempoRestante <= 60 ? 'alert-danger' : 'alert-warning'"
+  >
+    ⏳ Tiempo restante para completar el pago:
+    <strong>
+      {{ minutos }}:{{ segundos }}
+    </strong>
+  </div>
+</div>
+
       <!-- Formulario Stripe -->
       <form @submit.prevent="pagar">
 
         <div class="mb-3">
           <label class="form-label">{{ t.cardInfo }}</label>
-          <div id="card-element" class="form-control p-2"></div>
+          <div id="payment-element"></div>
         </div>
 
         <!-- Error -->
@@ -60,7 +73,7 @@
 
 
 <script setup lang="ts">
-import { onMounted, type Ref, ref, inject } from "vue"
+import { computed, onMounted, type Ref, ref, inject } from "vue"
 import { useRouter } from "vue-router"
 import { loadStripe } from "@stripe/stripe-js"
 
@@ -101,37 +114,56 @@ let clientSecret = ""
 const tiempoRestante = ref(900)
 
 const countdown = setInterval(() => {
-	tiempoRestante.value -= 1
-	if (tiempoRestante.value <= 0) {
-		clearInterval(countdown)
-		error.value = "Se ha cancelado la reserva por tiempo agotado."
-	}
+  tiempoRestante.value -= 1
+
+  if (tiempoRestante.value <= 0) {
+    clearInterval(countdown)
+    error.value = "Se ha cancelado la reserva por tiempo agotado."
+    
+    setTimeout(() => {
+      router.replace("/")
+    }, 3000)
+  }
 }, 1000)
 
+const minutos = computed(() => {
+  const m = Math.floor(tiempoRestante.value / 60)
+  return m.toString().padStart(2, "0")
+})
+
+const segundos = computed(() => {
+  const s = tiempoRestante.value % 60
+  return s.toString().padStart(2, "0")
+})
+
+let elements: any
+
 const pagar = async () => {
-	loading.value = true
-	error.value = ""
+  loading.value = true
+  error.value = ""
 
-	const result = await stripe.confirmCardPayment(clientSecret, {
-		payment_method: {
-			card: cardElement
-		}
-	})
+  const { error: stripeError } = await stripe.confirmPayment({
+    elements,
+    confirmParams: {
+      return_url: window.location.origin + "/pago-finalizado"
+    },
+    redirect: "if_required"
+  })
 
-	if (result.error) {
-		error.value = result.error.message
-		loading.value = false
-	} else {
-		await confirmarPago(parseInt(props.id))
-		router.push("/pago-finalizado")
-	}
+  if (stripeError) {
+    error.value = stripeError.message
+    loading.value = false
+  } else {
+    await confirmarPago(parseInt(props.id))
+    router.push("/pago-finalizado")
+  }
 }
 
 onMounted(async () => {
 	const reservaId = parseInt(props.id)
 
 	const resumenResponse = await getReservaActividadSimplificado(reservaId)
-	resumen.value = resumenResponse.data
+	resumen.value = resumenResponse
 
 	if (resumen.value.estado !== "PENDIENTE") {
 		router.replace("/")
@@ -140,12 +172,17 @@ onMounted(async () => {
 
 	const pagoResponse = await intentarPago(reservaId)
 
-	clientSecret = pagoResponse.data.client_secret
+	clientSecret = pagoResponse.client_secret
 
-	stripe = await loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY)
+  stripe = await loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY)
 
-	const elements = stripe.elements()
-	cardElement = elements.create("card")
-	cardElement.mount("#card-element")
+const elements = stripe.elements({
+  clientSecret: clientSecret
+})
+
+const paymentElement = elements.create("payment")
+paymentElement.mount("#payment-element")
+
+cardElement = paymentElement
 })
 </script>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, inject, type Ref } from "vue";
+import { ref, watch, inject, type Ref, computed } from "vue";
 import Modal from "@/components/ui/Modal.vue";
 import type { Language } from "@/useI18N";
 import { useI18n } from "@/useI18N";
@@ -10,6 +10,7 @@ const t = useI18n(language);
 const props = defineProps<{
   open: boolean;
   selectedDays: string[];
+  theme?: 'light' | 'dark';
 }>();
 
 const emit = defineEmits<{
@@ -49,24 +50,33 @@ const apply = () => {
   emit("apply", localSelection.value);
   emit("update:open", false);
 };
+
+// Computed para clases según el tema
+const buttonClass = (day: string) => {
+  const selected = localSelection.value.includes(day);
+  if (props.theme === 'dark') {
+    return selected ? 'btn btn-primary text-white' : 'btn btn-outline-light text-white text-opacity-75';
+  } else {
+    return selected ? 'btn btn-primary text-dark' : 'btn btn-outline-secondary text-dark text-opacity-75';
+  }
+};
+
+const titleClass = computed(() => props.theme === 'dark' ? 'fs-4 fw-semibold mb-4 mt-4 text-white text-center' : 'fs-4 fw-semibold mb-4 mt-4 text-dark text-center');
 </script>
 
 <template>
-  <Modal :open="open" @update:open="emit('update:open', $event)">
-    <h3 class="fs-4 fw-semibold mb-4 mt-4">
-      {{t.dayOfWeek}}
+  <Modal :open="open" :theme="props.theme" @update:open="emit('update:open', $event)">
+    <h3 :class="titleClass">
+      {{ t.dayOfWeek }}
     </h3>
 
     <!-- Botones para cada día -->
-    <div class="d-grid gap-3 mb-4">
+    <div style="max-width: 750px; margin: 0 auto;" class="d-grid gap-3 mb-4">
       <button
         v-for="day in days"
         :key="day"
         type="button"
-        class="btn text-start"
-        :class="localSelection.includes(day)
-          ? 'btn-primary'
-          : 'btn-outline-secondary'"
+        :class="buttonClass(day)"
         @click="toggleDay(day)"
       >
         {{ day }}
@@ -74,9 +84,9 @@ const apply = () => {
     </div>
 
     <!-- Botones de acción -->
-    <div class="d-flex justify-content-end">
-      <button class="btn btn-primary px-3" @click="apply()">
-        {{t.apply}}
+    <div class="d-flex justify-content-center mb-3">
+      <button :class="props.theme === 'dark' ? 'btn btn-primary px-3' : 'btn btn-primary px-3'" @click="apply()">
+        {{ t.apply }}
       </button>
     </div>
   </Modal>

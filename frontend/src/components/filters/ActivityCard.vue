@@ -1,9 +1,7 @@
 <script setup lang="ts">
-import { type Ref, inject } from 'vue';
-
+import { type Ref, inject, computed } from 'vue';
 import type { Language } from "@/useI18N";
 import { useI18n } from "@/useI18N";
-
 import { useUserStore } from '@/stores/usuarioFinal';
 
 const language = inject<Ref<Language>>("language")!;
@@ -34,29 +32,52 @@ const props = defineProps<{
     dias: string
   }
   icon: any
+  theme?: 'light' | 'dark';
 }>()
 
 const cambiarFavorito = () => {
   usuarioFinalStore.marcarActividadFavorita(props.actividad.id)
 }
 
+// Clases dinámicas según theme
+const cardClass = computed(() =>
+  props.theme === 'dark'
+    ? 'card shadow-sm h-100 activity-card bg-white bg-opacity-10 border border-white border-opacity-25'
+    : 'card shadow-sm h-100 activity-card bg-light border border-dark'
+)
+
+const textClass = computed(() =>
+  props.theme === 'dark' ? 'text-white' : 'text-dark'
+)
+
+const textOpacityClass = computed(() =>
+  props.theme === 'dark' ? 'text-white text-opacity-75' : 'text-dark text-opacity-75'
+)
+
+const iconWrapperClass = computed(() =>
+  props.theme === 'dark' ? 'icon-wrapper bg-white bg-opacity-10' : 'icon-wrapper bg-light'
+)
+
+const badgeClass = computed(() =>
+  props.theme === 'dark' ? 'badge rounded-pill bg-success bg-opacity-75 text-white' : 'badge rounded-pill bg-success text-dark'
+)
 </script>
 
 <template>
-  <div class="card shadow-sm h-100 activity-card">
+  <div :class="cardClass">
     <div class="card-body">
 
       <div class="d-flex justify-content-between align-items-start mb-3">
 
         <div class="d-flex align-items-start gap-3">
 
-          <div class="icon-wrapper bg-primary-subtle">
+          <div :class="iconWrapperClass">
             <component :is="icon" class="icon text-primary" />
           </div>
 
           <div>
-            <h5 class="mb-1">{{ actividad.nombre }}</h5>
-            <span class="badge rounded-pill text-bg-primary">
+            <h5 class="mb-1" :class="textClass">{{ actividad.nombre }}</h5>
+            <span :class="badgeClass">
               {{ t.activity }}
             </span>
           </div>
@@ -71,7 +92,7 @@ const cambiarFavorito = () => {
 
       </div>
 
-      <div class="text-muted small">
+      <div :class="['small', textOpacityClass]">
         <div class="d-flex justify-content-between mb-1">
           <span>{{ t.days }}</span>
           <strong>{{ actividad.dias }}</strong>
@@ -91,7 +112,6 @@ const cambiarFavorito = () => {
       </div>
     </div>
   </div>
-
 </template>
 
 <style scoped>
@@ -101,7 +121,7 @@ const cambiarFavorito = () => {
 
 .activity-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.15);
+  box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.25);
 }
 
 .icon-wrapper {

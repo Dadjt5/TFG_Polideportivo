@@ -194,7 +194,7 @@ onMounted(async () => {
   const id = parseInt(props.id);
 
   try {
-    pabellon.value = await getPabellon(id);
+    pabellon.value = await getPabellonDetalle(id);
 		pabellonOriginal.value = JSON.parse(JSON.stringify(pabellon.value))
   } catch(e) {
 		console.log("Error al obtener la informacion del pabellon", e);

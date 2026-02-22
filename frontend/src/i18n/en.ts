@@ -72,6 +72,7 @@ export default {
   bookingsMade: "Bookings made",
   viewBooks: "View reservations",
   favourites: "favourites",
+  noNotificacions: "Without notifications",
 
   /* Login */
   loginPage: "Login",

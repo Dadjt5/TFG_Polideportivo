@@ -1,28 +1,39 @@
 <template>
 <div class="min-vh-100 position-relative">
   <div
-    class="position-absolute top-0 start-0 w-100 h-100"
-    style="background: url('/images/Home2.jpg') center/cover no-repeat; filter: brightness(0.6);"
+  class="position-absolute top-0 start-0 w-100 h-100"
+  style="
+    background: 
+      linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),
+      url('/images/Polideportivo.jpg') center/cover no-repeat;
+  "
   ></div>
 
-  <main class="position-relative container-fluid mt-2 px-5 py-1">
-
+  <main class="position-relative container-fluid py-5 px-4 px-lg-5">
       <!-- INTRO -->
       <div class="text-center mt-5 mb-4">
-        <h1 class="fs-1 fw-bold text-dark">
+        <h1 class="fs-1 fw-bold text-white">
           {{ t.welcome }}
         </h1>
-        <p class="fs-5 text-secondary mt-2">
+        <p class="fs-5 text-white text-opacity-75 mt-2">
           {{ t.welcome2 }}
         </p>
 
         <!-- BUSQUEDAS -->
         <div class="container-fluid mt-4">
-          <div class="d-flex align-items-center bg-white rounded-3 shadow p-3 border gap-3">
+          <div class="d-flex align-items-center 
+            bg-white bg-opacity-10 
+            backdrop-blur 
+            rounded-4 
+            shadow-lg 
+            p-3 
+            border border-white border-opacity-25 
+            gap-3">
+
             <input
               type="text"
               v-model="textoBusqueda"
-              class="form-control border-0 fs-5"
+              class="form-control border-0 bg-transparent text-white fs-5"
               :placeholder="t.searchPlaceholder"
               @keyup.enter="buscar"
             />
@@ -35,7 +46,7 @@
       </div>
 
       <!-- FILTROS -->
-      <h2 class="fs-3 fw-semibold text-center text-dark mb-4">
+      <h2 class="fs-3 fw-semibold text-center text-white mb-4">
         {{ t.filterBy }}
       </h2>
 
@@ -78,6 +89,7 @@
                   :title="t.dayOfWeek"
                   :subtitle="orderedSelectedDays.join(', ')"
                   @click="activar('A1')"
+                  :theme="'dark'"
                 />
               </div>
 
@@ -87,6 +99,7 @@
                 :title="t.activityType"
                 :subtitle="selectedActivityTypes.join(', ')"
                 @click="activar('A2')"
+                :theme="'dark'"
               />
             </div>
 
@@ -96,6 +109,7 @@
                 :title="t.sessionTime"
                 :subtitle="activityStartTime || activityEndTime ? `${activityStartTime} - ${activityEndTime}`: ''"
                 @click="activar('A3')"
+                :theme="'dark'"
               />
             </div>
           </div>
@@ -113,6 +127,7 @@
                 :title="t.facilityType"
                 :subtitle="selectedFacilityTypes.join(', ')"
                 @click="activar('I1')"
+                :theme="'dark'"
               />
             </div>
 
@@ -122,6 +137,7 @@
                 :title="t.openingHours"
                 :subtitle="facilityStartTime || facilityEndTime ? `${facilityStartTime} - ${facilityEndTime}`: ''"
                 @click="activar('I2')"
+                :theme="'dark'"
               />
             </div>
           </div>
@@ -133,6 +149,7 @@
         @update:open="dayFilterOpen = $event"
         :selectedDays="selectedDays"
         @apply="selectedDays = $event"
+        :theme="'dark'"
       />
 
       <ActivityTypeFilter
@@ -141,6 +158,7 @@
         :selectedTypes="selectedActivityTypes"
         @apply="selectedActivityTypes = $event"
         :tiposActividad="estadisticasStore.data.tiposActividad"
+        :theme="'dark'"
       />
 
       <TimeRangeFilter
@@ -151,6 +169,7 @@
         @apply="({ start, end }) => { activityStartTime = start; activityEndTime = end }"
         title="Horario de sesión"
         description="Selecciona el rango horario."
+        :theme="'dark'"
       />
 
       <FacilityTypeFilter
@@ -159,6 +178,7 @@
         :selectedTypes="selectedFacilityTypes"
         @apply="selectedFacilityTypes = $event"
         :tiposInstalacion="estadisticasStore.data.tiposInstalacion"
+        :theme="'dark'"
       />
 
       <TimeRangeFilter
@@ -169,11 +189,16 @@
         @apply="({ start, end }) => { facilityStartTime = start; facilityEndTime = end }"
         title="Horario de apertura"
         description="Selecciona el horario de la instalación."
+        :theme="'dark'"
       />
 
       <!-- ESTADISTICAS -->
-      <div class="mt-5">
-        <h2 class="fs-2 fw-semibold text-center text-dark mb-4">
+      <div class="mt-5 py-5 rounded-4 
+          bg-white bg-opacity-10 
+          backdrop-blur 
+          border border-white border-opacity-25">
+
+        <h2 class="fs-2 fw-semibold text-center text-white mb-4">
           {{t.statsTitle}}
         </h2>
 
@@ -182,27 +207,27 @@
         <div v-else class="row text-center gy-4">
           <div class="col-6 col-md-4 col-lg">
             <p class="fs-3 text-primary fw-bold mb-1">{{ estadisticasStore.data.actividades }}</p>
-            <p class="fs-5 text-secondary mb-0">{{t.activities}}</p>
+            <p class="fs-5 text-white text-opacity-75 mb-0">{{t.activities}}</p>
           </div>
 
           <div class="col-6 col-md-4 col-lg">
             <p class="fs-3 text-primary fw-bold mb-1">{{ estadisticasStore.data.instalaciones }}</p>
-            <p class="fs-5 text-secondary mb-0">{{t.facilities}}</p>
+            <p class="fs-5 text-white text-opacity-75 mb-0">{{t.facilities}}</p>
           </div>
 
           <div class="col-6 col-md-4 col-lg">
             <p class="fs-3 text-primary fw-bold mb-1">{{ estadisticasStore.data.pabellones }}</p>
-            <p class="fs-5 text-secondary mb-0">{{t.pavilions}}</p>
+            <p class="fs-5 text-white text-opacity-75 mb-0">{{t.pavilions}}</p>
           </div>
 
           <div class="col-6 col-md-4 col-lg">
             <p class="fs-3 text-primary fw-bold mb-1">{{ estadisticasStore.data.deportes }}</p>
-            <p class="fs-5 text-secondary mb-0">{{t.sports}}</p>
+            <p class="fs-5 text-white text-opacity-75 mb-0">{{t.sports}}</p>
           </div>
 
           <div class="col-6 col-md-4 col-lg">
             <p class="fs-3 text-primary fw-bold mb-1">{{ estadisticasStore.data.usuarios }}</p>
-            <p class="fs-5 text-secondary mb-0">{{t.users}}</p>
+            <p class="fs-5 text-white text-opacity-75 mb-0">{{t.users}}</p>
           </div>
         </div>
       </div>
@@ -380,9 +405,14 @@ onMounted(async () => {
 
 <style scoped>
 .home-background {
-  background-image: url('/images/Home2.jpg');
+  background-image: url('/images/Polideportivo.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+}
+
+input::placeholder {
+  color: rgba(255, 255, 255, 0.8);
+  opacity: 1;
 }
 </style>

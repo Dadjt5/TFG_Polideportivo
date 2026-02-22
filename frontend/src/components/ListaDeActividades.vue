@@ -10,37 +10,37 @@
       <div class="row g-4">
         <div class="col-md-4">
           <FilterCard :icon="Calendar" :title="t.dayOfWeek" :subtitle="orderedSelectedDays.join(', ')"
-            @click="activar('A1')" />
+            @click="activar('A1')" :theme="'light'"/>
         </div>
 
         <div class="col-md-4">
           <FilterCard :icon="Activity" :title="t.activityType" :subtitle="selectedActivityTypes.join(', ')"
-            @click="activar('A2')" />
+            @click="activar('A2')" :theme="'light'"/>
         </div>
 
         <div class="col-md-4">
           <FilterCard :icon="Clock" :title="t.sessionTime"
             :subtitle="activityStartTime || activityEndTime ? `${activityStartTime} - ${activityEndTime}` : ''"
-            @click="activar('A3')" />
+            @click="activar('A3')" :theme="'light'"/>
         </div>
       </div>
     </div>
 
     <DayOfWeekFilter :open="dayFilterOpen" @update:open="dayFilterOpen = $event" :selectedDays="selectedDays"
-      @apply="selectedDays = $event" />
+      @apply="selectedDays = $event" :theme="'light'"/>
 
     <ActivityTypeFilter :open="activityTypeFilterOpen" @update:open="activityTypeFilterOpen = $event"
-      :selectedTypes="selectedActivityTypes" @apply="selectedActivityTypes = $event" />
+      :selectedTypes="selectedActivityTypes" @apply="selectedActivityTypes = $event" :theme="'light'"/>
 
     <TimeRangeFilter :open="activityTimeFilterOpen" @update:open="activityTimeFilterOpen = $event"
       :startTime="activityStartTime" :endTime="activityEndTime"
-      @apply="({ start, end }) => { activityStartTime = start; activityEndTime = end }" />
+      @apply="({ start, end }) => { activityStartTime = start; activityEndTime = end }" :theme="'light'"/>
 
 
     <div class="row g-4 mt-5">
       <div v-for="actividad in actividadesFiltradas" :key="actividad.id" class="col-12 col-sm-6 col-lg-4"
         @click="activityDetail(actividad.id)">
-        <ActivityCard :icon="Activity" :actividad="actividad" />
+        <ActivityCard :icon="Activity" :actividad="actividad" :theme="'light'"/>
       </div>
 
       <div v-if="!actividadesFiltradas.length" class="text-center text-muted py-5">

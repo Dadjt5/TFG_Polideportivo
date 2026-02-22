@@ -365,7 +365,7 @@ const continuarPago = async () => {
 
   router.push({
     name: 'pasarela-pago',
-    query: { id: idReserva }
+    params: { id: idReserva }
   })
 }
 

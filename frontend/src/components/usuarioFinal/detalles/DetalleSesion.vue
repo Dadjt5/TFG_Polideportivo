@@ -147,7 +147,7 @@ const cambiarAsistencia = (u: any) => {
 
 const actualizarAsistencia = async () => {
   try {
-		const respuesta = await guardarAsistencia(props.idAct, props.idSesion, sesion.value.participantes);
+		const respuesta = await guardarAsistencia(parseInt(props.idAct), parseInt(props.idSesion), sesion.value.participantes);
 		router.back();
 	} catch(e) {
 		console.log("Error al guardar la asistencia de los usuarios", e)

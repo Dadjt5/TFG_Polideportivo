@@ -759,7 +759,7 @@ class FisioterapiaSimpleSerializer(serializers.ModelSerializer):
 # --------------------
 
 class ReservaActividadSimpleSerializer(serializers.ModelSerializer):
-    nombreActividad = serializers.SerializerMethodField()
+    nombre = serializers.SerializerMethodField()
     pago = PagoSerializer(read_only=True)
 
     class Meta:
@@ -787,7 +787,7 @@ class ReservaActividadSerializer(serializers.ModelSerializer):
             "estado",
             "tarifa",
             "pago",
-            "descuento",
+            "descuentos",
             "actividad"
         )
 
@@ -808,7 +808,7 @@ class AlquilerSerializer(serializers.ModelSerializer):
 
 
 class AlquilerSimpleSerializer(serializers.ModelSerializer):
-    nombreInstalacion = serializers.SerializerMethodField()
+    nombre = serializers.SerializerMethodField()
     pago = PagoSerializer(read_only=True)
 
     class Meta:

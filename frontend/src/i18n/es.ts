@@ -74,6 +74,7 @@ export default {
   bookingsMade: "Reservas realizadas",
   viewBooks: "Ver reservas",
   favourites: "favoritas",
+  noNotificacions: "Sin notificaciones",
 
   /* Login */
   loginPage: "Iniciar sesión",
