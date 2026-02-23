@@ -1,5 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 
 from .constantes import EstadoPago
 
@@ -14,9 +16,11 @@ class Pago(models.Model):
     fecha = models.DateField(auto_now_add=True)
 
     estadoPago = models.CharField(default=EstadoPago.PENDIENTE, choices=EstadoPago.choices)
-    
-    reservaActividad = models.OneToOneField("ReservaActividad", on_delete=models.CASCADE, null=True, blank=True, related_name="pago")
-    alquiler = models.OneToOneField("Alquiler", on_delete=models.CASCADE, null=True, blank=True, related_name="pago")
+
+    # Relacion generica
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    objeto = GenericForeignKey("content_type", "object_id")
 
     def __str__(self):
         return f'Pago {self.concepto}, de coste {self.coste} en estado {self.estadoPago}'
@@ -26,23 +30,21 @@ class Pago(models.Model):
         return cls.objects.count()
     
     @classmethod
-    def nuevoPago(cls, concepto, usuario, reservaActividad=None, alquiler=None):
-        if reservaActividad:
-            porcentaje = reservaActividad.calcularDescuento()
-            coste = reservaActividad.actividad.calcular_precio(usuario)
+    def nuevoPago(cls, concepto, usuario, objeto):
+        porcentaje = objeto.calcularDescuento()
+        coste = objeto.calcular_precio(usuario)
+        costeFinal = coste - (coste * porcentaje / 100)
 
-            costeFinal = coste - (coste*porcentaje/100)
+        content_type = ContentType.objects.get_for_model(objeto)
 
-            pago = cls.objects.create(concepto=concepto, coste=coste, costeFinal=costeFinal, descuentoAplicado=porcentaje, estadoPago=EstadoPago.PENDIENTE, reservaActividad=reservaActividad)
-            return pago
-
-        if alquiler:
-            porcentaje = alquiler.calcularDescuento()
-            coste = alquiler.instalacion.calcular_precio(usuario)
-
-            costeFinal = coste - (coste*porcentaje/100)
-
-            pago = cls.objects.create(concepto=concepto, coste=coste, costeFinal=costeFinal, descuentoAplicado=porcentaje, estadoPago=EstadoPago.PENDIENTE, alquiler=alquiler)
-            return pago
+        return cls.objects.create(
+            concepto=concepto,
+            coste=coste,
+            costeFinal=costeFinal,
+            descuentoAplicado=porcentaje,
+            estadoPago=EstadoPago.PENDIENTE,
+            content_type=content_type,
+            object_id=objeto.id
+        )
 
         return None

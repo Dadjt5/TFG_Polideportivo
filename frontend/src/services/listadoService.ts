@@ -6,6 +6,11 @@ export const getTipos = async () => {
   return response.data
 }
 
+/* Función para obtener los deportes */
+export const getDeportes = async () => {
+  const response = await api.get("api/v1/deportes/")
+  return response.data;
+}
 
 /* Función para obtener los pabellones */
 export const getPabellones = async () => {

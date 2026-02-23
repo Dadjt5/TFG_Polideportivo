@@ -41,7 +41,8 @@ from polideportivo.models import (
     TarifaInstalacion, TDA, UsuarioFinal, AbonoDeportivo, AbonoVerano, Pabellon, 
     ReservaActividad, Alquiler, Administrador, User, CompraBono, CompraAbono,
     Mensaje, Sesion, MapaReservas, TipoActividad, TipoInstalacion, FormaReserva,
-    Terreno, Estado, Dia, ActividadComun, GrupoReducido, Fisioterapia, EstadoReserva
+    Terreno, Estado, Dia, ActividadComun, GrupoReducido, Fisioterapia, EstadoPago,
+    EstadoReserva
 )
 
 
@@ -811,6 +812,20 @@ class ReservasView(APIView):
         return Response(reservas)
 
 
+# Mostrar todos los abonos tanto deportivos como de verano
+class ObtenerAbonosView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        abonos_deportivos = AbonoDeportivo.objects.all()
+        abonos_verano = AbonoVerano.objects.all()
+
+        return Response({
+            "abonosDeportivos": AbonoDeportivoSerializer(abonos_deportivos, many=True).data,
+            "abonosVerano": AbonoVeranoSerializer(abonos_verano, many=True).data
+        })
+
+
 # Mostrar el foro y los canales, pero sin los mensajes
 class ForoView(APIView):
     permission_classes = [IsAuthenticated]
@@ -1080,11 +1095,10 @@ class ReservarActividadView(APIView):
         actividad = get_object_or_404(Actividad, id=actividad_id)
 
         res = ReservaActividad.nuevaReserva(request.user.usuario_final, actividad)
-        Pago.nuevoPago("Pago por reserva de la actividad", request.user.usuario_final, reservaActividad=res)
+        pago = Pago.nuevoPago("Pago por reserva de la actividad", request.user.usuario_final, res)
 
-        if res:
-            serializer = ReservaActividadSerializer(res)
-            return Response(serializer.data)
+        if res and pago:
+            return Response({"idPago": pago.id})
 
         return Response({"respuesta": "Error al reservar"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -1096,22 +1110,12 @@ class ReservaInstalacionView(APIView):
         instalacion = get_object_or_404(Instalacion, id=instalacion_id)
 
         res = Alquiler.nuevaReserva(request.user.usuario_final, instalacion)
-        Pago.nuevoPago("Pago por el alquiler de una instalación", request.user.usuario_final, alquiler=res)
+        pago = Pago.nuevoPago("Pago por el alquiler de una instalación", request.user.usuario_final, res)
 
-        if res:
-            serializer = AlquilerSerializer(res)
-            return Response(serializer.data)
+        if res and pago:
+            return Response({"idPago": pago.id})
 
         return Response({"respuesta": "Error al alquilar"}, status=status.HTTP_400_BAD_REQUEST)
-
-
-class ComprarAbonoView(APIView):
-    permission_classes = [IsAuthenticated]
-    
-    def post(self, request, abono_id):
-        instalacion = get_object_or_404(Instalacion, id=instalacion_id)
-        
-        return Response({"respuesta": "Error al comprar el abono"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class GestionUsuariosView(APIView):
@@ -1184,7 +1188,7 @@ class GestionTarifasView(APIView):
 
         return Response(data)
 
-
+# Obtener configuracion del sistema
 class ObtenerConfiguracionView(APIView):
     permission_classes = [IsAdministrador]
 
@@ -1202,7 +1206,121 @@ class ObtenerConfiguracionView(APIView):
             return Response({"respuesta": "Resultados cambiados correctamente"}, status=status.HTTP_200_OK)
         
         return Response({"respuesta": "Error al modificar la configuracion"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+# Comprar un abono
+class ComprarAbonoView(APIView):
+    permission_classes = [IsAuthenticated]
     
+    def post(self, request, abono_id):
+        tipoAbono = request.data.get('tipoAbono')
+
+        if tipoAbono == "abono deportivo":
+            abono = get_object_or_404(AbonoDeportivo, id=abono_id)
+        elif tipoAbono == "abono verano":
+            abono = get_object_or_404(AbonoVerano, id=abono_id)
+
+        compra = CompraAbono.compraAbono(abono, request.user.usuario_final, tipoAbono)
+        pago = Pago.nuevoPago(f'Pago por nuevo {tipoAbono}', request.user.usuario_final, compra)
+
+        if compra and pago:
+            return Response({"idPago": pago.id})
+
+        return Response({"respuesta": "Error al comprar el abono"}, status=status.HTTP_400_BAD_REQUEST)
+        
+
+# Comprar un bono
+class ComprarBonoView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request, bono_id):
+        bono = get_object_or_404(Bono, id=bono_id)
+
+        compra = CompraBono.compraBono(bono, request.user.usuario_final)
+        pago = Pago.nuevoPago(f'Pago por nuevo bono', request.user.usuario_final, compra)
+
+        if compra and pago:
+            return Response({"idPago": pago.id})
+
+        return Response({"respuesta": "Error al comprar el bono"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ResumenPagoView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, tipo, pago_id):
+        # Obtenemos el pago
+        pago = get_object_or_404(Pago, id=pago_id, usuario=request.user.usuario_final)
+        objeto = pago.objeto
+
+        if tipo == "reserva_actividad":
+            reserva = objeto  # objeto es una ReservaActividad
+            return Response({
+                "id": reserva.id,
+                "estado": reserva.estado,
+                "nombre": reserva.actividad.nombre,
+                "pago": {
+                    "concepto": pago.concepto,
+                    "coste": pago.coste,
+                    "costeFinal": pago.costeFinal,
+                    "descuentoAplicado": pago.descuentoAplicado,
+                    "fecha": pago.fecha,
+                    "estadoPago": pago.estadoPago
+                }
+            })
+
+        elif tipo == "aquiler_instalacion":
+            alquiler = objeto  # objeto es un alquiler
+            return Response({
+                "id": alquiler.id,
+                "estado": alquiler.estado,
+                "nombre": alquiler.instalacion.nombre,
+                "pago": {
+                    "concepto": pago.concepto,
+                    "coste": pago.coste,
+                    "costeFinal": pago.costeFinal,
+                    "descuentoAplicado": pago.descuentoAplicado,
+                    "fecha": pago.fecha,
+                    "estadoPago": pago.estadoPago
+                }
+            })
+
+        elif tipo == "compra_abono":
+            compra = objeto  # objeto es una CompraAbono
+            abono = compra.abonoDeportivo or compra.abonoVerano
+            return Response({
+                "id": compra.id,
+                "estado": compra.estado,
+                "nombre": abono.nombre,
+                "pago": {
+                    "concepto": pago.concepto,
+                    "coste": pago.coste,
+                    "costeFinal": pago.costeFinal,
+                    "descuentoAplicado": pago.descuentoAplicado,
+                    "fecha": pago.fecha,
+                    "estadoPago": pago.estadoPago
+                }
+            })
+
+        elif tipo == "compra_bono":
+            compra = objeto  # objeto es una CompraBono
+            return Response({
+                "id": compra.id,
+                "estado": compra.estado,
+                "nombre": compra.bono.nombre,
+                "pago": {
+                    "concepto": pago.concepto,
+                    "coste": pago.coste,
+                    "costeFinal": pago.costeFinal,
+                    "descuentoAplicado": pago.descuentoAplicado,
+                    "fecha": pago.fecha,
+                    "estadoPago": pago.estadoPago
+                }
+            })
+
+        else:
+            return Response({"respuesta": "Tipo no soportado"}, status=status.HTTP_400_BAD_REQUEST)
+
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -1211,23 +1329,23 @@ class CrearIntentoPagoView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        reserva_id = request.data.get("reserva_id")
-        reserva = get_object_or_404(ReservaActividad, id=reserva_id)
+        pago_id = request.data.get("pago_id")
+        pago = get_object_or_404(Pago, id=pago_id)
 
-        if reserva.estado != EstadoReserva.PENDIENTE:
-            return Response({"respuesta": "Reserva incorrecta"}, status=status.HTTP_400_BAD_REQUEST)
+        if pago.estado != EstadoReserva.PENDIENTE:
+            return Response({"respuesta": "Pago incorrecto"}, status=status.HTTP_400_BAD_REQUEST)
 
         intent = stripe.PaymentIntent.create(
-            amount=int(reserva.pago.coste * 100), # En centimos
+            amount=int(pago.coste * 100), # En centimos
             currency="eur",
             metadata={
-                "reserva_id": reserva.id,
+                "pago_id": pago.id,
                 "usuario_id": request.user.id
             }
         )
 
-        reserva.stripe_payment_intent = intent.id
-        reserva.save()
+        pago.stripe_payment_intent = intent.id
+        pago.save()
 
         return Response({
             "client_secret": intent.client_secret
@@ -1239,14 +1357,14 @@ class ConfirmarPagoView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        reserva_id = request.data.get("reserva_id")
-        reserva = get_object_or_404(ReservaActividad, id=reserva_id)
+        pago_id = request.data.get("pago_id")
+        pago = get_object_or_404(ReservaActividad, id=pago_id)
 
-        intent = stripe.PaymentIntent.retrieve(reserva.stripe_payment_intent)
+        intent = stripe.PaymentIntent.retrieve(pago.stripe_payment_intent)
 
         if intent.status == "succeeded":
-            reserva.estado = EstadoReserva.CONFIRMADA
-            reserva.save()
+            pago.estado = EstadoPago.CONFIRMADA
+            pago.save()
             return Response({"ok": True})
         else:
             return Response({"error": "Pago no válido"}, status=400)

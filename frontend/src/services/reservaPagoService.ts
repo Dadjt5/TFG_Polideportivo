@@ -20,23 +20,12 @@ export const getReservaActividad = async (id: number) => {
   return response.data;
 };
 
-/* Funcion para obtener información de una reserva de una actividad, pero solo ciertos datos */
-export const getReservaActividadSimplificado = async (id: number) => {
-  const response = await api.get(`api/v1/reservasActividadSimple/${id}/`)
-  return response.data;
-};
-
 /* Funcion para obtener información de un alquiler de una instalacion */
 export const getAlquiler = async (id: number) => {
   const response = await api.get(`api/v1/alquileres/${id}/`)
   return response.data;
 };
 
-/* Funcion para obtener información de un alquiler de una instalacion, pero solo ciertos datos */
-export const getAlquilerSimplificado = async (id: number) => {
-  const response = await api.get(`api/v1/alquileresSimple/${id}/`)
-  return response.data;
-};
 
 /* Función para reservar la actividad */
 export const reservarActividad = async(id: number) => {
@@ -44,14 +33,31 @@ export const reservarActividad = async(id: number) => {
   return response.data;
 }
 
-/* Función para intentar lanzar un pago */
-export const intentarPago = async(id: number) => {
-  const response = await api.post("api/v1/pago/comenzar/", {reserva_id: id})
+/* Función para comprar un abono */
+export const comprarAbono = async(id: number, tipo: string) => {
+  const response = await api.post(`api/v1/abonos/${id}/comprar/`, {"tipoAbono": tipo})
   return response.data;
 }
 
-/* Función para confirmar un pago */
-export const confirmarPago = async(id: number) => {
-  const response = await api.post("api/v1/pago/confirmar/", {reserva_id: id})
+/* Función para comprar un bono */
+export const comprarBono = async(id: number) => {
+  const response = await api.post(`api/v1/bonos/${id}/comprar/`)
   return response.data;
+}
+
+
+export const getResumenPago = async (id: number, tipo: string) => {
+  const response = await api.get(`api/v1/pagos/resumen/${tipo}/${id}/`)
+  return response.data
+}
+
+/* Función para intentar lanzar un pago */
+export const intentarPago = async (id: number, tipo: string) => {
+  const response = await api.post(`api/v1/pago/comenzar/`, { id, tipo })
+  return response.data
+}
+
+/* Función para confirmar un pago */
+export const confirmarPago = async (id: number, tipo: string) => {
+  await api.post(`api/v1/pago/confirmar/`, { id, tipo })
 }

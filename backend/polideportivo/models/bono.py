@@ -1,7 +1,10 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from dateutil.relativedelta import relativedelta
+from django.db import transaction
 from django.utils import timezone
+
+from .constantes import EstadoReserva
 
 
 class Bono(models.Model):
@@ -30,18 +33,30 @@ class CompraBono(models.Model):
 
     usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.RESTRICT)
     bono = models.ForeignKey('Bono', on_delete=models.RESTRICT, related_name="compras_bono")
-    pago = models.OneToOneField('Pago', on_delete=models.RESTRICT)
+    
+    estado = models.CharField(default=EstadoReserva.PENDIENTE, choices=EstadoReserva.choices)
 
     @classmethod
     def contar(cls):
         return cls.objects.count()
     
-    def save(self, *args, **kwargs):
-        if not self.fechaExpiracion:
-            self.fechaExpiracion = self.fecha + relativedelta(
-                years=self.bono.validez
+    @classmethod
+    def compraBono(cls, bono, usuario):
+        with transaction.atomic():
+            bono.refresh_from_db()
+
+            if cls.objects.filter(usuarioFinal=usuario, bono=bono).exists():
+                return None
+        
+            compra = cls.objects.create(
+                usuarioFinal=usuario,
+                bono=bono
             )
-        super().save(*args, **kwargs)
+
+            compra.fechaExpiracion = compra.fecha + relativedelta(years=bono.validez)
+            compra.save()
+
+            return compra
         
     @property
     def usosRestantes(self):

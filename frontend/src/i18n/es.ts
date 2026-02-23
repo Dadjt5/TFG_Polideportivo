@@ -191,16 +191,19 @@ export default {
   price: "Precio",
   buy: "Comprar",
   sport: "Deporte",
+  months: "Meses",
   sportsSubscription: "Abono deportivo",
   summerSubscription: "Abono de verano",
+  firstActivityDiscount: "Descuento en la primera actividad",
+  otherActivitiesDiscount: "Descuento para el resto de actividades",
+  outdoorDiscount: "Descuento para actividades externas",
+  singlePaymentUAM: "Pago único miembros UAM",
+  familyPrice: "Precio finales",
+
   unlimitedPool: "Acceso ilimitado a la piscina",
   unlimitedGym: "Acceso ilimitado a la sala de musculación",
-  activityDiscount: "Descuento del 30% en actividades",
-  facilityDiscount: "Reducción de precios en reserva de instalaciones",
-  summerPool: "Acceso a la piscina de verano",
+  summerPool: "Acceso ilimitado a la piscina en los meses de verano",
   cheaper: "Más barato que el abono deportivo",
-  sportPeriod: "1 mes, 4 meses o 12 meses",
-  summerPeriod: "12 meses",
   noBonus: "No has comprado ningún bono",
   noSubscripcion: "No has comprado ningún abono",
   mySubscripcions: "Tus abonos y bonos",
@@ -380,6 +383,7 @@ export default {
   physiotherapyTariff: "Tarifa de fisioterapia",
   newTariff: "Nueva tarifa",
   repositionPrice: "Precio de reposición",
+  newBonus: "Nuevo bono",
 
   /* Nuevas tarifas */
   newFacilityTariff: "Nueva tarifa de instalación",
@@ -404,6 +408,20 @@ export default {
   modifyTariff: "Modificar tarifa",
   deleteTariff: "Eliminar tarifa",
   tariffName: "Nombre de la tarifa...",
+
+  /* Editar bonos y abonos */
+  modifyBonuses: "Modificar bonus",
+  modifySummerSubscription: "Modificar abono de verano",
+  modifySportSubscription: "Modificar abono deportivo",
+  monthlyPriceUAM: "Precio mensual para UAM",
+  totalPriceUAM: "Precio total para UAM",
+  monthlyPriceOthers: "Precio mensual resto",
+  totalPriceOthers: "Precio total resto",
+  newSportSubscription: "Nuevo abono deportivo",
+  newSummerSubscription: "Nuevo abono de verano",
+  createBonuses: "Crear bono",
+  createSportSubscription: "Crear abono deportivo",
+  createSummerSubscription: "Crear abono de verano",
 
   /* Configuracion */
   configurationTitle: "Configuración del sistema",

@@ -361,11 +361,11 @@ const total = computed(() => {
 const continuarPago = async () => {
   const response = await reservarActividad(reserva.value.tarifa.idActividad)
 
-  const idReserva = response.id
+  const idPago = response.data.idPago
 
   router.push({
     name: 'pasarela-pago',
-    params: { id: idReserva }
+    params: { tipo: "reserva_actividad", id: idPago }
   })
 }
 

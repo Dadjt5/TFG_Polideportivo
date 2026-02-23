@@ -119,7 +119,7 @@ const routes = [
   { path: '/actividad/:id/reservar', component: ReservaActividad, name: 'reservar-actividad', props: true, meta: { requiresAuth: true } },
   { path: '/instalacion/:id/reservar', component: Alquiler, name: 'reservar-instalacion', props: true, meta: { requiresAuth: true } },
 
-  { path: '/pago/:id', component: Pago, props: true, name: 'pasarela-pago', meta: { requiresAuth: true }},
+  { path: '/pago/:tipo/:id', component: Pago, props: true, name: 'pasarela-pago', meta: { requiresAuth: true }},
   { path: '/pago/finalizado/:id', component: Pago, props: true, name: 'pago-finalizado', meta: { requiresAuth: true }},
 
   /* Detalle */

@@ -57,3 +57,21 @@ export const nuevaTarifaFisioterapia = async (payload: Payload): Promise<any> =>
   const response = await api.post("api/v1/fisioterapias/", payload)
   return response.data
 }
+
+/* Función para crear un nuevo abono deportivo */
+export const nuevoAbonoDeportivo = async (payload: Payload): Promise<any> => {
+  const response = await api.post("api/v1/abonosDeportivos/", payload)
+  return response.data
+}
+
+/* Función para crear un nuevo abono de verano */
+export const nuevoAbonoVerano = async (payload: Payload): Promise<any> => {
+  const response = await api.post("api/v1/abonosVerano/", payload)
+  return response.data
+}
+
+/* Función para crear un nuevo abono deportivo */
+export const nuevoBono = async (payload: Payload): Promise<any> => {
+  const response = await api.post("api/v1/bonos/", payload)
+  return response.data
+}

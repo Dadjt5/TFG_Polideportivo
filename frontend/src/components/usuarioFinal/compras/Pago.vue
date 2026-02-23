@@ -77,13 +77,16 @@ import { computed, onMounted, type Ref, ref, inject } from "vue"
 import { useRouter } from "vue-router"
 import { loadStripe } from "@stripe/stripe-js"
 
-import { confirmarPago, intentarPago, getReservaActividadSimplificado } from "@/services/reservaPagoService";
+import { confirmarPago, intentarPago, getResumenPago } from "@/services/reservaPagoService";
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
 import type { Language } from "@/useI18N";
 import { useI18n } from "@/useI18N";
 
-const props = defineProps<{ id: string }>();
+const props = defineProps<{
+  tipo: "reserva" | "abono" | "bono",
+  id: string
+}>();
 
 const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);
@@ -154,35 +157,38 @@ const pagar = async () => {
     error.value = stripeError.message
     loading.value = false
   } else {
-    await confirmarPago(parseInt(props.id))
+    await confirmarPago(parseInt(props.id), props.tipo)
     router.push("/pago-finalizado")
   }
 }
 
 onMounted(async () => {
-	const reservaId = parseInt(props.id)
+  try {
+    const resumenResponse = await getResumenPago(parseInt(props.id), props.tipo)
+    resumen.value = resumenResponse
 
-	const resumenResponse = await getReservaActividadSimplificado(reservaId)
-	resumen.value = resumenResponse
+    if (resumen.value.estado !== "PENDIENTE") {
+      router.replace("/")
+      return
+    }
 
-	if (resumen.value.estado !== "PENDIENTE") {
-		router.replace("/")
-		return
-	}
+    const pagoResponse = await intentarPago(parseInt(props.id), props.tipo)
+    clientSecret = pagoResponse.client_secret
 
-	const pagoResponse = await intentarPago(reservaId)
+    stripe = await loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY)
 
-	clientSecret = pagoResponse.client_secret
+    elements = stripe.elements({ clientSecret })
+    const paymentElement = elements.create("payment")
+    paymentElement.mount("#payment-element")
+    cardElement = paymentElement
+  } catch (e) {
+    error.value = "Error al cargar el pago"
+    console.error(e)
+  }
 
-  stripe = await loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY)
-
-const elements = stripe.elements({
-  clientSecret: clientSecret
+  const paymentElement = elements.create("payment")
+  paymentElement.mount("#payment-element")
+  cardElement = paymentElement
 })
 
-const paymentElement = elements.create("payment")
-paymentElement.mount("#payment-element")
-
-cardElement = paymentElement
-})
 </script>
