@@ -30,15 +30,6 @@
             </div>
 
             <div class="col-md-6">
-              <input
-                class="form-control"
-                :class="{ 'is-invalid': errores.DNI }"
-                placeholder="DNI"
-                v-model="usuarioFinal.DNI"
-              />
-            </div>
-
-            <div class="col-md-6">
               <select
                 class="form-select"
                 :class="{ 'is-invalid': errores.sexo }"
@@ -57,6 +48,16 @@
                 class="form-control"
                 :class="{ 'is-invalid': errores.fechaNacimiento }"
                 v-model="usuarioFinal.fechaNacimiento"
+                @change="checkAge"
+              />
+            </div>
+
+             <div class="col-md-6" v-if="!esMenor">
+              <input
+                class="form-control"
+                :class="{ 'is-invalid': errores.DNI }"
+                placeholder="DNI"
+                v-model="usuarioFinal.dni"
               />
             </div>
           </div>
@@ -183,10 +184,12 @@ const router = useRouter();
 const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);
 
+const esMenor = ref(false)
+
 const usuarioFinal = ref({
   nombre: '',
   apellidos: '',
-  DNI: '',
+  dni: '',
   sexo: '',
   esMenor: false,
   fechaNacimiento: '',
@@ -223,9 +226,22 @@ const errores = ref({
 const mensaje = ref('');
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+const checkAge = () => {
+  if (!usuarioFinal.value.fechaNacimiento) return
+  const birth = new Date(usuarioFinal.value.fechaNacimiento)
+  const now = new Date()
+  let age = now.getFullYear() - birth.getFullYear()
+  const m = now.getMonth() - birth.getMonth()
+  if (m < 0 || (m === 0 && now.getDate() < birth.getDate())) age--
+  esMenor.value = age < 18
+}
+
 function validarFormulario() {
   let valido = true
 
+  errores.value.nombre = usuarioFinal.value.nombre === ''
+  errores.value.apellidos = usuarioFinal.value.apellidos === ''
+  errores.value.DNI = usuarioFinal.value.dni === '' && !esMenor.value
   errores.value.sexo = usuarioFinal.value.sexo === ''
   errores.value.telefono = usuarioFinal.value.telefono === ''
   errores.value.provincia = usuarioFinal.value.provincia === ''
@@ -238,9 +254,8 @@ function validarFormulario() {
   errores.value.cuentaBancaria =
     usuarioFinal.value.cuentaBancaria !== '' &&
     usuarioFinal.value.cuentaBancaria.length < 20
-  errores.value.password =
-    usuarioFinal.value.password === '' ||
-    usuarioFinal.value.password !== usuarioFinal.value.confirmPassword
+  errores.value.password = usuarioFinal.value.password === ''
+  errores.value.confirmPassword = usuarioFinal.value.password !== usuarioFinal.value.confirmPassword
 
   for (const key in errores.value) {
     if(errores.value[key]) {

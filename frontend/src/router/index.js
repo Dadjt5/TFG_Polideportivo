@@ -65,6 +65,10 @@ import NuevaTarifaInstalacion from '@/components/administrador/nuevos/NuevaTarif
 import NuevaTarifaActividadComun from '@/components/administrador/nuevos/NuevaTarifaActividadComun.vue'
 import NuevaTarifaGrupoReducido from '@/components/administrador/nuevos/NuevaTarifaGrupoReducido.vue'
 import NuevaTarifaFisioterapia from '@/components/administrador/nuevos/NuevaTarifaFisioterapia.vue'
+import NuevoAbonoDeportivo from '@/components/administrador/nuevos/NuevoAbonoDeportivo.vue'
+import NuevoAbonoVerano from '@/components/administrador/nuevos/NuevoAbonoVerano.vue'
+import NuevoBono from '@/components/administrador/nuevos/NuevoBono.vue'
+
 
 // Editar
 import DetalleUsuarioFinal from '@/components/administrador/editar/DetalleUsuarioFinal.vue'
@@ -82,6 +86,9 @@ import EditarTarifaInstalacion from '@/components/administrador/editar/EditarTar
 import EditarTarifaActividadComun from '@/components/administrador/editar/EditarTarifaActividadComun.vue'
 import EditarTarifaGrupoReducido from '@/components/administrador/editar/EditarTarifaGrupoReducido.vue'
 import EditarTarifaFisioterapia from '@/components/administrador/editar/EditarTarifaFisioterapia.vue'
+import EditarAbonoDeportivo from '@/components/administrador/editar/EditarAbonoDeportivo.vue'
+import EditarAbonoVerano from '@/components/administrador/editar/EditarAbonoVerano.vue'
+import EditarBono from '@/components/administrador/editar/EditarBono.vue'
 
 const routes = [
   /******************* REDIRECCIÓN *******************/
@@ -136,12 +143,12 @@ const routes = [
   /******************* ADMINISTRADOR *******************/
   { path: '/home-administrador', component: HomeAdministrador, meta: { requiresAuth: true, role: 'administrador' } },
 
-  { path: '/gestion/usuarios', component: GestionarUsuarios, meta: { requiresAuth: true } },
-  { path: '/gestion/espacios', component: GestionarEspacios, meta: { requiresAuth: true } },
-  { path: '/gestion/actividades', component: GestionarActividades, meta: { requiresAuth: true } },
-  { path: '/gestion/tarifas', component: GestionarTarifas, meta: { requiresAuth: true } },
-  { path: '/configuracion', component: Configuracion, meta: { requiresAuth: true } },
-  { path: '/estadisticas/administrador', component: EstadisticasAdministrador, meta: { requiresAuth: true } },
+  { path: '/gestion/usuarios', component: GestionarUsuarios, name: 'gestion-usuarios', meta: { requiresAuth: true } },
+  { path: '/gestion/espacios', component: GestionarEspacios, name: 'gestion-espacios', meta: { requiresAuth: true } },
+  { path: '/gestion/actividades', component: GestionarActividades, name: 'gestion-actividades', meta: { requiresAuth: true } },
+  { path: '/gestion/tarifas', component: GestionarTarifas, name: 'gestion-tarifas', meta: { requiresAuth: true } },
+  { path: '/configuracion', component: Configuracion, name: 'configuracion', meta: { requiresAuth: true } },
+  { path: '/estadisticas/administrador', component: EstadisticasAdministrador, name: 'estadisticas-administrador', meta: { requiresAuth: true } },
 
   /* Nuevo */
   { path: '/registrar/usuario', component: NuevoUsuarioFinal, meta: { requiresAuth: true } },
@@ -159,11 +166,14 @@ const routes = [
   { path: '/crear/tarifa/comun', component: NuevaTarifaActividadComun, meta: { requiresAuth: true } },
   { path: '/crear/tarifa/grupos', component: NuevaTarifaGrupoReducido, meta: { requiresAuth: true } },
   { path: '/crear/tarifa/fisioterapia', component: NuevaTarifaFisioterapia, meta: { requiresAuth: true } },
+  { path: '/crear/abono/deportivo', component: NuevoAbonoDeportivo, meta: { requiresAuth: true } },
+  { path: '/crear/abono/verano', component: NuevoAbonoVerano, meta: { requiresAuth: true } },
+  { path: '/crear/bono', component: NuevoBono, meta: { requiresAuth: true } },
 
   /* Editar */
-  { path: '/usuarioFinal/:id', component: DetalleUsuarioFinal, props: true, name: 'editar-usuarioFinal', meta: { requiresAuth: true } },
-  { path: '/monitor/:id', component: DetalleMonitor, props: true, name: 'editar-monitor', meta: { requiresAuth: true } },
-  { path: '/administrador/:id', component: DetalleAdministrador, props: true, name: 'editar-administrador', meta: { requiresAuth: true } },
+  { path: '/usuarioFinal/:id', component: DetalleUsuarioFinal, props: true, name: 'detalle-usuarioFinal', meta: { requiresAuth: true } },
+  { path: '/monitor/:id', component: DetalleMonitor, props: true, name: 'detalle-monitor', meta: { requiresAuth: true } },
+  { path: '/administrador/:id', component: DetalleAdministrador, props: true, name: 'detalle-administrador', meta: { requiresAuth: true } },
 
   { path: '/admin/pabellones/:id', component: EditarPabellon, props: true, name: 'editar-pabellon', meta: { requiresAuth: true } },
   { path: '/admin/instalaciones/:id', component: EditarInstalacion, props: true, name: 'editar-instalacion', meta: { requiresAuth: true } },
@@ -176,6 +186,9 @@ const routes = [
   { path: '/editar/tarifa/comun/:id', component: EditarTarifaActividadComun, props: true, name: 'editar-tarifa-comun', meta: { requiresAuth: true } },
   { path: '/editar/tarifa/grupos/:id', component: EditarTarifaGrupoReducido, props: true, name: 'editar-tarifa-grupos', meta: { requiresAuth: true } },
   { path: '/editar/tarifa/fisioterapia/:id', component: EditarTarifaFisioterapia, props: true, name: 'editar-tarifa-fisioterapia', meta: { requiresAuth: true } },
+  { path: '/editar/abono/deportivo', component: EditarAbonoDeportivo, props: true, name: 'editar-abono-deportivo', meta: { requiresAuth: true } },
+  { path: '/editar/abono/verano', component: EditarAbonoVerano, props: true, name: 'editar-abono-verano', meta: { requiresAuth: true } },
+  { path: '/editar/bono', component: EditarBono, props: true, name: 'editar-bono', meta: { requiresAuth: true } },
 ]
 
 

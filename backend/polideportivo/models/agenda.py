@@ -4,23 +4,29 @@ from datetime import time
 from datetime import datetime, timedelta
 from django.core.exceptions import ValidationError
 
-from .constantes import TipoReserva
+from .constantes import TipoReserva, Dia
+
 
 class Agenda(models.Model):
     """Modelo para representar la agenda de las instalaciones"""
 
-    fecha = models.DateField()
+    fecha = models.DateField(blank=True, null=True)
+    dia = models.CharField(max_length=10, choices=Dia.choices, blank=True, null=True)
+
     horaApertura = models.TimeField(default=time(8, 0))
     horaCierre = models.TimeField(default=time(20, 0))
     abierto = models.BooleanField(default=True)
 
     instalacion = models.ForeignKey('Instalacion', on_delete=models.RESTRICT, related_name="agenda")
 
+
     class Meta:
-        unique_together = ('fecha', 'instalacion')
+        unique_together = [('dia', 'instalacion'), ('fecha', 'instalacion')]
 
     def __str__(self):
-        return f'Agenda para el día {self.fecha} para la instalacion: {self.instalacion.nombre}'
+        if self.dia:
+            return f'Agenda para {self.dia} de {self.instalacion.nombre}'
+        return f'Agenda para {self.fecha} de {self.instalacion.nombre}'
 
     def generar_agenda(self, minutos=60):
         if not self.abierto:

@@ -164,7 +164,7 @@ const crearMonitor = async () => {
     const data = await registrarMonitor(monitor.value);
     mensaje.value = data.mensaje;
 
-    router.push("/");
+    router.push({ name: 'gestion-usuarios' });
   } catch (error: any) {
     if (error.response && error.response.data?.mensaje) {
       mensaje.value = error.response.data.mensaje;

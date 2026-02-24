@@ -172,7 +172,7 @@ const crearAdministrador = async () => {
   try {
     const data = await registrarAdministrador(administrador.value)
     mensaje.value = data.mensaje
-    router.push("/")
+    router.push({ name: 'gestion-usuarios' });
   } catch (error: any) {
     if (error.response?.data?.mensaje) {
       mensaje.value = error.response.data.mensaje

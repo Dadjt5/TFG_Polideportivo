@@ -640,7 +640,6 @@ class RegistroView(APIView):
 # Registrar monitor
 class RegistroMonitorView(APIView):
     permission_classes = [IsAdministrador]
-    authentication_classes = []
 
     def post(self, request):
         nombre = request.data.get('nombre')
@@ -667,7 +666,6 @@ class RegistroMonitorView(APIView):
 # Registrar administrador
 class RegistroAdministradorView(APIView):
     permission_classes = [AllowAny]
-    authentication_classes = []
 
     def post(self, request):
         nombre = request.data.get('nombre')
@@ -1008,8 +1006,18 @@ class GuardarAsistenciaView(APIView):
                 return Response({"respuesta": "Error al pasar lista"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response({"respuesta": "Resultados cambiados correctamente"}, status=status.HTTP_200_OK)
-    
-    
+
+
+class AsignarAgendasView(APIView):
+    permission_classes = [IsAdministrador]
+
+    def post(self, request, instalacion_id):
+        instalacion = get_object_or_404(Instalacion, id=instalacion_id)
+
+        agenda = request.data.get('agenda', [])
+        fechas_especiales = request.data.get('fechasEspeciales', [])
+
+
 class TarifaActividadView(APIView):
     permission_classes = [IsAuthenticated]
     

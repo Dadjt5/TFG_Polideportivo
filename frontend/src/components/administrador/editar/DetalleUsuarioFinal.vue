@@ -79,9 +79,9 @@
             <div class="col-md-4">
               <label class="form-label">{{ t.sex }}</label>
               <select v-if="isEditing" class="form-select" :class="{ 'is-invalid': errores.sexo }" v-model="usuario.sexo">
-                <option value="M">{{ t.male }}</option>
-                <option value="F">{{ t.female }}</option>
-                <option value="N">{{ t.other }}</option>
+                <option value="MUJER">{{ t.female }}</option>
+                <option value="HOMBRE">{{ t.male }}</option>
+                <option value="NINGUNO">{{ t.other }}</option>
               </select>
               <p v-else class="form-control-plaintext">{{ usuario.sexo || '-' }}</p>
             </div>
@@ -440,6 +440,7 @@ const guardarCambios = async () => {
     if(Object.keys(data).length > 0) {
       await modificarUsuarioFinal(usuario.value.id, data);
     }
+    isEditing.value = false
   } catch (e) {
     console.error("Error al modificar el usuario final", e);
   }

@@ -33,9 +33,9 @@
               <label class="form-label">{{ t.sex }}</label>
               <select class="form-select" :class="{ 'is-invalid': errores.sexo }" v-model="formData.sexo">
                 <option value="">{{ t.selectOption }}</option>
-                <option value="male">{{ t.male }}</option>
-                <option value="female">{{ t.female }}</option>
-                <option value="other">{{ t.other }}</option>
+                <option value="MUJER">{{ t.male }}</option>
+                <option value="HOMBRE">{{ t.female }}</option>
+                <option value="NINGUNO">{{ t.other }}</option>
               </select>
             </div>
 
