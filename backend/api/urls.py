@@ -90,6 +90,7 @@ urlpatterns = [
     path("actividades/<int:actividad_id>/sesion/", views.NuevaSesionView.as_view(), name="crear-sesion"),
     path("actividades/<int:actividad_id>/sesiones/<int:sesion_id>/asistencia/", views.GuardarAsistenciaView.as_view(), name="guardar-asistencia"),
     path("actividades/<int:actividad_id>/reservar/", views.ReservarActividadView.as_view(), name="reservar-actividad"),
+    path("actividades/<int:actividad_id>/deportes/", views.AsignarDeporteView.as_view(), name="asignar-deporte"),
     path("instalaciones/<int:instalacion_id>/agendas/", views.AsignarAgendasView.as_view(), name="asignar-agenda"),
     path("tarifas/actividades/<int:actividad_id>/", views.TarifaActividadView.as_view(), name="tarifa-actividad"),
     path("tarifas/instalaciones/<int:instalacion_id>/", views.TarifaInstalacionView.as_view(), name="tarifa-instalacion"),

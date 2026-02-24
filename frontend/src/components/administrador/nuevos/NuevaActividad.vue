@@ -11,33 +11,22 @@
           <!-- NOMBRE -->
           <div class="col-md-6">
             <label class="form-label fw-semibold">{{ t.name }}</label>
-            <input
-              type="text"
-              class="form-control form-control-lg"
-              :class="{ 'is-invalid': errores.nombre }"
-              v-model="actividad.nombre"
-            />
+            <input type="text" class="form-control form-control-lg" :class="{ 'is-invalid': errores.nombre }"
+              v-model="actividad.nombre" />
           </div>
 
           <!-- AÑO -->
           <div class="col-md-3">
             <label class="form-label fw-semibold">{{ t.academicYear }}</label>
-            <input
-              type="number"
-              class="form-control form-control-lg"
-              :class="{ 'is-invalid': errores.año }"
-              v-model.number="actividad.año"
-            />
+            <input type="number" class="form-control form-control-lg" :class="{ 'is-invalid': errores.año }"
+              v-model.number="actividad.año" />
           </div>
 
           <!-- ESTADO -->
           <div class="col-md-3">
             <label class="form-label fw-semibold">{{ t.status }}</label>
-            <select
-              class="form-select form-select-lg"
-              :class="{ 'is-invalid': errores.estado }"
-              v-model="actividad.estado"
-            >
+            <select class="form-select form-select-lg" :class="{ 'is-invalid': errores.estado }"
+              v-model="actividad.estado">
               <option disabled value="">--</option>
               <option v-for="e in tiposStore.estados" :key="e[0]" :value="e[0]">{{ e[1] }}</option>
             </select>
@@ -46,94 +35,59 @@
           <!-- DESCRIPCIÓN -->
           <div class="col-md-12">
             <label class="form-label fw-semibold">{{ t.description }}</label>
-            <textarea
-              rows="3"
-              class="form-control form-control-lg"
-              v-model="actividad.descripcion"
-            />
+            <textarea rows="3" class="form-control form-control-lg" v-model="actividad.descripcion" />
           </div>
 
           <!-- IMAGEN -->
           <div class="col-md-12">
             <label class="form-label fw-semibold">{{ t.images }}</label>
-            <input
-              type="text"
-              class="form-control form-control-lg"
-              v-model="actividad.imagenURL"
-              placeholder="https://@."
-            />
+            <input type="text" class="form-control form-control-lg" v-model="actividad.imagenURL"
+              placeholder="https://@." />
           </div>
 
           <!-- PLAZAS -->
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.maxPlaces }}</label>
-            <input
-              type="number"
-              class="form-control form-control-lg"
-              :class="{ 'is-invalid': errores.plazasMaximas }"
-              v-model.number="actividad.plazasMaximas"
-            />
+            <input type="number" class="form-control form-control-lg" :class="{ 'is-invalid': errores.plazasMaximas }"
+              v-model.number="actividad.plazasMaximas" />
           </div>
 
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.reservedPlaces }}</label>
-            <input
-              type="number"
-              class="form-control form-control-lg"
-              :class="{ 'is-invalid': errores.plazasReservadas }"
-              v-model.number="actividad.plazasReservadas"
-            />
+            <input type="number" class="form-control form-control-lg"
+              :class="{ 'is-invalid': errores.plazasReservadas }" v-model.number="actividad.plazasReservadas" />
           </div>
 
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.minimumAge }}</label>
-            <input
-              type="number"
-              class="form-control form-control-lg"
-              :class="{ 'is-invalid': errores.edadMinima }"
-              v-model.number="actividad.edadMinima"
-            />
+            <input type="number" class="form-control form-control-lg" :class="{ 'is-invalid': errores.edadMinima }"
+              v-model.number="actividad.edadMinima" />
           </div>
 
           <!-- CRÉDITOS -->
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.credits }}</label>
-            <input
-              type="number"
-              class="form-control form-control-lg"
-              :class="{ 'is-invalid': errores.numeroCreditos }"
-              v-model.number="actividad.numeroCreditos"
-            />
+            <input type="number" class="form-control form-control-lg" :class="{ 'is-invalid': errores.numeroCreditos }"
+              v-model.number="actividad.numeroCreditos" />
           </div>
 
           <!-- NIVEL -->
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.level }}</label>
-            <input
-              type="text"
-              class="form-control form-control-lg"
-              v-model="actividad.nivel"
-            />
+            <input type="text" class="form-control form-control-lg" v-model="actividad.nivel" />
           </div>
 
           <!-- MATERIAL -->
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.material }}</label>
-            <input
-              type="text"
-              class="form-control form-control-lg"
-              v-model="actividad.material"
-            />
+            <input type="text" class="form-control form-control-lg" v-model="actividad.material" />
           </div>
 
           <!-- INSTALACIÓN -->
           <div class="col-md-6">
             <label class="form-label fw-semibold">{{ t.facility }}</label>
-            <select
-              class="form-select form-select-lg"
-              :class="{ 'is-invalid': errores.instalacion }"
-              v-model="actividad.instalacion_id"
-            >
+            <select class="form-select form-select-lg" :class="{ 'is-invalid': errores.instalacion }"
+              v-model="actividad.instalacion_id">
               <option disabled value="">--</option>
               <option v-for="i in instalaciones" :key="i.id" :value="i.id">
                 {{ i.nombre }}
@@ -144,11 +98,8 @@
           <!-- MONITOR -->
           <div class="col-md-6">
             <label class="form-label fw-semibold">{{ t.monitorName }}</label>
-            <select
-              class="form-select form-select-lg"
-              :class="{ 'is-invalid': errores.monitor }"
-              v-model="actividad.monitor_id"
-            >
+            <select class="form-select form-select-lg" :class="{ 'is-invalid': errores.monitor }"
+              v-model="actividad.monitor_id">
               <option disabled value="">--</option>
               <option v-for="m in monitores" :key="m.id" :value="m.id">
                 {{ m.nombre }}
@@ -156,14 +107,23 @@
             </select>
           </div>
 
+          <!-- DEPORTE -->
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">{{ t.sport }}</label>
+            <select class="form-select form-select-lg" :class="{ 'is-invalid': errores.deporte }"
+              v-model="nombreDeporte">
+              <option disabled value="">--</option>
+              <option v-for="d in deportes" :key="d.id" :value="d.titulo">
+                {{ d.titulo }}
+              </option>
+            </select>
+          </div>
+
           <!-- TIPO ACTIVIDAD -->
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.activityType }}</label>
-            <select
-              class="form-select form-select-lg"
-              :class="{ 'is-invalid': errores.tipoActividad }"
-              v-model="actividad.tipoActividad"
-            >
+            <select class="form-select form-select-lg" :class="{ 'is-invalid': errores.tipoActividad }"
+              v-model="actividad.tipoActividad">
               <option v-for="t in tiposStore.tiposActividad" :key="t[0]" :value="t[0]">{{ t[1] }}</option>
             </select>
           </div>
@@ -171,17 +131,9 @@
           <!-- TARIFA -->
           <div class="col-md-6">
             <label class="form-label fw-semibold">{{ t.tariff }}</label>
-            <select
-              class="form-select form-select-lg"
-              v-model="actividad.tarifa"
-              :key="tarifas.length"
-            >
+            <select class="form-select form-select-lg" v-model="actividad.tarifa" :key="tarifas.length">
               <option value="">--</option>
-              <option
-                v-for="t in tarifas"
-                :key="t.id"
-                :value="t.id"
-              >
+              <option v-for="t in tarifas" :key="t.id" :value="t.id">
                 {{ t.titulo }}
               </option>
             </select>
@@ -190,11 +142,8 @@
           <!-- RESERVA -->
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.reserveType }}</label>
-            <select
-              class="form-select form-select-lg"
-              :class="{ 'is-invalid': errores.tipoReserva }"
-              v-model="actividad.tipoReserva"
-            >
+            <select class="form-select form-select-lg" :class="{ 'is-invalid': errores.tipoReserva }"
+              v-model="actividad.tipoReserva">
               <option v-for="r in tiposStore.tiposReserva" :key="r[0]" :value="r[0]">{{ r[1] }}</option>
             </select>
           </div>
@@ -202,11 +151,8 @@
           <!-- TERRENO -->
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.terrainType }}</label>
-            <select
-              class="form-select form-select-lg"
-              :class="{ 'is-invalid': errores.terreno }"
-              v-model="actividad.terreno"
-            >
+            <select class="form-select form-select-lg" :class="{ 'is-invalid': errores.terreno }"
+              v-model="actividad.terreno">
               <option v-for="t in tiposStore.terrenos" :key="t[0]" :value="t[0]">{{ t[1] }}</option>
             </select>
           </div>
@@ -214,11 +160,7 @@
           <!-- EXTERIOR -->
           <div class="col-md-12">
             <div class="form-check form-switch mt-2">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                v-model="actividad.exterior"
-              />
+              <input class="form-check-input" type="checkbox" v-model="actividad.exterior" />
               <label class="form-check-label fw-semibold">
                 {{ t.outdoor }}
               </label>
@@ -246,8 +188,8 @@
 import { watch, inject, type Ref, ref, onMounted } from "vue"
 import { useRouter } from "vue-router"
 
-import { nuevaActividad } from "@/services/crearRecursosService"
-import { getInstalacionesSimples, getMonitoresSimples, getTarifasActividadComun, getTarifasFisioterapia, getTarifasGrupoReducido } from "@/services/listadoService"
+import { nuevaActividad, actualizarDeportes } from "@/services/crearRecursosService"
+import { getInstalacionesSimples, getMonitoresSimples, getTarifasActividadComun, getTarifasFisioterapia, getTarifasGrupoReducido, getDeportes } from "@/services/listadoService"
 
 import { useTiposStore } from "@/stores/tipos"
 
@@ -282,7 +224,8 @@ const actividad = ref({
   tipoReserva: "",
   terreno: "",
   estado: "",
-  periodo: "ANUAL"
+  periodo: "ANUAL",
+  deporte_id: null,
 })
 
 const errores = ref({
@@ -297,12 +240,16 @@ const errores = ref({
   terreno: false,
   estado: false,
   instalacion: false,
-  monitor: false
+  monitor: false,
+  deporte: false
 })
 
 const instalaciones = ref<any[]>([])
 const monitores = ref<any[]>([])
 const tarifas = ref<any[]>([])
+const deportes = ref<any[]>([])
+
+const nombreDeporte = ref("")
 
 function validarFormulario() {
   let ok = true
@@ -321,6 +268,7 @@ function validarFormulario() {
   errores.value.estado = actividad.value.estado === ""
   errores.value.instalacion = actividad.value.instalacion_id === ""
   errores.value.monitor = actividad.value.monitor_id === ""
+  errores.value.deporte = nombreDeporte.value === ""
 
   for (const k in errores.value) {
     if (errores.value[k]) {
@@ -335,9 +283,10 @@ const crearActividad = async () => {
   if (!validarFormulario()) return
 
   try {
-    await nuevaActividad(actividad.value)
-    router.back()
-  } catch(e) {
+    const actividadObj = await nuevaActividad(actividad.value)
+    await actualizarDeportes(actividadObj.id, nombreDeporte.value)
+    router.push({ name: 'gestion-actividades' });
+  } catch (e) {
     console.log("Error al crear la actividad", e)
   }
 }
@@ -367,5 +316,6 @@ onMounted(async () => {
   instalaciones.value = await getInstalacionesSimples()
   monitores.value = await getMonitoresSimples()
   tarifas.value = await getTarifasActividadComun()
+  deportes.value = await getDeportes()
 })
 </script>

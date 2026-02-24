@@ -56,6 +56,9 @@ class Instalacion(models.Model):
             precio = self.tarifa.precioTDA
         
         return precio
+    
+    def nuevoHorario(self, dia):
+        return
 
     def get_horario(self, fecha):
         agenda = Agenda.objects.filter(instalacion=self, fecha=fecha).first()

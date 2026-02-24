@@ -25,7 +25,7 @@ class Actividad(models.Model):
     material = models.CharField(max_length=1024, blank=True)
     exterior = models.BooleanField(default=False)
 
-    deportes = models.ManyToManyField('Deporte', related_name="actividades")
+    deportes = models.ForeignKey('Deporte', on_delete=models.CASCADE, related_name="actividades")
     instalacion = models.ForeignKey('Instalacion', on_delete=models.RESTRICT)
     monitor = models.ForeignKey('Monitor', on_delete=models.RESTRICT, related_name="actividades")
     tarifa = models.ForeignKey('TarifaActividad', on_delete=models.PROTECT, blank=True, null=True)

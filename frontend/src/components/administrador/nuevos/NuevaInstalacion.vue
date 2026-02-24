@@ -83,6 +83,75 @@
 
         </div>
 
+        <!-- Horarios semanales -->
+        <div class="card border-0 shadow-sm rounded-4 mt-4">
+          <div class="card-body d-flex justify-content-between align-items-center cursor-pointer"
+            style="cursor: pointer;" @click="openAgenda = !openAgenda">
+            <div class="d-flex align-items-center gap-2">
+              <i class="bi bi-calendar-event fs-5 text-primary"></i>
+              <span class="fw-semibold">
+                {{ t.weeklyHours }}
+              </span>
+            </div>
+
+            <i class="bi" :class="openAgenda ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+          </div>
+          <transition name="fade">
+            <div v-if="openAgenda" class="px-4 pb-4">
+              <div v-for="(d, index) in agenda" :key="index" class="d-flex align-items-center gap-2 mb-2">
+                <span class="w-25">{{ d.dia }}</span>
+                <input type="time" v-model="d.apertura" class="form-control form-control-sm w-auto" />
+                <span>-</span>
+                <input type="time" v-model="d.cierre" class="form-control form-control-sm w-auto" />
+              </div>
+            </div>
+          </transition>
+        </div>
+
+        <!-- Fechas especiales -->
+        <div class="card border-0 shadow-sm rounded-4 mt-4">
+          <div class="card-body d-flex justify-content-between align-items-center cursor-pointer"
+            style="cursor: pointer;" @click="openEspeciales = !openEspeciales">
+            <div class="d-flex align-items-center gap-2">
+              <i class="bi bi-calendar-event fs-5 text-primary"></i>
+              <span class="fw-semibold">
+                {{ t.specialDates }}
+              </span>
+            </div>
+
+            <i class="bi" :class="openEspeciales ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+          </div>
+
+          <transition name="fade">
+            <div v-if="openEspeciales" class="px-4 pb-4">
+
+              <div class="mb-3">
+                <input type="date" v-model="tempFecha" class="form-control mb-2" />
+                <div class="form-check mb-2">
+                  <input type="checkbox" class="form-check-input" v-model="tempAbierto" id="abiertoCheck" />
+                  <label for="abiertoCheck" class="form-check-label">{{ t.open }}</label>
+                </div>
+                <div v-if="tempAbierto" class="d-flex gap-2 mb-2">
+                  <input type="time" v-model="tempApertura" class="form-control form-control-sm" />
+                  <span>-</span>
+                  <input type="time" v-model="tempCierre" class="form-control form-control-sm" />
+                </div>
+                <button class="btn btn-success btn-sm" @click="handleAddFechaEspecial">{{ t.newSpecialDate }}</button>
+              </div>
+
+              <div v-for="(f, index) in fechasEspeciales" :key="index"
+                class="d-flex justify-content-between align-items-center mb-1 p-2 border rounded">
+                <div>
+                  <strong>{{ f.fecha }}</strong> -
+                  <span v-if="f.abierto">{{ f.apertura }} a {{ f.cierre }}</span>
+                  <span v-else>{{ t.close }}</span>
+                </div>
+                <button class="btn btn-danger btn-sm" @click="handleDeleteFechaEspecial(index)">{{ t.delete }}</button>
+              </div>
+            </div>
+          </transition>
+        </div>
+
         <!-- BOTONES -->
         <div class="d-flex justify-content-center gap-3 mt-5">
           <button class="btn btn-primary btn-lg px-5" @click="crearInstalacion">
@@ -93,57 +162,6 @@
             {{ t.return }}
           </button>
         </div>
-
-        <!-- HORARIOS SEMANALES — ACORDEÓN -->
-        <div>
-          <button class="btn btn-outline-primary w-100 text-start" @click="openAgenda = !openAgenda">
-            Horarios semanales
-          </button>
-
-          <div v-if="openAgenda" class="mt-3">
-            <div v-for="(d, index) in agenda" :key="index" class="d-flex align-items-center gap-2 mb-2">
-              <span class="w-25">{{ d.dia }}</span>
-              <input type="time" v-model="d.apertura" class="form-control form-control-sm w-auto" />
-              <span>a</span>
-              <input type="time" v-model="d.cierre" class="form-control form-control-sm w-auto" />
-            </div>
-          </div>
-        </div>
-
-        <!-- FECHAS ESPECIALES — ACORDEÓN -->
-        <div class="mt-4">
-          <button class="btn btn-outline-secondary w-100 text-start" @click="openEspeciales = !openEspeciales">
-            Fechas especiales
-          </button>
-
-          <div v-if="openEspeciales" class="mt-3">
-            <!-- Añadir fecha -->
-            <div class="mb-3">
-              <input type="date" v-model="tempFecha" class="form-control mb-2" />
-              <div class="form-check mb-2">
-                <input type="checkbox" class="form-check-input" v-model="tempAbierto" id="abiertoCheck" />
-                <label for="abiertoCheck" class="form-check-label">Abierto este día</label>
-              </div>
-              <div v-if="tempAbierto" class="d-flex gap-2 mb-2">
-                <input type="time" v-model="tempApertura" class="form-control form-control-sm" />
-                <span>a</span>
-                <input type="time" v-model="tempCierre" class="form-control form-control-sm" />
-              </div>
-              <button class="btn btn-success btn-sm" @click="handleAddFechaEspecial">Añadir fecha especial</button>
-            </div>
-
-            <!-- Lista de fechas especiales -->
-            <div v-for="(f, index) in fechasEspeciales" :key="index"
-              class="d-flex justify-content-between align-items-center mb-1 p-2 border rounded">
-              <div>
-                <strong>{{ f.fecha }}</strong> -
-                <span v-if="f.abierto">{{ f.apertura }} a {{ f.cierre }}</span>
-                <span v-else>Cerrado</span>
-              </div>
-              <button class="btn btn-danger btn-sm" @click="handleDeleteFechaEspecial(index)">Eliminar</button>
-            </div>
-          </div>
-        </div>
       </div>
     </main>
   </div>
@@ -153,7 +171,7 @@
 import { ref, inject, type Ref, onMounted } from "vue"
 import { useRouter } from "vue-router"
 
-import { nuevaInstalacion } from "@/services/crearRecursosService"
+import { nuevaInstalacion, actualizarAgenda } from "@/services/crearRecursosService"
 import { getPabellonesSimples, getTarifasInstalacion } from "@/services/listadoService"
 
 import { useTiposStore } from "@/stores/tipos"
@@ -252,8 +270,9 @@ const crearInstalacion = async () => {
   if (!validarFormulario()) return
 
   try {
-    await nuevaInstalacion(instalacion.value)
-    router.back()
+    const instalacionObj = await nuevaInstalacion(instalacion.value)
+    await actualizarAgenda(instalacionObj.id, agenda.value, fechasEspeciales.value)
+    router.push({ name: 'gestion-espacios' });
   } catch (e) {
     console.log("Error al crear la instalacion", e)
   }

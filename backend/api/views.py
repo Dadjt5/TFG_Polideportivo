@@ -1,6 +1,7 @@
 from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
+import re
 from rest_framework.permissions import (
     IsAuthenticated,
     AllowAny
@@ -1016,6 +1017,34 @@ class AsignarAgendasView(APIView):
 
         agenda = request.data.get('agenda', [])
         fechas_especiales = request.data.get('fechasEspeciales', [])
+
+        for dia in agenda:
+            print(dia)
+            instalacion.nuevoHorario(dia)
+
+
+class AsignarDeporteView(APIView):
+    permission_classes = [IsAdministrador]
+    
+    def post(self, request, actividad_id):
+        actividad = get_object_or_404(Actividad, id=actividad_id)
+
+        nombre = request.data.get('deporte')
+        if not nombre:
+            return Response({"respuesta": "Se debe indicar un deporte"}, status=status.HTTP_400_BAD_REQUEST)
+
+        nombre = nombre.strip()
+        
+        if not re.match(r'^[A-Za-zÁÉÍÓÚÑáéíóúñ ]+$', nombre):
+            return Response({"respuesta": "Nombre de deporte incorrecto"}, status=status.HTTP_400_BAD_REQUEST)
+
+        titulo = nombre.lower().replace(" ", "_")
+
+        deporte, _ = Deporte.objects.get_or_create(titulo=titulo)
+        actividad.deporte = deporte
+        actividad.save()
+
+        return Response({"respuesta": "Deporte asignado correctamente"}, status=status.HTTP_200_OK)
 
 
 class TarifaActividadView(APIView):

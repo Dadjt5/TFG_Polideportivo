@@ -351,6 +351,11 @@ export default {
   /* Nueva instalacion */
   maxCapacity: "Max capacity",
   createFacility: "Create facility",
+  weeklyHours: "Weekly hours",
+  specialDates: "Special dates",
+  open: "Open",
+  close: "Closed",
+  newSpecialDate: "New special date",
 
   /* Gestion de actividades */
   searchActivities: "Search for activities...",

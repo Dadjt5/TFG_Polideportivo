@@ -15,11 +15,22 @@ export const nuevaInstalacion = async (payload: Payload): Promise<any> => {
   return response.data
 }
 
+/* Función para actualizar la agenda */
+export const actualizarAgenda = async (id: number, agenda: Payload, fechasEspeciales: Payload) => {
+  const response = await api.post(`api/v1/instalaciones/${id}/agendas`, {"agenda": agenda, "fechasEspeciales": fechasEspeciales})
+  return response.data;
+}
+
 /* Función para crear una actividad */
 export const nuevaActividad = async (payload: Payload): Promise<any> => {
   console.log(payload)
   const response = await api.post("api/v1/actividades/", payload)
   return response.data
+}
+
+/* Función para actualizar los deportes */
+export const actualizarDeportes = async (id: number, titulo: string) => {
+  const response = await api.post(`api/v1/${id}/deportes/`, {"deporte": titulo})
 }
 
 /* Función para crear una sesion */
