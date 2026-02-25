@@ -21,6 +21,7 @@ export default {
   moreModifyPersonalData: "Modifica tu nombre, contraseña, email y otra información",
   viewTickets: "Ver Abonos y bonos",
   moreViewTickets: "Revisa los abonos y bonos en posesión",
+  emptyFields: "Hay campos obligatorios vacios.",
 
   /* Home - Buscar */
   welcome: "Bienvenido al Polideportivo XX",
@@ -374,6 +375,10 @@ export default {
   maxPlaces: "Plazas máximas",
   outdoor: "Exterior",
   newActivity: "Nueva actividad",
+  data: "Datos",
+  monitor: "Monitor",
+  startHour: "Hora de inicio",
+  endHour: "Hora de fin",
 
   /* Nueva sesion */
   newSession: "Nueva sesión",

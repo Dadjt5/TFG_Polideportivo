@@ -1,6 +1,6 @@
 <template>
   <div class="min-vh-100 bg-light">
-    <main class="container-fluid mt-2 px-5 py-4">
+    <main class="container py-5" style="max-width: 900px;">
 
       <!-- CABECERA -->
       <div class="d-flex justify-content-between align-items-center mb-4">
@@ -8,14 +8,14 @@
           ← {{ t.return }}
         </button>
 
-        <h1 class="fw-semibold mb-0">
-          <span v-if="!editando">{{ tarifa.nombre }}</span>
+        <h1 class="fw-bold text-center mb-4 display-5">
+          <span v-if="!editando">{{ tarifa.titulo }}</span>
           <input
             v-else
-            v-model="tarifa.nombre"
-            class="form-control text-center fw-semibold"
-            :class="{ 'is-invalid': errores.nombre }"
-            placeholder="t.tariffName"
+            v-model="tarifa.titulo"
+            class="form-control form-control-lg text-center fw-semibold"
+            :class="{ 'is-invalid': errores.titulo }"
+            :placeholder="tarifa.titulo"
           />
         </h1>
 
@@ -25,8 +25,8 @@
       <div class="row g-4">
 
         <!-- INFORMACIÓN DE TARIFAS -->
-        <div class="col-lg-6">
-          <div class="bg-white rounded-3 shadow-sm p-4 h-100">
+        <div class="col-12">
+          <div class="bg-white rounded-4 shadow p-5 h-100">
             <h4 class="mb-3 d-flex align-items-center">
               <i class="bi bi-cash-stack text-primary me-2"></i>
               {{ t.tariffDetail }}
@@ -37,13 +37,13 @@
               <!-- PRECIO ABONADO -->
               <div class="col-12 col-sm-6">
                 <span class="fw-medium">{{ t.priceSubscripcion }}:</span>
-                <p v-if="!editando">{{ tarifa.precioAbonado }} €</p>
+                <p v-if="!editando" class="fs-5 fw-semibold">{{ tarifa.precioAbonado }} €</p>
                 <input
                   v-else
                   type="number"
                   min="0"
                   step="0.01"
-                  class="form-control"
+                  class="form-control form-control-lg"
                   v-model.number="tarifa.precioAbonado"
                   :class="{ 'is-invalid': errores.precioAbonado }"
                 />
@@ -52,13 +52,13 @@
               <!-- PRECIO UAM -->
               <div class="col-12 col-sm-6">
                 <span class="fw-medium">{{ t.priceUAM }}:</span>
-                <p v-if="!editando">{{ tarifa.precioUAM }} €</p>
+                <p v-if="!editando" class="fs-5 fw-semibold">{{ tarifa.precioUAM }} €</p>
                 <input
                   v-else
                   type="number"
                   min="0"
                   step="0.01"
-                  class="form-control"
+                  class="form-control form-control-lg"
                   v-model.number="tarifa.precioUAM"
                   :class="{ 'is-invalid': errores.precioUAM }"
                 />
@@ -67,13 +67,13 @@
               <!-- PRECIO TDA -->
               <div class="col-12 col-sm-6">
                 <span class="fw-medium">{{ t.priceTDA }}:</span>
-                <p v-if="!editando">{{ tarifa.precioTDA }} €</p>
+                <p v-if="!editando" class="fs-5 fw-semibold">{{ tarifa.precioTDA }} €</p>
                 <input
                   v-else
                   type="number"
                   min="0"
                   step="0.01"
-                  class="form-control"
+                  class="form-control form-control-lg"
                   v-model.number="tarifa.precioTDA"
                   :class="{ 'is-invalid': errores.precioTDA }"
                 />
@@ -82,13 +82,13 @@
               <!-- PRECIO OTROS -->
               <div class="col-12 col-sm-6">
                 <span class="fw-medium">{{ t.priceOthers }}:</span>
-                <p v-if="!editando">{{ tarifa.precioOtros }} €</p>
+                <p v-if="!editando" class="fs-5 fw-semibold">{{ tarifa.precioOtros }} €</p>
                 <input
                   v-else
                   type="number"
                   min="0"
                   step="0.01"
-                  class="form-control"
+                  class="form-control form-control-lg"
                   v-model.number="tarifa.precioOtros"
                   :class="{ 'is-invalid': errores.precioOtros }"
                 />
@@ -97,7 +97,7 @@
               <!-- POR DEFECTO -->
               <div class="col-12">
                 <span class="fw-medium">{{ t.defaultTariff }}:</span>
-                <p v-if="!editando">{{ tarifa.por_defecto ? t.yes : 'No' }}</p>
+                <p v-if="!editando" class="fs-5 fw-semibold">{{ tarifa.por_defecto ? t.yes : 'No' }}</p>
                 <div v-else class="form-check mt-1">
                   <input
                     class="form-check-input"
@@ -177,7 +177,7 @@ const editando = ref(false);
 
 const tarifa = ref({
   id: 0,
-  nombre: '',
+  titulo: '',
   precioAbonado: 0,
   precioUAM: 0,
   precioTDA: 0,
@@ -186,7 +186,7 @@ const tarifa = ref({
 });
 
 const errores = ref({
-  nombre: false,
+  titulo: false,
   precioAbonado: false,
   precioUAM: false,
   precioTDA: false,
@@ -197,7 +197,7 @@ const tarifaOriginal = ref<any>(null);
 
 function validarFormulario() {
   let valido = true;
-  errores.value.nombre = tarifa.value.nombre === '';
+  errores.value.titulo = tarifa.value.titulo === '';
   errores.value.precioAbonado = tarifa.value.precioAbonado < 0;
   errores.value.precioUAM = tarifa.value.precioUAM < 0;
   errores.value.precioTDA = tarifa.value.precioTDA < 0;

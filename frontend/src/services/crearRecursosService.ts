@@ -17,7 +17,7 @@ export const nuevaInstalacion = async (payload: Payload): Promise<any> => {
 
 /* Función para actualizar la agenda */
 export const actualizarAgenda = async (id: number, agenda: Payload, fechasEspeciales: Payload) => {
-  const response = await api.post(`api/v1/instalaciones/${id}/agendas`, {"agenda": agenda, "fechasEspeciales": fechasEspeciales})
+  const response = await api.post(`api/v1/instalaciones/${id}/agendas/`, {"agenda": agenda, "fechasEspeciales": fechasEspeciales})
   return response.data;
 }
 

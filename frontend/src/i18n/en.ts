@@ -19,6 +19,7 @@ export default {
   moreModifyPersonalData: "Manage your name, password, email, and other information",
   viewTickets: "View passes and vouchers",
   moreViewTickets: "Review your owned passes and vouchers",
+  emptyFields: "There are empty mandatory fields.",
 
   /* Home - Buscar */
   welcome: "Welcome to Sports Center XX",
@@ -372,6 +373,10 @@ export default {
   maxPlaces: "Max places",
   outdoor: "Outdoor",
   newActivity: "Nueva actividad",
+  data: "Data",
+  monitor: "Monitor",
+  startHour: "Start time",
+  endHour: "Finish time",
 
   /* Nueva sesion */
   newSession: "New session",

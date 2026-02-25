@@ -1,124 +1,199 @@
 <template>
-	<div class="min-vh-100 bg-light">
-		<main class="container-fluid mt-2 px-5 py-4">
+  <div class="min-vh-100 bg-light">
+    <main class="container py-5" style="max-width: 1000px;">
 
-			<!-- CABECERA -->
-			<div class="d-flex justify-content-between align-items-center mb-4">
-				<button class="btn btn-secondary rounded-pill" @click="volver">
-					← {{ t.return }}
-				</button>
+      <!-- CABECERA -->
+      <div class="d-flex justify-content-between align-items-center mb-5">
+        <button class="btn btn-secondary rounded-pill" @click="volver">
+          ← {{ t.return }}
+        </button>
 
-				<h1 class="fw-semibold mb-0">
-          <span v-if="!editando">{{ tarifa.nombre }}</span>
+        <h1 class="fw-bold text-center display-5 mb-0">
+          <span v-if="!editando">{{ tarifa.titulo }}</span>
           <input
             v-else
-            v-model="tarifa.nombre"
-            class="form-control text-center fw-semibold"
-            :class="{ 'is-invalid': errores.nombre }"
-            placeholder="t.tariffName"
+            v-model="tarifa.titulo"
+            class="form-control form-control-lg text-center fw-semibold"
+            :class="{ 'is-invalid': errores.titulo }"
+            :placeholder="tarifa.titulo"
           />
         </h1>
 
-				<div style="width: 100px"></div>
-			</div>
+        <div style="width: 120px"></div>
+      </div>
 
-			<div class="row g-4">
+      <!-- BLOQUES TARIFA -->
+      <div class="row g-4">
 
-				<!-- CONSULTA INDIVIDUAL -->
-				<div class="col-lg-6">
-					<div class="bg-white rounded-3 shadow-sm p-4 h-100">
-						<h4 class="mb-3">{{ t.initialConsultation }}</h4>
+        <!-- CONSULTA INDIVIDUAL -->
+        <div class="col-12 col-md-6">
+          <div class="bg-white rounded-4 shadow p-5 h-100">
+            <h4 class="mb-4 d-flex align-items-center">
+              <i class="bi bi-person-badge text-primary me-2"></i>
+              {{ t.initialConsultation }}
+            </h4>
 
-						<div class="row g-3">
-							<PrecioField label="tdaPrice" v-model="tarifa.precioConsultaTDA" :editando="editando"
-								:error="errores.precioConsultaTDA" :t="t" />
+            <div class="row g-4">
+              <PrecioField
+                label="tdaPrice"
+                v-model="tarifa.precioConsultaTDA"
+                :editando="editando"
+                :error="errores.precioConsultaTDA"
+                :t="t"
+              />
+              <PrecioField
+                label="uamPrice"
+                v-model="tarifa.precioConsultaUAM"
+                :editando="editando"
+                :error="errores.precioConsultaUAM"
+                :t="t"
+              />
+              <PrecioField
+                label="otherPrice"
+                v-model="tarifa.precioConsultaOtros"
+                :editando="editando"
+                :error="errores.precioConsultaOtros"
+                :t="t"
+              />
+            </div>
+          </div>
+        </div>
 
-							<PrecioField label="uamPrice" v-model="tarifa.precioConsultaUAM" :editando="editando"
-								:error="errores.precioConsultaUAM" :t="t" />
+        <!-- BONO 1-5 -->
+        <div class="col-12 col-md-6">
+          <div class="bg-white rounded-4 shadow p-5 h-100">
+            <h4 class="mb-4 d-flex align-items-center">
+              <i class="bi bi-123 text-success me-2"></i>
+              {{ t.sessions1to5 }}
+            </h4>
 
-							<PrecioField label="otherPrice" v-model="tarifa.precioConsultaOtros" :editando="editando"
-								:error="errores.precioConsultaOtros" :t="t" />
-						</div>
-					</div>
-				</div>
+            <div class="row g-4">
+              <PrecioField
+                label="tdaPrice"
+                v-model="tarifa.precioSesiones1_5TDA"
+                :editando="editando"
+                :error="errores.precioSesiones1_5TDA"
+                :t="t"
+              />
+              <PrecioField
+                label="uamPrice"
+                v-model="tarifa.precioSesiones1_5UAM"
+                :editando="editando"
+                :error="errores.precioSesiones1_5UAM"
+                :t="t"
+              />
+              <PrecioField
+                label="otherPrice"
+                v-model="tarifa.precioSesiones1_5Otros"
+                :editando="editando"
+                :error="errores.precioSesiones1_5Otros"
+                :t="t"
+              />
+            </div>
+          </div>
+        </div>
 
-				<!-- BONO 1-5 -->
-				<div class="col-lg-6">
-					<div class="bg-white rounded-3 shadow-sm p-4 h-100">
-						<h4 class="mb-3">{{ t.sessions1to5 }}</h4>
+        <!-- BONO 6+ -->
+        <div class="col-12 col-md-6 mx-auto">
+          <div class="bg-white rounded-4 shadow p-5 h-100">
+            <h4 class="mb-4 d-flex align-items-center">
+              <i class="bi bi-plus-circle text-warning me-2"></i>
+              {{ t.sessions6plus }}
+            </h4>
 
-						<div class="row g-3">
-							<PrecioField label="tdaPrice" v-model="tarifa.precioSesiones1_5TDA" :editando="editando"
-								:error="errores.precioSesiones1_5TDA" :t="t" />
+            <div class="row g-4">
+              <PrecioField
+                label="tdaPrice"
+                v-model="tarifa.precioSesiones6TDA"
+                :editando="editando"
+                :error="errores.precioSesiones6TDA"
+                :t="t"
+              />
+              <PrecioField
+                label="uamPrice"
+                v-model="tarifa.precioSesiones6UAM"
+                :editando="editando"
+                :error="errores.precioSesiones6UAM"
+                :t="t"
+              />
+              <PrecioField
+                label="otherPrice"
+                v-model="tarifa.precioSesiones6Otros"
+                :editando="editando"
+                :error="errores.precioSesiones6Otros"
+                :t="t"
+              />
+            </div>
+          </div>
+        </div>
 
-							<PrecioField label="uamPrice" v-model="tarifa.precioSesiones1_5UAM" :editando="editando"
-								:error="errores.precioSesiones1_5UAM" :t="t" />
+        <!-- POR DEFECTO -->
+        <div class="col-12 text-center mt-4">
+          <div class="bg-white rounded-4 shadow p-4">
+            <span class="fw-medium d-block mb-2">{{ t.defaultTariff }}</span>
 
-							<PrecioField label="otherPrice" v-model="tarifa.precioSesiones1_5Otros" :editando="editando"
-								:error="errores.precioSesiones1_5Otros" :t="t" />
-						</div>
-					</div>
-				</div>
+            <p v-if="!editando" class="fs-5 fw-semibold">
+              {{ tarifa.por_defecto ? t.yes : 'No' }}
+            </p>
 
-				<!-- BONO 6 -->
-				<div class="col-lg-6">
-					<div class="bg-white rounded-3 shadow-sm p-4 h-100">
-						<h4 class="mb-3">{{ t.sessions6plus }}</h4>
+            <div v-else class="form-check d-inline-flex align-items-center justify-content-center">
+              <input
+                class="form-check-input me-2"
+                type="checkbox"
+                v-model="tarifa.por_defecto"
+                id="defaultCheck"
+              />
+              <label class="form-check-label" for="defaultCheck">
+                {{ t.defaultTariff }}
+              </label>
+            </div>
+          </div>
+        </div>
 
-						<div class="row g-3">
-							<PrecioField label="tdaPrice" v-model="tarifa.precioSesiones6TDA" :editando="editando"
-								:error="errores.precioSesiones6TDA" :t="t" />
+      </div>
 
-							<PrecioField label="uamPrice" v-model="tarifa.precioSesiones6UAM" :editando="editando"
-								:error="errores.precioSesiones6UAM" :t="t" />
+      <!-- ACCIONES -->
+      <div class="d-flex justify-content-center gap-4 mt-5">
 
-							<PrecioField label="otherPrice" v-model="tarifa.precioSesiones6Otros" :editando="editando"
-								:error="errores.precioSesiones6Otros" :t="t" />
-						</div>
-					</div>
-				</div>
+        <button
+          v-if="!editando"
+          class="btn btn-primary btn-lg rounded-pill px-5"
+          @click="activarEdicion"
+        >
+          <i class="bi bi-pencil me-2"></i>
+          {{ t.modifyTariff }}
+        </button>
 
-				<!-- POR DEFECTO -->
-				<div class="col-12">
-					<span class="fw-medium">{{ t.defaultTariff }}:</span>
-					<p v-if="!editando">{{ tarifa.por_defecto ? t.yes : 'No' }}</p>
-					<div v-else class="form-check mt-1">
-						<input class="form-check-input" type="checkbox" v-model="tarifa.por_defecto" id="defaultCheck" />
-						<label class="form-check-label" for="defaultCheck">
-							{{ t.defaultTariff }}
-						</label>
-					</div>
-				</div>
+        <template v-else>
+          <button
+            class="btn btn-success btn-lg rounded-pill px-5"
+            @click="guardarCambios"
+          >
+            <i class="bi bi-check-lg me-2"></i>
+            {{ t.saveChanges }}
+          </button>
 
-			</div>
+          <button
+            class="btn btn-secondary btn-lg rounded-pill px-5"
+            @click="cancelarEdicion"
+          >
+            {{ t.cancel }}
+          </button>
+        </template>
 
-			<!-- ACCIONES -->
-			<div class="d-flex justify-content-center gap-4 mt-5">
+        <button
+          v-if="!editando"
+          class="btn btn-danger btn-lg rounded-pill px-5"
+          @click="eliminar"
+        >
+          <i class="bi bi-trash me-2"></i>
+          {{ t.deleteTariff }}
+        </button>
 
-				<button v-if="!editando" class="btn btn-primary btn-lg rounded-pill" @click="activarEdicion">
-					<i class="bi bi-pencil me-2"></i>
-					{{ t.modifyTariff }}
-				</button>
+      </div>
 
-				<template v-else>
-					<button class="btn btn-success btn-lg rounded-pill" @click="guardarCambios">
-						<i class="bi bi-check-lg me-2"></i>
-						{{ t.saveChanges }}
-					</button>
-
-					<button class="btn btn-secondary btn-lg rounded-pill" @click="cancelarEdicion">
-						{{ t.cancel }}
-					</button>
-				</template>
-
-				<button v-if="!editando" class="btn btn-danger btn-lg rounded-pill" @click="eliminar">
-					<i class="bi bi-trash me-2"></i>
-					{{ t.deleteTariff }}
-				</button>
-
-			</div>
-		</main>
-	</div>
+    </main>
+  </div>
 </template>
 
 <script setup lang="ts">

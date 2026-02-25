@@ -151,9 +151,14 @@ class MonitorSerializer(serializers.ModelSerializer):
 
 
 class MonitorSimpleSerializer(serializers.ModelSerializer):
+    carga = serializers.SerializerMethodField()
+
     class Meta:
         model = Monitor
-        fields = ("id", 'DNI', "nombre")
+        fields = ("id", 'DNI', "nombre", "carga")
+        
+    def get_carga(self, obj):
+        return sum(act.calcularHorasSemanales() for act in obj.actividades.all())
 
 
 class AdministradorSimpleSerializer(serializers.ModelSerializer):
@@ -206,6 +211,22 @@ class CompraAbonoSerializer(serializers.ModelSerializer):
 
 
 # --------------------
+# Agenda
+# --------------------
+
+class AgendaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Agenda
+        fields = '__all__'
+
+
+class MapaReservasSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MapaReservas
+        fields = '__all__'
+
+
+# --------------------
 # Horarios
 # --------------------
 
@@ -232,9 +253,11 @@ class PabellonSerializer(serializers.ModelSerializer):
 
 
 class InstalacionSimpleSerializer(serializers.ModelSerializer):
+    agenda = AgendaSerializer(many=True, read_only=True)
+
     class Meta:
         model = Instalacion
-        fields = ("id", "nombre")
+        fields = ("id", "nombre", "agenda")
 
 
 class InstalacionSerializer(serializers.ModelSerializer):
@@ -242,6 +265,7 @@ class InstalacionSerializer(serializers.ModelSerializer):
     pabellon = PabellonSimpleSerializer(read_only=True)
     horaApertura = serializers.SerializerMethodField()
     horaCierre = serializers.SerializerMethodField()
+    agenda = AgendaSerializer(many=True, read_only=True)
     imagenURL = serializers.SerializerMethodField()
 
     class Meta:
@@ -258,6 +282,7 @@ class InstalacionSerializer(serializers.ModelSerializer):
             "pabellon_id",
             "horaApertura",
             "horaCierre",
+            "agenda"
         )
 
     def get_horaApertura(self, obj):
@@ -410,22 +435,6 @@ class AsistenciaSerializer(serializers.ModelSerializer):
         if usuarioFinal:
             return usuarioFinal.nombre
         return None 
-
-# --------------------
-# Agenda
-# --------------------
-
-class AgendaSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Agenda
-        fields = '__all__'
-
-
-class MapaReservasSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = MapaReservas
-        fields = '__all__'
-
 
 # --------------------
 # Bonos

@@ -262,10 +262,12 @@ class InstalacionViewSet(viewsets.ModelViewSet):
 
 
 class InstalacionSimpleViewSet(viewsets.ModelViewSet):
-    queryset = Instalacion.objects.all()
     serializer_class = InstalacionSimpleSerializer
     permission_classes = [AllowAny]
     authentication_classes = []
+
+    def get_queryset(self):
+        return Instalacion.objects.prefetch_related("agenda")
 
 
 class PabellonViewSet(viewsets.ModelViewSet):
@@ -751,16 +753,27 @@ class NuevaSesionView(APIView):
     def post(self, request, actividad_id):
         actividad = get_object_or_404(Actividad, id=actividad_id)
 
-        dia = request.data.get('dia')
-        horaInicio = request.data.get('horaInicio')
-        horaFin = request.data.get('horaFin')
+        sesiones = request.data
 
-        respuesta = actividad.nuevaSesion(dia, horaInicio, horaFin)
-        
-        if respuesta:
-            return Response({"respuesta": "Exito al crear la sesion"}, status=status.HTTP_200_OK)
+        if isinstance(sesiones, dict):
+            sesiones = [sesiones]
 
-        return Response({"respuesta": "No se ha podido crear la sesion"}, status=status.HTTP_400_BAD_REQUEST)
+        creadas = 0
+
+        for sesion in sesiones:
+            dia = sesion.get('dia')
+            hora_inicio = sesion.get('horaInicio')
+            hora_fin = sesion.get('horaFin')
+
+            respuesta = actividad.nuevaSesion(dia, hora_inicio, hora_fin)
+
+            if respuesta:
+                creadas += 1
+
+        if creadas > 0:
+            return Response({"respuesta": f"{creadas} sesión(es) creada(s) correctamente"}, status=status.HTTP_200_OK)
+
+        return Response({"respuesta": "No se ha podido crear ninguna sesión"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Marcar o desmarcar actividades o instalaciones como favoritos
@@ -1016,11 +1029,21 @@ class AsignarAgendasView(APIView):
         instalacion = get_object_or_404(Instalacion, id=instalacion_id)
 
         agenda = request.data.get('agenda', [])
-        fechas_especiales = request.data.get('fechasEspeciales', [])
+        fechasEspeciales = request.data.get('fechasEspeciales', [])
 
-        for dia in agenda:
-            print(dia)
-            instalacion.nuevoHorario(dia)
+        for fecha in agenda:
+            res = instalacion.nuevoHorario(fecha["dia"], fecha.get("apertura"), fecha.get("cierre"), fecha.get("abierto", True))
+            
+            if not res:
+                return Response({"respuesta": "Error al actualizar la agenda de los dias de la semana"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        for fecha in fechasEspeciales:
+            instalacion.nuevoHorarioEspecial(fecha["fecha"], fecha.get("apertura"), fecha.get("cierre"), fecha.get("abierto", True))
+            
+            if not res:
+                return Response({"respuesta": "Error al actualizar la agenda de los dias de la semana"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+        return Response({"respuesta": "Exito al asignar la agenda a la instalacion"}, status=status.HTTP_200_OK)
 
 
 class AsignarDeporteView(APIView):

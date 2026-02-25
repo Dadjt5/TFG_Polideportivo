@@ -57,8 +57,27 @@ class Instalacion(models.Model):
         
         return precio
     
-    def nuevoHorario(self, dia):
-        return
+    def nuevoHorario(self, dia, horaApertura, horaCierre, abierto):
+        if not abierto:
+            Agenda.objects.create(instalacion=self, dia=dia, abierto=False)
+            return True
+        
+        if not horaApertura or not horaCierre or horaCierre <= horaApertura:
+            return False
+
+        Agenda.objects.create(instalacion=self, dia=dia, horaApertura=horaApertura, horaCierre=horaCierre)
+        return True
+
+    def nuevoHorarioEspecial(self, fecha, horaApertura, horaCierre, abierto):
+        if not abierto:
+            Agenda.objects.create(instalacion=self, fecha=fecha, abierto=False)
+            return True
+
+        if not horaApertura or not horaCierre or horaCierre <= horaApertura:
+            return False
+
+        Agenda.objects.create(instalacion=self, fecha=fecha, horaApertura=horaApertura, horaCierre=horaCierre)
+        return True
 
     def get_horario(self, fecha):
         agenda = Agenda.objects.filter(instalacion=self, fecha=fecha).first()

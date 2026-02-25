@@ -3,7 +3,7 @@
     <div class="container-fluid px-4">
 
       <span class="navbar-brand fw-bold fs-4">
-        <router-link to="/" class="nav-link px-3 text-white">
+        <router-link to="/" class="nav-link px-3 text-white fs-2">
           Polideportivo XX
         </router-link>
       </span>

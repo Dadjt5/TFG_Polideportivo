@@ -98,11 +98,35 @@
           </div>
           <transition name="fade">
             <div v-if="openAgenda" class="px-4 pb-4">
-              <div v-for="(d, index) in agenda" :key="index" class="d-flex align-items-center gap-2 mb-2">
-                <span class="w-25">{{ d.dia }}</span>
-                <input type="time" v-model="d.apertura" class="form-control form-control-sm w-auto" />
-                <span>-</span>
-                <input type="time" v-model="d.cierre" class="form-control form-control-sm w-auto" />
+              <div v-for="(d, index) in agenda" :key="index" class="d-flex align-items-center gap-3 mb-3">
+
+                <!-- Día -->
+                <span class="w-25 fw-semibold">
+                  {{ d.dia }}
+                </span>
+
+                <!-- Si NO está cerrado -->
+                <template v-if="d.abierto">
+                  <input type="time" v-model="d.apertura" class="form-control form-control-sm w-auto" />
+
+                  <span>-</span>
+
+                  <input type="time" v-model="d.cierre" class="form-control form-control-sm w-auto" />
+                </template>
+
+                <!-- Texto cuando está cerrado -->
+                <span v-else class="text-danger fw-semibold">
+                  {{ t.close }}
+                </span>
+
+                <!-- Checkbox -->
+                <div class="form-check ms-auto">
+                  <input class="form-check-input" type="checkbox" v-model="d.abierto" :id="'abierto-' + index">
+                  <label class="form-check-label small" :for="'abierto-' + index">
+                    {{ t.close }}
+                  </label>
+                </div>
+
               </div>
             </div>
           </transition>
@@ -210,7 +234,8 @@ const diasSemana = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sába
 const agenda = ref(diasSemana.map(d => ({
   dia: d,
   apertura: "08:00",
-  cierre: "22:00"
+  cierre: "22:00",
+  abierto: true
 })));
 
 const fechasEspeciales = ref<{ fecha: string; abierto: boolean; apertura: string; cierre: string }[]>([]);

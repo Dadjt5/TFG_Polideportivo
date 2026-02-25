@@ -1,6 +1,6 @@
 <template>
   <div class="min-vh-100 bg-light">
-    <main class="container-fluid mt-2 px-5 py-4">
+    <main class="container py-5" style="max-width: 900px;">
 
       <!-- CABECERA -->
       <div class="d-flex justify-content-between align-items-center mb-4">
@@ -8,14 +8,14 @@
           ← {{ t.return }}
         </button>
 
-        <h1 class="fw-semibold mb-0">
-          <span v-if="!editando">{{ tarifa.nombre }}</span>
+        <h1 class="fw-bold text-center mb-4 display-5">
+          <span v-if="!editando">{{ tarifa.titulo }}</span>
           <input
             v-else
-            v-model="tarifa.nombre"
+            v-model="tarifa.titulo"
             class="form-control text-center fw-semibold"
-            :class="{ 'is-invalid': errores.nombre }"
-            placeholder="t.tariffName"
+            :class="{ 'is-invalid': errores.titulo }"
+            :placeholder="tarifa.titulo"
           />
         </h1>
 
@@ -24,8 +24,8 @@
 
       <div class="row g-4">
 
-        <div class="col-lg-6">
-          <div class="bg-white rounded-3 shadow-sm p-4 h-100">
+        <div class="col-12">
+          <div class="bg-white rounded-4 shadow p-5 h-100">
             <h4 class="mb-3 d-flex align-items-center">
               <i class="bi bi-currency-euro text-primary me-2"></i>
               {{ t.tariffDetail }}
@@ -36,13 +36,13 @@
               <!-- PRECIO UAM -->
               <div class="col-12 col-sm-6">
                 <span class="fw-medium">{{ t.priceUAM }}:</span>
-                <p v-if="!editando">{{ tarifa.precioUAM }} €</p>
+                <p v-if="!editando" class="fs-5 fw-semibold">{{ tarifa.precioUAM }} €</p>
                 <input
                   v-else
                   type="number"
                   min="0"
                   step="0.01"
-                  class="form-control"
+                  class="form-control form-control-lg"
                   v-model.number="tarifa.precioUAM"
                   :class="{ 'is-invalid': errores.precioUAM }"
                 />
@@ -51,13 +51,13 @@
               <!-- PRECIO OTROS -->
               <div class="col-12 col-sm-6">
                 <span class="fw-medium">{{ t.priceOthers }}:</span>
-                <p v-if="!editando">{{ tarifa.precioOtros }} €</p>
+                <p v-if="!editando" class="fs-5 fw-semibold">{{ tarifa.precioOtros }} €</p>
                 <input
                   v-else
                   type="number"
                   min="0"
                   step="0.01"
-                  class="form-control"
+                  class="form-control form-control-lg"
                   v-model.number="tarifa.precioOtros"
                   :class="{ 'is-invalid': errores.precioOtros }"
                 />
@@ -66,13 +66,13 @@
               <!-- PRECIO REPOSICIÓN -->
               <div class="col-12 col-sm-6">
                 <span class="fw-medium">{{ t.repositionPrice }}:</span>
-                <p v-if="!editando">{{ tarifa.precioReposicion }} €</p>
+                <p v-if="!editando" class="fs-5 fw-semibold">{{ tarifa.precioReposicion }} €</p>
                 <input
                   v-else
                   type="number"
                   min="0"
                   step="0.01"
-                  class="form-control"
+                  class="form-control form-control-lg"
                   v-model.number="tarifa.precioReposicion"
                   :class="{ 'is-invalid': errores.precioReposicion }"
                 />
@@ -81,7 +81,7 @@
 							<!-- POR DEFECTO -->
               <div class="col-12">
                 <span class="fw-medium">{{ t.defaultTariff }}:</span>
-                <p v-if="!editando">{{ tarifa.por_defecto ? t.yes : 'No' }}</p>
+                <p v-if="!editando" class="fs-5 fw-semibold">{{ tarifa.por_defecto ? t.yes : 'No' }}</p>
                 <div v-else class="form-check mt-1">
                   <input
                     class="form-check-input"
@@ -169,7 +169,7 @@ const editando = ref(false)
 
 const tarifa = ref({
   id: 0,
-  nombre: '',
+  titulo: '',
   precioUAM: 0,
   precioOtros: 0,
   precioReposicion: 0,
@@ -177,7 +177,7 @@ const tarifa = ref({
 })
 
 const errores = ref({
-  nombre: false,
+  titulo: false,
   precioUAM: false,
   precioOtros: false,
   precioReposicion: false
