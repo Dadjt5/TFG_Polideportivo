@@ -4,7 +4,7 @@
 
       <!-- CABECERA -->
       <div class="d-flex justify-content-between align-items-center mb-4">
-        <button class="btn btn-secondary rounded-pill" @click="volver">
+        <button class="btn btn-outline-secondary rounded-pill" @click="volver">
           ← {{ t.return }}
         </button>
 
@@ -21,180 +21,248 @@
         <div style="width: 120px"></div>
       </div>
 
-      <div class="row g-4">
+      <!-- TARJETAS RESUMEN -->
+      <div class="row g-3 mb-4">
 
-        <!-- COLUMNA IZQUIERDA: INFO GENERAL + IMÁGENES -->
-        <div class="col-lg-6 d-flex flex-column gap-4">
+        <div class="col-md-3">
+          <div class="card shadow-sm rounded-4 border-0 p-3 text-center">
+            <div class="fs-4 fw-bold">{{ instalacion.aforoMaximo }}</div>
+            <div class="text-muted small">{{ t.capacity }}</div>
+          </div>
+        </div>
 
-          <!-- INFORMACIÓN GENERAL -->
-          <div class="bg-white rounded-4 shadow-sm p-4">
-            <h4 class="mb-4 d-flex align-items-center">
-              <i class="bi bi-info-circle-fill text-primary me-2"></i>
-              {{ t.facilityDetails }}
-            </h4>
+        <div class="col-md-3">
+          <div class="card shadow-sm rounded-4 border-0 p-3 text-center">
+            <div class="fs-4 fw-bold">
+              {{ instalacion.luz ? t.yes : 'No' }}
+            </div>
+            <div class="text-muted small">{{ t.light }}</div>
+          </div>
+        </div>
 
-            <div class="row g-3">
-              <div class="col-12 col-sm-6">
-                <span class="fw-medium">{{ t.capacity }}:</span>
-                <p v-if="!editando">{{ instalacion.aforoMaximo }}</p>
+        <div class="col-md-3">
+          <div class="card shadow-sm rounded-4 border-0 p-3 text-center">
+            <div class="fs-4 fw-bold">
+              {{ instalacion.porcentajeTDA }}%
+            </div>
+            <div class="text-muted small">TDA</div>
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="card shadow-sm rounded-4 border-0 p-3 text-center">
+            <div class="fw-semibold">
+              {{ instalacion.tipoInstalacion }}
+            </div>
+            <div class="text-muted small">{{ t.facilityType }}</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- TABS -->
+      <ul class="nav nav-pills mb-4">
+        <li class="nav-item">
+          <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#info">
+            {{ t.facilityDetails }}
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link" data-bs-toggle="pill" data-bs-target="#horario">
+            {{ t.timetable }}
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link" data-bs-toggle="pill" data-bs-target="#especiales">
+            {{ t.specialDates }}
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link" data-bs-toggle="pill" data-bs-target="#imagenes">
+            {{ t.images }}
+          </button>
+        </li>
+      </ul>
+
+      <div class="tab-content">
+
+        <!-- INFORMACIÓN -->
+        <div class="tab-pane fade show active" id="info">
+          <div class="card border-0 shadow-sm rounded-4 p-4">
+            <div class="row g-4">
+
+              <div class="col-md-6">
+                <label class="fw-medium">{{ t.capacity }}</label>
                 <input
-                  v-else
+                  v-if="editando"
                   type="number"
                   min="1"
                   class="form-control"
                   v-model.number="instalacion.aforoMaximo"
-                  :class="{ 'is-invalid': errores.aforoMaximo }"
                 />
+                <p v-else>{{ instalacion.aforoMaximo }}</p>
               </div>
 
-              <div class="col-12 col-sm-6">
-                <span class="fw-medium">{{ t.light }}:</span>
-                <p v-if="!editando">{{ instalacion.luz ? t.yes : 'No' }}</p>
-                <div v-else class="form-check mt-1">
-                  <input
-                    class="form-check-input"
-                    type="checkbox"
-                    v-model="instalacion.luz"
-                    id="luzCheck"
-                  />
-                  <label class="form-check-label" for="luzCheck">{{ t.light }}</label>
+              <div class="col-md-6">
+                <label class="fw-medium">{{ t.light }}</label>
+                <div v-if="editando" class="form-check">
+                  <input class="form-check-input" type="checkbox" v-model="instalacion.luz" />
                 </div>
+                <p v-else>{{ instalacion.luz ? t.yes : 'No' }}</p>
               </div>
 
-              <div class="col-12 col-sm-6">
-                <span class="fw-medium">{{ t.tdaPercent }}:</span>
-                <p v-if="!editando">{{ instalacion.porcentajeTDA }} %</p>
+              <div class="col-md-6">
+                <label class="fw-medium">TDA (%)</label>
                 <input
-                  v-else
+                  v-if="editando"
                   type="number"
                   min="0"
                   max="100"
                   class="form-control"
                   v-model.number="instalacion.porcentajeTDA"
-                  :class="{ 'is-invalid': errores.porcentajeTDA }"
                 />
+                <p v-else>{{ instalacion.porcentajeTDA }}%</p>
               </div>
 
-              <div class="col-12 col-sm-6">
-                <span class="fw-medium">{{ t.facilityType }}:</span>
-                <p v-if="!editando">{{ instalacion.tipoInstalacion }}</p>
+              <div class="col-md-6">
+                <label class="fw-medium">{{ t.facilityType }}</label>
                 <select
-                  v-else
+                  v-if="editando"
                   class="form-select"
                   v-model="instalacion.tipoInstalacion"
                 >
-                  <option value="">---</option>
-                  <option value="Pista">Pista</option>
-                  <option value="Sala">Sala</option>
-                  <option value="Piscina">Piscina</option>
+                  <option value="" disabled>--</option>
+                  <option
+                    v-for="t in tiposStore.tiposInstalacion"
+                    :key="t[0]"
+                    :value="t[0]"
+                  >
+                    {{ t[1] }}
+                  </option>
                 </select>
+                <p v-else>{{ instalacion.tipoInstalacion }}</p>
               </div>
 
-              <div class="col-12 col-sm-6" v-if="instalacion.pabellon">
-                <span class="fw-medium">{{ t.pavilion }}:</span>
-                <p>{{ instalacion.pabellon.nombre }}</p>
-              </div>
-
-              <div class="col-12 col-sm-6" v-if="instalacion.pabellon">
-                <span class="fw-medium">{{ t.address }}:</span>
-                <p>{{ instalacion.pabellon.direccion }}</p>
-              </div>
             </div>
           </div>
-
-          <!-- IMÁGENES -->
-          <div class="bg-white rounded-4 shadow-sm p-4" v-if="instalacion.imagenURL.length">
-            <h4 class="mb-3 d-flex align-items-center gap-2">
-              <i class="bi bi-images text-primary"></i>
-              {{ t.images }}
-            </h4>
-
-            <div class="row g-3">
-              <div class="col-6" v-for="(img, i) in instalacion.imagenURL" :key="i">
-                <img :src="img" class="img-fluid rounded mb-2 shadow-sm" />
-                <input
-                  v-if="editando"
-                  v-model="instalacion.imagenURL[i]"
-                  class="form-control"
-                  placeholder="URL imagen"
-                />
-              </div>
-            </div>
-          </div>
-
         </div>
 
-        <!-- COLUMNA DERECHA: HORARIO -->
-        <div class="col-lg-6">
-
-          <div class="bg-white rounded-4 shadow-sm p-4 h-100">
-
-            <h5 class="fw-semibold mb-3 d-flex align-items-center">
-              <i class="bi bi-clock text-primary me-2"></i>
-              Horario semanal
-            </h5>
-
+        <!-- HORARIO SEMANAL -->
+        <div class="tab-pane fade" id="horario">
+          <div class="row g-3">
             <div
-              v-for="(dia, index) in instalacion.agenda"
+              class="col-md-6 col-lg-4"
+              v-for="dia in instalacion.agenda"
               :key="dia.dia"
-              class="border rounded-4 p-3 mb-3 bg-light"
             >
-              <div class="d-flex justify-content-between align-items-center mb-2">
-                <strong>{{ dia.dia }}</strong>
+              <div
+                class="card border-0 shadow-sm rounded-4 h-100"
+                :class="dia.abierto ? 'border-success' : 'border-danger'"
+              >
+                <div class="card-body">
 
-                <div v-if="editando" class="form-check form-switch">
-                  <input class="form-check-input" type="checkbox" v-model="dia.abierto" />
-                  <label class="form-check-label">
-                    {{ dia.abierto ? 'Abierto' : 'Cerrado' }}
-                  </label>
-                </div>
+                  <div class="d-flex justify-content-between mb-2">
+                    <strong>{{ dia.dia }}</strong>
 
-                <span
-                  v-else
-                  class="fw-semibold"
-                  :class="dia.abierto ? 'text-success' : 'text-danger'"
-                >
-                  {{ dia.abierto ? 'Abierto' : 'Cerrado' }}
-                </span>
-              </div>
+                    <span
+                      class="badge"
+                      :class="dia.abierto ? 'bg-success' : 'bg-danger'"
+                    >
+                      {{ dia.abierto ? 'Abierto' : 'Cerrado' }}
+                    </span>
+                  </div>
 
-              <div v-if="dia.abierto" class="row g-2">
-                <div class="col-6">
-                  <label class="small text-muted">Apertura</label>
-                  <p v-if="!editando" class="mb-0">{{ dia.horaApertura?.slice(0,5) }}</p>
-                  <input v-else type="time" class="form-control" v-model="dia.horaApertura" />
-                </div>
-                <div class="col-6">
-                  <label class="small text-muted">Cierre</label>
-                  <p v-if="!editando" class="mb-0">{{ dia.horaCierre?.slice(0,5) }}</p>
-                  <input v-else type="time" class="form-control" v-model="dia.horaCierre" />
+                  <div v-if="dia.abierto" class="small text-muted">
+                    {{ dia.horaApertura?.slice(0,5) }} -
+                    {{ dia.horaCierre?.slice(0,5) }}
+                  </div>
+
                 </div>
               </div>
             </div>
           </div>
         </div>
+
+        <!-- FECHAS ESPECIALES -->
+        <div class="tab-pane fade" id="especiales">
+          <div v-if="instalacion.fechasEspeciales?.length" class="row g-3">
+            <div
+              class="col-md-4"
+              v-for="fecha in instalacion.fechasEspeciales"
+              :key="fecha.fecha"
+            >
+              <div
+                class="card border-0 shadow-sm rounded-4 p-3"
+                :class="fecha.abierto ? 'bg-success-subtle' : 'bg-danger-subtle'"
+              >
+                <div class="fw-semibold">
+                  {{ fecha.fecha }}
+                </div>
+
+                <div v-if="fecha.abierto" class="small">
+                  {{ fecha.apertura }} - {{ fecha.cierre }}
+                </div>
+
+                <div v-else class="small text-danger">
+                  {{ t.close }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div v-else class="text-muted">
+            No hay fechas especiales configuradas.
+          </div>
+        </div>
+
+        <!-- IMÁGENES -->
+        <div class="tab-pane fade" id="imagenes">
+          <div class="row g-3">
+            <div
+              class="col-md-4"
+              v-for="(img, i) in instalacion.imagenURL"
+              :key="i"
+            >
+              <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <img :src="img" class="img-fluid" />
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
 
       <!-- ACCIONES -->
       <div class="d-flex justify-content-center gap-4 mt-5">
-        <button v-if="!editando" class="btn btn-primary btn-lg rounded-pill px-4" @click="activarEdicion">
-          <i class="bi bi-pencil me-2"></i>
+        <button
+          v-if="!editando"
+          class="btn btn-primary btn-lg rounded-pill px-4"
+          @click="activarEdicion"
+        >
           {{ t.modifyFacility }}
         </button>
 
         <template v-else>
-          <button class="btn btn-success btn-lg rounded-pill px-4" @click="guardarCambios">
-            <i class="bi bi-check-lg me-2"></i>
+          <button
+            class="btn btn-success btn-lg rounded-pill px-4"
+            @click="guardarCambios"
+          >
             {{ t.saveChanges }}
           </button>
 
-          <button class="btn btn-secondary btn-lg rounded-pill px-4" @click="cancelarEdicion">
+          <button
+            class="btn btn-secondary btn-lg rounded-pill px-4"
+            @click="cancelarEdicion"
+          >
             {{ t.cancel }}
           </button>
         </template>
 
-        <button v-if="!editando" class="btn btn-danger btn-lg rounded-pill px-4" @click="eliminar">
-          <i class="bi bi-trash me-2"></i>
+        <button
+          v-if="!editando"
+          class="btn btn-outline-danger btn-lg rounded-pill px-4"
+          @click="eliminar"
+        >
           {{ t.deleteFacility }}
         </button>
       </div>
@@ -202,7 +270,6 @@
     </main>
   </div>
 </template>
-yyy
 
 <script setup lang="ts">
 import { inject, ref, onMounted, type Ref } from 'vue';
@@ -210,6 +277,7 @@ import { useRouter } from "vue-router";
 
 /* Importamos la comunicacion para recuperar la informacion de instalaciones del backend */
 import { getInstalacionDetalle, modificarInstalacion, eliminarInstalacion } from "@/services/detalleService";
+import { useTiposStore } from '@/stores/tipos';
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
 import type { Language } from "@/useI18N";
@@ -220,6 +288,7 @@ const props = defineProps<{ id: string }>();
 const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);
 
+const tiposStore = useTiposStore();
 const router = useRouter();
 
 const editando = ref(false)
@@ -237,7 +306,7 @@ const instalacion = ref({
 });
 
 const errores = ref({
-	nombre: false,
+  nombre: false,
   aforoMaximo: false,
   porcentajeTDA: false,
   horaApertura: false,
@@ -250,13 +319,13 @@ const instalacionOriginal = ref<any>(null);
 function validarFormulario() {
   let valido = true
 
-	errores.value.nombre = instalacion.value.nombre === ''
-	errores.value.aforoMaximo = instalacion.value.aforoMaximo <= 0
-	errores.value.porcentajeTDA = instalacion.value.porcentajeTDA <= 0
-	errores.value.tipoInstalacion = instalacion.value.tipoInstalacion === ''
+  errores.value.nombre = instalacion.value.nombre === ''
+  errores.value.aforoMaximo = instalacion.value.aforoMaximo <= 0
+  errores.value.porcentajeTDA = instalacion.value.porcentajeTDA <= 0
+  errores.value.tipoInstalacion = instalacion.value.tipoInstalacion === ''
 
   for (const key in errores.value) {
-    if(errores.value[key]) {
+    if (errores.value[key]) {
       valido = false
     }
   }
@@ -266,7 +335,7 @@ function validarFormulario() {
 
 function activarEdicion() {
   instalacionOriginal.value = JSON.parse(JSON.stringify(instalacion.value))
-	Object.keys(errores.value).forEach(k => errores.value[k] = false)
+  Object.keys(errores.value).forEach(k => errores.value[k] = false)
   editando.value = true
 }
 
@@ -279,24 +348,24 @@ function cancelarEdicion() {
 function camposModificados() {
   const data: any = {}
 
-	if(instalacionOriginal.value.nombre != instalacion.value.nombre) {
-      data["nombre"] = instalacion.value.nombre
+  if (instalacionOriginal.value.nombre != instalacion.value.nombre) {
+    data["nombre"] = instalacion.value.nombre
   }
 
-	if(instalacionOriginal.value.porcentajeTDA != instalacion.value.porcentajeTDA) {
-      data["porcentajeTDA"] = instalacion.value.porcentajeTDA
+  if (instalacionOriginal.value.porcentajeTDA != instalacion.value.porcentajeTDA) {
+    data["porcentajeTDA"] = instalacion.value.porcentajeTDA
   }
 
-	if(instalacionOriginal.value.aforoMaximo != instalacion.value.aforoMaximo) {
-      data["aforoMaximo"] = instalacion.value.aforoMaximo
+  if (instalacionOriginal.value.aforoMaximo != instalacion.value.aforoMaximo) {
+    data["aforoMaximo"] = instalacion.value.aforoMaximo
   }
 
-	if(instalacionOriginal.value.luz != instalacion.value.luz) {
-      data["luz"] = instalacion.value.luz
+  if (instalacionOriginal.value.luz != instalacion.value.luz) {
+    data["luz"] = instalacion.value.luz
   }
 
-	if(instalacionOriginal.value.tipoInstalacion != instalacion.value.tipoInstalacion) {
-      data["tipoInstalacion"] = instalacion.value.tipoInstalacion
+  if (instalacionOriginal.value.tipoInstalacion != instalacion.value.tipoInstalacion) {
+    data["tipoInstalacion"] = instalacion.value.tipoInstalacion
   }
 
   return data;
@@ -305,11 +374,13 @@ function camposModificados() {
 
 const guardarCambios = async () => {
   try {
-		if (!validarFormulario()) return
+    if (!validarFormulario()) return
 
-		const data = camposModificados();
-    if(Object.keys(data).length > 0) {
+    const data = camposModificados();
+    if (Object.keys(data).length > 0) {
       await modificarInstalacion(instalacion.value.id, data);
+      await actualizarAgenda(instalacion.value.id, agenda.value, fechasEspeciales.value)
+      editando.value = false
     }
   } catch (e) {
     console.error("Error al modificar la instalacion", e);
@@ -319,6 +390,7 @@ const guardarCambios = async () => {
 const eliminar = async () => {
   try {
     await eliminarInstalacion(instalacion.value.id)
+    router.push({ name: 'gestion-espacios' });
   } catch (e) {
     console.error("Error al eliminar la instalacion", e);
   }
@@ -334,7 +406,7 @@ onMounted(async () => {
   try {
     instalacion.value = await getInstalacionDetalle(id);
     instalacionOriginal.value = JSON.parse(JSON.stringify(instalacion.value))
-  } catch(e) {
+  } catch (e) {
     console.log("Error al obtener la informacion de la instalacion", e);
   }
 });

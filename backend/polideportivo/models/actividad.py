@@ -25,8 +25,8 @@ class Actividad(models.Model):
     material = models.CharField(max_length=1024, blank=True)
     exterior = models.BooleanField(default=False)
 
-    deportes = models.ForeignKey('Deporte', on_delete=models.CASCADE, related_name="actividades")
-    instalacion = models.ForeignKey('Instalacion', on_delete=models.RESTRICT)
+    deportes = models.ForeignKey('Deporte', on_delete=models.CASCADE, related_name="actividades", null=True, blank=True)
+    instalacion = models.ForeignKey('Instalacion', on_delete=models.RESTRICT, related_name="actividad")
     monitor = models.ForeignKey('Monitor', on_delete=models.RESTRICT, related_name="actividades")
     tarifa = models.ForeignKey('TarifaActividad', on_delete=models.PROTECT, blank=True, null=True)
 
@@ -38,21 +38,6 @@ class Actividad(models.Model):
 
     def __str__(self):
         return f'{self.nombre}, en la instalacion {self.instalacion}'
-
-    def save(self, *args, **kwargs):
-        if not self.tarifa:
-            if self.tipoActividad == TipoActividad.OTROS:
-                tarifa = ActividadComun.objects.filter(por_defecto=True).first()
-            elif self.tipoActividad == TipoActividad.FISIOTERAPIA:
-                tarifa = Fisioterapia.objects.filter(por_defecto=True).first()
-            else:
-                tarifa = GrupoReducido.objects.filter(por_defecto=True).first()
-
-            if not tarifa:
-                raise ValidationError("No existe una tarifa por defecto para este tipo de actividad")
-
-            self.tarifa = tarifa
-        super().save(*args, **kwargs)
 
     def obtener_precios(self):
         if self.tipoActividad == TipoActividad.OTROS:
@@ -176,21 +161,16 @@ class Actividad(models.Model):
         return horario
     
     def nuevaSesion(self, dia, horaInicio, horaFin):
-        try:
-            with transaction.atomic():
-                if isinstance(horaInicio, str):
-                    h, m = map(int, horaInicio.split(":"))
-                    horaInicio = time(h, m)
-                if isinstance(horaFin, str):
-                    h, m = map(int, horaFin.split(":"))
-                    horaFin = time(h, m)
+        if isinstance(horaInicio, str):
+            h, m = map(int, horaInicio.split(":"))
+            horaInicio = time(h, m)
+        if isinstance(horaFin, str):
+            h, m = map(int, horaFin.split(":"))
+            horaFin = time(h, m)
 
-                sesion = Sesion.objects.create(dia=dia, horaInicio=horaInicio, horaFin=horaFin, actividad=self, numeroHoras=0.0)
-
-            return True
-        except Exception:
-            return False
-
+        sesion = Sesion.objects.create(dia=dia, horaInicio=horaInicio, horaFin=horaFin, actividad=self, numeroHoras=0.0)
+        return True
+    
     @classmethod
     def contar(cls):
         return cls.objects.count()

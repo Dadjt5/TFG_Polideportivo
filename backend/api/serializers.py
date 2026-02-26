@@ -214,17 +214,18 @@ class CompraAbonoSerializer(serializers.ModelSerializer):
 # Agenda
 # --------------------
 
-class AgendaSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Agenda
-        fields = '__all__'
-
-
 class MapaReservasSerializer(serializers.ModelSerializer):
     class Meta:
         model = MapaReservas
         fields = '__all__'
 
+
+class AgendaSerializer(serializers.ModelSerializer):
+    mapa_reservas = MapaReservasSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Agenda
+        fields = ("id", "fecha", "dia", "horaApertura", "horaCierre", "abierto", "mapa_reservas")
 
 # --------------------
 # Horarios
@@ -390,6 +391,7 @@ class ActividadSerializer(serializers.ModelSerializer):
             "estado",
             "horasSemanales",
             "dias",
+            "tarifa",
             "instalacion",
             "instalacion_id",
             "monitor",

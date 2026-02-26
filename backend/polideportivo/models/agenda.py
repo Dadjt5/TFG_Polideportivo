@@ -17,7 +17,7 @@ class Agenda(models.Model):
     horaCierre = models.TimeField(default=time(20, 0))
     abierto = models.BooleanField(default=True)
 
-    instalacion = models.ForeignKey('Instalacion', on_delete=models.RESTRICT, related_name="agenda")
+    instalacion = models.ForeignKey('Instalacion', on_delete=models.CASCADE, related_name="agenda")
 
 
     class Meta:
@@ -28,12 +28,12 @@ class Agenda(models.Model):
             return f'Agenda para {self.dia} de {self.instalacion.nombre}'
         return f'Agenda para {self.fecha} de {self.instalacion.nombre}'
 
-    def generar_agenda(self, minutos=60):
+    def generarMapa(self, minutos=60):
         if not self.abierto:
             return
 
-        inicio = datetime.combine(self.fecha, self.horaApertura)
-        fin = datetime.combine(self.fecha, self.horaCierre)
+        inicio = datetime.combine(datetime.today(), self.horaApertura)
+        fin = datetime.combine(datetime.today(), self.horaCierre)
 
         while inicio < fin:
             siguiente = inicio + timedelta(minutes=minutos)

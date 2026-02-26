@@ -10,6 +10,7 @@ export const useTiposStore = defineStore("tipos", {
     terrenos: JSON.parse(localStorage.getItem("terrenos") || "[]") as string[],
     estados: JSON.parse(localStorage.getItem("estados") || "[]") as string[],
     dias: JSON.parse(localStorage.getItem("dias") || "[]") as string[],
+    periodos: JSON.parse(localStorage.getItem("periodos") || "[]") as string[],
 		modificado: false
   }),
 
@@ -24,6 +25,7 @@ export const useTiposStore = defineStore("tipos", {
 				this.terrenos = data.terrenos;
 				this.estados = data.estados;
         this.dias = data.dias;
+        this.periodos = data.periodos;
 
 				localStorage.setItem("tiposActividad", JSON.stringify(this.tiposActividad));
     		localStorage.setItem("tiposInstalacion", JSON.stringify(this.tiposInstalacion));
@@ -31,6 +33,7 @@ export const useTiposStore = defineStore("tipos", {
 				localStorage.setItem("terrenos", JSON.stringify(this.terrenos));
 				localStorage.setItem("estados", JSON.stringify(this.estados));
         localStorage.setItem("dias", JSON.stringify(this.dias));
+        localStorage.setItem("periodos", JSON.stringify(this.periodos));
 
 				this.modificado = true
       } catch (e) {

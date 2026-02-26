@@ -9,9 +9,27 @@
 
         <!-- TABS -->
         <ul class="nav nav-tabs nav-fill mb-4">
-          <li class="nav-item" v-for="n in 4" :key="n">
-            <button type="button" class="nav-link" :class="{ active: tab === n }" @click="tab = n">
-              {{ tabLabels[n] }}
+          <li class="nav-item">
+            <button type="button" class="nav-link" :class="{ active: tab === 1 }" @click="tab = 1">
+              {{ t.data }}
+            </button>
+          </li>
+
+          <li class="nav-item">
+            <button type="button" class="nav-link" :class="{ active: tab === 2 }" @click="tab = 2">
+              {{ t.facility }}
+            </button>
+          </li>
+
+          <li class="nav-item">
+            <button type="button" class="nav-link" :class="{ active: tab === 3 }" @click="tab = 3">
+              {{ t.monitorTariff }}
+            </button>
+          </li>
+
+          <li class="nav-item">
+            <button type="button" class="nav-link" :class="{ active: tab === 4 }" @click="tab = 4">
+              {{ t.sessions }}
             </button>
           </li>
         </ul>
@@ -134,6 +152,15 @@
             </select>
           </div>
 
+          <!-- PERIODO -->
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">{{ t.period }}</label>
+            <select class="form-select form-select-lg" :class="{ 'is-invalid': errores.periodo }"
+              v-model="actividad.periodo">
+              <option v-for="t in tiposStore.periodos" :key="t[0]" :value="t[0]">{{ t[1] }}</option>
+            </select>
+          </div>
+
           <!-- EXTERIOR -->
           <div class="col-md-12">
             <div class="form-check form-switch mt-2">
@@ -145,12 +172,14 @@
           </div>
         </div>
 
+
         <!-- TAB 2 INSTALACION -->
         <div v-if="tab === 2">
 
           <div class="mb-4">
             <label class="form-label fw-semibold">{{ t.facility }}</label>
-            <select class="form-select form-select-lg" v-model="actividad.instalacion_id">
+            <select class="form-select form-select-lg" :class="{ 'is-invalid': errores.instalacion }"
+              v-model="actividad.instalacion_id">
               <option :value="null">--</option>
               <option v-for="i in instalaciones" :key="i.id" :value="i.id">
                 {{ i.nombre }}
@@ -160,30 +189,39 @@
 
           <!-- HORARIO -->
           <div v-if="instalacionSeleccionada?.agenda?.length" class="card border-0 shadow-sm rounded-4 p-4 bg-light">
-
             <h5 class="fw-bold mb-3">
               {{ t.weekHours }}
             </h5>
 
+            <!-- LEYENDA -->
+            <div class="mt-4">
+              <span class="badge bg-success me-2">{{ t.free }}</span>
+              <span class="badge bg-primary me-2">{{ t.selected }}</span>
+              <span class="badge bg-warning text-dark">{{ t.activity }}</span>
+            </div>
+
             <div class="row">
+              <div v-for="dia in instalacionSeleccionada.agenda" :key="dia.id" class="col-md-6 mb-3">
+                <div class="p-3 rounded-3 bg-white border">
 
-              <div v-for="dia in instalacionSeleccionada.agenda" :key="dia.dia" class="col-md-6 mb-2">
+                  <!-- Nombre del día -->
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="fw-semibold">{{ dia.dia }}</span>
+                    <span v-if="!dia.abierto" class="text-danger fw-semibold">{{ t.close }}</span>
+                  </div>
 
-                <div class="d-flex justify-content-between
-                    p-2 rounded-3 bg-white border">
+                  <!-- Intervalos -->
+                  <div v-if="dia.abierto">
+                    <div v-for="intervalo in dia.mapa_reservas" :key="intervalo.id"
+                      class="small mb-1 px-2 py-1 rounded text-white" :class="{
+                        'bg-success': intervalo.estado === 'LIBRE',
+                        'bg-warning text-dark': intervalo.estado === 'ACTIVIDAD',
+                        'bg-primary': intervalo.estado === 'PROPIO'
+                      }">
+                      {{ intervalo.horaInicio.slice(0, 5) }} - {{ intervalo.horaFin.slice(0, 5) }}
+                    </div>
+                  </div>
 
-                  <span class="fw-semibold">
-                    {{ dia.dia }}
-                  </span>
-
-                  <span v-if="!dia.abierto" class="text-danger fw-semibold">
-                    {{ t.close }}
-                  </span>
-
-                  <span v-else class="text-success">
-                    {{ dia.horaApertura.slice(0, 5) }} -
-                    {{ dia.horaCierre.slice(0, 5) }}
-                  </span>
                 </div>
               </div>
             </div>
@@ -195,7 +233,8 @@
 
           <div class="mb-4">
             <label class="form-label fw-semibold">{{ t.monitor }}</label>
-            <select class="form-select form-select-lg" v-model="actividad.monitor_id">
+            <select class="form-select form-select-lg" :class="{ 'is-invalid': errores.monitor }"
+              v-model="actividad.monitor_id">
               <option :value="null">--</option>
               <option v-for="m in monitores" :key="m.id" :value="m.id">
                 {{ m.nombre }}
@@ -203,24 +242,116 @@
             </select>
 
             <div v-if="monitorSeleccionado" class="bg-light rounded-4 p-3 mt-3">
-              <strong>Carga actual:</strong>
+              <strong>{{ t.weeklyWork }}:</strong>
               {{ monitorSeleccionado.carga }} {{ t.weekHours }}
             </div>
           </div>
 
           <div>
             <label class="form-label fw-semibold">{{ t.tariff }}</label>
-            <select class="form-select form-select-lg" v-model="actividad.tarifa">
+            <select class="form-select form-select-lg" :class="{ 'is-invalid': errores.tarifa }"
+              v-model="actividad.tarifa">
               <option :value="null">--</option>
               <option v-for="t in tarifas" :key="t.id" :value="t.id">
                 {{ t.titulo }}
               </option>
             </select>
 
-            <div v-if="tarifaSeleccionada" class="bg-light rounded-4 p-3 mt-3">
-              <strong>{{ t.priceSubscripcion }}:</strong>
-              {{ tarifaSeleccionada.precioAbonado }} €
-            </div>
+            <transition name="fade">
+              <div v-if="tarifaSeleccionada" class="mt-4 p-4 bg-white rounded-4 shadow-sm border">
+                <h5 class="mb-3 text-primary">{{ t.priceSubscripcion }}</h5>
+
+                <div v-if="actividad.tipoActividad === 'OTROS'" class="row g-3">
+                  <div class="col-md-6">
+                    <div class="p-3 bg-light rounded-3">
+                      <strong>{{ t.priceUAM }}:</strong> {{ tarifaSeleccionada.precioUAM }} €
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="p-3 bg-light rounded-3">
+                      <strong>{{ t.priceOthers }}:</strong> {{ tarifaSeleccionada.precioOtros }} €
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <div class="p-3 bg-light rounded-3">
+                      <strong>{{ t.weekHours }}:</strong> {{ tarifaSeleccionada.numeroHorasSemana }}
+                    </div>
+                  </div>
+                </div>
+
+                <div v-else-if="actividad.tipoActividad === 'GRUPOS_REDUCIDOS'" class="row g-3">
+                  <div class="col-md-4">
+                    <div class="p-3 bg-light rounded-3">
+                      <strong>{{ t.price }}:</strong> {{ tarifaSeleccionada.precio }} €
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="p-3 bg-light rounded-3">
+                      <strong>{{ t.monthlyPrice }}:</strong> {{ tarifaSeleccionada.precioMensual }} €
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="p-3 bg-light rounded-3">
+                      <strong>{{ t.quarterPrice }}:</strong> {{ tarifaSeleccionada.precioCuatrimestre }} €
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="p-3 bg-light rounded-3">
+                      <strong>{{ t.weekHours }}:</strong> {{ tarifaSeleccionada.numeroHoras }}
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="p-3 bg-light rounded-3">
+                      <strong>{{ t.people }}:</strong> {{ tarifaSeleccionada.numeroPersonas }}
+                    </div>
+                  </div>
+                </div>
+
+                <div v-else-if="actividad.tipoActividad === 'FISIOTERAPIA'" class="row g-3 mt-3">
+                  <!-- TDA -->
+                  <div class="col-md-4">
+                    <div class="p-3 bg-light rounded-3 shadow-sm">
+                      <h6 class="text-primary">{{ t.priceTDA }}</h6>
+                      <p class="mb-1">{{ t.consultationPrice }}: {{ tarifaSeleccionada.precioConsultaTDA }} €</p>
+                      <p class="mb-1">{{ t.sessions1to5 }}: {{ tarifaSeleccionada.precioSesiones1_5TDA }} €</p>
+                      <p class="mb-1">{{ t.sessions6plus }}: {{ tarifaSeleccionada.precioSesiones6TDA }} €</p>
+                    </div>
+                  </div>
+
+                  <!-- UAM -->
+                  <div class="col-md-4">
+                    <div class="p-3 bg-light rounded-3 shadow-sm">
+                      <h6 class="text-success">{{ t.priceUAM }}</h6>
+                      <p class="mb-1">{{ t.consultationPrice }}: {{ tarifaSeleccionada.precioConsultaUAM }} €</p>
+                      <p class="mb-1">{{ t.sessions1to5 }}: {{ tarifaSeleccionada.precioSesiones1_5UAM }} €</p>
+                      <p class="mb-1">{{ t.sessions6plus }}: {{ tarifaSeleccionada.precioSesiones6UAM }} €</p>
+                    </div>
+                  </div>
+
+                  <!-- Others -->
+                  <div class="col-md-4">
+                    <div class="p-3 bg-light rounded-3 shadow-sm">
+                      <h6 class="text-warning">{{ t.priceOthers }}</h6>
+                      <p class="mb-1">{{ t.consultationPrice }}: {{ tarifaSeleccionada.precioConsultaOtros }} €</p>
+                      <p class="mb-1">{{ t.sessions1to5 }}: {{ tarifaSeleccionada.precioSesiones1_5Otros }} €</p>
+                      <p class="mb-1">{{ t.sessions6plus }}: {{ tarifaSeleccionada.precioSesiones6Otros }} €</p>
+                    </div>
+                  </div>
+
+                  <!-- Información general -->
+                  <div class="col-6">
+                    <div class="p-3 bg-light rounded-3 shadow-sm">
+                      <strong>{{ t.weekHours }}:</strong> {{ tarifaSeleccionada.numeroHoras }}
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <div class="p-3 bg-light rounded-3 shadow-sm">
+                      <strong>{{ t.people }}:</strong> {{ tarifaSeleccionada.numeroPersonas }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </transition>
           </div>
 
         </div>
@@ -277,8 +408,12 @@
 
         </div>
 
+        <div class="text-center mt-5 fs-5">
+          <p v-if="mensaje" class="text-danger">{{ mensaje }}</p>
+        </div>
+
         <!-- BOTONES -->
-        <div class="d-flex justify-content-between mt-5">
+        <div class="d-flex justify-content-between mt-3">
           <button class="btn btn-outline-secondary" type="button" @click="volver">
             {{ t.return }}
           </button>
@@ -297,7 +432,7 @@
 import { watch, inject, type Ref, ref, onMounted, computed } from "vue"
 import { useRouter } from "vue-router"
 
-import { nuevaActividad, actualizarDeportes, nuevaSesion } from "@/services/crearRecursosService"
+import { nuevaActividad } from "@/services/crearRecursosService"
 import { getInstalacionesSimples, getMonitoresSimples, getTarifasActividadComun, getTarifasFisioterapia, getTarifasGrupoReducido, getDeportes } from "@/services/listadoService"
 
 import { useTiposStore } from "@/stores/tipos"
@@ -316,12 +451,12 @@ const añoActual = new Date().getFullYear()
 
 const tab = ref(1)
 
-const tabLabels = {
+const tabLabels = ref({
   1: t.value.data,
   2: t.value.facility,
-  3: t.value.monitor,
+  3: t.value.monitorTariff,
   4: t.value.sessions
-}
+})
 
 const actividad = ref({
   nombre: "",
@@ -342,8 +477,7 @@ const actividad = ref({
   tipoReserva: "",
   terreno: "",
   estado: "",
-  periodo: "ANUAL",
-  deporte_id: null,
+  periodo: "",
 })
 
 const errores = ref({
@@ -359,9 +493,12 @@ const errores = ref({
   estado: false,
   instalacion: false,
   monitor: false,
-  deporte: false
+  deporte: false,
+  tarifa: false,
+  periodo: false
 })
 
+const mensaje = ref("")
 const instalaciones = ref<any[]>([])
 const monitores = ref<any[]>([])
 const tarifas = ref<any[]>([])
@@ -412,8 +549,10 @@ function validarFormulario() {
   errores.value.tipoReserva = actividad.value.tipoReserva === ""
   errores.value.terreno = actividad.value.terreno === ""
   errores.value.estado = actividad.value.estado === ""
-  errores.value.instalacion = actividad.value.instalacion_id === ""
-  errores.value.monitor = actividad.value.monitor_id === ""
+  errores.value.periodo = actividad.value.periodo === ""
+  errores.value.instalacion = actividad.value.instalacion_id === null
+  errores.value.monitor = actividad.value.monitor_id === null
+  errores.value.tarifa = actividad.value.tarifa === null
   errores.value.deporte = nombreDeporte.value === ""
 
   for (const k in errores.value) {
@@ -426,14 +565,22 @@ function validarFormulario() {
 }
 
 const crearActividad = async () => {
-  if (!validarFormulario()) return
+  mensaje.value = ""
+  if (!validarFormulario()) {
+    mensaje.value = t.value.emptyFields
+    return
+  }
 
   try {
-    const actividadObj = await nuevaActividad(actividad.value)
-    await nuevaSesion(actividadObj.id, sesiones.value)
-    await actualizarDeportes(actividadObj.id, nombreDeporte.value)
-    router.push({ name: 'gestion-actividades' });
-  } catch (e) {
+    const respuesta = await nuevaActividad(
+      actividad.value,
+      sesiones.value,
+      nombreDeporte.value
+    )
+
+    router.push({ name: 'gestion-actividades' })
+  } catch (e: any) {
+    mensaje.value = e.response?.data?.respuesta
     console.log("Error al crear la actividad", e)
   }
 }

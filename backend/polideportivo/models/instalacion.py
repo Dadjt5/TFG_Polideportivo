@@ -1,9 +1,10 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-
-from .constantes import TipoInstalacion
+from datetime import time
 
 from .agenda import Agenda
+from .constantes import TipoInstalacion, TipoReserva
+
 
 class Pabellon(models.Model):
     """Modelo para representar un pabellon"""
@@ -56,19 +57,95 @@ class Instalacion(models.Model):
             precio = self.tarifa.precioTDA
         
         return precio
-    
-    def nuevoHorario(self, dia, horaApertura, horaCierre, abierto):
-        if not abierto:
-            Agenda.objects.create(instalacion=self, dia=dia, abierto=False)
-            return True
+
+    def controlarHorarioActividad(self, dia, hora_inicio, hora_fin):
+        if isinstance(hora_inicio, str):
+            h, m = map(int, hora_inicio.split(":"))
+            hora_inicio = time(h, m)
+        if isinstance(hora_fin, str):
+            h, m = map(int, hora_fin.split(":"))
+            hora_fin = time(h, m)
+
+        agenda = self.agenda.filter(dia__iexact=dia).first()
+        if not agenda or not agenda.abierto:
+            return False
+
+        if agenda.horaApertura > hora_inicio or agenda.horaCierre < hora_fin:
+            return False
+
+        conflictos = self.actividad.filter(
+            sesiones__dia=dia,
+            sesiones__horaInicio__lt=hora_fin,
+            sesiones__horaFin__gt=hora_inicio
+        )
+
+        if conflictos.exists():
+            return False
+
+        return True
+
+    def controlarCambioHorario(self, dia, horaInicio, horaFin, abierto):
+        conflictos = self.actividad.filter(
+            sesiones__dia=dia,
+            sesiones__horaInicio__lt=horaFin,
+            sesiones__horaFin__gt=horaInicio
+        )
+
+        if conflictos.exists():
+            return False
         
+        return True
+
+    def nuevoHorario(self, dia, horaApertura, horaCierre, abierto):
+        if isinstance(horaApertura, str):
+            h, m = map(int, horaApertura.split(":")[:2])
+            horaApertura = time(h, m)
+
+        if isinstance(horaCierre, str):
+            h, m = map(int, horaCierre.split(":")[:2])
+            horaCierre = time(h, m)
+
+        agenda = Agenda.objects.filter(instalacion=self, dia=dia, fecha__isnull=True).first()
+
+        if not abierto:
+            if agenda:
+                agenda.abierto = False
+                agenda.horaApertura = None
+                agenda.horaCierre = None
+                agenda.save()
+            else:
+                Agenda.objects.create(instalacion=self, dia=dia, abierto=False)
+            return True
+
         if not horaApertura or not horaCierre or horaCierre <= horaApertura:
             return False
 
-        Agenda.objects.create(instalacion=self, dia=dia, horaApertura=horaApertura, horaCierre=horaCierre)
+        if agenda:
+            agenda.abierto = True
+            agenda.horaApertura = horaApertura
+            agenda.horaCierre = horaCierre
+            agenda.save()
+        else:
+            agenda = Agenda.objects.create(
+                instalacion=self,
+                dia=dia,
+                horaApertura=horaApertura,
+                horaCierre=horaCierre,
+                abierto=True
+            )
+
+        agenda.generarMapa()
         return True
 
     def nuevoHorarioEspecial(self, fecha, horaApertura, horaCierre, abierto):
+        if isinstance(horaApertura, str):
+            h, m = map(int, horaApertura.split(":")[:2])
+            horaApertura = time(h, m)
+
+        if isinstance(horaCierre, str):
+            h, m = map(int, horaCierre.split(":")[:2])
+            horaCierre = time(h, m)
+
         if not abierto:
             Agenda.objects.create(instalacion=self, fecha=fecha, abierto=False)
             return True
@@ -76,7 +153,9 @@ class Instalacion(models.Model):
         if not horaApertura or not horaCierre or horaCierre <= horaApertura:
             return False
 
-        Agenda.objects.create(instalacion=self, fecha=fecha, horaApertura=horaApertura, horaCierre=horaCierre)
+        agenda = Agenda.objects.create(instalacion=self, fecha=fecha, horaApertura=horaApertura, horaCierre=horaCierre)
+        agenda.generarMapa()
+
         return True
 
     def get_horario(self, fecha):

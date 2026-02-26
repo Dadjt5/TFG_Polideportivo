@@ -10,6 +10,7 @@ from rest_framework import status
 import stripe
 from django.utils.dateparse import parse_date
 from datetime import date
+from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.conf import settings
 
@@ -43,7 +44,7 @@ from polideportivo.models import (
     ReservaActividad, Alquiler, Administrador, User, CompraBono, CompraAbono,
     Mensaje, Sesion, MapaReservas, TipoActividad, TipoInstalacion, FormaReserva,
     Terreno, Estado, Dia, ActividadComun, GrupoReducido, Fisioterapia, EstadoPago,
-    EstadoReserva
+    EstadoReserva, Periodo
 )
 
 
@@ -567,7 +568,8 @@ class TiposViews(APIView):
             "tiposReserva": FormaReserva.choices,
             "terrenos": Terreno.choices,
             "estados": Estado.choices,
-            "dias": Dia.choices
+            "dias": Dia.choices,
+            "periodos": Periodo.choices
         }
 
         return Response(data)
@@ -750,30 +752,32 @@ class ObtenerActividadesInstalaciones(APIView):
 class NuevaSesionView(APIView):
     permission_classes = [IsAdministrador]
 
+    @transaction.atomic
     def post(self, request, actividad_id):
         actividad = get_object_or_404(Actividad, id=actividad_id)
-
+        instalacion = get_object_or_404(Instalacion, id=actividad.instalacion.id)
+        
         sesiones = request.data
-
         if isinstance(sesiones, dict):
             sesiones = [sesiones]
-
-        creadas = 0
 
         for sesion in sesiones:
             dia = sesion.get('dia')
             hora_inicio = sesion.get('horaInicio')
             hora_fin = sesion.get('horaFin')
+            
+            respuesta = instalacion.controlarHorarioActividad(dia, hora_inicio, hora_fin)
+            if not respuesta:
+                return Response({"respuesta": "Una o más sesiones no se pueden realizar en esta instalación en el horario previsto"}, status=status.HTTP_400_BAD_REQUEST)
 
             respuesta = actividad.nuevaSesion(dia, hora_inicio, hora_fin)
 
-            if respuesta:
-                creadas += 1
+            if not respuesta:
+                return Response({"respuesta": "No se ha podido crear ninguna sesión"}, status=status.HTTP_400_BAD_REQUEST)
 
-        if creadas > 0:
-            return Response({"respuesta": f"{creadas} sesión(es) creada(s) correctamente"}, status=status.HTTP_200_OK)
+        return Response({"respuesta": "sesiones creadas correctamente"}, status=status.HTTP_200_OK)
 
-        return Response({"respuesta": "No se ha podido crear ninguna sesión"}, status=status.HTTP_400_BAD_REQUEST)
+        
 
 
 # Marcar o desmarcar actividades o instalaciones como favoritos
@@ -1031,43 +1035,74 @@ class AsignarAgendasView(APIView):
         agenda = request.data.get('agenda', [])
         fechasEspeciales = request.data.get('fechasEspeciales', [])
 
+        Agenda.objects.filter(instalacion=instalacion, fecha__isnull=False).delete()
+
         for fecha in agenda:
+            res = instalacion.controlarCambioHorario(fecha["dia"], fecha.get("apertura"), fecha.get("cierre"), fecha.get("abierto", True))
+            if not res:
+                return Response({"respuesta": "Error, el cambio no esta permitido debido a que hay sesiones en esas horas"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
             res = instalacion.nuevoHorario(fecha["dia"], fecha.get("apertura"), fecha.get("cierre"), fecha.get("abierto", True))
-            
             if not res:
                 return Response({"respuesta": "Error al actualizar la agenda de los dias de la semana"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         for fecha in fechasEspeciales:
             instalacion.nuevoHorarioEspecial(fecha["fecha"], fecha.get("apertura"), fecha.get("cierre"), fecha.get("abierto", True))
-            
+
             if not res:
-                return Response({"respuesta": "Error al actualizar la agenda de los dias de la semana"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-            
+                return Response({"respuesta": "Error al actualizar la agenda de los dias especiales"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
         return Response({"respuesta": "Exito al asignar la agenda a la instalacion"}, status=status.HTTP_200_OK)
 
 
-class AsignarDeporteView(APIView):
+class NuevaActividadView(APIView):
     permission_classes = [IsAdministrador]
-    
-    def post(self, request, actividad_id):
-        actividad = get_object_or_404(Actividad, id=actividad_id)
 
-        nombre = request.data.get('deporte')
-        if not nombre:
-            return Response({"respuesta": "Se debe indicar un deporte"}, status=status.HTTP_400_BAD_REQUEST)
+    @transaction.atomic
+    def post(self, request):
+        try:
+            # Datos de la actividad
+            actividad_data = request.data.get("actividad", {})
+            tarifa_id = actividad_data.pop("tarifa", None)
+            tarifa = get_object_or_404(TarifaActividad, id=tarifa_id)
 
-        nombre = nombre.strip()
+            actividad = Actividad.objects.create(**actividad_data, tarifa=tarifa)
+            
+            # Sesiones de la actividad
+            instalacion = get_object_or_404(Instalacion, id=actividad.instalacion.id)
+            sesiones = request.data.get("sesiones", [])
+
+            for sesion in sesiones:
+                dia = sesion.get('dia')
+                hora_inicio = sesion.get('horaInicio')
+                hora_fin = sesion.get('horaFin')
+
+                respuesta = instalacion.controlarHorarioActividad(dia, hora_inicio, hora_fin)
+                if not respuesta:
+                    return Response({"respuesta": "Una o más sesiones no se pueden realizar en esta instalación en el horario elegido"}, status=status.HTTP_400_BAD_REQUEST)
+
+                respuesta = actividad.nuevaSesion(dia, hora_inicio, hora_fin)
+
+                if not respuesta:
+                    return Response({"respuesta": "No se ha podido crear ninguna sesión"}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Deporte de la actividad
+            nombre = request.data.get("deportes")
+            nombre = nombre.strip()
         
-        if not re.match(r'^[A-Za-zÁÉÍÓÚÑáéíóúñ ]+$', nombre):
-            return Response({"respuesta": "Nombre de deporte incorrecto"}, status=status.HTTP_400_BAD_REQUEST)
+            if not re.match(r'^[A-Za-zÁÉÍÓÚÑáéíóúñ ]+$', nombre):
+                return Response({"respuesta": "Nombre de deporte incorrecto"}, status=status.HTTP_400_BAD_REQUEST)
 
-        titulo = nombre.lower().replace(" ", "_")
+            titulo = nombre.lower().replace(" ", "_")
 
-        deporte, _ = Deporte.objects.get_or_create(titulo=titulo)
-        actividad.deporte = deporte
-        actividad.save()
+            deporte, _ = Deporte.objects.get_or_create(titulo=titulo)
+            actividad.deportes = deporte
+            actividad.save()
 
-        return Response({"respuesta": "Deporte asignado correctamente"}, status=status.HTTP_200_OK)
+            return Response({"respuesta": "Deporte asignado correctamente"}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({"respuesta": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class TarifaActividadView(APIView):

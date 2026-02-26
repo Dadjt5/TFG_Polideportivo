@@ -379,6 +379,8 @@ export default {
   monitor: "Monitor",
   startHour: "Hora de inicio",
   endHour: "Hora de fin",
+  monitorTariff: "Monitor y Tarifa",
+  weeklyWork: "Carga de trabajo",
 
   /* Nueva sesion */
   newSession: "Nueva sesión",

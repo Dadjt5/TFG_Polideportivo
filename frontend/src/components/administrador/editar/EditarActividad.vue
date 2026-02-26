@@ -28,23 +28,27 @@
 
               <!-- PERIODO -->
               <div class="col-12 col-sm-4">
-                <span class="fw-medium">{{ t.period }}:</span>
+                <span class="fw-medium">{{ t.period }}: </span>
                 <span v-if="!editando"> {{ actividad.periodo }}</span>
-                <input v-else v-model="actividad.periodo" class="form-control"
-                  :class="{ 'is-invalid': errores.periodo }" />
+                <select v-else class="form-select form-select-lg" :class="{ 'is-invalid': errores.periodo }"
+                    v-model="actividad.periodo">
+                    <option v-for="t in tiposStore.periodos" :key="t[0]" :value="t[0]">{{ t[1] }}</option>
+                </select>
               </div>
 
               <!-- ESTADO -->
               <div class="col-12 col-sm-4">
-                <span class="fw-medium">{{ t.status }}:</span>
+                <span class="fw-medium">{{ t.status }}: </span>
                 <span v-if="!editando"> {{ actividad.estado }}</span>
-                <input v-else v-model="actividad.estado" class="form-control"
-                  :class="{ 'is-invalid': errores.estado }" />
+                <select v-else class="form-select form-select-lg" :class="{ 'is-invalid': errores.estado }"
+                    v-model="actividad.estado">
+                    <option v-for="t in tiposStore.estados" :key="t[0]" :value="t[0]">{{ t[1] }}</option>
+                </select>
               </div>
 
               <!-- EDAD MINIMA -->
               <div class="col-12 col-sm-4">
-                <span class="fw-medium">{{ t.minimumAge }}:</span>
+                <span class="fw-medium">{{ t.minimumAge }}: </span>
                 <span v-if="!editando"> {{ actividad.edadMinima }}</span>
                 <input v-else type="number" v-model.number="actividad.edadMinima" class="form-control"
                   :class="{ 'is-invalid': errores.edadMinima }" />
@@ -52,7 +56,7 @@
 
               <!-- PLAZAS MAX -->
               <div class="col-12 col-sm-4">
-                <span class="fw-medium">{{ t.availablePlaces }}:</span>
+                <span class="fw-medium">{{ t.availablePlaces }}: </span>
                 <span v-if="!editando"> {{ actividad.plazasMaximas }}</span>
                 <input v-else type="number" v-model.number="actividad.plazasMaximas" class="form-control"
                   :class="{ 'is-invalid': errores.plazasMaximas }" />
@@ -60,7 +64,7 @@
 
               <!-- PLAZAS RESERVADAS -->
               <div class="col-12 col-sm-4">
-                <span class="fw-medium">{{ t.reservedPlaces }}:</span>
+                <span class="fw-medium">{{ t.reservedPlaces }}: </span>
                 <span v-if="!editando"> {{ actividad.plazasReservadas }}</span>
                 <input v-else type="number" v-model.number="actividad.plazasReservadas" class="form-control"
                   :class="{ 'is-invalid': errores.plazasReservadas }" />
@@ -68,31 +72,37 @@
 
               <!-- TIPO ACTIVIDAD -->
               <div class="col-12 col-sm-4">
-                <span class="fw-medium">{{ t.activityType }}:</span>
+                <span class="fw-medium">{{ t.activityType }}: </span>
                 <span v-if="!editando"> {{ actividad.tipoActividad }}</span>
-                <input v-else v-model="actividad.tipoActividad" class="form-control"
-                  :class="{ 'is-invalid': errores.tipoActividad }" />
+                <select v-else class="form-select form-select-lg" :class="{ 'is-invalid': errores.tipoActividad }"
+                    v-model="actividad.tipoActividad">
+                    <option v-for="t in tiposStore.tiposActividad" :key="t[0]" :value="t[0]">{{ t[1] }}</option>
+                </select>
               </div>
 
               <!-- TERRENO -->
               <div class="col-12 col-sm-4">
-                <span class="fw-medium">{{ t.terrainType }}:</span>
+                <span class="fw-medium">{{ t.terrainType }}: </span>
                 <span v-if="!editando"> {{ actividad.terreno }}</span>
-                <input v-else v-model="actividad.terreno" class="form-control"
-                  :class="{ 'is-invalid': errores.terreno }" />
+                <select v-else class="form-select form-select-lg" :class="{ 'is-invalid': errores.terreno }"
+                    v-model="actividad.terreno">
+                    <option v-for="t in tiposStore.terrenos" :key="t[0]" :value="t[0]">{{ t[1] }}</option>
+                </select>
               </div>
 
               <!-- TIPO RESERVA -->
               <div class="col-12 col-sm-4">
-                <span class="fw-medium">{{ t.reserveType }}:</span>
+                <span class="fw-medium">{{ t.reserveType }}: </span>
                 <span v-if="!editando"> {{ actividad.tipoReserva }}</span>
-                <input v-else v-model="actividad.tipoReserva" class="form-control"
-                  :class="{ 'is-invalid': errores.tipoReserva }" />
+                <select v-else class="form-select form-select-lg" :class="{ 'is-invalid': errores.tipoReserva }"
+                    v-model="actividad.tipoReserva">
+                    <option v-for="t in tiposStore.tiposReserva" :key="t[0]" :value="t[0]">{{ t[1] }}</option>
+                </select>
               </div>
 
               <!-- CREDITOS -->
               <div class="col-12 col-sm-4">
-                <span class="fw-medium">{{ t.credits }}:</span>
+                <span class="fw-medium">{{ t.credits }}: </span>
                 <span v-if="!editando"> {{ actividad.numeroCreditos }}</span>
                 <input v-else type="number" v-model.number="actividad.numeroCreditos" class="form-control"
                   :class="{ 'is-invalid': errores.numeroCreditos }" />
@@ -100,7 +110,7 @@
 
               <!-- AÑO -->
               <div class="col-12 col-sm-4">
-                <span class="fw-medium">{{ t.academicYear }}:</span>
+                <span class="fw-medium">{{ t.academicYear }}: </span>
                 <span v-if="!editando"> {{ actividad.año }}</span>
                 <input v-else type="number" v-model.number="actividad.año" class="form-control"
                   :class="{ 'is-invalid': errores.año }" />
@@ -207,6 +217,7 @@ import { useRouter } from "vue-router";
 
 /* Importamos la comunicacion para recuperar la informacion de actividades del backend y el usuario*/
 import { getActividadDetalle, modificarActividad, eliminarActividad } from "@/services/detalleService";
+import { useTiposStore } from '@/stores/tipos';
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
 import type { Language } from "@/useI18N";
@@ -217,6 +228,7 @@ const props = defineProps<{ id: string }>();
 const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);
 
+const tiposStore = useTiposStore();
 const router = useRouter();
 
 type Generic = {
@@ -407,6 +419,7 @@ onMounted(async () => {
   const id = parseInt(props.id);
   try {
     actividad.value = await getActividadDetalle(id);
+    console.log(actividad)
     actividadOriginal.value = JSON.parse(JSON.stringify(actividad.value))
   } catch (e) {
     console.log("Error al obtener la informacion de la actividad", e);

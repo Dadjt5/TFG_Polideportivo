@@ -22,15 +22,9 @@ export const actualizarAgenda = async (id: number, agenda: Payload, fechasEspeci
 }
 
 /* Función para crear una actividad */
-export const nuevaActividad = async (payload: Payload): Promise<any> => {
-  console.log(payload)
-  const response = await api.post("api/v1/actividades/", payload)
+export const nuevaActividad = async (actividad: any, sesiones: any, deportes: any): Promise<any> => {
+  const response = await api.post("api/v1/actividades/crear/", {"actividad": actividad, "sesiones": sesiones, "deportes": deportes})
   return response.data
-}
-
-/* Función para actualizar los deportes */
-export const actualizarDeportes = async (id: number, titulo: string) => {
-  const response = await api.post(`api/v1/${id}/deportes/`, {"deporte": titulo})
 }
 
 /* Función para crear una sesion */

@@ -123,7 +123,7 @@
                 <div class="form-check ms-auto">
                   <input class="form-check-input" type="checkbox" v-model="d.abierto" :id="'abierto-' + index">
                   <label class="form-check-label small" :for="'abierto-' + index">
-                    {{ t.close }}
+                    {{ t.open }}
                   </label>
                 </div>
 
@@ -190,6 +190,7 @@
     </main>
   </div>
 </template>
+
 
 <script setup lang="ts">
 import { ref, inject, type Ref, onMounted } from "vue"

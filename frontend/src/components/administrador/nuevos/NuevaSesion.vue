@@ -47,7 +47,7 @@
 
 
 <script setup lang="ts">
-import { ref, inject, type Ref, onMounted } from "vue"
+import { ref, inject, type Ref } from "vue"
 import { useRouter } from "vue-router"
 
 import { nuevaSesion } from "@/services/crearRecursosService"
@@ -65,6 +65,7 @@ const t = useI18n(language)
 
 const tipoStore = useTiposStore();
 const router = useRouter()
+const mensaje = ref("")
 
 const sesion = ref({
   dia: "",
@@ -97,12 +98,17 @@ function validarFormulario() {
 const volver = () => router.back()
 
 const crearSesion = async () => {
-  if (!validarFormulario()) return
-  console.log(props.id)
+  mensaje.value = ""
+  if (!validarFormulario()){
+    mensaje.value = t.value.emptyFields
+    return
+  }
+
   try {
     await nuevaSesion(Number(props.id), sesion.value)
     router.back()
-  } catch (e) {
+  } catch (e: any) {
+    mensaje.value = e.response?.data?.respuesta
     console.error("Error al crear la sesión", e)
   }
 }
