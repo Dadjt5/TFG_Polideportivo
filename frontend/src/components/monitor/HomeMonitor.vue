@@ -4,15 +4,16 @@
       <h1 class="text-center fs-2 fw-bold mb-4">{{ t.monitorHomeTitle }} {{ monitorStore.monitor?.nombre }}</h1>
       <div class="row g-4">
 
-        <div class="col-lg-12">
-          <div class="card shadow-sm border-0 mb-4">
+        <!-- Notificaciones -->
+        <div class="col-lg-8">
+          <div class="card shadow-sm h-100 bg-white bg-opacity-10 border border-white border-opacity-25">
             <div class="card-body">
               <div class="d-flex justify-content-between align-items-center mb-3">
                 <router-link to="/notificaciones"
-                  class="d-flex align-items-center gap-2 text-decoration-none text-dark">
+                  class="d-flex align-items-center gap-2 text-decoration-none text-white">
                   <i class="bi bi-bell-fill text-primary fs-4"></i>
 
-                  <h5 class="mb-0 text-primary">
+                  <h5 class="mb-0 text-white">
                     {{ t.notifications }}
                   </h5>
 
@@ -22,10 +23,17 @@
                 </router-link>
               </div>
 
-              <div v-for="notf in monitorStore.notificaciones" :key="notf.id" class="rounded p-3 mb-2"
-                :class="notf.leido ? 'bg-white' : 'bg-primary bg-opacity-10'">
+              <div v-if="monitorStore.notificaciones.length === 0"
+                class="d-flex flex-column justify-content-center align-items-center py-5 text-center">
+                <i class="bi bi-bell-slash text-white fs-1 mb-3"></i>
+                <p class="text-white opacity-75 fs-5 mb-0">
+                  {{ t.noNotificacions }}
+                </p>
+              </div>
+              <div v-else v-for="notf in monitorStore.notificaciones" :key="notf.id" class="rounded p-3 mb-2"
+                :class="notf.leido ? 'bg-white bg-opacity-10 text-white' : 'bg-primary bg-opacity-20 text-white'">
                 <strong>{{ notf.titulo }}</strong>
-                <p class="mb-0 small text-muted">
+                <p class="mb-0 small text-white text-opacity-75">
                   {{ notf.descripcion }}
                 </p>
               </div>

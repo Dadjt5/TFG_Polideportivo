@@ -3,6 +3,11 @@ from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 
+from .configuracion import Configuracion
+from .usuario_final import UsuarioFinal
+from .monitor import Monitor
+from .administrador import Administrador
+
 
 class Notificacion(models.Model):
     """Modelo para representar una notificacion"""
@@ -32,3 +37,66 @@ class Notificacion(models.Model):
     @classmethod
     def cambiar_estado(cls, usuario, id, leido, fijado):
         cls.objects.filter(id=id, usuario=usuario).update(leido=leido, fijado=fijado)
+
+    @classmethod
+    def nuevaNotificacion(cls, titulo, descripcion, tipoUsuarios, complemento):
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+
+        if tipoUsuarios == "TODOS":
+            usuarios = User.objects.all()
+
+        elif tipoUsuarios == "USUARIOS_FINALES":
+            usuarios = User.objects.filter(id__in=UsuarioFinal.objects.values_list('user_id', flat=True))
+
+        elif tipoUsuarios == "MONITORES":
+            usuarios = User.objects.filter(id__in=Monitor.objects.values_list('user_id', flat=True))
+
+        elif tipoUsuarios == "ADMINISTRADORES":
+            usuarios = User.objects.filter(id__in=Administrador.objects.values_list('user_id', flat=True))
+
+        elif tipoUsuarios == "ACTIVIDAD":
+            usuarios = User.objects.filter(id__in=UsuarioFinal.objects.filter(asistencia__sesion__actividad_id=complemento).values_list('user_id', flat=True)).distinct()
+
+        elif tipoUsuarios == "INSTALACION":
+            usuarios = User.objects.filter(id__in=UsuarioFinal.objects.filter(reservas__instalacion_id=complemento).values_list('user_id', flat=True)).distinct()
+
+        elif tipoUsuarios == "PABELLON":
+            usuarios = User.objects.filter(id__in=UsuarioFinal.objects.filter(reservas__instalacion__pabellon_id=complemento).values_list('user_id', flat=True)).distinct()
+
+        else:
+            usuarios = User.objects.none()
+
+
+        notificaciones = [
+            cls(
+                titulo=titulo,
+                descripcion=descripcion,
+                usuario=usuario,
+                actividad_id=complemento if tipoUsuarios == "ACTIVIDAD" else None,
+                instalacion_id=complemento if tipoUsuarios == "INSTALACION" else None,
+                pabellon_id=complemento if tipoUsuarios == "PABELLON" else None,
+            )
+            for usuario in usuarios
+        ]
+
+        cls.objects.bulk_create(notificaciones)
+
+    @classmethod
+    def notificarNuevaActividad(cls, actividad):
+        configuracion = Configuracion.objects.all().first()
+        
+        if not actividad.deportes:
+            return
+
+        usuarios = UsuarioFinal.objects.filter(
+            deportesFavoritos=actividad.deportes
+        )
+
+        for usuario in usuarios:
+            cls.objects.create(
+                titulo=configuracion.titulo_avisos_actividades,
+                descripcion=configuracion.texto_avisos_actividades,
+                usuario=usuario.user,
+                actividad=actividad
+            )

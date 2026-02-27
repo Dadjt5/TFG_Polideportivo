@@ -123,21 +123,6 @@
               v-model.number="tarifa.precioSesiones6Otros"
             />
           </div>
-
-          <!-- POR DEFECTO -->
-          <div class="col-12">
-            <div class="form-check form-switch mt-3">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                id="porDefecto"
-                v-model="tarifa.por_defecto"
-              />
-              <label class="form-check-label fw-semibold" for="porDefecto">
-                {{ t.defaultTariff }}
-              </label>
-            </div>
-          </div>
         </div>
 
         <p v-if="mensaje" class="text-center text-danger mt-4">
@@ -184,8 +169,7 @@ const tarifa = ref({
   precioSesiones1_5Otros: 0,
   precioSesiones6TDA: 0,
   precioSesiones6UAM: 0,
-  precioSesiones6Otros: 0,
-  por_defecto: false
+  precioSesiones6Otros: 0
 })
 
 const errores = ref({

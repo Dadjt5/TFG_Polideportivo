@@ -8,7 +8,7 @@ from django.db import transaction
 from django.http import Http404
 
 from .constantes import TipoActividad, FormaReserva, Terreno, Estado, Periodo, Dia
-from .tarifa_actividad import Fisioterapia, GrupoReducido, ActividadComun
+
 
 class Actividad(models.Model):
     """Modelo para representar una actividad"""
@@ -121,7 +121,6 @@ class Actividad(models.Model):
             return precio
 
         raise Http404("Tipo de actividad no válido")
-
 
     @property
     def activa(self):

@@ -38,16 +38,6 @@
 						<input type="number" min="0" class="form-control form-control-lg"
 							:class="{ 'is-invalid': errores.numeroHorasSemana }" v-model.number="tarifa.numeroHorasSemana" />
 					</div>
-
-					<!-- POR DEFECTO -->
-					<div class="col-12">
-						<div class="form-check form-switch mt-3">
-							<input class="form-check-input" type="checkbox" id="porDefecto" v-model="tarifa.por_defecto" />
-							<label class="form-check-label fw-semibold" for="porDefecto">
-								{{ t.defaultTariff }}
-							</label>
-						</div>
-					</div>
 				</div>
 
 				<!-- BOTONES -->
@@ -83,8 +73,7 @@ const tarifa = ref({
 	titulo: '',
 	precioUAM: 0,
 	precioOtros: 0,
-	numeroHorasSemana: 0,
-	por_defecto: false
+	numeroHorasSemana: 0
 })
 
 const errores = ref({

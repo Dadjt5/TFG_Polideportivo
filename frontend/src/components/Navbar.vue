@@ -16,31 +16,31 @@
         </li>
 
         <li class="nav-item fs-5">
-          <router-link to="/actividades" v-if="userStore.role === 'usuario_final'" class="nav-link px-3 text-white">
+          <router-link to="/actividades" v-if="userStore.isUsuarioFinal" class="nav-link px-3 text-white">
             {{ t.activities }}
           </router-link>
         </li>
 
         <li class="nav-item fs-5">
-          <router-link to="/comprar-abonos" v-if="userStore.role === 'usuario_final'" class="nav-link px-3 text-white">
+          <router-link to="/comprar-abonos" v-if="userStore.isUsuarioFinal" class="nav-link px-3 text-white">
             {{ t.seasonTickets }}
           </router-link>
         </li>
 
         <li class="nav-item fs-5">
-          <router-link to="/foro" v-if="userStore.role === 'usuario_final' || userStore.role === 'administrador'" class="nav-link px-3 text-white">
+          <router-link to="/foro" v-if="userStore.isUsuarioFinal || userStore.isAdminEspacios || userStore.isAdminRaiz" class="nav-link px-3 text-white">
             {{ t.forum }}
           </router-link>
         </li>
 
         <li class="nav-item fs-5">
-          <router-link to="/contacto" v-if="userStore.role !== 'administrador'" class="nav-link px-3 text-white">
+          <router-link to="/contacto" v-if="!userStore.isAdmin" class="nav-link px-3 text-white">
             {{ t.contact }}
           </router-link>
         </li>
 
         <li class="nav-item fs-5">
-          <router-link to="/faq" v-if="userStore.role !== 'administrador'" class="nav-link px-3 text-white">
+          <router-link to="/faq" v-if="!userStore.isAdmin" class="nav-link px-3 text-white">
             {{ t.faq }}
           </router-link>
         </li>
@@ -100,11 +100,11 @@ const monitorStore = useMonitorStore();
 const administradorStore = useAdministradorStore();
 
 const activeStore = computed(() => {
-  if(userStore.role == "usuario_final") {
+  if(userStore.isUsuarioFinal) {
     return usuarioFinalStore;
   }
 
-  if(userStore.role == "monitor") {
+  if(userStore.isMonitor) {
     return monitorStore;
   }
 

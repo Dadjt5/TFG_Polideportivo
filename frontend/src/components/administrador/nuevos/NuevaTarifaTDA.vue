@@ -44,17 +44,6 @@
 							v-model.number="tarifa.precioReposicion" />
 					</div>
 
-					<!-- POR DEFECTO -->
-					<div class="col-12">
-						<div class="form-check form-switch mt-3">
-							<input class="form-check-input" type="checkbox" id="porDefecto"
-								v-model="tarifa.por_defecto" />
-							<label class="form-check-label fw-semibold" for="porDefecto">
-								{{ t.defaultTariff }}
-							</label>
-						</div>
-					</div>
-
 				</div>
 
 				<!-- BOTONES -->
@@ -90,8 +79,7 @@ const tarifa = ref({
 	titulo: '',
 	precioUAM: 0,
 	precioOtros: 0,
-	precioReposicion: 0,
-	por_defecto: false
+	precioReposicion: 0
 })
 
 const errores = ref({

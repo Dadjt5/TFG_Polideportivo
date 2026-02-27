@@ -77,41 +77,78 @@
 
 
     <!-- NOTIFICACIONES -->
-    <div v-if="activeTab === 'notifs'" class="card shadow-sm">
-      <div class="card-body">
-        <h4 class="mb-4">{{ t.notificationTitle }}</h4>
+<div v-if="activeTab === 'notifs'" class="card shadow-sm">
+  <div class="card-body">
+    <h4 class="mb-4">{{ t.notificationTitle }}</h4>
 
-        <div class="mb-4">
-          <label class="form-label fw-semibold">{{ t.textChangesCancellations }}</label>
-          <textarea class="form-control" rows="3" v-model="configuracionStore.texto_cambios_cancelaciones" />
-        </div>
+    <!-- CAMBIOS Y CANCELACIONES -->
+    <div class="mb-4">
+      <label class="form-label fw-semibold">Título - {{ t.textChangesCancellations }}</label>
+      <input type="text" class="form-control mb-2"
+        v-model="configuracionStore.titulo_cambios_cancelaciones" />
 
-        <div class="mb-4">
-          <label class="form-label fw-semibold">{{ t.textActivityNotices }}</label>
-          <textarea class="form-control" rows="3" v-model="configuracionStore.texto_avisos_actividades" />
-        </div>
-
-        <div class="mb-4">
-          <label class="form-label fw-semibold">{{ t.textPaymentProblems }}</label>
-          <textarea class="form-control" rows="3" v-model="configuracionStore.texto_problemas_pago" />
-        </div>
-
-        <div class="mb-4">
-          <label class="form-label fw-semibold">{{ t.textWaitingListExit }}</label>
-          <textarea class="form-control" rows="3" v-model="configuracionStore.texto_salida_lista_espera" />
-        </div>
-
-        <div class="mb-4">
-          <label class="form-label fw-semibold">{{ t.textAbsences }}</label>
-          <textarea class="form-control" rows="3" v-model="configuracionStore.texto_ausencias" />
-        </div>
-
-        <div class="mb-4">
-          <label class="form-label fw-semibold">{{ t.textSpecialMaterial }}</label>
-          <textarea class="form-control" rows="3" v-model="configuracionStore.texto_material_especial" />
-        </div>
-      </div>
+      <label class="form-label fw-semibold">{{ t.textChangesCancellations }}</label>
+      <textarea class="form-control" rows="3"
+        v-model="configuracionStore.texto_cambios_cancelaciones" />
     </div>
+
+    <!-- AVISOS ACTIVIDADES -->
+    <div class="mb-4">
+      <label class="form-label fw-semibold">Título - {{ t.textActivityNotices }}</label>
+      <input type="text" class="form-control mb-2"
+        v-model="configuracionStore.titulo_avisos_actividades" />
+
+      <label class="form-label fw-semibold">{{ t.textActivityNotices }}</label>
+      <textarea class="form-control" rows="3"
+        v-model="configuracionStore.texto_avisos_actividades" />
+    </div>
+
+    <!-- PROBLEMAS PAGO -->
+    <div class="mb-4">
+      <label class="form-label fw-semibold">Título - {{ t.textPaymentProblems }}</label>
+      <input type="text" class="form-control mb-2"
+        v-model="configuracionStore.titulo_problemas_pago" />
+
+      <label class="form-label fw-semibold">{{ t.textPaymentProblems }}</label>
+      <textarea class="form-control" rows="3"
+        v-model="configuracionStore.texto_problemas_pago" />
+    </div>
+
+    <!-- SALIDA LISTA ESPERA -->
+    <div class="mb-4">
+      <label class="form-label fw-semibold">Título - {{ t.textWaitingListExit }}</label>
+      <input type="text" class="form-control mb-2"
+        v-model="configuracionStore.titulo_salida_lista_espera" />
+
+      <label class="form-label fw-semibold">{{ t.textWaitingListExit }}</label>
+      <textarea class="form-control" rows="3"
+        v-model="configuracionStore.texto_salida_lista_espera" />
+    </div>
+
+    <!-- AUSENCIAS -->
+    <div class="mb-4">
+      <label class="form-label fw-semibold">Título - {{ t.textAbsences }}</label>
+      <input type="text" class="form-control mb-2"
+        v-model="configuracionStore.titulo_ausencias" />
+
+      <label class="form-label fw-semibold">{{ t.textAbsences }}</label>
+      <textarea class="form-control" rows="3"
+        v-model="configuracionStore.texto_ausencias" />
+    </div>
+
+    <!-- MATERIAL ESPECIAL -->
+    <div class="mb-4">
+      <label class="form-label fw-semibold">Título - {{ t.textSpecialMaterial }}</label>
+      <input type="text" class="form-control mb-2"
+        v-model="configuracionStore.titulo_material_especial" />
+
+      <label class="form-label fw-semibold">{{ t.textSpecialMaterial }}</label>
+      <textarea class="form-control" rows="3"
+        v-model="configuracionStore.texto_material_especial" />
+    </div>
+
+  </div>
+</div>
 
     <div class="text-center mt-4">
       <button class="fs-4 btn btn-primary px-4 mt-4" @click="guardarConfiguracion">

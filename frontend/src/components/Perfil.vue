@@ -1,7 +1,7 @@
 <template>
   <div class="min-vh-100 bg-light">
-    <PerfilUsuarioFinal v-if="userStore.role === 'usuario_final'" />
-    <PerfilMonitor v-else-if="userStore.role === 'monitor'" />
+    <PerfilUsuarioFinal v-if="userStore.isUsuarioFinal" />
+    <PerfilMonitor v-else-if="userStore.isMonitor" />
     <PerfilAdministrador v-else />
   </div>
 </template>

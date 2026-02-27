@@ -14,7 +14,7 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.conf import settings
 
-from .permissions import IsAdministrador, IsMonitor, IsUsuarioFinal
+from .permissions import IsAdministradorRaiz, IsAdministradorEspacios, IsAdministradorTarifas, IsAdministradorUsuarios, IsMonitor, IsUsuarioFinal, IsAdministrador
 
 from .serializers import (
     AbonoDeportivoSerializer, AbonoVeranoSerializer, BonoSerializer,
@@ -147,7 +147,7 @@ class MapaReservasViewSet(viewsets.ModelViewSet):
 class CanalViewSet(viewsets.ModelViewSet):
     queryset = Canal.objects.all()
     serializer_class = CanalSerializer
-    permission_classes = [IsAdministrador]
+    permission_classes = [IsAuthenticated]
     
 
 # ----------------
@@ -157,7 +157,7 @@ class CanalViewSet(viewsets.ModelViewSet):
 class SesionViewSet(viewsets.ModelViewSet):
     queryset = Sesion.objects.all()
     serializer_class = SesionSerializer
-    permission_classes = [IsAdministrador]
+    permission_classes = [IsAuthenticated]
 
 
 # ----------------
@@ -222,7 +222,7 @@ class DeporteViewSet(viewsets.ModelViewSet):
 class DescuentoViewSet(viewsets.ModelViewSet):
     queryset = Descuento.objects.all()
     serializer_class = DescuentoSerializer
-    permission_classes = [IsAdministrador]
+    permission_classes = [IsAuthenticated]
 
 
 # ----------------
@@ -431,25 +431,25 @@ class TarifaInstalacionViewSet(viewsets.ModelViewSet):
 class TarifaActividadViewSet(viewsets.ModelViewSet):
     queryset = TarifaActividad.objects.all()
     serializer_class = TarifaActividadSerializer
-    permission_classes = [IsAdministrador]
+    permission_classes = [IsAdministradorTarifas]
 
 
 class ActividadComunViewSet(viewsets.ModelViewSet):
     queryset = ActividadComun.objects.all()
     serializer_class = ActividadComunSerializer
-    permission_classes = [IsAdministrador]
+    permission_classes = [IsAdministradorTarifas]
 
 
 class GrupoReducidoViewSet(viewsets.ModelViewSet):
     queryset = GrupoReducido.objects.all()
     serializer_class = GrupoReducidoSerializer
-    permission_classes = [IsAdministrador]
+    permission_classes = [IsAdministradorTarifas]
 
 
 class FisioterapiaViewSet(viewsets.ModelViewSet):
     queryset = Fisioterapia.objects.all()
     serializer_class = FisioterapiaSerializer
-    permission_classes = [IsAdministrador]
+    permission_classes = [IsAdministradorTarifas]
 
 
 # ----------------
@@ -494,7 +494,7 @@ class AdministradorViewSet(viewsets.ModelViewSet):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [IsAdministrador]
+    permission_classes = [IsAdministradorUsuarios]
 
 
 
@@ -578,7 +578,6 @@ class TiposViews(APIView):
 # Busquedas
 class BuscarView(APIView):
     permission_classes = [AllowAny]
-    authentication_classes = []
 
     def get(self, request):
         nombre = request.query_params.get('busqueda')
@@ -607,7 +606,6 @@ class BuscarView(APIView):
 # Registro
 class RegistroView(APIView):
     permission_classes = [AllowAny]
-    authentication_classes = []
 
     def post(self, request):
         nombre = request.data.get('nombre')
@@ -644,7 +642,7 @@ class RegistroView(APIView):
 
 # Registrar monitor
 class RegistroMonitorView(APIView):
-    permission_classes = [IsAdministrador]
+    permission_classes = [IsAdministradorUsuarios]
 
     def post(self, request):
         nombre = request.data.get('nombre')
@@ -670,7 +668,7 @@ class RegistroMonitorView(APIView):
 
 # Registrar administrador
 class RegistroAdministradorView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAdministradorUsuarios]
 
     def post(self, request):
         nombre = request.data.get('nombre')
@@ -690,9 +688,35 @@ class RegistroAdministradorView(APIView):
             sta = status.HTTP_201_CREATED
 
         return Response(
-            {"mensaje": respuesta["respuesta"]},
+            {"respuesta": respuesta["respuesta"]},
             status=sta
         )
+
+
+# Crear nuevas notificaciones
+class NuevaNotificacionView(APIView):
+    permission_classes = [IsAdministrador]
+
+    def post(self, request):
+        titulo = request.data.get("titulo")
+        descripcion = request.data.get("descripcion")
+        tipo = request.data.get("tipo", [])
+        actividad_id = request.data.get("actividad_id", "")
+        instalacion_id = request.data.get("instalacion_id", "")
+        pabellon_id = request.data.get("pabellon_id", "")
+
+        complemento = None
+
+        if tipo == "ACTIVIDAD":
+            complemento = actividad_id
+        elif tipo == "INSTALACION":
+            complemento = instalacion_id
+        elif tipo == "PABELLON":
+            complemento = pabellon_id
+
+        Notificacion.nuevaNotificacion(titulo, descripcion, tipo, complemento)
+        return Response({"respuesta": "Notificacion creada correctamente"}, status=status.HTTP_200_OK)
+
 
 # Guardar informacion de notificaciones
 class GuardarNotificacionView(APIView):
@@ -709,12 +733,12 @@ class GuardarNotificacionView(APIView):
                 fijado=n['fijado']
             )
 
-        return Response({"status": "ok"})
+        return Response({"respuesta": "Notificacion modificada correctamente"}, status=status.HTTP_200_OK)
 
 
 # Asignar la TDA al usuario
 class ValidarTDAView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsUsuarioFinal]
 
     def post(self, request):
         codigo = request.data.get("codigo")
@@ -724,9 +748,9 @@ class ValidarTDAView(APIView):
         for tda in tdas_libres:
             if tda.comprobar_codigo_secreto(codigo) or tda.codigo_secreto == codigo:
                 tda.asignar_usuario(request.user.usuario_final)
-                return Response({"status": "ok"})
+                return Response({"respuesta": "TDA validada correctamente"}, status=status.HTTP_200_OK)
 
-        return Response({"status": "error"})
+        return Response({"respuesta": "Error al validar la TDA correctamente"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Obtener actividades e instalaciones de una lista de ids dados
@@ -750,7 +774,7 @@ class ObtenerActividadesInstalaciones(APIView):
 
 # Crear nuevas sesiones en una actividad
 class NuevaSesionView(APIView):
-    permission_classes = [IsAdministrador]
+    permission_classes = [IsAdministradorEspacios]
 
     @transaction.atomic
     def post(self, request, actividad_id):
@@ -808,7 +832,7 @@ class AlterarFavoritosView(APIView):
 
 # Obtener las reservas tanto de alquileres de instalaciones como reservas de actividades
 class ReservasView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsUsuarioFinal]
 
     def get(self, request):
         user = request.user
@@ -830,7 +854,7 @@ class ReservasView(APIView):
 
 # Mostrar todos los abonos tanto deportivos como de verano
 class ObtenerAbonosView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsUsuarioFinal | IsAdministradorTarifas]
     
     def get(self, request):
         abonos_deportivos = AbonoDeportivo.objects.all()
@@ -844,7 +868,7 @@ class ObtenerAbonosView(APIView):
 
 # Mostrar el foro y los canales, pero sin los mensajes
 class ForoView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsUsuarioFinal | IsAdministradorUsuarios]
 
     def get(self, request):
         foro = Foro.objects.first()
@@ -873,7 +897,7 @@ class ForoView(APIView):
 
 # Mostrar la informacion de un canal para el admin
 class CanalAdministradorView(APIView):
-    permission_classes = [IsAdministrador]
+    permission_classes = [IsAdministradorUsuarios]
 
     def get(self, request, canal_id):
         canal = get_object_or_404(Canal, id=canal_id)
@@ -884,7 +908,7 @@ class CanalAdministradorView(APIView):
 
 # Crear nuevos canales en el foro
 class NuevoCanalView(APIView):
-    permission_classes = [IsAdministrador]
+    permission_classes = [IsAdministradorUsuarios]
 
     def post(self, request, foro_id):
         foro = get_object_or_404(Foro, id=foro_id)
@@ -904,7 +928,7 @@ class NuevoCanalView(APIView):
 
 # Mostrar los mensajes de un canal o escribir nuevos
 class MensajesCanalView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsUsuarioFinal | IsAdministradorUsuarios]
     
     def get(self, request, canal_id):
         canal = get_object_or_404(Canal, id=canal_id)
@@ -927,7 +951,7 @@ class MensajesCanalView(APIView):
 
 
 class GestionarUsuarioCanalView(APIView):
-    permission_classes = [IsAdministrador]
+    permission_classes = [IsAdministradorUsuarios]
 
     def patch(self, request, canal_id, usuario_id):
         accion = request.data
@@ -947,7 +971,7 @@ class GestionarUsuarioCanalView(APIView):
 
 # Mostrar las sesiones del monitor
 class SesionesMonitorView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsMonitor | IsAdministradorEspacios]
 
     def get(self, request, monitor_id):
         sesiones = []
@@ -971,7 +995,7 @@ class SesionesMonitorView(APIView):
 
 # Mostrar informacion en detalle de una sesion para el monitor
 class DetalleSesionView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsMonitor | IsAdministradorEspacios]
 
     def get(self, request, actividad_id, sesion_id):
         data = []
@@ -1006,8 +1030,9 @@ class DetalleSesionView(APIView):
 
         return Response(data)
 
+
 class GuardarAsistenciaView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsMonitor]
 
     def post(self, request, actividad_id, sesion_id):
         actividad = get_object_or_404(Actividad, id=actividad_id)
@@ -1027,7 +1052,7 @@ class GuardarAsistenciaView(APIView):
 
 
 class AsignarAgendasView(APIView):
-    permission_classes = [IsAdministrador]
+    permission_classes = [IsAdministradorEspacios]
 
     def post(self, request, instalacion_id):
         instalacion = get_object_or_404(Instalacion, id=instalacion_id)
@@ -1056,7 +1081,7 @@ class AsignarAgendasView(APIView):
 
 
 class NuevaActividadView(APIView):
-    permission_classes = [IsAdministrador]
+    permission_classes = [IsAdministradorEspacios]
 
     @transaction.atomic
     def post(self, request):
@@ -1067,7 +1092,7 @@ class NuevaActividadView(APIView):
             tarifa = get_object_or_404(TarifaActividad, id=tarifa_id)
 
             actividad = Actividad.objects.create(**actividad_data, tarifa=tarifa)
-            
+
             # Sesiones de la actividad
             instalacion = get_object_or_404(Instalacion, id=actividad.instalacion.id)
             sesiones = request.data.get("sesiones", [])
@@ -1098,6 +1123,8 @@ class NuevaActividadView(APIView):
             deporte, _ = Deporte.objects.get_or_create(titulo=titulo)
             actividad.deportes = deporte
             actividad.save()
+            
+            Notificacion.notificarNuevaActividad(actividad)
 
             return Response({"respuesta": "Deporte asignado correctamente"}, status=status.HTTP_200_OK)
 
@@ -1184,7 +1211,7 @@ class TarifaInstalacionView(APIView):
 
 
 class ReservarActividadView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsUsuarioFinal]
     
     def post(self, request, actividad_id):
         actividad = get_object_or_404(Actividad, id=actividad_id)
@@ -1199,7 +1226,7 @@ class ReservarActividadView(APIView):
 
 
 class ReservaInstalacionView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsUsuarioFinal]
     
     def post(self, request, instalacion_id):
         instalacion = get_object_or_404(Instalacion, id=instalacion_id)
@@ -1214,7 +1241,7 @@ class ReservaInstalacionView(APIView):
 
 
 class GestionUsuariosView(APIView):
-    permission_classes = [IsAdministrador]
+    permission_classes = [IsAdministradorUsuarios]
 
     def get(self, request):
         usuariosFinales = UsuarioFinal.objects.all().order_by('nombre')
@@ -1236,7 +1263,7 @@ class GestionUsuariosView(APIView):
 
 
 class GestionEspaciosView(APIView):
-    permission_classes = [IsAdministrador]
+    permission_classes = [IsAdministradorEspacios]
 
     def get(self, request):
         pabellones = Pabellon.objects.all().order_by('nombre')
@@ -1254,7 +1281,7 @@ class GestionEspaciosView(APIView):
     
 
 class GestionTarifasView(APIView):
-    permission_classes = [IsAdministrador]
+    permission_classes = [IsAdministradorTarifas]
 
     def get(self, request):
         tarifasInstalacion = TarifaInstalacion.objects.all().order_by('titulo')
@@ -1285,7 +1312,7 @@ class GestionTarifasView(APIView):
 
 # Obtener configuracion del sistema
 class ObtenerConfiguracionView(APIView):
-    permission_classes = [IsAdministrador]
+    permission_classes = [IsAdministradorRaiz]
 
     def get(self, request):
         configuracion = Configuracion.objects.first()
@@ -1305,7 +1332,7 @@ class ObtenerConfiguracionView(APIView):
 
 # Comprar un abono
 class ComprarAbonoView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsUsuarioFinal]
     
     def post(self, request, abono_id):
         tipoAbono = request.data.get('tipoAbono')
@@ -1326,7 +1353,7 @@ class ComprarAbonoView(APIView):
 
 # Comprar un bono
 class ComprarBonoView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsUsuarioFinal]
     
     def post(self, request, bono_id):
         bono = get_object_or_404(Bono, id=bono_id)
@@ -1341,7 +1368,7 @@ class ComprarBonoView(APIView):
 
 
 class ResumenPagoView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsUsuarioFinal]
     
     def get(self, request, tipo, pago_id):
         # Obtenemos el pago
@@ -1421,7 +1448,7 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 
 # Realizar un intento de pago
 class CrearIntentoPagoView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsUsuarioFinal]
 
     def post(self, request):
         pago_id = request.data.get("pago_id")
@@ -1449,7 +1476,7 @@ class CrearIntentoPagoView(APIView):
 
 # Confirmar un pago
 class ConfirmarPagoView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsUsuarioFinal]
 
     def post(self, request):
         pago_id = request.data.get("pago_id")

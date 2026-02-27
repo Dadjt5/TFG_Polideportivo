@@ -464,6 +464,15 @@ export default {
   modifyChannel: "Modificar canal",
   channelDetail: "Detalles del canal",
 
+  /* Nueva notificacion */
+  newNotification: "Nueva notificación",
+  recipients: "Destinatarios",
+  allUsers: "Todos los usuarios",
+  byActivity: "Por actividad",
+  byFacility: "Por instalación",
+  byPavilion: "Por pabellón",
+  sendNotification: "Enviar notificación",
+
   /* Contacto */
   contactTitle: "Contacto con el centro deportivo",
   contactSubtitle: "Información de contacto del edificio de administración",

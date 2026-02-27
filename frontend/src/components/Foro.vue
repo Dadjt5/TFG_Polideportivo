@@ -1,7 +1,7 @@
 <template>
   <div class="min-vh-100 bg-light">
-    <ForoUsuarioFinal v-if="userStore.role === 'usuario_final'" />
-    <ForoAdministrador v-else-if="userStore.role === 'administrador'" />
+    <ForoUsuarioFinal v-if="userStore.isUsuarioFinal" />
+    <ForoAdministrador v-else-if="userStore.isAdminUsuarios || userStore.isAdminRaiz" />
   </div>
 </template>
 

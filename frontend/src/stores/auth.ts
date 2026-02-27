@@ -13,6 +13,8 @@ export interface User {
   usuario_final_id: number,
   monitor_id: number,
   administrador_id: number
+
+  rol?: string | null;
 }
 
 export const useAuthStore = defineStore("auth", {
@@ -25,13 +27,24 @@ export const useAuthStore = defineStore("auth", {
 
   getters: {
     isAuthenticated: (state) => !!state.access,
-    role: (state) => {
-      if (!state.user) return null;
-      if (state.user.is_usuario_final) return "usuario_final";
-      if (state.user.is_monitor) return "monitor";
-      if (state.user.is_administrador) return "administrador";
-      return null;
-    },
+
+    isUsuarioFinal: (state) => state.user?.is_usuario_final ?? false,
+    isMonitor: (state) => state.user?.is_monitor ?? false,
+    isAdmin: (state) => state.user?.is_administrador ?? false,
+
+    adminRole: (state) => state.user?.rol ?? null,
+
+    isAdminRaiz: (state) =>
+      state.user?.is_administrador && state.user?.rol === "RAIZ",
+
+    isAdminUsuarios: (state) =>
+      state.user?.is_administrador && state.user?.rol === "USUARIOS",
+
+    isAdminEspacios: (state) =>
+      state.user?.is_administrador && state.user?.rol === "ESPACIOS",
+
+    isAdminTarifas: (state) =>
+      state.user?.is_administrador && state.user?.rol === "TARIFAS",
   },
 
   actions: {

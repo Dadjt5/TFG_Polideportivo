@@ -78,23 +78,6 @@
                 />
               </div>
 
-              <!-- POR DEFECTO -->
-              <div class="col-12">
-                <span class="fw-medium">{{ t.defaultTariff }}:</span>
-                <p v-if="!editando" class="fs-5 fw-semibold">{{ tarifa.por_defecto ? t.yes : 'No' }}</p>
-                <div v-else class="form-check mt-1">
-                  <input
-                    class="form-check-input"
-                    type="checkbox"
-                    v-model="tarifa.por_defecto"
-                    id="defaultCheck"
-                  />
-                  <label class="form-check-label" for="defaultCheck">
-                    {{ t.defaultTariff }}
-                  </label>
-                </div>
-              </div>
-
             </div>
           </div>
         </div>
@@ -167,7 +150,6 @@ const tarifa = ref({
   precioUAM: 0,
   precioOtros: 0,
   numeroHorasSemana: 0,
-  por_defecto: false
 })
 
 const errores = ref({

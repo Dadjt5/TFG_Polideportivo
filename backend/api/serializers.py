@@ -686,9 +686,24 @@ class EntradaListaEsperaSerializer(serializers.ModelSerializer):
 # --------------------
 
 class NotificacionSerializer(serializers.ModelSerializer):
+    actividad = ActividadSimpleSerializer(read_only=True)
+    instalacion = InstalacionSimpleSerializer(read_only=True)
+    pabellon = PabellonSimpleSerializer(read_only=True)
+
     class Meta:
         model = Notificacion
-        fields = '__all__'
+        fields = (
+            "id",
+            "titulo",
+            "descripcion",
+            "fecha",
+            "hora",
+            "leido",
+            "fijado",
+            "actividad",
+            "instalacion",
+            "pabellon"
+        )
 
 # --------------------
 # Pagos

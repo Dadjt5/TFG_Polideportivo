@@ -127,29 +127,6 @@
           </div>
         </div>
 
-        <!-- POR DEFECTO -->
-        <div class="col-12 text-center mt-4">
-          <div class="bg-white rounded-4 shadow p-4">
-            <span class="fw-medium d-block mb-2">{{ t.defaultTariff }}</span>
-
-            <p v-if="!editando" class="fs-5 fw-semibold">
-              {{ tarifa.por_defecto ? t.yes : 'No' }}
-            </p>
-
-            <div v-else class="form-check d-inline-flex align-items-center justify-content-center">
-              <input
-                class="form-check-input me-2"
-                type="checkbox"
-                v-model="tarifa.por_defecto"
-                id="defaultCheck"
-              />
-              <label class="form-check-label" for="defaultCheck">
-                {{ t.defaultTariff }}
-              </label>
-            </div>
-          </div>
-        </div>
-
       </div>
 
       <!-- ACCIONES -->

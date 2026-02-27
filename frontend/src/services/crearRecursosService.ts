@@ -3,6 +3,12 @@ import api from "./api"
 /* Tipo genérico para payloads */
 type Payload = Record<string, any>
 
+/* Función para crear una nueva notificación */
+export const nuevaNotificacion = async (payload: Payload): Promise<any> => {
+  const response = await api.post("api/v1/notificaciones/nueva/", payload)
+  return response.data
+}
+
 /* Función para crear un nuevo pabellon */
 export const nuevoPabellon = async (payload: Payload): Promise<any> => {
   const response = await api.post("api/v1/pabellones/", payload)

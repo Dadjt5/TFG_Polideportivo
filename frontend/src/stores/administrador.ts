@@ -16,9 +16,18 @@ export interface Notificacion {
   fijado: boolean;
   fecha: string;
   hora: string;
-  actividad: number | null;
-  instalacion: number | null;
-  pabellon: number | null;
+  actividad: {
+    id: number;
+    nombre: string;
+  };
+  instalacion: {
+    id: number;
+    nombre: string;
+  };
+  pabellon: {
+    id: number;
+    nombre: string;
+  };
 }
 
 export interface Sesion {
@@ -50,6 +59,9 @@ export const useAdministradorStore = defineStore("administrador", {
   actions: {
     async fetchUser(id: number | undefined) {
       try {
+        if(id == null){
+          return
+        }
         const data = await getAdministrador(id);
 
         this.administrador = data;

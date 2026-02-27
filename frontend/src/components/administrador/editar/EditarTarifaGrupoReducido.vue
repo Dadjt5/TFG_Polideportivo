@@ -105,24 +105,6 @@
                   :class="{ 'is-invalid': errores.precioMensual }"
                 />
               </div>
-
-              <!-- POR DEFECTO -->
-              <div class="col-12">
-                <span class="fw-medium">{{ t.defaultTariff }}:</span>
-                <p v-if="!editando" class="fs-5 fw-semibold">{{ tarifa.por_defecto ? t.yes : 'No' }}</p>
-                <div v-else class="form-check mt-1">
-                  <input
-                    class="form-check-input"
-                    type="checkbox"
-                    v-model="tarifa.por_defecto"
-                    id="defaultCheck"
-                  />
-                  <label class="form-check-label" for="defaultCheck">
-                    {{ t.defaultTariff }}
-                  </label>
-                </div>
-              </div>
-
             </div>
           </div>
         </div>
@@ -201,8 +183,7 @@ const tarifa = ref({
   numeroPersonas: 0,
   precio: 0,
   precioCuatrimestre: 0,
-  precioMensual: 0,
-  por_defecto: false
+  precioMensual: 0
 })
 
 const errores = ref({

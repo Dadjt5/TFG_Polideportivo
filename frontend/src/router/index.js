@@ -48,6 +48,7 @@ import GestionarActividades from '@/components/administrador/GestionarActividade
 import GestionarTarifas from '@/components/administrador/GestionarTarifas.vue'
 import Configuracion from '@/components/administrador/Configuracion.vue'
 import EstadisticasAdministrador from '@/components/administrador/EstadisticasAdministrador.vue'
+import NuevaNotificacion from '@/components/administrador/NuevaNotificacion.vue'
 
 // Nuevos
 import NuevoUsuarioFinal from '@/components/administrador/nuevos/NuevoUsuarioFinal.vue'
@@ -68,7 +69,6 @@ import NuevaTarifaFisioterapia from '@/components/administrador/nuevos/NuevaTari
 import NuevoAbonoDeportivo from '@/components/administrador/nuevos/NuevoAbonoDeportivo.vue'
 import NuevoAbonoVerano from '@/components/administrador/nuevos/NuevoAbonoVerano.vue'
 import NuevoBono from '@/components/administrador/nuevos/NuevoBono.vue'
-
 
 // Editar
 import DetalleUsuarioFinal from '@/components/administrador/editar/DetalleUsuarioFinal.vue'
@@ -108,87 +108,88 @@ const routes = [
   {
     path: '/home-usuario',
     component: HomeUsuarioFinal,
-    meta: { requiresAuth: true, role: 'usuario_final' }
+    meta: { requiresAuth: true, allowedRoles: ['usuario_final'] }
   },
-  { path: '/notificaciones', component: Notificaciones, meta: { requiresAuth: true } },
+  { path: '/notificaciones', component: Notificaciones, meta: { requiresAuth: true, allowedRoles: ['usuario_final'] } },
   { path: '/registrarse', component: Registro, meta: { public: true } },
 
   /* Perfil */
   { path: '/perfil', component: Perfil, meta: { requiresAuth: true } },
-  { path: '/ver-tda', component: TarjetaDeportivaAnual, meta: { requiresAuth: true } },
-  { path: '/ver-abonos', component: VerAbonosBonos, meta: { requiresAuth: true } },
-  { path: '/modificar-datos', component: ModificarDatosPersonales, meta: { requiresAuth: true } },
+  { path: '/ver-tda', component: TarjetaDeportivaAnual, meta: { requiresAuth: true, allowedRoles: ['usuario_final'] } },
+  { path: '/ver-abonos', component: VerAbonosBonos, meta: { requiresAuth: true, allowedRoles: ['usuario_final'] } },
+  { path: '/modificar-datos', component: ModificarDatosPersonales, meta: { requiresAuth: true, allowedRoles: ['usuario_final'] } },
 
   /* Comprar */
-  { path: '/comprar-abonos', component: ComprarAbonosBonos, meta: { requiresAuth: true } },
-  { path: '/reservas-realizadas', component: ReservasRealizadas, meta: { requiresAuth: true } },
+  { path: '/comprar-abonos', component: ComprarAbonosBonos, meta: { requiresAuth: true, allowedRoles: ['usuario_final'] } },
+  { path: '/reservas-realizadas', component: ReservasRealizadas, meta: { requiresAuth: true, allowedRoles: ['usuario_final'] } },
 
-  { path: '/actividad/:id/reservar', component: ReservaActividad, name: 'reservar-actividad', props: true, meta: { requiresAuth: true } },
-  { path: '/instalacion/:id/reservar', component: Alquiler, name: 'reservar-instalacion', props: true, meta: { requiresAuth: true } },
+  { path: '/actividad/:id/reservar', component: ReservaActividad, name: 'reservar-actividad', props: true, meta: { requiresAuth: true, allowedRoles: ['usuario_final'] } },
+  { path: '/instalacion/:id/reservar', component: Alquiler, name: 'reservar-instalacion', props: true, meta: { requiresAuth: true, allowedRoles: ['usuario_final'] } },
 
-  { path: '/pago/:tipo/:id', component: Pago, props: true, name: 'pasarela-pago', meta: { requiresAuth: true }},
-  { path: '/pago/finalizado/:id', component: Pago, props: true, name: 'pago-finalizado', meta: { requiresAuth: true }},
+  { path: '/pago/:tipo/:id', component: Pago, props: true, name: 'pasarela-pago', meta: { requiresAuth: true, allowedRoles: ['usuario_final'] }},
+  { path: '/pago/finalizado/:id', component: Pago, props: true, name: 'pago-finalizado', meta: { requiresAuth: true, allowedRoles: ['usuario_final'] }},
 
   /* Detalle */
   { path: '/pabellones/:id', component: DetallePabellon, name: 'detalle-pabellon', props: true, meta: { public: true } },
   { path: '/instalaciones/:id', component: DetalleInstalacion, name: 'detalle-instalacion', props: true, meta: { public: true } },
   { path: '/actividades/:id', component: DetalleActividad, name: 'detalle-actividad', props: true, meta: { public: true } },
-  { path: '/actividades/:idAct/sesiones/:idSesion', component: DetalleSesion, name: 'detalle-sesion', props: true, meta: { requiresAuth: true } },
+  { path: '/actividades/:idAct/sesiones/:idSesion', component: DetalleSesion, name: 'detalle-sesion', props: true, meta: { public: true } },
 
 
   /******************* MONITOR *******************/
-  { path: '/home-monitor', component: HomeMonitor, meta: { requiresAuth: true, role: 'monitor' } },
+  { path: '/home-monitor', component: HomeMonitor, meta: { requiresAuth: true, allowedRoles: ['monitor'] } },
 
 
   /******************* ADMINISTRADOR *******************/
-  { path: '/home-administrador', component: HomeAdministrador, meta: { requiresAuth: true, role: 'administrador' } },
+  { path: '/home-administrador', component: HomeAdministrador, meta: { requiresAuth: true, allowedRoles: ['administrador'] } },
 
-  { path: '/gestion/usuarios', component: GestionarUsuarios, name: 'gestion-usuarios', meta: { requiresAuth: true } },
-  { path: '/gestion/espacios', component: GestionarEspacios, name: 'gestion-espacios', meta: { requiresAuth: true } },
-  { path: '/gestion/actividades', component: GestionarActividades, name: 'gestion-actividades', meta: { requiresAuth: true } },
-  { path: '/gestion/tarifas', component: GestionarTarifas, name: 'gestion-tarifas', meta: { requiresAuth: true } },
-  { path: '/configuracion', component: Configuracion, name: 'configuracion', meta: { requiresAuth: true } },
-  { path: '/estadisticas/administrador', component: EstadisticasAdministrador, name: 'estadisticas-administrador', meta: { requiresAuth: true } },
+  { path: '/gestion/usuarios', component: GestionarUsuarios, name: 'gestion-usuarios', meta: { requiresAuth: true, allowedAdminRoles: ['RAIZ', 'USUARIOS'] } },
+  { path: '/gestion/espacios', component: GestionarEspacios, name: 'gestion-espacios', meta: { requiresAuth: true, allowedAdminRoles: ['RAIZ', 'ESPACIOS'] } },
+  { path: '/gestion/actividades', component: GestionarActividades, name: 'gestion-actividades', meta: { requiresAuth: true, allowedAdminRoles: ['RAIZ', 'ESPACIOS'] } },
+  { path: '/gestion/tarifas', component: GestionarTarifas, name: 'gestion-tarifas', meta: { requiresAuth: true, allowedAdminRoles: ['RAIZ', 'TARIFAS'] } },
+  { path: '/configuracion', component: Configuracion, name: 'configuracion', meta: { requiresAuth: true, allowedAdminRoles: ['RAIZ'] } },
+  { path: '/estadisticas/administrador', component: EstadisticasAdministrador, name: 'estadisticas-administrador', meta: { requiresAuth: true, allowedRoles: ['administrador'] } },
+  { path: '/notificaciones/nueva', component: NuevaNotificacion, name: 'nueva-notificacion', meta: { requiresAuth: true, allowedRoles: ['administrador'] } },
 
   /* Nuevo */
-  { path: '/registrar/usuario', component: NuevoUsuarioFinal, meta: { requiresAuth: true } },
-  { path: '/registrar/monitor', component: NuevoMonitor, meta: { requiresAuth: true } },
-  { path: '/registrar/administrador', component: NuevoAdministrador, meta: { requiresAuth: true } },
+  { path: '/registrar/usuario', component: NuevoUsuarioFinal, meta: { requiresAuth: true, allowedAdminRoles: ['RAIZ', 'USUARIOS'] } },
+  { path: '/registrar/monitor', component: NuevoMonitor, meta: { requiresAuth: true, allowedAdminRoles: ['RAIZ', 'USUARIOS'] } },
+  { path: '/registrar/administrador', component: NuevoAdministrador, meta: { requiresAuth: true, allowedAdminRoles: ['RAIZ', 'USUARIOS'] } },
 
-  { path: '/crear/pabellon', component: NuevoPabellon, name: 'crear-pabellon', meta: { requiresAuth: true } },
-  { path: '/crear/instalacion', component: NuevaInstalacion, name: 'crear-instalacion', meta: { requiresAuth: true } },
-  { path: '/crear/actividad', component: NuevaActividad, name: 'crear-actividad', meta: { requiresAuth: true } },
-  { path: '/crear/sesion/:id', component: NuevaSesion, props: true, name: 'crear-sesion', meta: { requiresAuth: true } },
-  { path: '/crear/canal/:id', component: NuevoCanal, props: true, name: 'crear-canal', meta: { requiresAuth: true } },
+  { path: '/crear/pabellon', component: NuevoPabellon, name: 'crear-pabellon', meta: { requiresAuth: true, allowedAdminRoles: ['RAIZ', 'ESPACIOS'] } },
+  { path: '/crear/instalacion', component: NuevaInstalacion, name: 'crear-instalacion', meta: { requiresAuth: true, allowedAdminRoles: ['RAIZ', 'ESPACIOS'] } },
+  { path: '/crear/actividad', component: NuevaActividad, name: 'crear-actividad', meta: { requiresAuth: true, allowedAdminRoles: ['RAIZ', 'ESPACIOS'] } },
+  { path: '/crear/sesion/:id', component: NuevaSesion, props: true, name: 'crear-sesion', meta: { requiresAuth: true, allowedAdminRoles: ['RAIZ', 'ESPACIOS'] } },
+  { path: '/crear/canal/:id', component: NuevoCanal, props: true, name: 'crear-canal', meta: { requiresAuth: true, allowedAdminRoles: ['RAIZ', 'ESPACIOS'] } },
 
-  { path: '/crear/tarifa/tda', component: NuevaTarifaTDA, meta: { requiresAuth: true } },
-  { path: '/crear/tarifa/instalacion', component: NuevaTarifaInstalacion, meta: { requiresAuth: true } },
-  { path: '/crear/tarifa/comun', component: NuevaTarifaActividadComun, meta: { requiresAuth: true } },
-  { path: '/crear/tarifa/grupos', component: NuevaTarifaGrupoReducido, meta: { requiresAuth: true } },
-  { path: '/crear/tarifa/fisioterapia', component: NuevaTarifaFisioterapia, meta: { requiresAuth: true } },
-  { path: '/crear/abono/deportivo', component: NuevoAbonoDeportivo, meta: { requiresAuth: true } },
-  { path: '/crear/abono/verano', component: NuevoAbonoVerano, meta: { requiresAuth: true } },
-  { path: '/crear/bono', component: NuevoBono, meta: { requiresAuth: true } },
+  { path: '/crear/tarifa/tda', component: NuevaTarifaTDA, meta: { requiresAuth: true, allowedAdminRoles: ['RAIZ', 'TARIFAS'] } },
+  { path: '/crear/tarifa/instalacion', component: NuevaTarifaInstalacion, meta: { requiresAuth: true, allowedAdminRoles: ['RAIZ', 'TARIFAS'] } },
+  { path: '/crear/tarifa/comun', component: NuevaTarifaActividadComun, meta: { requiresAuth: true, allowedAdminRoles: ['RAIZ', 'TARIFAS'] } },
+  { path: '/crear/tarifa/grupos', component: NuevaTarifaGrupoReducido, meta: { requiresAuth: true, allowedAdminRoles: ['RAIZ', 'TARIFAS'] } },
+  { path: '/crear/tarifa/fisioterapia', component: NuevaTarifaFisioterapia, meta: { requiresAuth: true, allowedAdminRoles: ['RAIZ', 'TARIFAS'] } },
+  { path: '/crear/abono/deportivo', component: NuevoAbonoDeportivo, meta: { requiresAuth: true, allowedAdminRoles: ['RAIZ', 'TARIFAS'] } },
+  { path: '/crear/abono/verano', component: NuevoAbonoVerano, meta: { requiresAuth: true, allowedAdminRoles: ['RAIZ', 'TARIFAS'] } },
+  { path: '/crear/bono', component: NuevoBono, meta: { requiresAuth: true, allowedAdminRoles: ['RAIZ', 'TARIFAS'] } },
 
   /* Editar */
-  { path: '/usuarioFinal/:id', component: DetalleUsuarioFinal, props: true, name: 'detalle-usuarioFinal', meta: { requiresAuth: true } },
-  { path: '/monitor/:id', component: DetalleMonitor, props: true, name: 'detalle-monitor', meta: { requiresAuth: true } },
-  { path: '/administrador/:id', component: DetalleAdministrador, props: true, name: 'detalle-administrador', meta: { requiresAuth: true } },
+  { path: '/usuarioFinal/:id', component: DetalleUsuarioFinal, props: true, name: 'detalle-usuarioFinal', meta: { requiresAuth: true, allowedAdminRoles: ['RAIZ', 'USUARIOS'] } },
+  { path: '/monitor/:id', component: DetalleMonitor, props: true, name: 'detalle-monitor', meta: { requiresAuth: true, allowedAdminRoles: ['RAIZ', 'USUARIOS'] } },
+  { path: '/administrador/:id', component: DetalleAdministrador, props: true, name: 'detalle-administrador', meta: { requiresAuth: true, allowedAdminRoles: ['RAIZ', 'USUARIOS'] } },
 
-  { path: '/admin/pabellones/:id', component: EditarPabellon, props: true, name: 'editar-pabellon', meta: { requiresAuth: true } },
-  { path: '/admin/instalaciones/:id', component: EditarInstalacion, props: true, name: 'editar-instalacion', meta: { requiresAuth: true } },
-  { path: '/admin/actividades/:id', component: EditarActividad, props: true, name: 'editar-actividad', meta: { requiresAuth: true } },
-  { path: '/admin/actividades/:idAct/sesiones/:idSesion', component: EditarSesion, props: true, name: 'editar-sesion', meta: { requiresAuth: true } },
-  { path: '/admin/foros/:idForo/canales/:idCanal', component: EditarCanal, props: true, name: 'editar-canal', meta: { requiresAuth: true } },
+  { path: '/admin/pabellones/:id', component: EditarPabellon, props: true, name: 'editar-pabellon', meta: { requiresAuth: true, allowedAdminRoles: ['RAIZ', 'ESPACIOS'] } },
+  { path: '/admin/instalaciones/:id', component: EditarInstalacion, props: true, name: 'editar-instalacion', meta: { requiresAuth: true, allowedAdminRoles: ['RAIZ', 'ESPACIOS'] } },
+  { path: '/admin/actividades/:id', component: EditarActividad, props: true, name: 'editar-actividad', meta: { requiresAuth: true, allowedAdminRoles: ['RAIZ', 'ESPACIOS'] } },
+  { path: '/admin/actividades/:idAct/sesiones/:idSesion', component: EditarSesion, props: true, name: 'editar-sesion', meta: { requiresAuth: true, allowedAdminRoles: ['RAIZ', 'ESPACIOS'] } },
+  { path: '/admin/foros/:idForo/canales/:idCanal', component: EditarCanal, props: true, name: 'editar-canal', meta: { requiresAuth: true, allowedAdminRoles: ['RAIZ', 'ESPACIOS'] } },
 
-  { path: '/editar/tarifa/tda/:id', component: EditarTarifaTDA, props: true, name: 'editar-tarifa-tda', meta: { requiresAuth: true } },
-  { path: '/editar/tarifa/instalacion/:id', component: EditarTarifaInstalacion, props: true, name: 'editar-tarifa-instalacion', meta: { requiresAuth: true } },
-  { path: '/editar/tarifa/comun/:id', component: EditarTarifaActividadComun, props: true, name: 'editar-tarifa-comun', meta: { requiresAuth: true } },
-  { path: '/editar/tarifa/grupos/:id', component: EditarTarifaGrupoReducido, props: true, name: 'editar-tarifa-grupos', meta: { requiresAuth: true } },
-  { path: '/editar/tarifa/fisioterapia/:id', component: EditarTarifaFisioterapia, props: true, name: 'editar-tarifa-fisioterapia', meta: { requiresAuth: true } },
-  { path: '/editar/abono/deportivo', component: EditarAbonoDeportivo, props: true, name: 'editar-abono-deportivo', meta: { requiresAuth: true } },
-  { path: '/editar/abono/verano', component: EditarAbonoVerano, props: true, name: 'editar-abono-verano', meta: { requiresAuth: true } },
-  { path: '/editar/bono', component: EditarBono, props: true, name: 'editar-bono', meta: { requiresAuth: true } },
+  { path: '/editar/tarifa/tda/:id', component: EditarTarifaTDA, props: true, name: 'editar-tarifa-tda', meta: { requiresAuth: true, allowedAdminRoles: ['RAIZ', 'TARIFAS'] } },
+  { path: '/editar/tarifa/instalacion/:id', component: EditarTarifaInstalacion, props: true, name: 'editar-tarifa-instalacion', meta: { requiresAuth: true, allowedAdminRoles: ['RAIZ', 'TARIFAS'] } },
+  { path: '/editar/tarifa/comun/:id', component: EditarTarifaActividadComun, props: true, name: 'editar-tarifa-comun', meta: { requiresAuth: true, allowedAdminRoles: ['RAIZ', 'TARIFAS'] } },
+  { path: '/editar/tarifa/grupos/:id', component: EditarTarifaGrupoReducido, props: true, name: 'editar-tarifa-grupos', meta: { requiresAuth: true, allowedAdminRoles: ['RAIZ', 'TARIFAS'] } },
+  { path: '/editar/tarifa/fisioterapia/:id', component: EditarTarifaFisioterapia, props: true, name: 'editar-tarifa-fisioterapia', meta: { requiresAuth: true, allowedAdminRoles: ['RAIZ', 'TARIFAS'] } },
+  { path: '/editar/abono/deportivo', component: EditarAbonoDeportivo, props: true, name: 'editar-abono-deportivo', meta: { requiresAuth: true, allowedAdminRoles: ['RAIZ', 'TARIFAS'] } },
+  { path: '/editar/abono/verano', component: EditarAbonoVerano, props: true, name: 'editar-abono-verano', meta: { requiresAuth: true, allowedAdminRoles: ['RAIZ', 'TARIFAS'] } },
+  { path: '/editar/bono', component: EditarBono, props: true, name: 'editar-bono', meta: { requiresAuth: true, allowedAdminRoles: ['RAIZ', 'TARIFAS'] } },
 ]
 
 
@@ -201,7 +202,6 @@ const router = createRouter({
   }
 })
 
-/* Antes de acceder a una direccion revisamos los campos clave y las redirecciones necesarias cuando hay usuarios logueados */
 router.beforeEach(async (to) => {
   const auth = useAuthStore();
 
@@ -210,20 +210,42 @@ router.beforeEach(async (to) => {
   }
 
   if (to.path === '/home') {
-    if (auth.role === 'usuario_final') return '/home-usuario';
-    if (auth.role === 'monitor') return '/home-monitor';
-    if (auth.role === 'administrador') return '/home-administrador';
+    if (auth.isUsuarioFinal) return '/home-usuario';
+    if (auth.isMonitor) return '/home-monitor';
+    if (auth.isAdmin) return '/home-administrador';
   }
 
-  if (to.meta.public) {
-    return true;
-  }
+  // Rutas públicas
+  if (to.meta.public) return true;
 
-  if (!auth.isAuthenticated) {
+  // Requiere login
+  if (!auth.isAuthenticated) return '/login';
+
+  // Roles
+  if (to.meta.allowedRoles) {
+    const allowed = to.meta.allowedRoles;
+
+    if (
+      (allowed.includes('usuario_final') && auth.isUsuarioFinal) ||
+      (allowed.includes('monitor') && auth.isMonitor) ||
+      (allowed.includes('administrador') && auth.isAdmin)
+    ) {
+      return true;
+    }
+
     return '/login';
   }
 
-  if (to.meta.role && auth.role !== to.meta.role) {
+  // Roles de admin
+  if (to.meta.allowedAdminRoles) {
+    const allowedAdmin = to.meta.allowedAdminRoles;
+
+    if (!auth.isAdmin) return '/login';
+
+    if (allowedAdmin.includes(auth.adminRole)) {
+      return true;
+    }
+
     return '/login';
   }
 

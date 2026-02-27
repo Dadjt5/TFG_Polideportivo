@@ -74,6 +74,7 @@ urlpatterns = [
     path("registrarse/", views.RegistroView.as_view(), name="registro"),
     path("registrar/monitor/", views.RegistroMonitorView.as_view(), name="registrar-monitor"),
     path("registrar/administrador/", views.RegistroAdministradorView.as_view(), name="registrar-administrador"),
+    path("notificaciones/nueva/", views.NuevaNotificacionView.as_view(), name="crear-notificacion"),
     path("notificaciones/guardar/", views.GuardarNotificacionView.as_view(), name="modificar-notificacion"),
     path("tda/validar/", views.ValidarTDAView.as_view(), name="validar-tda"),
     path("marcar/favoritas/", views.AlterarFavoritosView.as_view(), name="marcar-favoritas"),

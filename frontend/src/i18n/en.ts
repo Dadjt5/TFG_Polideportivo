@@ -451,6 +451,15 @@ export default {
   minCancellationDays: "Minimum number of days required to cancel a reservation",
   previousNotificationHours: "Hours in advance to send a notification",
 
+  /* Nueva notificacion */
+  newNotification: "New notification",
+  recipients: "Recipients",
+  allUsers: "All users",
+  byActivity: "By activity",
+  byFacility: "By facility",
+  byPavilion: "By pavilion",
+  sendNotification: "Send notification",
+
   /* Foro administrador */
   channelName: "Channel name",
   newChannel: "New channel",

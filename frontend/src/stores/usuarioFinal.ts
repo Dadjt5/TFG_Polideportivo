@@ -20,9 +20,18 @@ export interface Notificacion {
   fijado: boolean;
   fecha: string;
   hora: string;
-  actividad: number | null;
-  instalacion: number | null;
-  pabellon: number | null;
+  actividad: {
+    id: number;
+    nombre: string;
+  };
+  instalacion: {
+    id: number;
+    nombre: string;
+  };
+  pabellon: {
+    id: number;
+    nombre: string;
+  };
 }
 
 export interface TDA {
