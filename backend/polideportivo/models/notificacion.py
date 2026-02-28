@@ -56,6 +56,7 @@ class Notificacion(models.Model):
             usuarios = User.objects.filter(id__in=Administrador.objects.values_list('user_id', flat=True))
 
         elif tipoUsuarios == "ACTIVIDAD":
+            # Trae todos los usuarios finales que tengan asistencia en alguna sesión de la actividad
             usuarios = User.objects.filter(id__in=UsuarioFinal.objects.filter(asistencia__sesion__actividad_id=complemento).values_list('user_id', flat=True)).distinct()
 
         elif tipoUsuarios == "INSTALACION":
@@ -66,7 +67,6 @@ class Notificacion(models.Model):
 
         else:
             usuarios = User.objects.none()
-
 
         notificaciones = [
             cls(

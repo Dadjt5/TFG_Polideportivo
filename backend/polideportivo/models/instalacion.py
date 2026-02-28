@@ -3,7 +3,8 @@ from django.utils.translation import gettext_lazy as _
 from datetime import time
 
 from .agenda import Agenda
-from .constantes import TipoInstalacion, TipoReserva
+from .constantes import TipoInstalacion
+from .actividad import Sesion
 
 
 class Pabellon(models.Model):
@@ -58,7 +59,7 @@ class Instalacion(models.Model):
         
         return precio
 
-    def controlarHorarioActividad(self, dia, hora_inicio, hora_fin):
+    def controlarHorarioActividad(self, dia, hora_inicio, hora_fin, sesion_id=None):
         if isinstance(hora_inicio, str):
             h, m = map(int, hora_inicio.split(":"))
             hora_inicio = time(h, m)
@@ -73,12 +74,16 @@ class Instalacion(models.Model):
         if agenda.horaApertura > hora_inicio or agenda.horaCierre < hora_fin:
             return False
 
-        conflictos = self.actividad.filter(
-            sesiones__dia=dia,
-            sesiones__horaInicio__lt=hora_fin,
-            sesiones__horaFin__gt=hora_inicio
+        conflictos = Sesion.objects.filter(
+            actividad__instalacion=self,
+            dia=dia,
+            horaInicio__lt=hora_fin,
+            horaFin__gt=hora_inicio
         )
 
+        if sesion_id and sesion_id != -1:
+            conflictos = conflictos.exclude(id=sesion_id)
+        
         if conflictos.exists():
             return False
 

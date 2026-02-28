@@ -6,7 +6,7 @@
         {{ t.notifications }}
       </h2>
 
-      <div v-if="userStore.isAdmin" class="text-end mb-3">
+      <div v-if="userStore.isAdmin" class="text-center mb-3">
         <router-link to="/notificaciones/nueva" class="btn btn-primary rounded-pill">
           <i class="bi bi-megaphone-fill me-2"></i>
           {{ t.newNotification }}

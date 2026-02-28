@@ -9,6 +9,12 @@ export const nuevaNotificacion = async (payload: Payload): Promise<any> => {
   return response.data
 }
 
+/* Función para crear un nuevo deporte */
+export const nuevoDeporte = async (payload: Payload): Promise<any> => {
+  const response = await api.post("api/v1/deportes/", payload)
+  return response.data
+}
+
 /* Función para crear un nuevo pabellon */
 export const nuevoPabellon = async (payload: Payload): Promise<any> => {
   const response = await api.post("api/v1/pabellones/", payload)

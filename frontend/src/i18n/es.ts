@@ -366,6 +366,9 @@ export default {
   deleteActivity: "Eliminar actividad",
   modifySession: "Editar sesión",
   deleteSession: "Eliminar sesión",
+  newSport: "Nuevo deporte",
+  modifySport: "Modificar deporte",
+  deleteSport: "Eliminar deporte",
 
   /* Detalle actividad */
   noSession: "Sin sesiones",

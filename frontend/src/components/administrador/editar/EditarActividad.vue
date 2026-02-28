@@ -2,7 +2,7 @@
   <div class="min-vh-100 bg-light pb-5">
     <main class="container py-5" style="max-width: 1100px;">
       <h1 class="text-center fw-bold mb-5 display-6">
-        {{ t.editActivity }}
+        {{ t.modifyActivity }}
       </h1>
 
       <div class="card border-0 shadow-lg rounded-4 p-4">
@@ -94,19 +94,25 @@
             <input type="text" class="form-control form-control-lg" v-model="actividad.material" />
           </div>
 
+          <!-- DEPORTE -->
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.sport }}</label>
-            <input type="text" class="form-control form-control-lg" v-model="nombreDeporte" list="listaDeportes" placeholder="Ej: Fútbol" :class="{ 'is-invalid': errores.deporte }" />
-            <datalist id="listaDeportes">
-              <option v-for="d in deportes" :key="d.id" :value="d.titulo" />
-            </datalist>
+
+            <select class="form-select form-select-lg" v-model="actividad.nombreDeporte"
+              :class="{ 'is-invalid': errores.deporte }">
+              <option disabled value="">{{ t.selectOption }}</option>
+
+              <option v-for="d in deportes" :key="d.id" :value="d.id">
+                {{ d.titulo }}
+              </option>
+
+              <option value="nuevo">+ {{ t.newSport }}</option>
+            </select>
           </div>
 
-          <div class="col-md-4">
-            <label class="form-label fw-semibold">{{ t.activityType }}</label>
-            <select class="form-select form-select-lg" v-model="actividad.tipoActividad" :class="{ 'is-invalid': errores.tipoActividad }">
-              <option v-for="t in tiposStore.tiposActividad" :key="t[0]" :value="t[0]">{{ t[1] }}</option>
-            </select>
+          <div v-if="actividad.nombreDeporte === 'nuevo'" class="mt-3">
+            <input type="text" class="form-control form-control-lg" v-model="actividad.nombreDeporte"
+              :placeholder=t.title />
           </div>
 
           <div class="col-md-4">
@@ -142,7 +148,7 @@
         <div v-if="tab === 2">
           <div class="mb-4">
             <label class="form-label fw-semibold">{{ t.facility }}</label>
-            <select class="form-select form-select-lg" v-model="actividad.instalacion_id" :class="{ 'is-invalid': errores.instalacion }">
+            <select class="form-select form-select-lg" v-model="actividad.instalacion" :class="{ 'is-invalid': errores.instalacion }">
               <option :value="null">--</option>
               <option v-for="i in instalaciones" :key="i.id" :value="i.id">{{ i.nombre }}</option>
             </select>
@@ -184,7 +190,7 @@
         <div v-if="tab === 3">
           <div class="mb-4">
             <label class="form-label fw-semibold">{{ t.monitor }}</label>
-            <select class="form-select form-select-lg" v-model="actividad.monitor_id" :class="{ 'is-invalid': errores.monitor }">
+            <select class="form-select form-select-lg" v-model="actividad.monitor" :class="{ 'is-invalid': errores.monitor }">
               <option :value="null">--</option>
               <option v-for="m in monitores" :key="m.id" :value="m.id">{{ m.nombre }}</option>
             </select>
@@ -200,6 +206,102 @@
               <option :value="null">--</option>
               <option v-for="t in tarifas" :key="t.id" :value="t.id">{{ t.titulo }}</option>
             </select>
+
+            <transition name="fade">
+              <div v-if="tarifaSeleccionada" class="mt-4 p-4 bg-white rounded-4 shadow-sm border">
+                <h5 class="mb-3 text-primary">{{ t.priceSubscripcion }}</h5>
+
+                <div v-if="actividad.tipoActividad === 'OTROS'" class="row g-3">
+                  <div class="col-md-6">
+                    <div class="p-3 bg-light rounded-3">
+                      <strong>{{ t.priceUAM }}:</strong> {{ tarifaSeleccionada.precioUAM }} €
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="p-3 bg-light rounded-3">
+                      <strong>{{ t.priceOthers }}:</strong> {{ tarifaSeleccionada.precioOtros }} €
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <div class="p-3 bg-light rounded-3">
+                      <strong>{{ t.weekHours }}:</strong> {{ tarifaSeleccionada.numeroHorasSemana }}
+                    </div>
+                  </div>
+                </div>
+
+                <div v-else-if="actividad.tipoActividad === 'GRUPOS_REDUCIDOS'" class="row g-3">
+                  <div class="col-md-4">
+                    <div class="p-3 bg-light rounded-3">
+                      <strong>{{ t.price }}:</strong> {{ tarifaSeleccionada.precio }} €
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="p-3 bg-light rounded-3">
+                      <strong>{{ t.monthlyPrice }}:</strong> {{ tarifaSeleccionada.precioMensual }} €
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="p-3 bg-light rounded-3">
+                      <strong>{{ t.quarterPrice }}:</strong> {{ tarifaSeleccionada.precioCuatrimestre }} €
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="p-3 bg-light rounded-3">
+                      <strong>{{ t.weekHours }}:</strong> {{ tarifaSeleccionada.numeroHoras }}
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="p-3 bg-light rounded-3">
+                      <strong>{{ t.people }}:</strong> {{ tarifaSeleccionada.numeroPersonas }}
+                    </div>
+                  </div>
+                </div>
+
+                <div v-else-if="actividad.tipoActividad === 'FISIOTERAPIA'" class="row g-3 mt-3">
+                  <!-- TDA -->
+                  <div class="col-md-4">
+                    <div class="p-3 bg-light rounded-3 shadow-sm">
+                      <h6 class="text-primary">{{ t.priceTDA }}</h6>
+                      <p class="mb-1">{{ t.consultationPrice }}: {{ tarifaSeleccionada.precioConsultaTDA }} €</p>
+                      <p class="mb-1">{{ t.sessions1to5 }}: {{ tarifaSeleccionada.precioSesiones1_5TDA }} €</p>
+                      <p class="mb-1">{{ t.sessions6plus }}: {{ tarifaSeleccionada.precioSesiones6TDA }} €</p>
+                    </div>
+                  </div>
+
+                  <!-- UAM -->
+                  <div class="col-md-4">
+                    <div class="p-3 bg-light rounded-3 shadow-sm">
+                      <h6 class="text-success">{{ t.priceUAM }}</h6>
+                      <p class="mb-1">{{ t.consultationPrice }}: {{ tarifaSeleccionada.precioConsultaUAM }} €</p>
+                      <p class="mb-1">{{ t.sessions1to5 }}: {{ tarifaSeleccionada.precioSesiones1_5UAM }} €</p>
+                      <p class="mb-1">{{ t.sessions6plus }}: {{ tarifaSeleccionada.precioSesiones6UAM }} €</p>
+                    </div>
+                  </div>
+
+                  <!-- Others -->
+                  <div class="col-md-4">
+                    <div class="p-3 bg-light rounded-3 shadow-sm">
+                      <h6 class="text-warning">{{ t.priceOthers }}</h6>
+                      <p class="mb-1">{{ t.consultationPrice }}: {{ tarifaSeleccionada.precioConsultaOtros }} €</p>
+                      <p class="mb-1">{{ t.sessions1to5 }}: {{ tarifaSeleccionada.precioSesiones1_5Otros }} €</p>
+                      <p class="mb-1">{{ t.sessions6plus }}: {{ tarifaSeleccionada.precioSesiones6Otros }} €</p>
+                    </div>
+                  </div>
+
+                  <!-- Información general -->
+                  <div class="col-6">
+                    <div class="p-3 bg-light rounded-3 shadow-sm">
+                      <strong>{{ t.weekHours }}:</strong> {{ tarifaSeleccionada.numeroHoras }}
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <div class="p-3 bg-light rounded-3 shadow-sm">
+                      <strong>{{ t.people }}:</strong> {{ tarifaSeleccionada.numeroPersonas }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </transition>
           </div>
         </div>
 
@@ -256,16 +358,20 @@
 <script setup lang="ts">
 import { ref, onMounted, inject, type Ref, computed } from "vue"
 import { useRouter } from "vue-router"
+
+import { getInstalacionesSimples, getMonitoresSimples, getTarifasActividadComun, getTarifasFisioterapia, getTarifasGrupoReducido, getDeportes } from "@/services/listadoService"
 import { getActividadDetalle, modificarActividad } from "@/services/detalleService"
 import { useTiposStore } from "@/stores/tipos"
+
 import type { Language } from "@/useI18N"
 import { useI18n } from "@/useI18N"
 
 const props = defineProps<{ id: string }>()
-const router = useRouter()
+
 const language = inject<Ref<Language>>("language")!
 const t = useI18n(language)
 
+const router = useRouter()
 const tiposStore = useTiposStore()
 const tab = ref(1)
 const añoActual = new Date().getFullYear()
@@ -282,19 +388,19 @@ const actividad = ref<any>({
   nivel: "",
   material: "",
   exterior: false,
-  instalacion_id: null,
-  monitor_id: null,
+  instalacion: null,
+  monitor: null,
   tipoActividad: "",
   tarifa: null,
   tipoReserva: "",
   terreno: "",
   estado: "",
   periodo: "",
+  nombreDeporte: ""
 })
 
 const sesiones = ref<any[]>([])
-const crearSesion = ref({ dia: "", horaInicio: "", horaFin: "" })
-const nombreDeporte = ref("")
+const crearSesion = ref({ id: -1, dia: "", horaInicio: "", horaFin: "" })
 const mensaje = ref("")
 
 const errores = ref<any>({
@@ -305,13 +411,13 @@ const errores = ref<any>({
 })
 
 const monitorSeleccionado = computed(() =>
-  monitores.value.find(m => m.id === actividad.value.monitor_id)
+  monitores.value.find(m => m.id === actividad.value.monitor)
 )
 const tarifaSeleccionada = computed(() =>
   tarifas.value.find(t => t.id === actividad.value.tarifa)
 )
 const instalacionSeleccionada = computed(() =>
-  instalaciones.value.find(i => i.id === actividad.value.instalacion_id)
+  instalaciones.value.find(i => i.id === actividad.value.instalacion)
 )
 
 const instalaciones = ref<any[]>([])
@@ -322,7 +428,7 @@ const deportes = ref<any[]>([])
 function agregarSesion() {
   if (!crearSesion.value.dia || !crearSesion.value.horaInicio || !crearSesion.value.horaFin) return
   sesiones.value.push({ ...crearSesion.value })
-  crearSesion.value = { dia: "", horaInicio: "", horaFin: "" }
+  crearSesion.value = { id: -1, dia: "", horaInicio: "", horaFin: "" }
 }
 
 function volver() { router.back() }
@@ -340,10 +446,10 @@ function validarFormulario() {
   errores.value.terreno = actividad.value.terreno === ""
   errores.value.estado = actividad.value.estado === ""
   errores.value.periodo = actividad.value.periodo === ""
-  errores.value.instalacion = actividad.value.instalacion_id === null
-  errores.value.monitor = actividad.value.monitor_id === null
+  errores.value.instalacion = actividad.value.instalacion === null
+  errores.value.monitor = actividad.value.monitor === null
   errores.value.tarifa = actividad.value.tarifa === null
-  errores.value.deporte = nombreDeporte.value === ""
+  errores.value.deporte = actividad.value.nombreDeporte.value === ""
   for (const k in errores.value) if (errores.value[k]) ok = false
   return ok
 }
@@ -356,21 +462,40 @@ async function guardarCambios() {
   }
 
   try {
-    await modificarActividad(parseInt(props.id), { ...actividad.value, sesiones: sesiones.value, nombreDeporte: nombreDeporte.value })
+    await modificarActividad(
+      parseInt(props.id),
+      actividad.value,
+      sesiones.value,
+      actividad.value.nombreDeporte,
+    )
     router.back()
-  } catch (e) {
+  } catch (e: any) {
+    mensaje.value = e.response?.data?.respuesta
     console.error(e)
-    mensaje.value = "Error al guardar cambios"
   }
 }
 
 onMounted(async () => {
   const id = parseInt(props.id);
   try {
-    actividad.value = await getActividadDetalle(id);
-    console.log(actividad)
+    const data = await getActividadDetalle(id);
+    actividad.value = data;
+    sesiones.value = data.sesiones
     //actividadOriginal.value = JSON.parse(JSON.stringify(actividad.value))
-  } catch (e) {
+
+    instalaciones.value = await getInstalacionesSimples()
+    monitores.value = await getMonitoresSimples()
+    deportes.value = await getDeportes()
+
+    if (actividad.value.tipoActividad === "OTROS") {
+      tarifas.value = await getTarifasActividadComun()
+    } else if (actividad.value.tipoActividad === "GRUPOS_REDUCIDOS") {
+      tarifas.value = await getTarifasGrupoReducido()
+    } else if (actividad.value.tipoActividad === "FISIOTERAPIA") {
+      tarifas.value = await getTarifasFisioterapia()
+    }
+  } catch (e: any) {
+    mensaje.value = e.response?.data?.respuesta
     console.log("Error al obtener la informacion de la actividad", e);
   }
 });

@@ -12,6 +12,7 @@ from django.utils.dateparse import parse_date
 from datetime import date
 from django.db import transaction
 from django.shortcuts import get_object_or_404
+from django.db.models.deletion import RestrictedError
 from django.conf import settings
 
 from .permissions import IsAdministradorRaiz, IsAdministradorEspacios, IsAdministradorTarifas, IsAdministradorUsuarios, IsMonitor, IsUsuarioFinal, IsAdministrador
@@ -211,8 +212,21 @@ class DeporteViewSet(viewsets.ModelViewSet):
     serializer_class = DeporteSerializer
     permission_classes = [AllowAny]
     
-    def get_queryset(self):
-        return Deporte.objects.filter(usuariosFinales__user=self.request.user)
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+
+        try:
+            self.perform_destroy(instance)
+            return Response(
+                {"respuesta": "Deporte eliminado correctamente"},
+                status=status.HTTP_204_NO_CONTENT
+            )
+
+        except RestrictedError:
+            return Response(
+                {"respuesta": "No se puede eliminar el deporte porque está siendo utilizado en una o más actividades"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
 
 # ----------------
@@ -700,7 +714,7 @@ class NuevaNotificacionView(APIView):
     def post(self, request):
         titulo = request.data.get("titulo")
         descripcion = request.data.get("descripcion")
-        tipo = request.data.get("tipo", [])
+        tipo = request.data.get("usuarios")
         actividad_id = request.data.get("actividad_id", "")
         instalacion_id = request.data.get("instalacion_id", "")
         pabellon_id = request.data.get("pabellon_id", "")
@@ -1088,13 +1102,18 @@ class NuevaActividadView(APIView):
         try:
             # Datos de la actividad
             actividad_data = request.data.get("actividad", {})
+            
             tarifa_id = actividad_data.pop("tarifa", None)
+            instalacion_id = actividad_data.pop("instalacion", None)
+            monitor_id = actividad_data.pop("monitor", None)
+            
             tarifa = get_object_or_404(TarifaActividad, id=tarifa_id)
+            instalacion = get_object_or_404(Instalacion, id=instalacion_id)
+            monitor = get_object_or_404(Monitor, id=monitor_id)
 
-            actividad = Actividad.objects.create(**actividad_data, tarifa=tarifa)
+            actividad = Actividad.objects.create(**actividad_data, tarifa=tarifa, instalacion=instalacion, monitor=monitor)
 
             # Sesiones de la actividad
-            instalacion = get_object_or_404(Instalacion, id=actividad.instalacion.id)
             sesiones = request.data.get("sesiones", [])
 
             for sesion in sesiones:
@@ -1114,10 +1133,6 @@ class NuevaActividadView(APIView):
             # Deporte de la actividad
             nombre = request.data.get("deportes")
             nombre = nombre.strip()
-        
-            if not re.match(r'^[A-Za-zÁÉÍÓÚÑáéíóúñ ]+$', nombre):
-                return Response({"respuesta": "Nombre de deporte incorrecto"}, status=status.HTTP_400_BAD_REQUEST)
-
             titulo = nombre.lower().replace(" ", "_")
 
             deporte, _ = Deporte.objects.get_or_create(titulo=titulo)
@@ -1125,6 +1140,84 @@ class NuevaActividadView(APIView):
             actividad.save()
             
             Notificacion.notificarNuevaActividad(actividad)
+
+            return Response({"respuesta": "Deporte asignado correctamente"}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({"respuesta": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class EditarActividadView(APIView):
+    permission_classes = [IsAdministradorEspacios]
+
+    @transaction.atomic
+    def post(self, request, actividad_id):
+        try:
+            actividad = get_object_or_404(Actividad, id=actividad_id)
+
+            actividad_data = request.data.get("actividad", {})
+
+            tarifa_id = actividad_data.pop("tarifa", None)
+            instalacion_id = actividad_data.pop("instalacion", None)
+            monitor_id = actividad_data.pop("monitor", None)
+
+            tarifa = get_object_or_404(TarifaActividad, id=tarifa_id)
+            instalacion = get_object_or_404(Instalacion, id=instalacion_id)
+            monitor = get_object_or_404(Monitor, id=monitor_id)
+            
+            sesiones_recibidas = request.data.get("sesiones", [])
+
+            sesiones_bd = actividad.sesiones.all()
+            ids_recibidos = []
+
+            for sesion_data in sesiones_recibidas:
+                dia = sesion_data.get('dia')
+                hora_inicio = sesion_data.get('horaInicio')
+                hora_fin = sesion_data.get('horaFin')
+                sesion_id = sesion_data.get('id')
+
+                respuesta = instalacion.controlarHorarioActividad(
+                    dia,
+                    hora_inicio,
+                    hora_fin,
+                    sesion_id
+                )
+
+                if not respuesta:
+                    return Response(
+                        {"respuesta": "Una o más sesiones no se pueden realizar en esta instalación en el horario elegido"},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+
+                if not sesion_id or sesion_id == -1:
+                    nueva = actividad.nuevaSesion(dia, hora_inicio, hora_fin)
+                    ids_recibidos.append(nueva.id)
+
+                else:
+                    sesion_existente = sesiones_bd.filter(id=sesion_id).first()
+
+                    if sesion_existente:
+                        sesion_existente.dia = dia
+                        sesion_existente.horaInicio = hora_inicio
+                        sesion_existente.horaFin = hora_fin
+                        sesion_existente.save()
+
+                        ids_recibidos.append(sesion_existente.id)
+
+            for sesion in sesiones_bd:
+                if sesion.id not in ids_recibidos:
+                    sesion.delete()
+
+            # Nombre del deporte
+            nombre = request.data.get("deportes")
+            nombre = nombre.strip()
+            titulo = nombre.lower().replace(" ", "_")
+
+            deporte, _ = Deporte.objects.get_or_create(titulo=titulo)
+            if actividad.deportes != deporte:
+                actividad.deportes = deporte
+
+            actividad.modificarInformacion(actividad_data, tarifa, instalacion, monitor)
 
             return Response({"respuesta": "Deporte asignado correctamente"}, status=status.HTTP_200_OK)
 

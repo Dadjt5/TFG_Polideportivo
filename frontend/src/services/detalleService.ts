@@ -7,14 +7,26 @@ export const getActividadDetalle = async (id: number) => {
 };
 
 /* Función para editar los campos indicados de una actividad */
-export const modificarActividad = async (id: number, data: any) => {
-  const response = await api.patch(`api/v1/actividades/${id}/`, data);
-  return response.data;
-};
+export const modificarActividad = async (id: number, actividad: any, sesiones: any, deportes: any): Promise<any> => {
+  const response = await api.post(`api/v1/actividades/${id}/editar/`, {"actividad": actividad, "sesiones": sesiones, "deportes": deportes})
+  return response.data
+}
 
 /* Función para eliminar una actividad */
 export const eliminarActividad = async (id: number) => {
   const response = await api.delete(`api/v1/actividades/${id}/`);
+  return response.data;
+};
+
+/* Función para editar los campos indicados de un deporte */
+export const modificarDeporte = async (id: number, data: any) => {
+  const response = await api.patch(`api/v1/deportes/${id}/`, data);
+  return response.data;
+};
+
+/* Función para eliminar un deporte */
+export const eliminarDeporte = async (id: number) => {
+  const response = await api.delete(`api/v1/deportes/${id}/`);
   return response.data;
 };
 

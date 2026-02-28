@@ -168,8 +168,47 @@ class Actividad(models.Model):
             horaFin = time(h, m)
 
         sesion = Sesion.objects.create(dia=dia, horaInicio=horaInicio, horaFin=horaFin, actividad=self, numeroHoras=0.0)
-        return True
+        return sesion
     
+    def modificarInformacion(self, actividad_data, tarifa, instalacion, monitor):
+        campos_simples = [
+            "nombre",
+            "edadMinima",
+            "año",
+            "numeroCreditos",
+            "nivel",
+            "material",
+            "exterior",
+            "tipoReserva",
+            "terreno",
+            "periodo",
+            "estado",
+        ]
+
+        # Validaciones especiales
+        nuevas_plazas_max = actividad_data.get("plazasMaximas", self.plazasMaximas)
+        nuevas_plazas_res = actividad_data.get("plazasReservadas", self.plazasReservadas)
+
+        if nuevas_plazas_res > nuevas_plazas_max:
+            return False
+
+        if nuevas_plazas_max < self.plazasReservadas:
+            return False
+        
+        for campo in campos_simples:
+            if campo in actividad_data:
+                setattr(self, campo, actividad_data[campo])
+
+        self.plazasMaximas = nuevas_plazas_max
+        self.plazasReservadas = nuevas_plazas_res
+
+        self.tarifa = tarifa
+        self.instalacion = instalacion
+        self.monitor = monitor
+
+        self.save()
+        return True
+
     @classmethod
     def contar(cls):
         return cls.objects.count()

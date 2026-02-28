@@ -358,15 +358,10 @@ class ActividadSimpleSerializer(serializers.ModelSerializer):
 
 
 class ActividadSerializer(serializers.ModelSerializer):
-    instalacion_id = serializers.PrimaryKeyRelatedField(queryset=Instalacion.objects.all(), source="instalacion", write_only=True)
-    monitor_id = serializers.PrimaryKeyRelatedField(queryset=Monitor.objects.all(), source="monitor", write_only=True)
-
-    instalacion = InstalacionSimpleSerializer(read_only=True)
-    monitor = MonitorSimpleSerializer(read_only=True)
-
     sesiones = SesionSerializer(many=True, read_only=True)
     horasSemanales = serializers.SerializerMethodField()
     dias = serializers.SerializerMethodField()
+    nombreDeporte = serializers.SerializerMethodField()
     imagenURL = serializers.SerializerMethodField()
 
     class Meta:
@@ -393,14 +388,16 @@ class ActividadSerializer(serializers.ModelSerializer):
             "dias",
             "tarifa",
             "instalacion",
-            "instalacion_id",
             "monitor",
-            "monitor_id",
-            "sesiones"
+            "sesiones",
+            "nombreDeporte"
         )
 
     def get_horasSemanales(self, obj):
         return obj.calcularHorasSemanales()
+    
+    def get_nombreDeporte(self, obj):
+        return obj.deportes.titulo
 
     def get_dias(self, obj):
         return ",".join(sesion.dia for sesion in obj.sesiones.all())

@@ -110,7 +110,7 @@ const routes = [
     component: HomeUsuarioFinal,
     meta: { requiresAuth: true, allowedRoles: ['usuario_final'] }
   },
-  { path: '/notificaciones', component: Notificaciones, meta: { requiresAuth: true, allowedRoles: ['usuario_final'] } },
+  { path: '/notificaciones', component: Notificaciones, name: 'notificaciones', meta: { requiresAuth: true, } },
   { path: '/registrarse', component: Registro, meta: { public: true } },
 
   /* Perfil */

@@ -117,12 +117,21 @@
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.sport }}</label>
 
-            <input type="text" class="form-control form-control-lg" :class="{ 'is-invalid': errores.deporte }"
-              v-model="nombreDeporte" list="listaDeportes" placeholder="Ej: Fútbol" />
+            <select class="form-select form-select-lg" v-model="nombreDeporte"
+              :class="{ 'is-invalid': errores.deporte }">
+              <option disabled value="">{{ t.selectOption }}</option>
 
-            <datalist id="listaDeportes">
-              <option v-for="d in deportes" :key="d.id" :value="d.titulo" />
-            </datalist>
+              <option v-for="d in deportes" :key="d.id" :value="d.id">
+                {{ d.titulo }}
+              </option>
+
+              <option value="nuevo">+ {{ t.newSport }}</option>
+            </select>
+          </div>
+
+          <div v-if="nombreDeporte === 'nuevo'" class="mt-3">
+            <input type="text" class="form-control form-control-lg" v-model="nombreDeporte"
+              :placeholder=t.title />
           </div>
 
           <!-- TIPO ACTIVIDAD -->
@@ -179,7 +188,7 @@
           <div class="mb-4">
             <label class="form-label fw-semibold">{{ t.facility }}</label>
             <select class="form-select form-select-lg" :class="{ 'is-invalid': errores.instalacion }"
-              v-model="actividad.instalacion_id">
+              v-model="actividad.instalacion">
               <option :value="null">--</option>
               <option v-for="i in instalaciones" :key="i.id" :value="i.id">
                 {{ i.nombre }}
@@ -234,7 +243,7 @@
           <div class="mb-4">
             <label class="form-label fw-semibold">{{ t.monitor }}</label>
             <select class="form-select form-select-lg" :class="{ 'is-invalid': errores.monitor }"
-              v-model="actividad.monitor_id">
+              v-model="actividad.monitor">
               <option :value="null">--</option>
               <option v-for="m in monitores" :key="m.id" :value="m.id">
                 {{ m.nombre }}
@@ -451,13 +460,6 @@ const añoActual = new Date().getFullYear()
 
 const tab = ref(1)
 
-const tabLabels = ref({
-  1: t.value.data,
-  2: t.value.facility,
-  3: t.value.monitorTariff,
-  4: t.value.sessions
-})
-
 const actividad = ref({
   nombre: "",
   descripcion: "",
@@ -470,8 +472,8 @@ const actividad = ref({
   nivel: "",
   material: "",
   exterior: false,
-  instalacion_id: null,
-  monitor_id: null,
+  instalacion: null,
+  monitor: null,
   tipoActividad: "OTROS",
   tarifa: null,
   tipoReserva: "",
@@ -514,7 +516,7 @@ const crearSesion = ref({
 })
 
 const monitorSeleccionado = computed(() =>
-  monitores.value.find(m => m.id === actividad.value.monitor_id)
+  monitores.value.find(m => m.id === actividad.value.monitor)
 )
 
 const tarifaSeleccionada = computed(() =>
@@ -522,7 +524,7 @@ const tarifaSeleccionada = computed(() =>
 )
 
 const instalacionSeleccionada = computed(() =>
-  instalaciones.value.find(i => i.id === actividad.value.instalacion_id)
+  instalaciones.value.find(i => i.id === actividad.value.instalacion)
 )
 
 function agregarSesion() {
@@ -550,8 +552,8 @@ function validarFormulario() {
   errores.value.terreno = actividad.value.terreno === ""
   errores.value.estado = actividad.value.estado === ""
   errores.value.periodo = actividad.value.periodo === ""
-  errores.value.instalacion = actividad.value.instalacion_id === null
-  errores.value.monitor = actividad.value.monitor_id === null
+  errores.value.instalacion = actividad.value.instalacion === null
+  errores.value.monitor = actividad.value.monitor === null
   errores.value.tarifa = actividad.value.tarifa === null
   errores.value.deporte = nombreDeporte.value === ""
 
@@ -572,7 +574,7 @@ const crearActividad = async () => {
   }
 
   try {
-    const respuesta = await nuevaActividad(
+    await nuevaActividad(
       actividad.value,
       sesiones.value,
       nombreDeporte.value

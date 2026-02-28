@@ -28,7 +28,7 @@
       </div>
 
       <div v-if="form.tipo === 'ACTIVIDAD'" class="mb-3">
-        <label class="form-label">Actividad</label>
+        <label class="form-label">{{ t.activity }}</label>
         <select v-model="form.actividad_id" class="form-select">
           <option v-for="act in actividades" :key="act.id" :value="act.id">
             {{ act.nombre }}
@@ -36,7 +36,7 @@
         </select>
       </div>
 
-      <button class="btn btn-primary" @click="enviar">
+      <button class="btn btn-primary mt-3" @click="enviar">
         {{ t.sendNotification }}
       </button>
 
@@ -58,6 +58,7 @@ import { useI18n } from "@/useI18N";
 const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);
 
+const router = useRouter();
 const loading = ref(false);
 const error = ref<string | null>(null);
 const success = ref(false);
@@ -74,16 +75,6 @@ const form = ref({
 const actividades = ref<any[]>([]);
 const instalaciones = ref<any[]>([]);
 const pabellones = ref<any[]>([]);
-
-onMounted(async () => {
-  try {
-    actividades.value = await getActividadesSimples();
-    instalaciones.value = await getInstalacionesSimples();
-    pabellones.value = await getPabellonesSimples();
-  } catch (e) {
-    console.error(e);
-  }
-});
 
 const validar = () => {
   if (!form.value.titulo || !form.value.descripcion) {
@@ -128,22 +119,23 @@ const enviar = async () => {
     });
 
     success.value = true;
-
-    // Reset
-    form.value = {
-      titulo: "",
-      descripcion: "",
-      tipo: "TODOS",
-      actividad_id: null,
-      instalacion_id: null,
-      pabellon_id: null,
-    };
-
+    router.push({ name: 'notificaciones' })
   } catch (e: any) {
-    error.value = "Error al enviar la notificación.";
+    error.value = e.response?.data?.respuesta
     console.error(e);
   } finally {
     loading.value = false;
   }
 };
+
+
+onMounted(async () => {
+  try {
+    actividades.value = await getActividadesSimples();
+    instalaciones.value = await getInstalacionesSimples();
+    pabellones.value = await getPabellonesSimples();
+  } catch (e) {
+    console.error(e);
+  }
+});
 </script>

@@ -88,6 +88,7 @@ urlpatterns = [
     path("canales/<int:canal_id>/modificar/<int:usuario_id>/", views.GestionarUsuarioCanalView.as_view(), name="gestionar-usuario-canal"),
     path("monitores/<int:monitor_id>/sesiones/", views.SesionesMonitorView.as_view(), name="sesiones-monitor"),
     path("actividades/crear/", views.NuevaActividadView.as_view(), name="nueva-actividad"),
+    path("actividades/<int:actividad_id>/editar/", views.EditarActividadView.as_view(), name="editar-actividad"),
     path("actividades/<int:actividad_id>/sesiones/<int:sesion_id>/", views.DetalleSesionView.as_view(), name="detalle-sesion"),
     path("actividades/<int:actividad_id>/sesion/", views.NuevaSesionView.as_view(), name="crear-sesion"),
     path("actividades/<int:actividad_id>/sesiones/<int:sesion_id>/asistencia/", views.GuardarAsistenciaView.as_view(), name="guardar-asistencia"),
