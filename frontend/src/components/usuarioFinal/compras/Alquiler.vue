@@ -109,6 +109,7 @@
   </div>
 </template>
 
+
 <script setup lang="ts">
 import { computed, watch, onMounted, inject, type Ref, ref } from 'vue'
 import { useRouter } from 'vue-router'
@@ -144,7 +145,6 @@ const reserva = ref({
       horaFin: string,
       estado: 'Libre' | 'Reserva usuario' | 'Reserva actividad'
     }[]
-
   },
   seleccion: {
     fecha: new Date().toISOString().slice(0, 10),
@@ -163,10 +163,9 @@ const reserva = ref({
 })
 
 
-const horasSeleccionadas = ref<number[]>([])
+const horasSeleccionadas = ref<string[]>([])
 
 const horaATime = (horaStr: string) => {
-  // Convierte 14:00 a 14
   return parseInt(horaStr.split(':')[0])
 }
 
@@ -197,26 +196,20 @@ const claseHora = (hora: any) => {
   return 'btn-outline-success'
 }
 
-const toggleHora = (hora: any) => {
-  if (estaBloqueada(hora)) return
+const toggleHora = (intervalo: any) => {
+  if (intervalo.estado !== 'Libre') return
 
-  if (horasSeleccionadas.value.includes(hora)) {
-    horasSeleccionadas.value = horasSeleccionadas.value.filter(h => h !== hora)
+  const key = intervalo.horaInicio
+
+  if (horasSeleccionadas.value.includes(key)) {
+    horasSeleccionadas.value =
+      horasSeleccionadas.value.filter(h => h !== key)
     return
   }
 
-  // Dos horas maximo y consecutivas
   if (horasSeleccionadas.value.length >= 2) return
 
-  if (
-    horasSeleccionadas.value.length === 1 &&
-    Math.abs(horasSeleccionadas.value[0] - hora) !== 1
-  ) {
-    return
-  }
-
-  horasSeleccionadas.value.push(hora)
-  horasSeleccionadas.value.sort()
+  horasSeleccionadas.value.push(key)
 }
 
 const total = computed(() => {

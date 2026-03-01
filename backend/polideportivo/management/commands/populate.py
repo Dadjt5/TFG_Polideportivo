@@ -2,7 +2,7 @@ import os
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
 from django.db import transaction
-from polideportivo.models import Administrador, RolAdministrador, Configuracion
+from polideportivo.models import Administrador, RolAdministrador, Configuracion, Foro
 
 User = get_user_model()
 
@@ -61,15 +61,26 @@ class Command(BaseCommand):
                 titulo_problemas_pago="Fallo en el pago",
                 titulo_salida_lista_espera="Salida de la lista de espera",
                 titulo_ausencias="Aviso por falta de asistencia",
-                titulo_material_especial="Material especial necesario"
+                titulo_material_especial="Nuevo material especial necesario",
                 texto_cambios_cancelaciones="Las cancelaciones deben realizarse con antelación suficiente.",
                 texto_avisos_actividades="Hay una nueva actividad que podría interesarle.",
                 texto_problemas_pago="Si tiene problemas con el pago contacte con administración.",
                 texto_salida_lista_espera="Ha salido de la lista de espera.",
                 texto_ausencias="Recuerde justificar sus ausencias.",
-                texto_material_especial="Algunas actividades requieren material específico."
+                texto_material_especial="Algunas actividades requieren nuevo material."
             )
 
             self.stdout.write(self.style.SUCCESS("Configuración global creada"))
         else:
             self.stdout.write(self.style.WARNING("La configuración ya existe"))
+        
+        # Foro unico del sistema
+        if not Foro.objects.exists():
+            Foro.objects.create(
+                titulo = "Foro",
+                numeroParticipantes = 0
+            )
+
+            self.stdout.write(self.style.SUCCESS("Foro general creado"))
+        else:
+            self.stdout.write(self.style.WARNING("El foro ya existe"))

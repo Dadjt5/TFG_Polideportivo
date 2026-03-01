@@ -196,7 +196,7 @@
 import { ref, inject, type Ref, onMounted } from "vue"
 import { useRouter } from "vue-router"
 
-import { nuevaInstalacion, actualizarAgenda } from "@/services/crearRecursosService"
+import { nuevaInstalacion } from "@/services/crearRecursosService"
 import { getPabellonesSimples, getTarifasInstalacion } from "@/services/listadoService"
 
 import { useTiposStore } from "@/stores/tipos"
@@ -210,6 +210,7 @@ const t = useI18n(language)
 const router = useRouter()
 
 const tiposStore = useTiposStore();
+const mensaje = ref("")
 
 const instalacion = ref({
   nombre: "",
@@ -293,13 +294,22 @@ function validarFormulario() {
 }
 
 const crearInstalacion = async () => {
-  if (!validarFormulario()) return
+  mensaje.value = ""
+  if (!validarFormulario()) {
+    mensaje.value = t.value.emptyFields
+    return
+  }
 
   try {
-    const instalacionObj = await nuevaInstalacion(instalacion.value)
-    await actualizarAgenda(instalacionObj.id, agenda.value, fechasEspeciales.value)
-    router.push({ name: 'gestion-espacios' });
-  } catch (e) {
+    await nuevaInstalacion(
+      instalacion.value,
+      agenda.value,
+      fechasEspeciales.value
+    )
+
+    router.push({ name: 'gestion-espacios' })
+  } catch (e: any) {
+    mensaje.value = e.response?.data?.respuesta
     console.log("Error al crear la instalacion", e)
   }
 }

@@ -1065,33 +1065,165 @@ class GuardarAsistenciaView(APIView):
         return Response({"respuesta": "Resultados cambiados correctamente"}, status=status.HTTP_200_OK)
 
 
-class AsignarAgendasView(APIView):
+class NuevaInstalacionView(APIView):
     permission_classes = [IsAdministradorEspacios]
 
+    @transaction.atomic
+    def post(self, request):
+        try:
+            # Datos de la instalacion
+            instalacion_data = request.data.get("instalacion", {})
+
+            pabellon_id = instalacion_data.pop("pabellon", None)            
+            tarifa_id = instalacion_data.pop("tarifa", None)            
+
+            pabellon = get_object_or_404(Pabellon, id=pabellon_id)
+            tarifa = get_object_or_404(TarifaInstalacion, id=tarifa_id)
+
+            instalacion = Instalacion.objects.create(**instalacion_data, pabellon=pabellon, tarifa=tarifa)
+
+            # Crear y manejar la agenda y fechas especiales
+            agenda = request.data.get('agenda', [])
+            fechasEspeciales = request.data.get('fechasEspeciales', [])
+
+            for fecha in agenda:
+                res = instalacion.controlarCambioHorario(fecha["dia"], fecha.get("apertura"), fecha.get("cierre"), fecha.get("abierto", True))
+                if not res:
+                    return Response({"respuesta": "Error, el cambio no esta permitido debido a que hay sesiones en esas horas"}, status=status.HTTP_400_BAD_REQUEST)
+
+                res = instalacion.nuevoHorario(fecha["dia"], fecha.get("apertura"), fecha.get("cierre"), fecha.get("abierto", True))
+                if not res:
+                    return Response({"respuesta": "Error al actualizar la agenda de los dias de la semana"}, status=status.HTTP_400_BAD_REQUEST)
+
+            for fecha in fechasEspeciales:
+                instalacion.nuevoHorarioEspecial(fecha["fecha"], fecha.get("apertura"), fecha.get("cierre"), fecha.get("abierto", True))
+
+                if not res:
+                    return Response({"respuesta": "Error al actualizar la agenda de los dias especiales"}, status=status.HTTP_400_BAD_REQUEST)
+
+            return Response({"respuesta": "Exito al asignar la agenda a la instalacion"}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({"respuesta": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class EditarInstalacionView(APIView):
+    permission_classes = [IsAdministradorEspacios]
+
+    @transaction.atomic
     def post(self, request, instalacion_id):
-        instalacion = get_object_or_404(Instalacion, id=instalacion_id)
+        try:
+            instalacion = get_object_or_404(Instalacion, id=instalacion_id)
 
-        agenda = request.data.get('agenda', [])
-        fechasEspeciales = request.data.get('fechasEspeciales', [])
+            # Datos de la instalacion
+            instalacion_data = request.data.get("instalacion", {})
 
-        Agenda.objects.filter(instalacion=instalacion, fecha__isnull=False).delete()
+            pabellon_id = instalacion_data.pop("pabellon", None)            
+            tarifa_id = instalacion_data.pop("tarifa", None)            
 
-        for fecha in agenda:
-            res = instalacion.controlarCambioHorario(fecha["dia"], fecha.get("apertura"), fecha.get("cierre"), fecha.get("abierto", True))
-            if not res:
-                return Response({"respuesta": "Error, el cambio no esta permitido debido a que hay sesiones en esas horas"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            pabellon = get_object_or_404(Pabellon, id=pabellon_id)
+            tarifa = get_object_or_404(TarifaInstalacion, id=tarifa_id)
 
-            res = instalacion.nuevoHorario(fecha["dia"], fecha.get("apertura"), fecha.get("cierre"), fecha.get("abierto", True))
-            if not res:
-                return Response({"respuesta": "Error al actualizar la agenda de los dias de la semana"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        for fecha in fechasEspeciales:
-            instalacion.nuevoHorarioEspecial(fecha["fecha"], fecha.get("apertura"), fecha.get("cierre"), fecha.get("abierto", True))
+            # Manejar la agenda y fechas especiales
+            agenda = request.data.get('agenda', [])
+            fechasEspeciales = request.data.get('fechasEspeciales', [])
 
-            if not res:
-                return Response({"respuesta": "Error al actualizar la agenda de los dias especiales"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            # AGENDA SEMANAL
+            agendas_existentes = {
+                a.dia.lower(): a
+                for a in Agenda.objects.filter(
+                    instalacion=instalacion,
+                    fecha__isnull=True
+                )
+            }
 
-        return Response({"respuesta": "Exito al asignar la agenda a la instalacion"}, status=status.HTTP_200_OK)
+            dias_recibidos = set()
+
+            for item in agenda:
+                dia = item["dia"].lower()
+                dias_recibidos.add(dia)
+
+                apertura = item.get("apertura")
+                cierre = item.get("cierre")
+                abierto = item.get("abierto", True)
+
+                agenda_existente = agendas_existentes.get(dia)
+
+                if agenda_existente:
+                    # Validar conflicto antes
+                    if not instalacion.controlarCambioHorario(dia, apertura, cierre, abierto):
+                        return Response(
+                            {"respuesta": f"No se puede modificar el día {dia} por conflictos existentes"},
+                            status=status.HTTP_400_BAD_REQUEST
+                        )
+
+                    agenda_existente.horaApertura = apertura
+                    agenda_existente.horaCierre = cierre
+                    agenda_existente.abierto = abierto
+                    agenda_existente.save()
+                else:
+                    if not instalacion.nuevoHorario(dia, apertura, cierre, abierto):
+                        return Response(
+                            {"respuesta": f"Error creando horario para {dia}"},
+                            status=status.HTTP_400_BAD_REQUEST
+                        )
+
+            # Eliminar los que ya no vienen
+            for dia, agenda in agendas_existentes.items():
+                if dia not in dias_recibidos:
+                    agenda.delete()
+
+            # FECHAS ESPECIALES
+            especiales_existentes = {
+                str(a.fecha): a
+                for a in Agenda.objects.filter(
+                    instalacion=instalacion,
+                    fecha__isnull=False
+                )
+            }
+
+            fechas_recibidas = set()
+
+            for item in fechasEspeciales:
+                fecha = item["fecha"]
+                fechas_recibidas.add(str(fecha))
+
+                apertura = item.get("apertura")
+                cierre = item.get("cierre")
+                abierto = item.get("abierto", True)
+
+                especial_existente = especiales_existentes.get(str(fecha))
+
+                if especial_existente:
+                    if not instalacion.controlarCambioHorario(fecha, apertura, cierre, abierto):
+                        return Response(
+                            {"respuesta": f"No se puede modificar la fecha {fecha} por conflictos existentes"},
+                            status=status.HTTP_400_BAD_REQUEST
+                        )
+
+                    especial_existente.horaApertura = apertura
+                    especial_existente.horaCierre = cierre
+                    especial_existente.abierto = abierto
+                    especial_existente.save()
+                else:
+                    if not instalacion.nuevoHorarioEspecial(fecha, apertura, cierre, abierto):
+                        return Response(
+                            {"respuesta": f"Error creando horario especial {fecha}"},
+                            status=status.HTTP_400_BAD_REQUEST
+                        )
+
+            # Eliminar especiales que ya no vienen
+            for fecha, agenda in especiales_existentes.items():
+                if fecha not in fechas_recibidas:
+                    agenda.delete()
+
+            instalacion.modificarInformacion(instalacion_data, pabellon, tarifa)
+            return Response({"respuesta": "Exito al asignar la agenda a la instalacion"}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({"respuesta": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class NuevaActividadView(APIView):
@@ -1268,21 +1400,42 @@ class TarifaInstalacionView(APIView):
 
         precios = instalacion.obtener_precios()
 
-        fecha = request.query_params.get('fecha')
-        if not fecha:
+        fecha_str = request.query_params.get('fecha')
+        if fecha_str:
+            fecha = parse_date(fecha_str)
+        else:
             fecha = date.today()
 
-        fecha = parse_date(fecha)
-        horaApertura, horaCierre = instalacion.get_horario(fecha)
-        mapaReservas = instalacion.get_reservas(fecha)
+        agenda_fecha = Agenda.objects.filter(fecha=fecha).first()
+
+        if agenda_fecha:
+            dia = agenda_fecha
+        else:
+            dia_semana = fecha.strftime("%A").upper()
+
+            mapa_dias = {
+                "MONDAY": Dia.LUNES,
+                "TUESDAY": Dia.MARTES,
+                "WEDNESDAY": Dia.MIERCOLES,
+                "THURSDAY": Dia.JUEVES,
+                "FRIDAY": Dia.VIERNES,
+                "SATURDAY": Dia.SABADO,
+                "SUNDAY": Dia.DOMINGO,
+            }
+
+            dia_modelo = mapa_dias[dia_semana]
+            dia = Agenda.objects.filter(dia__iexact=dia_modelo).first()
+
+        if not dia:
+            return Response({"respuesta": "No hay horarios para esa fecha"}, status=status.HTTP_400_BAD_REQUEST)
 
         data = {
             "tarifa": {
                 "nombre": instalacion.nombre,
-                "horaApertura": horaApertura,
-                "horaCierre": horaCierre,
+                "horaApertura": dia.horaApertura,
+                "horaCierre": dia.horaCierre,
                 "datos": precios,
-                "reservas": mapaReservas
+                "reservas": dia.mapa_reservas.all()
             },
             "descuento": {
                 "porcentaje_total": 0,

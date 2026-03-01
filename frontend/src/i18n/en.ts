@@ -348,6 +348,7 @@ export default {
   modifyFacility: "Modify facility",
   deletePavilion: "Delete pavilion",
   deleteFacility: "Delete facility",
+  noSpecialDates: "No special dates",
 
   /* Nueva instalacion */
   maxCapacity: "Max capacity",

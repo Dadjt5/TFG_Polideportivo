@@ -22,15 +22,9 @@ export const nuevoPabellon = async (payload: Payload): Promise<any> => {
 }
 
 /* Función para crear una instalacion */
-export const nuevaInstalacion = async (payload: Payload): Promise<any> => {
-  const response = await api.post("api/v1/instalaciones/", payload)
+export const nuevaInstalacion = async (instalacion: any, agenda: any, fechasEspeciales: any): Promise<any> => {
+  const response = await api.post("api/v1/instalaciones/crear/", {"instalacion": instalacion, "agenda": agenda, "fechasEspeciales": fechasEspeciales})
   return response.data
-}
-
-/* Función para actualizar la agenda */
-export const actualizarAgenda = async (id: number, agenda: Payload, fechasEspeciales: Payload) => {
-  const response = await api.post(`api/v1/instalaciones/${id}/agendas/`, {"agenda": agenda, "fechasEspeciales": fechasEspeciales})
-  return response.data;
 }
 
 /* Función para crear una actividad */

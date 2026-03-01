@@ -148,72 +148,186 @@
         </div>
 
         <!-- HORARIO SEMANAL -->
-        <div class="tab-pane fade" id="horario">
-          <div class="row g-3">
-            <div
-              class="col-md-6 col-lg-4"
-              v-for="dia in instalacion.agenda"
-              :key="dia.dia"
-            >
-              <div
-                class="card border-0 shadow-sm rounded-4 h-100"
-                :class="dia.abierto ? 'border-success' : 'border-danger'"
-              >
-                <div class="card-body">
+<div class="tab-pane fade" id="horario">
+  <div class="row g-3">
+    <div
+      class="col-md-6 col-lg-4"
+      v-for="dia in agenda"
+      :key="dia.dia"
+    >
+      <div class="card border-0 shadow-sm rounded-4 h-100">
+        <div class="card-body">
 
-                  <div class="d-flex justify-content-between mb-2">
-                    <strong>{{ dia.dia }}</strong>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <strong>{{ dia.dia }}</strong>
 
-                    <span
-                      class="badge"
-                      :class="dia.abierto ? 'bg-success' : 'bg-danger'"
-                    >
-                      {{ dia.abierto ? 'Abierto' : 'Cerrado' }}
-                    </span>
-                  </div>
-
-                  <div v-if="dia.abierto" class="small text-muted">
-                    {{ dia.horaApertura?.slice(0,5) }} -
-                    {{ dia.horaCierre?.slice(0,5) }}
-                  </div>
-
-                </div>
+            <div v-if="editando">
+              <div class="form-check form-switch">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  v-model="dia.abierto"
+                />
               </div>
             </div>
+
+            <span
+              v-else
+              class="badge"
+              :class="dia.abierto ? 'bg-success' : 'bg-danger'"
+            >
+              {{ dia.abierto ? 'Abierto' : 'Cerrado' }}
+            </span>
           </div>
+
+          <div v-if="dia.abierto">
+
+            <!-- MODO EDICIÓN -->
+            <div v-if="editando" class="row g-2">
+              <div class="col-6">
+                <label class="small text-muted">Apertura</label>
+                <input
+                  type="time"
+                  class="form-control"
+                  v-model="dia.horaApertura"
+                />
+              </div>
+              <div class="col-6">
+                <label class="small text-muted">Cierre</label>
+                <input
+                  type="time"
+                  class="form-control"
+                  v-model="dia.horaCierre"
+                />
+              </div>
+            </div>
+
+            <!-- MODO LECTURA -->
+            <div v-else class="small text-muted">
+              {{ dia.horaApertura?.slice(0,5) }} -
+              {{ dia.horaCierre?.slice(0,5) }}
+            </div>
+
+          </div>
+
         </div>
+      </div>
+    </div>
+  </div>
+</div>
 
         <!-- FECHAS ESPECIALES -->
-        <div class="tab-pane fade" id="especiales">
-          <div v-if="instalacion.fechasEspeciales?.length" class="row g-3">
-            <div
-              class="col-md-4"
-              v-for="fecha in instalacion.fechasEspeciales"
-              :key="fecha.fecha"
-            >
-              <div
-                class="card border-0 shadow-sm rounded-4 p-3"
-                :class="fecha.abierto ? 'bg-success-subtle' : 'bg-danger-subtle'"
-              >
-                <div class="fw-semibold">
-                  {{ fecha.fecha }}
-                </div>
+<div class="tab-pane fade" id="especiales">
 
-                <div v-if="fecha.abierto" class="small">
-                  {{ fecha.apertura }} - {{ fecha.cierre }}
-                </div>
+  <!-- BOTÓN AÑADIR -->
+  <div v-if="editando" class="mb-4">
+    <button
+      class="btn btn-outline-primary rounded-pill"
+      @click="fechasEspeciales.push({
+        fecha: '',
+        horaApertura: '',
+        horaCierre: '',
+        abierto: true
+      })"
+    >
+      + Añadir fecha especial
+    </button>
+  </div>
 
-                <div v-else class="small text-danger">
-                  {{ t.close }}
-                </div>
-              </div>
+  <div v-if="fechasEspeciales?.length" class="row g-3">
+    <div
+      class="col-md-4"
+      v-for="(fecha, index) in fechasEspeciales"
+      :key="index"
+    >
+      <div class="card border-0 shadow-sm rounded-4 p-3">
+
+        <!-- CABECERA -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+
+          <!-- FECHA -->
+          <div v-if="editando">
+            <input
+              type="date"
+              class="form-control"
+              v-model="fecha.fecha"
+            />
+          </div>
+
+          <div v-else class="fw-semibold">
+            {{ fecha.fecha }}
+          </div>
+
+          <!-- ELIMINAR -->
+          <button
+            v-if="editando"
+            class="btn btn-sm btn-outline-danger"
+            @click="fechasEspeciales.splice(index, 1)"
+          >
+            ✕
+          </button>
+        </div>
+
+        <!-- ABIERTO / CERRADO -->
+        <div class="mb-3">
+          <div v-if="editando" class="form-check form-switch">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              v-model="fecha.abierto"
+            />
+            <label class="form-check-label">
+              Abierto
+            </label>
+          </div>
+
+          <span
+            v-else
+            class="badge"
+            :class="fecha.abierto ? 'bg-success' : 'bg-danger'"
+          >
+            {{ fecha.abierto ? 'Abierto' : 'Cerrado' }}
+          </span>
+        </div>
+
+        <!-- HORAS -->
+        <div v-if="fecha.abierto">
+
+          <div v-if="editando" class="row g-2">
+            <div class="col-6">
+              <label class="small text-muted">Apertura</label>
+              <input
+                type="time"
+                class="form-control"
+                v-model="fecha.horaApertura"
+              />
+            </div>
+            <div class="col-6">
+              <label class="small text-muted">Cierre</label>
+              <input
+                type="time"
+                class="form-control"
+                v-model="fecha.horaCierre"
+              />
             </div>
           </div>
 
-          <div v-else class="text-muted">
-            No hay fechas especiales configuradas.
+          <div v-else class="small">
+            {{ fecha.horaApertura?.slice(0,5) }} -
+            {{ fecha.horaCierre?.slice(0,5) }}
           </div>
+
         </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div v-else class="text-muted">
+    {{ t.noSpecialDates }}
+  </div>
+
+</div>
 
         <!-- IMÁGENES -->
         <div class="tab-pane fade" id="imagenes">
@@ -277,6 +391,7 @@ import { useRouter } from "vue-router";
 
 /* Importamos la comunicacion para recuperar la informacion de instalaciones del backend */
 import { getInstalacionDetalle, modificarInstalacion, eliminarInstalacion } from "@/services/detalleService";
+
 import { useTiposStore } from '@/stores/tipos';
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
@@ -292,6 +407,10 @@ const tiposStore = useTiposStore();
 const router = useRouter();
 
 const editando = ref(false)
+const mensaje = ref("")
+
+const agenda = ref<any[]>([])
+const fechasEspeciales = ref<any[]>([])
 
 const instalacion = ref({
   id: 0,
@@ -302,7 +421,7 @@ const instalacion = ref({
   porcentajeTDA: 0,
   pabellon: { id: -1, nombre: "", direccion: "" },
   tipoInstalacion: "",
-  agenda: [] as any[]
+  agenda: [] as any[],
 });
 
 const errores = ref({
@@ -340,50 +459,29 @@ function activarEdicion() {
 }
 
 function cancelarEdicion() {
-  instalacionOriginal.value = JSON.parse(JSON.stringify(instalacion.value))
+  instalacion.value = JSON.parse(JSON.stringify(instalacionOriginal.value))
+  agenda.value = JSON.parse(JSON.stringify(instalacionOriginal.value.agenda))
   editando.value = false
 }
 
-/* Solo mandamos al backend para modificar los campos que se hayan modificado */
-function camposModificados() {
-  const data: any = {}
-
-  if (instalacionOriginal.value.nombre != instalacion.value.nombre) {
-    data["nombre"] = instalacion.value.nombre
+async function guardarCambios() {
+  mensaje.value = ""
+  if (!validarFormulario()) {
+    mensaje.value = t.value.emptyFields
+    return
   }
 
-  if (instalacionOriginal.value.porcentajeTDA != instalacion.value.porcentajeTDA) {
-    data["porcentajeTDA"] = instalacion.value.porcentajeTDA
-  }
-
-  if (instalacionOriginal.value.aforoMaximo != instalacion.value.aforoMaximo) {
-    data["aforoMaximo"] = instalacion.value.aforoMaximo
-  }
-
-  if (instalacionOriginal.value.luz != instalacion.value.luz) {
-    data["luz"] = instalacion.value.luz
-  }
-
-  if (instalacionOriginal.value.tipoInstalacion != instalacion.value.tipoInstalacion) {
-    data["tipoInstalacion"] = instalacion.value.tipoInstalacion
-  }
-
-  return data;
-}
-
-
-const guardarCambios = async () => {
   try {
-    if (!validarFormulario()) return
-
-    const data = camposModificados();
-    if (Object.keys(data).length > 0) {
-      await modificarInstalacion(instalacion.value.id, data);
-      await actualizarAgenda(instalacion.value.id, agenda.value, fechasEspeciales.value)
-      editando.value = false
-    }
-  } catch (e) {
-    console.error("Error al modificar la instalacion", e);
+    await modificarInstalacion(
+      parseInt(props.id),
+      instalacion.value,
+      agenda.value,
+      fechasEspeciales.value
+    )
+    router.back()
+  } catch (e: any) {
+    mensaje.value = e.response?.data?.respuesta
+    console.error(e)
   }
 }
 
@@ -404,8 +502,19 @@ onMounted(async () => {
   const id = parseInt(props.id);
 
   try {
-    instalacion.value = await getInstalacionDetalle(id);
+    const data = await getInstalacionDetalle(id)
+
+    // Separar agendas y fechas especiales
+    agenda.value = data.agenda.filter((a: any) => a.dia && !a.fecha)
+    fechasEspeciales.value = data.agenda.filter((a: any) => a.fecha)
+
+    instalacion.value = {
+      ...data,
+      agenda: agenda.value
+    }
+
     instalacionOriginal.value = JSON.parse(JSON.stringify(instalacion.value))
+
   } catch (e) {
     console.log("Error al obtener la informacion de la instalacion", e);
   }

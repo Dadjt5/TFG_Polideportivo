@@ -13,8 +13,7 @@ const props = defineProps<{
   instalacion: {
     id: number;
     nombre: string;
-    horaApertura: string;
-    horaCierre: string;
+    tipoInstalacion: string;
     pabellon?: {
       nombre: string;
       direccion: string;
@@ -86,8 +85,8 @@ const badgeClass = computed(() =>
 
       <div :class="textClass">
         <div class="d-flex justify-content-between mb-1">
-          <span>{{ t.schedule }}</span>
-          <strong>{{ instalacion.horaApertura }} - {{ instalacion.horaCierre }}</strong>
+          <span>{{ t.facilityType }}</span>
+          <strong>{{ instalacion.tipoInstalacion }}</strong>
         </div>
 
         <div v-if="instalacion.pabellon" class="d-flex justify-content-between">

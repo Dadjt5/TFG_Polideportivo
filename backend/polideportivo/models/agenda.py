@@ -19,7 +19,6 @@ class Agenda(models.Model):
 
     instalacion = models.ForeignKey('Instalacion', on_delete=models.CASCADE, related_name="agenda")
 
-
     class Meta:
         unique_together = [('dia', 'instalacion'), ('fecha', 'instalacion')]
 

@@ -359,6 +359,7 @@ export default {
   open: "Abierto",
   close: "Cerrado",
   newSpecialDate: "Nueva fecha especial",
+  noSpecialDates: "No hay fechas especiales",
 
   /* Gestion de actividades */
   searchActivities: "Buscar actividades...",

@@ -47,7 +47,7 @@ class Instalacion(models.Model):
             "precioTDA": self.tarifa.precioTDA,
             "precioOtros": self.tarifa.precioOtros
         }
-        
+
     def calcular_precio(self, usuario):
         precio = self.tarifa.precioOtros
         if usuario.tieneAbono:
@@ -56,8 +56,26 @@ class Instalacion(models.Model):
             precio = self.tarifa.precioUAM
         elif usuario.tieneTDA:
             precio = self.tarifa.precioTDA
-        
+
         return precio
+
+    def modificarInformacion(self, instlacion_data, pabellon, tarifa):
+        campos_simples = [
+            "nombre",
+            "aforoMaximo",
+            "luz",
+            "porcentajeTDA",
+        ]
+
+        for campo in campos_simples:
+            if campo in instlacion_data:
+                setattr(self, campo, instlacion_data[campo])
+
+        self.tarifa = tarifa
+        self.pabellon = pabellon
+
+        self.save()
+        return True
 
     def controlarHorarioActividad(self, dia, hora_inicio, hora_fin, sesion_id=None):
         if isinstance(hora_inicio, str):

@@ -102,6 +102,10 @@
               </div>
             </div>
 
+            <div class="text-center mt-5 fs-5">
+              <p v-if="mensaje" class="text-danger">{{ mensaje }}</p>
+            </div>
+
             <div class="list-group list-group-flush">
               <div
                 v-for="d in deportesFiltrados"
@@ -232,6 +236,7 @@ const nombreDeporte = ref("")
 const deporteEditandoId = ref<number | null>(null)
 
 const abrirModalCrear = () => {
+  mensaje.value = ""
   modoEdicion.value = false
   nombreDeporte.value = ""
   deporteEditandoId.value = null
@@ -239,6 +244,7 @@ const abrirModalCrear = () => {
 }
 
 const abrirModalEditar = (deporte: any) => {
+  mensaje.value = ""
   modoEdicion.value = true
   nombreDeporte.value = deporte.titulo
   deporteEditandoId.value = deporte.id
@@ -250,6 +256,7 @@ const cerrarModal = () => {
 }
 
 const guardarDeporte = async () => {
+  mensaje.value = ""
   if (!nombreDeporte.value.trim()) return
 
   if (modoEdicion.value && deporteEditandoId.value !== null) {

@@ -37,10 +37,10 @@ export const getInstalacionDetalle = async (id: number) => {
 };
 
 /* Función para editar los campos indicados de una instalacion */
-export const modificarInstalacion = async (id: number, data: any) => {
-  const response = await api.patch(`api/v1/instalaciones/${id}/`, data);
-  return response.data;
-};
+export const modificarInstalacion = async (id: number, instalacion: any, agendas: any, fechasEspeciales: any): Promise<any> => {
+  const response = await api.post(`api/v1/instalaciones/${id}/editar/`, {"instalacion": instalacion, "agendas": agendas, "fechasEspeciales": fechasEspeciales})
+  return response.data
+}
 
 /* Función para eliminar una instalacion */
 export const eliminarInstalacion = async (id: number) => {

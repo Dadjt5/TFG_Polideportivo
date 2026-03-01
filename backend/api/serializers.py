@@ -264,8 +264,6 @@ class InstalacionSimpleSerializer(serializers.ModelSerializer):
 class InstalacionSerializer(serializers.ModelSerializer):
     pabellon_id = serializers.PrimaryKeyRelatedField(queryset=Pabellon.objects.all(), source="pabellon", write_only=True)
     pabellon = PabellonSimpleSerializer(read_only=True)
-    horaApertura = serializers.SerializerMethodField()
-    horaCierre = serializers.SerializerMethodField()
     agenda = AgendaSerializer(many=True, read_only=True)
     imagenURL = serializers.SerializerMethodField()
 
@@ -281,32 +279,9 @@ class InstalacionSerializer(serializers.ModelSerializer):
             "porcentajeTDA",
             "pabellon",
             "pabellon_id",
-            "horaApertura",
-            "horaCierre",
-            "agenda"
+            "agenda",
+            "tarifa"
         )
-
-    def get_horaApertura(self, obj):
-        hoy = timezone.localdate()
-        
-        # Controlamos solo mandar instalaciones que esten abiertas
-        agenda = obj.agenda.filter(fecha=hoy, abierto=True).first()
-
-        if agenda:
-            return agenda.horaApertura
-        
-        return None
-
-    def get_horaCierre(self, obj):
-        hoy = timezone.localdate()
-        
-        # Controlamos solo mandar instalaciones que esten abiertas
-        agenda = obj.agenda.filter(fecha=hoy, abierto=True).first()
-
-        if agenda:
-            return agenda.horaCierre
-        
-        return None
     
     def get_imagenURL(self, obj):
         if not obj.imagenURL:
@@ -390,7 +365,8 @@ class ActividadSerializer(serializers.ModelSerializer):
             "instalacion",
             "monitor",
             "sesiones",
-            "nombreDeporte"
+            "nombreDeporte",
+            "nombreMonitor"
         )
 
     def get_horasSemanales(self, obj):
@@ -398,6 +374,9 @@ class ActividadSerializer(serializers.ModelSerializer):
     
     def get_nombreDeporte(self, obj):
         return obj.deportes.titulo
+    
+    def get_nombreMonitor(self, obj):
+        return obj.monitor.nombre
 
     def get_dias(self, obj):
         return ",".join(sesion.dia for sesion in obj.sesiones.all())

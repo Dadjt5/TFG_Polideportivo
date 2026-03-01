@@ -344,11 +344,40 @@
           <p v-if="mensaje" class="text-danger">{{ mensaje }}</p>
         </div>
 
-        <!-- BOTONES -->
-        <div class="d-flex justify-content-between mt-5">
-          <button class="btn btn-outline-secondary" type="button" @click="volver">{{ t.return }}</button>
-          <button class="btn btn-success px-4" type="button" @click="guardarCambios">{{ t.saveChanges }}</button>
-        </div>
+        <!-- ACCIONES -->
+      <div class="d-flex justify-content-center gap-4 mt-5">
+        <button
+          v-if="!editando"
+          class="btn btn-primary btn-lg rounded-pill px-4"
+          @click="activarEdicion"
+        >
+          {{ t.modifyFacility }}
+        </button>
+
+        <template v-else>
+          <button
+            class="btn btn-success btn-lg rounded-pill px-4"
+            @click="guardarCambios"
+          >
+            {{ t.saveChanges }}
+          </button>
+
+          <button
+            class="btn btn-secondary btn-lg rounded-pill px-4"
+            @click="cancelarEdicion"
+          >
+            {{ t.cancel }}
+          </button>
+        </template>
+
+        <button
+          v-if="!editando"
+          class="btn btn-outline-danger btn-lg rounded-pill px-4"
+          @click="eliminar"
+        >
+          {{ t.deleteFacility }}
+        </button>
+      </div>
 
       </div>
     </main>
@@ -399,9 +428,11 @@ const actividad = ref<any>({
   nombreDeporte: ""
 })
 
+const actividadOriginal = ref<any>(null);
 const sesiones = ref<any[]>([])
 const crearSesion = ref({ id: -1, dia: "", horaInicio: "", horaFin: "" })
 const mensaje = ref("")
+const editando = ref(false)
 
 const errores = ref<any>({
   nombre: false, plazasMaximas: false, plazasReservadas: false, edadMinima: false,
@@ -424,6 +455,17 @@ const instalaciones = ref<any[]>([])
 const monitores = ref<any[]>([])
 const tarifas = ref<any[]>([])
 const deportes = ref<any[]>([])
+
+function activarEdicion() {
+  actividadOriginal.value = JSON.parse(JSON.stringify(actividad.value))
+  Object.keys(errores.value).forEach(k => errores.value[k] = false)
+  editando.value = true
+}
+
+function cancelarEdicion() {
+  actividadOriginal.value = JSON.parse(JSON.stringify(actividad.value))
+  editando.value = false
+}
 
 function agregarSesion() {
   if (!crearSesion.value.dia || !crearSesion.value.horaInicio || !crearSesion.value.horaFin) return
@@ -481,7 +523,7 @@ onMounted(async () => {
     const data = await getActividadDetalle(id);
     actividad.value = data;
     sesiones.value = data.sesiones
-    //actividadOriginal.value = JSON.parse(JSON.stringify(actividad.value))
+    actividadOriginal.value = JSON.parse(JSON.stringify(actividad.value))
 
     instalaciones.value = await getInstalacionesSimples()
     monitores.value = await getMonitoresSimples()

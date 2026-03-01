@@ -29,6 +29,7 @@ const props = defineProps<{
     estado: string
     horasSemanales: number
     nombreMonitor: string
+    nombreDeporte: string
     dias: string
   }
   icon: any
