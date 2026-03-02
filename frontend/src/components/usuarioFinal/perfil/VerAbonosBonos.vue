@@ -133,7 +133,6 @@ const bonos = ref<BonoComprado[]>([])
 const porcentajeUso = (b: BonoComprado) =>
   (b.usosRestantes / b.bono.usos) * 100
 
-
 type AbonoActivo = {
   id: number
   fecha: string

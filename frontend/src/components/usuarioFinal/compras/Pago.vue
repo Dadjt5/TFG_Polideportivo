@@ -148,7 +148,7 @@ const pagar = async () => {
   const { error: stripeError } = await stripe.confirmPayment({
     elements,
     confirmParams: {
-      return_url: window.location.origin + "/pago-finalizado"
+      return_url: `${window.location.origin}/pago/finalizado/${props.id}`
     },
     redirect: "if_required"
   })
@@ -157,8 +157,8 @@ const pagar = async () => {
     error.value = stripeError.message
     loading.value = false
   } else {
-    await confirmarPago(parseInt(props.id), props.tipo)
-    router.push("/pago-finalizado")
+    await confirmarPago(parseInt(props.id))
+    router.push({ name: 'pago-finalizado', params: { id: props.id } })
   }
 }
 
@@ -172,7 +172,7 @@ onMounted(async () => {
       return
     }
 
-    const pagoResponse = await intentarPago(parseInt(props.id), props.tipo)
+    const pagoResponse = await intentarPago(parseInt(props.id))
     clientSecret = pagoResponse.client_secret
 
     stripe = await loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY)

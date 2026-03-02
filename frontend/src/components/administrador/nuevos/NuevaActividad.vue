@@ -117,7 +117,7 @@
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.sport }}</label>
 
-            <select class="form-select form-select-lg" v-model="nombreDeporte"
+            <select class="form-select form-select-lg" v-model="deporteSeleccionado"
               :class="{ 'is-invalid': errores.deporte }">
               <option disabled value="">{{ t.selectOption }}</option>
 
@@ -129,9 +129,9 @@
             </select>
           </div>
 
-          <div v-if="nombreDeporte === 'nuevo'" class="mt-3">
-            <input type="text" class="form-control form-control-lg" v-model="nombreDeporte"
-              :placeholder=t.title />
+          <div v-if="deporteSeleccionado === 'nuevo'" class="mt-3">
+            <input type="text" class="form-control form-control-lg" v-model="nuevoDeporteNombre"
+              :placeholder="t.title" />
           </div>
 
           <!-- TIPO ACTIVIDAD -->
@@ -506,7 +506,8 @@ const monitores = ref<any[]>([])
 const tarifas = ref<any[]>([])
 const deportes = ref<any[]>([])
 
-const nombreDeporte = ref("")
+const deporteSeleccionado = ref("")
+const nuevoDeporteNombre = ref("")
 
 const sesiones = ref<any[]>([])
 const crearSesion = ref({
@@ -555,7 +556,8 @@ function validarFormulario() {
   errores.value.instalacion = actividad.value.instalacion === null
   errores.value.monitor = actividad.value.monitor === null
   errores.value.tarifa = actividad.value.tarifa === null
-  errores.value.deporte = nombreDeporte.value === ""
+  errores.value.deporte =
+    deporteSeleccionado.value === "" || (deporteSeleccionado.value === "nuevo" && nuevoDeporteNombre.value === "")
 
   for (const k in errores.value) {
     if (errores.value[k]) {
@@ -577,7 +579,7 @@ const crearActividad = async () => {
     await nuevaActividad(
       actividad.value,
       sesiones.value,
-      nombreDeporte.value
+      deporteSeleccionado.value === "nuevo" ? nuevoDeporteNombre.value : deporteSeleccionado.value
     )
 
     router.push({ name: 'gestion-actividades' })

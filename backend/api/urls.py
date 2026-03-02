@@ -81,6 +81,8 @@ urlpatterns = [
     path("obtener/favoritas/", views.ObtenerActividadesInstalaciones.as_view(), name="favoritas"),
     path("reservas/", views.ReservasView.as_view(), name="Reservas-favoritas"),
     path("abonos/", views.ObtenerAbonosView.as_view(), name="Obtener-abonos"),
+    path("abonos/<int:abono_id>/comprar/", views.ComprarAbonoView.as_view(), name="comprar-abono"),
+    path("bonos/<int:bono_id>/comprar/", views.ComprarBonoView.as_view(), name="comprar-bono"),
     path("foro/", views.ForoView.as_view(), name="Foro"),
     path("foros/<int:foro_id>/canal/", views.NuevoCanalView.as_view(), name="crear-canal"),
     path("canales/<int:canal_id>/mensajes/", views.MensajesCanalView.as_view(), name="mensajes-canal"),
@@ -102,7 +104,7 @@ urlpatterns = [
     path("tarifas/", views.GestionTarifasView.as_view(), name="obtener-tarifas"),
     path("configuracion/", views.ObtenerConfiguracionView.as_view(), name="obtener-configuracion"),
     path("pagos/resumen/<str:tipo>/<int:pago_id>/", views.ResumenPagoView.as_view(), name="resumen-pago"),
-    path("pago/comenzar/", views.CrearIntentoPagoView.as_view(), name="intentar-pago"),
-    path("pago/confirmar/", views.ConfirmarPagoView.as_view(), name="confirmar-pago"),
+    path("pagos/<int:pago_id>/comenzar/", views.CrearIntentoPagoView.as_view(), name="intentar-pago"),
+    path("pagos/<int:pago_id>/confirmar/", views.ConfirmarPagoView.as_view(), name="confirmar-pago"),
     path('', include(router.urls)),
 ]

@@ -17,8 +17,7 @@ class Bono(models.Model):
     precioAbono = models.FloatField(default=0.0)
     precioOtros = models.FloatField(default=0.0)
 
-    instalacion = models.ForeignKey('Instalacion', on_delete=models.RESTRICT, blank=True, null=True)
-    deporte = models.ForeignKey('Deporte', on_delete=models.RESTRICT, blank=True, null=True)
+    instalacion = models.ForeignKey('Instalacion', on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
         return f'Bono de {self.usos} usos en un máximo de {self.validez} años'
@@ -33,31 +32,54 @@ class CompraBono(models.Model):
 
     usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.RESTRICT)
     bono = models.ForeignKey('Bono', on_delete=models.RESTRICT, related_name="compras_bono")
-    
+
     estado = models.CharField(default=EstadoReserva.PENDIENTE, choices=EstadoReserva.choices)
 
     @classmethod
     def contar(cls):
         return cls.objects.count()
-    
+
     @classmethod
     def compraBono(cls, bono, usuario):
         with transaction.atomic():
             bono.refresh_from_db()
 
-            if cls.objects.filter(usuarioFinal=usuario, bono=bono).exists():
+            if cls.objects.filter(usuarioFinal=usuario, bono=bono, estado=EstadoReserva.CONFIRMADA).exists():
                 return None
-        
+
+            for comBono in cls.objects.filter(usuarioFinal=usuario, bono=bono, estado=EstadoReserva.PENDIENTE):
+                comBono.cancelarCompra()
+
             compra = cls.objects.create(
                 usuarioFinal=usuario,
-                bono=bono
+                bono=bono,
+                estado=EstadoReserva.PENDIENTE
             )
 
             compra.fechaExpiracion = compra.fecha + relativedelta(years=bono.validez)
             compra.save()
 
             return compra
-        
+    
+    def calcular_precio(self, usuario):
+        precio = self.bono.precioOtros
+        if usuario.tieneAbono:
+            precio = self.bono.precioAbonado
+        elif usuario.esUAM:
+            precio = self.bono.precioUAM
+        elif usuario.tieneTDA:
+            precio = self.bono.precioTDA
+
+        return precio
+    
+    def confirmarCompra(self):
+        self.estado = EstadoReserva.CONFIRMADA
+        self.save()
+    
+    def cancelarCompra(self):
+        self.estado = EstadoReserva.CANCELADO
+        self.save()
+
     @property
     def usosRestantes(self):
         return max(0, self.bono.usos - self.vecesUsado)

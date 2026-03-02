@@ -68,9 +68,9 @@ class Actividad(models.Model):
             }
 
         raise Http404("Tipo de actividad no válido")
-
-
-    def calcular_precio(self, usuario, numeroHorasSemana=0, numeroPersonas=0, tipoPago='', tipoSesion=''):
+    
+    def _calcular_precio_base(self, usuario, numeroHorasSemana=0, numeroPersonas=0, tipoPago='', tipoSesion=''):
+        """Devuelve el precio base según tipo de actividad y parámetros"""
         if self.tipoActividad == TipoActividad.OTROS:
             if self.tarifa.actividadcomun.numeroHorasSemana == 0:
                 raise ValueError("El número de horas no puede ser 0")
@@ -79,7 +79,7 @@ class Actividad(models.Model):
             if usuario.esUAM:
                 precio = self.tarifa.actividadcomun.precioUAM
 
-            return precio * (self.calcularHorasSemanales()/self.tarifa.actividadcomun.numeroHorasSemana)
+            return precio * (numeroHorasSemana/self.tarifa.actividadcomun.numeroHorasSemana)
 
         elif self.tipoActividad == TipoActividad.GRUPOS_REDUCIDOS:
             if self.tarifa.gruporeducido.numeroHoras == 0 or self.tarifa.gruporeducido.numeroPersonas == 0:
@@ -90,7 +90,7 @@ class Actividad(models.Model):
                 precio = self.tarifa.gruporeducido.precioMensual
             elif tipoPago.lower() == "cuatrimestral":
                 precio = self.tarifa.gruporeducido.precioCuatrimestre
-            
+
             precio = precio * (numeroHorasSemana/self.tarifa.gruporeducido.numeroHoras)
             return precio * (numeroPersonas/self.tarifa.gruporeducido.numeroPersonas)
 
@@ -120,7 +120,7 @@ class Actividad(models.Model):
 
             return precio
 
-        raise Http404("Tipo de actividad no válido")
+        raise ValueError("Tipo de actividad no válido")
 
     @property
     def activa(self):

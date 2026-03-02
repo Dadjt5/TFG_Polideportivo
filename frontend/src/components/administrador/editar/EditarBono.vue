@@ -97,26 +97,12 @@
 							<div class="col-md-6">
 								<span class="fw-medium">{{ t.facility }}:</span>
 								<p v-if="!editando">
-									{{ bono.instalacion_nombre || "—" }}
+									{{ bono.nombreInstalacion || "—" }}
 								</p>
 
 								<select v-else class="form-select" v-model="bono.instalacion">
 									<option v-for="i in instalaciones" :key="i.id" :value="i.id">
 										{{ i.nombre }}
-									</option>
-								</select>
-							</div>
-
-							<!-- DEPORTE -->
-							<div class="col-md-6">
-								<span class="fw-medium">{{ t.sport }}:</span>
-								<p v-if="!editando">
-									{{ bono.deporte_nombre || "—" }}
-								</p>
-
-								<select v-else class="form-select" v-model="bono.deporte">
-									<option v-for="d in deportes" :key="d.id" :value="d.id">
-										{{ d.nombre }}
 									</option>
 								</select>
 							</div>
@@ -177,7 +163,6 @@ const bono = ref<any>({});
 const bonoOriginal = ref<any>(null);
 
 const instalaciones = ref<any[]>([]);
-const deportes = ref<any[]>([]);
 
 function activarEdicion() {
 	bonoOriginal.value = JSON.parse(JSON.stringify(bono.value));
@@ -221,6 +206,5 @@ onMounted(async () => {
 	bonoOriginal.value = JSON.parse(JSON.stringify(bono.value));
 
 	instalaciones.value = await getInstalacionesSimples();
-	deportes.value = await getDeportes();
 });
 </script>

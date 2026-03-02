@@ -59,27 +59,68 @@ class CompraAbono(models.Model):
     def contar(cls):
         return cls.objects.count()
     
+    def calcular_precio(self, usuario, forma="", familiar=False):
+        if isinstance(self, AbonoDeportivo):
+            precio = self.abonoDeportivo.precioPagoUnicoOtros
+
+            if forma == "MENSUAL":
+                precio = self.abonoDeportivo.precioTotalMensualOtros
+
+            if usuario.esUAM:
+                if forma == "MENSUAL":
+                    precio = self.abonoDeportivo.precioTotalMensual
+                elif forma == "TOTAL":
+                    precio = self.abonoDeportivo.precioPagoUnicoUAM
+
+            if familiar:
+                precio = self.abonoDeportivo.precioFamiliar
+            
+        elif isinstance(self, AbonoVerano):
+            precio = self.abonoVerano.precioOtros
+            if usuario.esUAM:
+                precio = self.abonoVerano.precioUAM
+            elif usuario.tieneTDA:
+                precio = self.abonoVerano.precioTDA
+
+        return precio
+    
+    def confirmarCompra(self):
+        self.estado = EstadoReserva.CONFIRMADA
+        self.save()
+    
+    def cancelarCompra(self):
+        self.estado = EstadoReserva.CANCELADO
+        self.save()
+    
     @classmethod
     def compraAbono(cls, abono, usuario, tipoAbono):
         with transaction.atomic():
             abono.refresh_from_db()
 
             if tipoAbono == "abono_deportivo":
-                if cls.objects.filter(usuarioFinal=usuario, abonoDeportivo=abono).exists():
+                if cls.objects.filter(usuarioFinal=usuario, abonoDeportivo=abono, estado=EstadoReserva.CONFIRMADA).exists():
                     return None
+                
+                for comAbono in cls.objects.filter(usuarioFinal=usuario, abonoDeportivo=abono, estado=EstadoReserva.PENDIENTE):
+                    comAbono.cancelarCompra()
 
                 compra = cls.objects.create(
                     usuarioFinal=usuario,
-                    abonoDeportivo=abono
+                    abonoDeportivo=abono,
+                    estado=EstadoReserva.PENDIENTE
                 )
 
             elif tipoAbono == "abono_verano":
-                if cls.objects.filter(usuarioFinal=usuario, abonoVerano=abono).exists():
+                if cls.objects.filter(usuarioFinal=usuario, abonoVerano=abono, estado=EstadoReserva.CONFIRMADA).exists():
                     return None
+                
+                for comAbono in cls.objects.filter(usuarioFinal=usuario, AbonoVerano=abono, estado=EstadoReserva.PENDIENTE):
+                    comAbono.cancelarCompra()
         
                 compra = cls.objects.create(
                     usuarioFinal=usuario,
-                    abonoVerano=abono
+                    abonoVerano=abono,
+                    estado=EstadoReserva.PENDIENTE
                 )
 
             return compra

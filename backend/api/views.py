@@ -54,27 +54,21 @@ from polideportivo.models import (
 # ----------------
 
 class AbonoDeportivoViewSet(viewsets.ModelViewSet):
+    queryset = AbonoDeportivo.objects.all()
     serializer_class = AbonoDeportivoSerializer
     permission_classes = [IsAuthenticated]
 
-    def get_queryset(self):
-        user = self.request.user
-        return AbonoDeportivo.objects.filter(compras_deportivo__usuarioFinal__user=user)
-
 
 class AbonoVeranoViewSet(viewsets.ModelViewSet):
+    queryset = AbonoVerano.objects.all()
     serializer_class = AbonoVeranoSerializer
     permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        user = self.request.user
-        return AbonoVerano.objects.filter(compras_verano__usuarioFinal__user=user)
 
 
 class CompraAbonoViewSet(viewsets.ModelViewSet):
     serializer_class = CompraAbonoSerializer
     permission_classes = [IsUsuarioFinal]
-
+    
     def perform_create(self, serializer):
         usuario_final = UsuarioFinal.objects.get(user=self.request.user)
         serializer.save(usuarioFinal=usuario_final)
@@ -1074,8 +1068,8 @@ class NuevaInstalacionView(APIView):
             # Datos de la instalacion
             instalacion_data = request.data.get("instalacion", {})
 
-            pabellon_id = instalacion_data.pop("pabellon", None)            
-            tarifa_id = instalacion_data.pop("tarifa", None)            
+            pabellon_id = instalacion_data.pop("pabellon", None)
+            tarifa_id = instalacion_data.pop("tarifa", None)
 
             pabellon = get_object_or_404(Pabellon, id=pabellon_id)
             tarifa = get_object_or_404(TarifaInstalacion, id=tarifa_id)
@@ -1087,7 +1081,7 @@ class NuevaInstalacionView(APIView):
             fechasEspeciales = request.data.get('fechasEspeciales', [])
 
             for fecha in agenda:
-                res = instalacion.controlarCambioHorario(fecha["dia"], fecha.get("apertura"), fecha.get("cierre"), fecha.get("abierto", True))
+                res = instalacion.controlarCambioHorario(fecha["dia"], fecha.get("apertura"), fecha.get("cierre"))
                 if not res:
                     return Response({"respuesta": "Error, el cambio no esta permitido debido a que hay sesiones en esas horas"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -1124,7 +1118,6 @@ class EditarInstalacionView(APIView):
 
             pabellon = get_object_or_404(Pabellon, id=pabellon_id)
             tarifa = get_object_or_404(TarifaInstalacion, id=tarifa_id)
-
 
             # Manejar la agenda y fechas especiales
             agenda = request.data.get('agenda', [])
@@ -1244,6 +1237,7 @@ class NuevaActividadView(APIView):
             monitor = get_object_or_404(Monitor, id=monitor_id)
 
             actividad = Actividad.objects.create(**actividad_data, tarifa=tarifa, instalacion=instalacion, monitor=monitor)
+            ListaEspera.objects.create(actividad=actividad)
 
             # Sesiones de la actividad
             sesiones = request.data.get("sesiones", [])
@@ -1456,36 +1450,6 @@ class TarifaInstalacionView(APIView):
         return Response(data)
 
 
-class ReservarActividadView(APIView):
-    permission_classes = [IsUsuarioFinal]
-    
-    def post(self, request, actividad_id):
-        actividad = get_object_or_404(Actividad, id=actividad_id)
-
-        res = ReservaActividad.nuevaReserva(request.user.usuario_final, actividad)
-        pago = Pago.nuevoPago("Pago por reserva de la actividad", request.user.usuario_final, res)
-
-        if res and pago:
-            return Response({"idPago": pago.id})
-
-        return Response({"respuesta": "Error al reservar"}, status=status.HTTP_400_BAD_REQUEST)
-
-
-class ReservaInstalacionView(APIView):
-    permission_classes = [IsUsuarioFinal]
-    
-    def post(self, request, instalacion_id):
-        instalacion = get_object_or_404(Instalacion, id=instalacion_id)
-
-        res = Alquiler.nuevaReserva(request.user.usuario_final, instalacion)
-        pago = Pago.nuevoPago("Pago por el alquiler de una instalación", request.user.usuario_final, res)
-
-        if res and pago:
-            return Response({"idPago": pago.id})
-
-        return Response({"respuesta": "Error al alquilar"}, status=status.HTTP_400_BAD_REQUEST)
-
-
 class GestionUsuariosView(APIView):
     permission_classes = [IsAdministradorUsuarios]
 
@@ -1576,12 +1540,48 @@ class ObtenerConfiguracionView(APIView):
         return Response({"respuesta": "Error al modificar la configuracion"}, status=status.HTTP_400_BAD_REQUEST)
 
 
+class ReservarActividadView(APIView):
+    permission_classes = [IsUsuarioFinal]
+
+    def post(self, request, actividad_id):
+        actividad = get_object_or_404(Actividad, id=actividad_id)
+        complementos = request.data.get('complementos')
+
+        res = ReservaActividad.nuevaReserva(request.user.usuario_final, actividad)
+        pago = Pago.nuevoPago("Pago por reserva de la actividad", request.user.usuario_final, res, complementos)
+
+        if res and pago:
+            return Response({"idPago": pago.id})
+
+        return Response({"respuesta": "Error al reservar"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ReservaInstalacionView(APIView):
+    permission_classes = [IsUsuarioFinal]
+    
+    def post(self, request, instalacion_id):
+        instalacion = get_object_or_404(Instalacion, id=instalacion_id)
+        complementos = request.data.get('complementos')
+
+        res = Alquiler.nuevaReserva(request.user.usuario_final, instalacion, complementos)
+        if not res:
+            return Response({"respuesta": "Error al alquilar, la instalacion esta ocupada"}, status=status.HTTP_400_BAD_REQUEST)
+
+        pago = Pago.nuevoPago("Pago por el alquiler de una instalación", request.user.usuario_final, res)
+
+        if res and pago:
+            return Response({"idPago": pago.id})
+
+        return Response({"respuesta": "Error al alquilar"}, status=status.HTTP_400_BAD_REQUEST)
+
+
 # Comprar un abono
 class ComprarAbonoView(APIView):
     permission_classes = [IsUsuarioFinal]
     
     def post(self, request, abono_id):
         tipoAbono = request.data.get('tipoAbono')
+        complementos = request.data.get('complementos')
 
         if tipoAbono == "abono deportivo":
             abono = get_object_or_404(AbonoDeportivo, id=abono_id)
@@ -1589,7 +1589,10 @@ class ComprarAbonoView(APIView):
             abono = get_object_or_404(AbonoVerano, id=abono_id)
 
         compra = CompraAbono.compraAbono(abono, request.user.usuario_final, tipoAbono)
-        pago = Pago.nuevoPago(f'Pago por nuevo {tipoAbono}', request.user.usuario_final, compra)
+        if not compra:
+            return Response({"respuesta": "Error al comprar el abono"}, status=status.HTTP_400_BAD_REQUEST)
+
+        pago = Pago.nuevoPago(f'Pago por nuevo {tipoAbono}', request.user.usuario_final, compra, complementos)
 
         if compra and pago:
             return Response({"idPago": pago.id})
@@ -1605,6 +1608,9 @@ class ComprarBonoView(APIView):
         bono = get_object_or_404(Bono, id=bono_id)
 
         compra = CompraBono.compraBono(bono, request.user.usuario_final)
+        if not compra:
+            return Response({"respuesta": "Error al comprar el bono"}, status=status.HTTP_400_BAD_REQUEST)
+
         pago = Pago.nuevoPago(f'Pago por nuevo bono', request.user.usuario_final, compra)
 
         if compra and pago:
@@ -1618,7 +1624,7 @@ class ResumenPagoView(APIView):
     
     def get(self, request, tipo, pago_id):
         # Obtenemos el pago
-        pago = get_object_or_404(Pago, id=pago_id, usuario=request.user.usuario_final)
+        pago = get_object_or_404(Pago, id=pago_id, usuarioFinal=request.user.usuario_final)
         objeto = pago.objeto
 
         if tipo == "reserva_actividad":
@@ -1653,7 +1659,7 @@ class ResumenPagoView(APIView):
                 }
             })
 
-        elif tipo == "compra_abono":
+        elif tipo == "comprar_abono":
             compra = objeto  # objeto es una CompraAbono
             abono = compra.abonoDeportivo or compra.abonoVerano
             return Response({
@@ -1670,12 +1676,12 @@ class ResumenPagoView(APIView):
                 }
             })
 
-        elif tipo == "compra_bono":
+        elif tipo == "comprar_bono":
             compra = objeto  # objeto es una CompraBono
             return Response({
                 "id": compra.id,
                 "estado": compra.estado,
-                "nombre": compra.bono.nombre,
+                "nombre": f'Bono para {compra.bono.instalacion.nombre}',
                 "pago": {
                     "concepto": pago.concepto,
                     "coste": pago.coste,
@@ -1696,11 +1702,10 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 class CrearIntentoPagoView(APIView):
     permission_classes = [IsUsuarioFinal]
 
-    def post(self, request):
-        pago_id = request.data.get("pago_id")
+    def post(self, request, pago_id):
         pago = get_object_or_404(Pago, id=pago_id)
 
-        if pago.estado != EstadoReserva.PENDIENTE:
+        if pago.estadoPago != EstadoPago.PENDIENTE:
             return Response({"respuesta": "Pago incorrecto"}, status=status.HTTP_400_BAD_REQUEST)
 
         intent = stripe.PaymentIntent.create(
@@ -1724,15 +1729,14 @@ class CrearIntentoPagoView(APIView):
 class ConfirmarPagoView(APIView):
     permission_classes = [IsUsuarioFinal]
 
-    def post(self, request):
-        pago_id = request.data.get("pago_id")
-        pago = get_object_or_404(ReservaActividad, id=pago_id)
+    def post(self, request, pago_id):
+        pago = get_object_or_404(Pago, id=pago_id)
 
         intent = stripe.PaymentIntent.retrieve(pago.stripe_payment_intent)
 
         if intent.status == "succeeded":
-            pago.estado = EstadoPago.CONFIRMADA
-            pago.save()
-            return Response({"ok": True})
+            pago.confirmarPago()
+            return Response({"respuesta": "Pago completado con exito"}, status=status.HTTP_200_OK)
         else:
-            return Response({"error": "Pago no válido"}, status=400)
+            pago.cancelarPago()
+            return Response({"respuesta": "Error al pagar"}, status=status.HTTP_400_BAD_REQUEST)

@@ -48,7 +48,7 @@ class Instalacion(models.Model):
             "precioOtros": self.tarifa.precioOtros
         }
 
-    def calcular_precio(self, usuario):
+    def _calcular_precio_base(self, usuario):
         precio = self.tarifa.precioOtros
         if usuario.tieneAbono:
             precio = self.tarifa.precioAbonado
@@ -107,7 +107,7 @@ class Instalacion(models.Model):
 
         return True
 
-    def controlarCambioHorario(self, dia, horaInicio, horaFin, abierto):
+    def controlarCambioHorario(self, dia, horaInicio, horaFin):
         conflictos = self.actividad.filter(
             sesiones__dia=dia,
             sesiones__horaInicio__lt=horaFin,
@@ -117,6 +117,25 @@ class Instalacion(models.Model):
         if conflictos.exists():
             return False
         
+        return True
+    
+    def controlarAlquiler(self, dia, horaInicio, horaFin):
+        if isinstance(horaInicio, str):
+            h, m = map(int, horaInicio.split(":"))
+            horaInicio = time(h, m)
+        if isinstance(horaFin, str):
+            h, m = map(int, horaFin.split(":"))
+            horaFin = time(h, m)
+
+        agenda = self.agenda.filter(fecha=dia)
+        if not agenda:
+            agenda = self.agenda.filter(dia_iexact=dia)
+
+        if agenda.estaOcupado(horaInicio, horaFin):
+            return False
+
+        agenda.alquilarHoras(horaInicio, horaFin)
+
         return True
 
     def nuevoHorario(self, dia, horaApertura, horaCierre, abierto):

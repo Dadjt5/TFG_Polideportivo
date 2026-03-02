@@ -34,8 +34,8 @@ export const reservarActividad = async(id: number) => {
 }
 
 /* Función para comprar un abono */
-export const comprarAbono = async(id: number, tipo: string) => {
-  const response = await api.post(`api/v1/abonos/${id}/comprar/`, {"tipoAbono": tipo})
+export const comprarAbono = async(id: number, tipo: string, forma: string, familiar: boolean) => {
+  const response = await api.post(`api/v1/abonos/${id}/comprar/`, {"tipoAbono": tipo, "complementos": {"forma": forma, "familiar": familiar}})
   return response.data;
 }
 
@@ -45,6 +45,10 @@ export const comprarBono = async(id: number) => {
   return response.data;
 }
 
+export const getPago = async (id: number) => {
+  const response = await api.get(`api/v1/pagos/${id}/`)
+  return response.data;
+}
 
 export const getResumenPago = async (id: number, tipo: string) => {
   const response = await api.get(`api/v1/pagos/resumen/${tipo}/${id}/`)
@@ -52,12 +56,12 @@ export const getResumenPago = async (id: number, tipo: string) => {
 }
 
 /* Función para intentar lanzar un pago */
-export const intentarPago = async (id: number, tipo: string) => {
-  const response = await api.post(`api/v1/pago/comenzar/`, { id, tipo })
+export const intentarPago = async (id: number) => {
+  const response = await api.post(`api/v1/pagos/${id}/comenzar/`)
   return response.data
 }
 
 /* Función para confirmar un pago */
-export const confirmarPago = async (id: number, tipo: string) => {
-  await api.post(`api/v1/pago/confirmar/`, { id, tipo })
+export const confirmarPago = async (id: number) => {
+  await api.post(`api/v1/pagos/${id}/confirmar/`)
 }

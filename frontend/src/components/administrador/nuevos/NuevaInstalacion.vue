@@ -5,8 +5,31 @@
         {{ t.newFacility }}
       </h1>
 
-      <div class="card shadow-sm border-0 rounded-4 p-4">
-        <div class="row g-4">
+      <div class="card border-0 shadow-lg rounded-4 p-4">
+
+        <!-- TABS -->
+        <ul class="nav nav-tabs nav-fill mb-4">
+          <li class="nav-item">
+            <button type="button" class="nav-link" :class="{ active: tab === 1 }" @click="tab = 1">
+              {{ t.data }}
+            </button>
+          </li>
+
+          <li class="nav-item">
+            <button type="button" class="nav-link" :class="{ active: tab === 2 }" @click="tab = 2">
+              {{ t.pavilion }} & {{ t.tariff }}
+            </button>
+          </li>
+
+          <li class="nav-item">
+            <button type="button" class="nav-link" :class="{ active: tab === 3 }" @click="tab = 3">
+              {{ t.weeklyHours }}
+            </button>
+          </li>
+        </ul>
+
+        <!-- ================= TAB 1 DATOS ================= -->
+        <div v-if="tab === 1" class="row g-4">
 
           <!-- NOMBRE -->
           <div class="col-md-6">
@@ -23,29 +46,6 @@
               <option value="" disabled>--</option>
               <option v-for="t in tiposStore.tiposInstalacion" :key="t[0]" :value="t[0]">
                 {{ t[1] }}
-              </option>
-            </select>
-          </div>
-
-          <!-- PABELLÓN -->
-          <div class="col-md-6">
-            <label class="form-label fw-semibold">{{ t.pavilion }}</label>
-            <select class="form-select form-select-lg" :class="{ 'is-invalid': errores.pabellon }"
-              v-model="instalacion.pabellon_id">
-              <option value="" disabled>--</option>
-              <option v-for="p in pabellones" :key="p.id" :value="p.id">
-                {{ p.nombre }}
-              </option>
-            </select>
-          </div>
-
-          <!-- TARIFA -->
-          <div class="col-md-6">
-            <label class="form-label fw-semibold">{{ t.tariff }}</label>
-            <select class="form-select form-select-lg" v-model="instalacion.tarifa">
-              <option value="">--</option>
-              <option v-for="t in tarifas" :key="t.id" :value="t.id">
-                {{ t.titulo }}
               </option>
             </select>
           </div>
@@ -83,29 +83,50 @@
 
         </div>
 
-        <!-- Horarios semanales -->
-        <div class="card border-0 shadow-sm rounded-4 mt-4">
-          <div class="card-body d-flex justify-content-between align-items-center cursor-pointer"
-            style="cursor: pointer;" @click="openAgenda = !openAgenda">
-            <div class="d-flex align-items-center gap-2">
-              <i class="bi bi-calendar-event fs-5 text-primary"></i>
-              <span class="fw-semibold">
-                {{ t.weeklyHours }}
-              </span>
-            </div>
+        <!-- ================= TAB 2 PABELLON Y TARIFA ================= -->
+        <div v-if="tab === 2" class="row g-4">
 
-            <i class="bi" :class="openAgenda ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+          <!-- PABELLÓN -->
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">{{ t.pavilion }}</label>
+            <select class="form-select form-select-lg" :class="{ 'is-invalid': errores.pabellon }"
+              v-model="instalacion.pabellon">
+              <option value="" disabled>--</option>
+              <option v-for="p in pabellones" :key="p.id" :value="p.id">
+                {{ p.nombre }}
+              </option>
+            </select>
           </div>
-          <transition name="fade">
-            <div v-if="openAgenda" class="px-4 pb-4">
+
+          <!-- TARIFA -->
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">{{ t.tariff }}</label>
+            <select class="form-select form-select-lg" v-model="instalacion.tarifa">
+              <option value="">--</option>
+              <option v-for="t in tarifas" :key="t.id" :value="t.id">
+                {{ t.titulo }}
+              </option>
+            </select>
+          </div>
+
+        </div>
+
+        <!-- ================= TAB 3 HORARIOS ================= -->
+        <div v-if="tab === 3">
+
+          <!-- HORARIOS SEMANALES -->
+          <div class="card border-0 shadow-sm rounded-4 mb-4">
+            <div class="card-body">
+              <h5 class="fw-bold mb-4">
+                {{ t.weeklyHours }}
+              </h5>
+
               <div v-for="(d, index) in agenda" :key="index" class="d-flex align-items-center gap-3 mb-3">
 
-                <!-- Día -->
                 <span class="w-25 fw-semibold">
                   {{ d.dia }}
                 </span>
 
-                <!-- Si NO está cerrado -->
                 <template v-if="d.abierto">
                   <input type="time" v-model="d.apertura" class="form-control form-control-sm w-auto" />
 
@@ -114,78 +135,82 @@
                   <input type="time" v-model="d.cierre" class="form-control form-control-sm w-auto" />
                 </template>
 
-                <!-- Texto cuando está cerrado -->
                 <span v-else class="text-danger fw-semibold">
                   {{ t.close }}
                 </span>
 
-                <!-- Checkbox -->
                 <div class="form-check ms-auto">
-                  <input class="form-check-input" type="checkbox" v-model="d.abierto" :id="'abierto-' + index">
-                  <label class="form-check-label small" :for="'abierto-' + index">
-                    {{ t.open }}
-                  </label>
+                  <input class="form-check-input" type="checkbox" v-model="d.abierto">
                 </div>
-
               </div>
             </div>
-          </transition>
-        </div>
-
-        <!-- Fechas especiales -->
-        <div class="card border-0 shadow-sm rounded-4 mt-4">
-          <div class="card-body d-flex justify-content-between align-items-center cursor-pointer"
-            style="cursor: pointer;" @click="openEspeciales = !openEspeciales">
-            <div class="d-flex align-items-center gap-2">
-              <i class="bi bi-calendar-event fs-5 text-primary"></i>
-              <span class="fw-semibold">
-                {{ t.specialDates }}
-              </span>
-            </div>
-
-            <i class="bi" :class="openEspeciales ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
           </div>
 
-          <transition name="fade">
-            <div v-if="openEspeciales" class="px-4 pb-4">
+          <!-- FECHAS ESPECIALES -->
+          <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body">
+              <h5 class="fw-bold mb-4">
+                {{ t.specialDates }}
+              </h5>
 
-              <div class="mb-3">
-                <input type="date" v-model="tempFecha" class="form-control mb-2" />
-                <div class="form-check mb-2">
-                  <input type="checkbox" class="form-check-input" v-model="tempAbierto" id="abiertoCheck" />
-                  <label for="abiertoCheck" class="form-check-label">{{ t.open }}</label>
-                </div>
-                <div v-if="tempAbierto" class="d-flex gap-2 mb-2">
-                  <input type="time" v-model="tempApertura" class="form-control form-control-sm" />
-                  <span>-</span>
-                  <input type="time" v-model="tempCierre" class="form-control form-control-sm" />
-                </div>
-                <button class="btn btn-success btn-sm" @click="handleAddFechaEspecial">{{ t.newSpecialDate }}</button>
+              <input type="date" v-model="tempFecha" class="form-control mb-2" />
+
+              <div class="form-check mb-2">
+                <input type="checkbox" class="form-check-input" v-model="tempAbierto" />
+                <label class="form-check-label">
+                  {{ t.open }}
+                </label>
               </div>
+
+              <div v-if="tempAbierto" class="d-flex gap-2 mb-3">
+                <input type="time" v-model="tempApertura" class="form-control form-control-sm" />
+                <span>-</span>
+                <input type="time" v-model="tempCierre" class="form-control form-control-sm" />
+              </div>
+
+              <button class="btn btn-success btn-sm mb-3" @click="handleAddFechaEspecial">
+                {{ t.newSpecialDate }}
+              </button>
 
               <div v-for="(f, index) in fechasEspeciales" :key="index"
-                class="d-flex justify-content-between align-items-center mb-1 p-2 border rounded">
+                class="d-flex justify-content-between align-items-center mb-2 p-2 border rounded">
+
                 <div>
                   <strong>{{ f.fecha }}</strong> -
-                  <span v-if="f.abierto">{{ f.apertura }} a {{ f.cierre }}</span>
-                  <span v-else>{{ t.close }}</span>
+                  <span v-if="f.abierto">
+                    {{ f.apertura }} - {{ f.cierre }}
+                  </span>
+                  <span v-else>
+                    {{ t.close }}
+                  </span>
                 </div>
-                <button class="btn btn-danger btn-sm" @click="handleDeleteFechaEspecial(index)">{{ t.delete }}</button>
+
+                <button class="btn btn-danger btn-sm" @click="handleDeleteFechaEspecial(index)">
+                  {{ t.delete }}
+                </button>
               </div>
+
             </div>
-          </transition>
+          </div>
+
+        </div>
+
+        <!-- MENSAJE ERROR -->
+        <div class="text-center mt-4">
+          <p v-if="mensaje" class="text-danger">{{ mensaje }}</p>
         </div>
 
         <!-- BOTONES -->
-        <div class="d-flex justify-content-center gap-3 mt-5">
-          <button class="btn btn-primary btn-lg px-5" @click="crearInstalacion">
-            {{ t.createFacility }}
-          </button>
-
-          <button class="btn btn-danger btn-lg px-5" @click="volver">
+        <div class="d-flex justify-content-between mt-4">
+          <button class="btn btn-outline-secondary" type="button" @click="volver">
             {{ t.return }}
           </button>
+
+          <button class="btn btn-success px-4" type="button" @click="crearInstalacion">
+            {{ t.createFacility }}
+          </button>
         </div>
+
       </div>
     </main>
   </div>
@@ -193,7 +218,7 @@
 
 
 <script setup lang="ts">
-import { ref, inject, type Ref, onMounted } from "vue"
+import { ref, inject, type Ref, onMounted, computed } from "vue"
 import { useRouter } from "vue-router"
 
 import { nuevaInstalacion } from "@/services/crearRecursosService"
@@ -212,14 +237,16 @@ const router = useRouter()
 const tiposStore = useTiposStore();
 const mensaje = ref("")
 
+const tab = ref(1)
+
 const instalacion = ref({
   nombre: "",
   imagenURL: "",
   aforoMaximo: 50,
   luz: false,
   porcentajeTDA: 0,
-  pabellon_id: null,
   tarifa: null,
+  pabellon: null,
   tipoInstalacion: ""
 })
 
@@ -252,6 +279,7 @@ const openEspeciales = ref(false);
 const pabellones = ref<any[]>([])
 const tarifas = ref<any[]>([])
 
+
 function handleAgendaChange(index: number, field: "apertura" | "cierre", value: string) {
   agenda.value[index][field] = value;
 }
@@ -283,7 +311,7 @@ function validarFormulario() {
   errores.value.porcentajeTDA =
     instalacion.value.porcentajeTDA < 0 ||
     instalacion.value.porcentajeTDA > 100
-  errores.value.pabellon = instalacion.value.pabellon_id === ""
+  errores.value.pabellon = instalacion.value.pabellon === ""
   errores.value.tipoInstalacion = instalacion.value.tipoInstalacion === ""
 
   for (const k in errores.value) {

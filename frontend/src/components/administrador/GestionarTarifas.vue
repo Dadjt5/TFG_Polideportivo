@@ -52,7 +52,7 @@
                       class="list-group-item rounded-3 mb-2 shadow-sm d-flex justify-content-between align-items-center"
                       @click="abonoDetail(abono.id, 'deportivo')">
                       <div class="fw-medium text-primary">
-                        {{ abono.titulo }}
+                        {{ abono.nombre }}
                       </div>
                     </div>
                   </div>
@@ -75,7 +75,7 @@
                       class="list-group-item rounded-3 mb-2 shadow-sm d-flex justify-content-between align-items-center"
                       @click="abonoDetail(abono.id, 'verano')">
                       <div class="fw-medium text-primary">
-                        {{ abono.titulo }}
+                        {{ abono.nombre }}
                       </div>
                     </div>
                   </div>
@@ -103,7 +103,7 @@
                     class="list-group-item rounded-3 mb-2 shadow-sm d-flex justify-content-between align-items-center"
                     @click="bonoDetail(bono.id)">
                     <div class="fw-medium text-primary">
-                      {{ bono.titulo }}
+                      {{ t.bonus }} {{ bono.nombreInstalacion }}
                     </div>
                   </div>
                 </div>
@@ -320,15 +320,16 @@ onMounted(async () => {
     const abonos = await getAbonos();
     bonos.value = await getBonos();
 
-    abonosDeportivos.value = data.abonosDeportivos
-    abonosVerano.value = data.abonosVerano
+    abonosDeportivos.value = abonos.abonosDeportivos
+    abonosVerano.value = abonos.abonosVerano
+
     tarifasInstalacion.value = data.tarifasInstalacion
     tarifasTDA.value = data.tarifasTDA
     tarifasActividadComun.value = data.tarifasActividadComun
     tarifasGrupoReducido.value = data.tarifasGrupoReducido
     tarifasFisioterapia.value = data.tarifasFisioterapia
   } catch (e) {
-    console.log("Error al obtener las tarifas", e);
+    console.log("Error al obtener las tarifas, bonos o abonos", e);
   }
 });
 </script>

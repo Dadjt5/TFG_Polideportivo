@@ -262,8 +262,6 @@ class InstalacionSimpleSerializer(serializers.ModelSerializer):
 
 
 class InstalacionSerializer(serializers.ModelSerializer):
-    pabellon_id = serializers.PrimaryKeyRelatedField(queryset=Pabellon.objects.all(), source="pabellon", write_only=True)
-    pabellon = PabellonSimpleSerializer(read_only=True)
     agenda = AgendaSerializer(many=True, read_only=True)
     imagenURL = serializers.SerializerMethodField()
 
@@ -278,7 +276,6 @@ class InstalacionSerializer(serializers.ModelSerializer):
             "imagenURL",
             "porcentajeTDA",
             "pabellon",
-            "pabellon_id",
             "agenda",
             "tarifa"
         )
@@ -337,6 +334,7 @@ class ActividadSerializer(serializers.ModelSerializer):
     horasSemanales = serializers.SerializerMethodField()
     dias = serializers.SerializerMethodField()
     nombreDeporte = serializers.SerializerMethodField()
+    nombreMonitor = serializers.SerializerMethodField()
     imagenURL = serializers.SerializerMethodField()
 
     class Meta:
@@ -420,7 +418,6 @@ class AsistenciaSerializer(serializers.ModelSerializer):
 
 class BonoSerializer(serializers.ModelSerializer):
     nombreInstalacion = serializers.SerializerMethodField()
-    nombreDeporte = serializers.SerializerMethodField()
     precioFinal = serializers.SerializerMethodField()
     textoPrecio = serializers.SerializerMethodField()
 
@@ -430,67 +427,60 @@ class BonoSerializer(serializers.ModelSerializer):
             "id",
             "validez",
             "usos",
+            "precioTDA",
+            "precioUAM",
+            "precioAbono",
+            "precioOtros",
             "precioFinal",
             "textoPrecio",
-            "nombreInstalacion",
-            "nombreDeporte"
+            "instalacion",
+            "nombreInstalacion"
         )
     
     def get_precioFinal(self, obj):
         user = self.context.get('user')
         precio = obj.precioOtros
 
-        if user.is_usuario_final:
-            if user.usuario_final.tda.first():
-                if precio > obj.precioTDA:
-                    precio = obj.precioTDA
+        if user and user.is_usuario_final:
+            usuario = user.usuario_final
 
-            if user.usuario_final.rol and "externo" not in user.usuario_final.rol.lower():
-                if precio > obj.precioUAM:
-                    precio = obj.precioUAM
+            if usuario.tieneTDA and precio > obj.precioTDA:
+                precio = obj.precioTDA
 
-            if user.usuario_final.abono.first():
-                if precio > obj.precioAbono:
-                    precio = obj.precioAbono
+            if usuario.esUAM and precio > obj.precioUAM:
+                precio = obj.precioUAM
+
+            if usuario.tieneAbono and precio > obj.precioAbono:
+                precio = obj.precioAbono
 
         return precio
     
     def get_textoPrecio(self, obj):
         user = self.context.get('user')
-        cadena = ""
         precio = obj.precioOtros
-        
-        if user.is_usuario_final:
-            if user.usuario_final.tda.first():
-                if precio > obj.precioTDA:
-                    precio = obj.precioTDA
-                    cadena = "Descuento por TDA"
+        cadena = ""
 
-            if user.usuario_final.rol and "externo" not in user.usuario_final.rol.lower():
-                if precio > obj.precioUAM:
-                    precio = obj.precioUAM
-                    cadena = "Descuento comunidad UAM"
+        if user and user.is_usuario_final:
+            usuario = user.usuario_final
 
-            if user.usuario_final.abono.first():
-                if precio > obj.precioAbono:
-                    precio = obj.precioAbono
-                    cadena = "Descuento por abono"
+            if usuario.tieneTDA and precio > obj.precioTDA:
+                precio = obj.precioTDA
+                cadena = "Descuento por TDA"
+
+            if usuario.esUAM and precio > obj.precioUAM:
+                precio = obj.precioUAM
+                cadena = "Descuento comunidad UAM"
+
+            if usuario.tieneAbono and precio > obj.precioAbono:
+                precio = obj.precioAbono
+                cadena = "Descuento por abono"
 
         return cadena
     
     def get_nombreInstalacion(self, obj):
-        instalacion = obj.instalacion
-
-        if instalacion:
-            return instalacion.nombre
-        return None
-    
-    def get_nombreDeporte(self, obj):
-        deporte = obj.deporte
-
-        if deporte:
-            return deporte.titulo
-        return None
+        if obj.instalacion:
+            return obj.instalacion.nombre
+        return ""
 
 
 class CompraBonoSerializer(serializers.ModelSerializer):
@@ -688,7 +678,14 @@ class NotificacionSerializer(serializers.ModelSerializer):
 class PagoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Pago
-        fields = '__all__'
+        fields = (
+            "concepto",
+            "coste",
+            "costeFinal",
+            "descuentoAplicado",
+            "fecha",
+            "estadoPago"
+        )
 
 
 # --------------------

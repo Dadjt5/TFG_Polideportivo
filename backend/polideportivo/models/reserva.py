@@ -5,6 +5,9 @@ from django.db import transaction
 
 from .constantes import EstadoReserva
 from .descuento import Descuento
+from .lista_espera import ListaEspera, EntradaListaEspera
+from .notificacion import Notificacion
+from .constantes import TipoActividad
 
 
 class Reserva(models.Model):
@@ -31,10 +34,59 @@ class Reserva(models.Model):
 class ReservaActividad(Reserva):
     """Modelo para representar una reserva en una actividad"""
 
+    numeroHorasSemana = models.IntegerField(default=0)
+    numeroPersonas = models.IntegerField(default=1)
+    tipoPago = models.CharField(default="total")
+    tipoSesion = models.CharField(default="consulta")
+
     actividad = models.ForeignKey('Actividad', on_delete=models.CASCADE)
 
     def __str__(self):
         return f'Reserva de {self.actividad}'
+    
+    def calcular_precio(self):
+        """Calcula el precio final de la reserva usando la actividad"""
+        return self.actividad._calcular_precio_base(
+            usuario=self.usuario,
+            numeroHorasSemana=self.numeroHorasSemana,
+            numeroPersonas=self.numeroPersonas,
+            tipoPago=self.tipoPago,
+            tipoSesion=self.tipoSesion
+        )
+    
+    def confirmarCompra(self):
+        self.estado = EstadoReserva.CONFIRMADA
+        self.save()
+    
+    def cancelarCompra(self):
+        self.actividad.lista_espera.salirLista(self.usuarioFinal)
+
+        self.actividad.plazasReservadas -= 1
+        self.estado = EstadoReserva.CANCELADO
+        self.save()
+
+        lista_espera = self.actividad.lista_espera
+        while self.actividad.plazasReservadas < self.actividad.plazasMaximas:
+            entrada = lista_espera.siguienteUsuario()
+            if not entrada:
+                break
+
+            descuentos = Descuento.obtener_descuentos(actividad=self.actividad)
+            if descuentos:
+                self.descuentos.set(descuentos["descuento"]["aplicados"])
+
+            ReservaActividad.objects.get_or_create(
+                usuarioFinal=entrada.usuarioFinal,
+                actividad=self.actividad,
+                estado=EstadoReserva.PENDIENTE
+            )
+
+            Notificacion.notificarSalidaListaDeEspera(entrada.usuarioFinal, self.actividad)
+
+            entrada.delete()
+
+            self.actividad.plazasReservadas += 1
+            self.actividad.save()
 
     @classmethod
     def contar(cls):
@@ -45,19 +97,20 @@ class ReservaActividad(Reserva):
         with transaction.atomic():
             actividad.refresh_from_db()
 
-            if actividad.plazasReservadas >= actividad.plazasMaximas:
-                raise ValueError("No hay plazas disponibles") # hay que hacer la lista de espera
-
             descuentos = Descuento.obtener_descuentos(actividad=actividad)
 
             if cls.objects.filter(usuarioFinal=usuario, actividad=actividad, estado=EstadoReserva.CONFIRMADA).exists():
                 return None
-        
+
+            # Lista de espera
+            if actividad.plazasReservadas >= actividad.plazasMaximas:
+                lista = ListaEspera.objects.filter(actividad=actividad).first()
+                EntradaListaEspera.objects.create(usuarioFinal=usuario, listaEspera=lista)
+
             reservasPrevias = cls.objects.filter(usuarioFinal=usuario, actividad=actividad, estado=EstadoReserva.PENDIENTE)
 
             for r in reservasPrevias:
-                r.estado = 'CANCELADA'
-                r.save()
+                r.cancelarCompra()
 
             reserva = cls.objects.create(
                 usuarioFinal=usuario,
@@ -86,30 +139,44 @@ class Alquiler(Reserva):
 
     def __str__(self):
         return f'Alquiler de {self.instalacion}, en {self.fecha} de {self.horaInicio} a {self.horaFin}'
+    
+    def calcular_precio(self):
+        """Calcula el precio final de la reserva usando la instalacion"""
+        return self.instalacion._calcular_precio_base(usuario=self.usuario)
+
+    def confirmarCompra(self):
+        self.estado = EstadoReserva.CONFIRMADA
+        self.save()
+
+    def cancelarCompra(self):
+        self.estado = EstadoReserva.CANCELADO
+        self.save()
 
     @classmethod
     def contar(cls):
         return cls.objects.count()
     
     @classmethod
-    def nuevaReserva(cls, usuario, instalacion):
+    def nuevaReserva(cls, usuario, instalacion, complementos):
         with transaction.atomic():
             instalacion.refresh_from_db()
 
             descuentos = Descuento.obtener_descuentos(instalacion=instalacion)
 
-            if cls.objects.filter(usuarioFinal=usuario, instalacion=instalacion, estado=EstadoReserva.CONFIRMADA).exists():
+            if not instalacion.controlarAlquiler(complementos["fecha"], complementos["horaInicio"], complementos["horaFin"]):
                 return None
-        
+
             reservasPrevias = cls.objects.filter(usuarioFinal=usuario, instalacion=instalacion, estado=EstadoReserva.PENDIENTE)
 
             for r in reservasPrevias:
-                r.estado = 'CANCELADA'
-                r.save()
+                r.cancelarCompra()
 
             reserva = cls.objects.create(
                 usuarioFinal=usuario,
                 instalacion=instalacion,
+                fecha=complementos["fecha"],
+                horaInicio=complementos["horaInicio"],
+                horaFin=complementos["horaFin"],
                 estado=EstadoReserva.PENDIENTE
             )
 

@@ -19,12 +19,7 @@
           <div class="col-md-4" v-for="b in bonos" :key="b.id">
             <div class="card h-100 shadow-sm rounded-4 border-0 hover-shadow">
               <div class="card-body">
-                <p v-if="b.nombreInstalacion != ''">
-                  <strong>{{ t.facility }}:</strong> {{ b.nombreInstalacion }}
-                </p>
-                <p v-else>
-                  <strong>{{ t.sport }}:</strong> {{ b.nombreDeporte }}
-                </p>
+                <p><strong>{{ t.facility }}:</strong> {{ b.nombreInstalacion }}</p>
                 <p><strong>{{ t.uses }}:</strong> {{ b.usos }}</p>
                 <p><strong>{{ t.validity }}:</strong> {{ b.validez }}</p>
                 <p><strong>{{ t.price }}:</strong> {{ b.precioFinal }}€</p>
@@ -217,7 +212,7 @@ import { getAbonos, getBonos } from "@/services/abonoBonoService"
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
 import type { Language } from "@/useI18N";
 import { useI18n } from "@/useI18N";
-import { comprarAbono, comprarBono } from '@/services/reservaPagoService';
+import { comprarBono } from '@/services/reservaPagoService';
 
 const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);
@@ -250,20 +245,15 @@ const abonos = ref({
 const bonos = ref<any[]>([])
 
 const nuevoAbono = async (id: number, tipoAbono: string) => {
-  const response = await comprarAbono(id, tipoAbono)
-
-  const idPago = response.data.idPago
-
   router.push({
-    name: 'pasarela-pago',
-    params: { tipo: "comprar_abono", id: idPago }
+    name: 'configurar-abono'
   })
 }
 
 const nuevoBono = async (id: number) => {
   const response = await comprarBono(id)
 
-  const idPago = response.data.idPago
+  const idPago = response.idPago
 
   router.push({
     name: 'pasarela-pago',

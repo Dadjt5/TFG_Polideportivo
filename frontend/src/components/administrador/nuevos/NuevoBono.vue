@@ -12,14 +12,16 @@
             <label class="form-label fw-semibold">{{ t.uses }}</label>
             <input type="number"
               class="form-control form-control-lg"
-              v-model.number="bono.usos" />
+              v-model.number="bono.usos"
+              :class="{ 'is-invalid': errores.usos }"/>
           </div>
 
           <div class="col-md-3">
             <label class="form-label fw-semibold">{{ t.validity }}</label>
             <input type="number"
               class="form-control form-control-lg"
-              v-model.number="bono.validez" />
+              v-model.number="bono.validez"
+              :class="{ 'is-invalid': errores.validez }"/>
           </div>
 
           <div class="col-md-3">
@@ -38,22 +40,11 @@
 
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.facility }}</label>
-            <select class="form-select form-select-lg"
+            <select class="form-select form-select-lg" :class="{ 'is-invalid': errores.instalacion }"
               v-model="bono.instalacion">
               <option :value="null">--</option>
               <option v-for="i in instalaciones" :key="i.id" :value="i.id">
                 {{ i.nombre }}
-              </option>
-            </select>
-          </div>
-
-          <div class="col-md-4">
-            <label class="form-label fw-semibold">{{ t.sport }}</label>
-            <select class="form-select form-select-lg"
-              v-model="bono.deporte">
-              <option :value="null">--</option>
-              <option v-for="d in deportes" :key="d.id" :value="d.id">
-                {{ d.nombre }}
               </option>
             </select>
           </div>
@@ -81,8 +72,7 @@ import { type Ref, ref, inject, onMounted } from "vue"
 import { useRouter } from "vue-router"
 
 import { nuevoBono } from "@/services/crearRecursosService"
-import { getInstalaciones } from "@/services/listadoService"
-import { getDeportes } from "@/services/listadoService"
+import { getInstalacionesSimples } from "@/services/listadoService"
 
 import type { Language } from "@/useI18N";
 import { useI18n } from "@/useI18N";
@@ -99,28 +89,30 @@ const bono = ref({
   precioUAM: 0,
   precioAbono: 0,
   precioOtros: 0,
-  instalacion: null as number | null,
-  deporte: null as number | null
+  instalacion: null as number | null
 })
 
 const instalaciones = ref<any[]>([])
-const deportes = ref<any[]>([])
 
 const errores = ref({
-  usos: false
+  usos: false,
+  validez: false,
+  instalacion: false
 })
 
 function validar() {
   errores.value.usos = bono.value.usos <= 0
+  errores.value.validez = bono.value.validez <= 0
+  errores.value.instalacion = bono.value.instalacion == null
+
   return !errores.value.usos
 }
 
 const cargarDatos = async () => {
   try {
-    instalaciones.value = await getInstalaciones()
-    deportes.value = await getDeportes()
-  } catch (error) {
-    console.error("Error cargando datos:", error)
+    instalaciones.value = await getInstalacionesSimples()
+  } catch (e) {
+    console.error("Error cargando datos:", e)
   }
 }
 

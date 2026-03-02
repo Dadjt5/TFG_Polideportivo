@@ -100,3 +100,14 @@ class Notificacion(models.Model):
                 usuario=usuario.user,
                 actividad=actividad
             )
+        
+    @classmethod
+    def notificarSalidaListaDeEspera(cls, usuario, actividad):
+        configuracion = Configuracion.objects.all().first()
+
+        cls.objects.create(
+            titulo=configuracion.titulo_salida_lista_espera,
+            descripcion=configuracion.texto_salida_lista_espera,
+            usuario=usuario.user,
+            actividad=actividad
+        )
