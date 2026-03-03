@@ -29,3 +29,9 @@ export const editarConfiguracion = async (data: any) => {
   const response = await api.patch(`api/v1/configuracion/`, data)
   return response.data
 };
+
+/* Función para obtener las estadísticas del sistema */
+export const getEstadisticasAdministrador = async () => {
+  const response = await api.get('api/v1/estadisticas/administrador/')
+  return response.data;
+}

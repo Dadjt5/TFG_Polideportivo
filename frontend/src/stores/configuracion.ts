@@ -10,6 +10,7 @@ export const useConfiguracionStore = defineStore("configuracion", {
 		dias_maximo_reserva_actividad: 0,
 		dias_minimo_cancelacion: 0,
 		horas_previas_notificacion: 0,
+		porcentaje_maximo: 0,
 		titulo_cambios_cancelaciones: '',
 		titulo_avisos_actividades: '',
 		titulo_problemas_pago: '',
@@ -36,6 +37,7 @@ export const useConfiguracionStore = defineStore("configuracion", {
 				this.dias_maximo_reserva_actividad = data.dias_maximo_reserva_actividad;
 				this.dias_minimo_cancelacion = data.dias_minimo_cancelacion;
 				this.horas_previas_notificacion = data.horas_previas_notificacion;
+				this.porcentaje_maximo = data.porcentaje_maximo;
 
 				this.titulo_cambios_cancelaciones = data.titulo_cambios_cancelaciones;
 				this.titulo_avisos_actividades = data.titulo_avisos_actividades;
@@ -67,6 +69,7 @@ export const useConfiguracionStore = defineStore("configuracion", {
 					dias_maximo_reserva_actividad: this.dias_maximo_reserva_actividad,
 					dias_minimo_cancelacion: this.dias_minimo_cancelacion,
 					horas_previas_notificacion: this.horas_previas_notificacion,
+					porcentaje_maximo: this.porcentaje_maximo,
 					titulo_cambios_cancelaciones: this.titulo_cambios_cancelaciones,
 					titulo_avisos_actividades: this.titulo_avisos_actividades,
 					titulo_problemas_pago: this.titulo_problemas_pago,
@@ -100,6 +103,7 @@ export const useConfiguracionStore = defineStore("configuracion", {
 				dias_maximo_reserva_actividad: this.dias_maximo_reserva_actividad,
 				dias_minimo_cancelacion: this.dias_minimo_cancelacion,
 				horas_previas_notificacion: this.horas_previas_notificacion,
+				porcentaje_maximo: this.porcentaje_maximo,
 				titulo_cambios_cancelaciones: this.titulo_cambios_cancelaciones,
 				titulo_avisos_actividades: this.titulo_avisos_actividades,
 				titulo_problemas_pago: this.titulo_problemas_pago,

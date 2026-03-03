@@ -15,6 +15,12 @@ export const nuevoDeporte = async (payload: Payload): Promise<any> => {
   return response.data
 }
 
+/* Función para crear un nuevo descuento */
+export const nuevoDescuento = async (payload: Payload): Promise<any> => {
+  const response = await api.post("api/v1/descuentos/", payload)
+  return response.data
+}
+
 /* Función para crear un nuevo pabellon */
 export const nuevoPabellon = async (payload: Payload): Promise<any> => {
   const response = await api.post("api/v1/pabellones/", payload)

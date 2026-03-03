@@ -55,15 +55,21 @@ class ReservaActividad(Reserva):
         )
     
     def confirmarCompra(self):
+        self.usuarioFinal.actividadesRealizadas += 1
+        self.usuarioFinal.save()
+
         self.estado = EstadoReserva.CONFIRMADA
         self.save()
-    
+
     def cancelarCompra(self):
         self.actividad.lista_espera.salirLista(self.usuarioFinal)
 
         self.actividad.plazasReservadas -= 1
         self.estado = EstadoReserva.CANCELADO
         self.save()
+
+        self.usuarioFinal.actividadesRealizadas -= 1
+        self.usuarioFinal.save()
 
         lista_espera = self.actividad.lista_espera
         while self.actividad.plazasReservadas < self.actividad.plazasMaximas:

@@ -269,9 +269,19 @@ export default {
   timetable: "Horario",
   tariff: "Tarifa",
   discount: "Descuento",
+  discounts: "Descuentos",
   cancel: "Cancelar",
   payContinue: "Continuar con el pago",
   prices: "Precios",
+
+  /* Descuentos */
+  newDiscount: "Nuevo descuento",
+  modifyDiscount: "Modificar descuento",
+  combinable: "Combinable",
+  priority: "Prioridad",
+  percentage: "Porcentaje",
+  appliesTo: "Aplica a",
+  discountDetail: "Detalles del descuento",
 
   /* Pasarela de pago */
   processing: "Procesando",
@@ -279,6 +289,13 @@ export default {
   paymentTitle: "Finalizar el pago",
   reservationConfirmed: "Reserva confirmada",
   thankYouMessage: "Muchas gracias por su compra",
+
+  /* Confirmar pago */
+  confirmPayTitle: "Pago realizado correctamente",
+  confirmPaySubtitle: "La operación se ha completado con éxito.",
+  concept: "Concepto",
+  payState: "Estado del pago",
+  returnHome: "Volver al inicio",
 
   /* Home Monitor */
   monitorHomeTitle: "Panel principal de",
@@ -455,6 +472,7 @@ export default {
   maxDaysActivityReservation: "Cantidad máxima de días para reservar la actividad",
   minCancellationDays: "Cantidad de días mínima para cancelar la reserva",
   previousNotificationHours: "Horas previas para enviar una notificación",
+  maxPercentage: "Porcentaje máximo aplicable",
 
   /* Foro administrador */
   channelName: "Nombre del canal",

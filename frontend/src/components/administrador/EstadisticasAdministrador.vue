@@ -70,18 +70,18 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="pabellon in usoPabellones" :key="pabellon.nombre">
+                <tr v-for="pabellon in usoPabellones" :key="pabellon.id">
                   <td>{{ pabellon.nombre }}</td>
                   <td>{{ pabellon.horas }}</td>
-                  <td>
+                  <td style="min-width: 150px;">
                     <div class="progress" style="height: 8px;">
-                      <div
-                        class="progress-bar"
-                        role="progressbar"
-                        :style="{ width: pabellon.ocupacion + '%' }"
-                      ></div>
+                      <div class="progress-bar" role="progressbar" :class="{
+                        'bg-success': pabellon.ocupacion < 50,
+                        'bg-warning': pabellon.ocupacion >= 50 && pabellon.ocupacion < 80,
+                        'bg-danger': pabellon.ocupacion >= 80
+                      }" :style="{ width: pabellon.ocupacion + '%' }"></div>
                     </div>
-                    <small>{{ pabellon.ocupacion }}%</small>
+                    <small class="text-muted">{{ pabellon.ocupacion }}%</small>
                   </td>
                 </tr>
               </tbody>
@@ -106,7 +106,7 @@
 import { inject, type Ref, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { useEstadisticasStore } from "@/stores/estadisticas";
+import { getEstadisticasAdministrador } from "@/services/administradorService"
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
 import type { Language } from "@/useI18N";
@@ -115,7 +115,6 @@ import { useI18n } from "@/useI18N";
 const language = inject<Ref<Language>>('language')!;
 const t = useI18n(language);
 
-const estadisticasStore = useEstadisticasStore();
 const router = useRouter();
 
 const volver = () => {
@@ -131,26 +130,25 @@ const kpis = ref([
   { title: 'Ingresos (mes)', value: '0 €' }
 ])
 
-const usoPabellones = ref([
-  { nombre: 'Pabellón A', horas: 0, ocupacion: 0 },
-  { nombre: 'Pabellón B', horas: 0, ocupacion: 0 }
-])
+const usoPabellones = ref([])
 
 
 onMounted(async () => {
   try {
-    if(!estadisticasStore.data.modificado) {
-      await estadisticasStore.cargarEstadisticas();
-    }
+    const data = await getEstadisticasAdministrador()
+
+    console.log(data)
 
     kpis.value = [
-      { title: 'Usuarios', value: estadisticasStore.data.usuarios },
-      { title: 'Monitores', value: 0 },
-      { title: 'Pabellones', value: estadisticasStore.data.pabellones },
-      { title: 'Sesiones', value: 0 },
-      { title: 'Reservas (mes)', value: 0 },
-      { title: 'Ingresos (mes)', value: '0 €' }
+      { title: 'Usuarios', value: data.usuarios },
+      { title: 'Monitores', value: data.monitores },
+      { title: 'Pabellones', value: data.pabellones },
+      { title: 'Sesiones', value: data.sesiones },
+      { title: 'Reservas (mes)', value: data.reservas_mes },
+      { title: 'Ingresos (mes)', value: data.ingresos_mes + " €" }
     ]
+
+    usoPabellones.value = data.uso_pabellones || []
 
   } catch (e) {
     console.error('Error cargando estadísticas', e)

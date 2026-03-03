@@ -267,9 +267,19 @@ export default {
   timetable: "Timetable",
   tariff: "Tariff",
   discount: "Discount",
+  discounts: "Discounts",
   cancel: "Cancel",
   payContinue: "Proceed with payment",
   prices: "Prices",
+
+  /* Descuentos */
+  newDiscount: "New discount",
+  modifyDiscount: "Modify discount",
+  combinable: "Combinable",
+  priority: "Priority",
+  percentage: "Percentage",
+  appliesTo: "Applies to",
+  discountDetail: "Discount detail",
 
   /* Pasarela de pago */
   processing: "Processing",
@@ -277,6 +287,13 @@ export default {
   paymentTitle: "Complete payment",
   reservationConfirmed: "Reservation confirmed",
   thankYouMessage: "Thank you very much for your purchase",
+
+  /* Pago confirmado */
+  confirmPayTitle: "Payment successful",
+  confirmPaySubtitle: "The transaction has been completed successfully.",
+  concept: "Concept",
+  payState: "Payment status",
+  returnHome: "Return to home",
 
   /* Home Monitor */
   monitorHomeTitle: "Dashboard of",
@@ -454,6 +471,7 @@ export default {
   maxDaysActivityReservation: "Maximum number of days to book the activity",
   minCancellationDays: "Minimum number of days required to cancel a reservation",
   previousNotificationHours: "Hours in advance to send a notification",
+  maxPercentage: "Maximum applicable percentage",
 
   /* Nueva notificacion */
   newNotification: "New notification",

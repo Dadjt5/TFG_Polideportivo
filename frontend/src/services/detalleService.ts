@@ -89,3 +89,21 @@ export const eliminarSesion = async (id: string) => {
   const response = await api.delete(`api/v1/sesiones/${id}/`);
   return response.data;
 };
+
+/* Función para obtener la informacion de un descuento */
+export const getDescuentoDetalle = async (id: number) => {
+  const response = await api.get(`/api/v1/descuentos/${id}/`);
+  return response.data;
+};
+
+/* Función para editar los campos indicados de un descuento */
+export const modificarDescuento = async (id: string, data: any) => {
+  const response = await api.patch(`api/v1/descuentos/${id}/`, data);
+  return response.data
+}
+
+/* Función para eliminar un descuento */
+export const eliminarDescuento = async (id: number) => {
+  const response = await api.delete(`api/v1/descuentos/${id}/`);
+  return response.data;
+};

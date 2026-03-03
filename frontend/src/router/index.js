@@ -70,6 +70,7 @@ import NuevaTarifaFisioterapia from '@/components/administrador/nuevos/NuevaTari
 import NuevoAbonoDeportivo from '@/components/administrador/nuevos/NuevoAbonoDeportivo.vue'
 import NuevoAbonoVerano from '@/components/administrador/nuevos/NuevoAbonoVerano.vue'
 import NuevoBono from '@/components/administrador/nuevos/NuevoBono.vue'
+import NuevoDescuento from '@/components/administrador/nuevos/NuevoDescuento.vue'
 
 // Editar
 import DetalleUsuarioFinal from '@/components/administrador/editar/DetalleUsuarioFinal.vue'
@@ -90,6 +91,8 @@ import EditarTarifaFisioterapia from '@/components/administrador/editar/EditarTa
 import EditarAbonoDeportivo from '@/components/administrador/editar/EditarAbonoDeportivo.vue'
 import EditarAbonoVerano from '@/components/administrador/editar/EditarAbonoVerano.vue'
 import EditarBono from '@/components/administrador/editar/EditarBono.vue'
+import EditarDescuento from '@/components/administrador/editar/EditarDescuento.vue'
+
 
 const routes = [
   /******************* REDIRECCIÓN *******************/
@@ -172,6 +175,7 @@ const routes = [
   { path: '/crear/abono/deportivo', component: NuevoAbonoDeportivo, meta: { requiresAuth: true, allowedAdminRoles: ['RAIZ', 'TARIFAS'] } },
   { path: '/crear/abono/verano', component: NuevoAbonoVerano, meta: { requiresAuth: true, allowedAdminRoles: ['RAIZ', 'TARIFAS'] } },
   { path: '/crear/bono', component: NuevoBono, meta: { requiresAuth: true, allowedAdminRoles: ['RAIZ', 'TARIFAS'] } },
+  { path: '/crear/descuento', component: NuevoDescuento, meta: { requiresAuth: true, allowedAdminRoles: ['RAIZ', 'TARIFAS'] } },
 
   /* Editar */
   { path: '/usuarioFinal/:id', component: DetalleUsuarioFinal, props: true, name: 'detalle-usuarioFinal', meta: { requiresAuth: true, allowedAdminRoles: ['RAIZ', 'USUARIOS'] } },
@@ -192,6 +196,7 @@ const routes = [
   { path: '/editar/abono/deportivo/:id', component: EditarAbonoDeportivo, props: true, name: 'editar-abono-deportivo', meta: { requiresAuth: true, allowedAdminRoles: ['RAIZ', 'TARIFAS'] } },
   { path: '/editar/abono/verano/:id', component: EditarAbonoVerano, props: true, name: 'editar-abono-verano', meta: { requiresAuth: true, allowedAdminRoles: ['RAIZ', 'TARIFAS'] } },
   { path: '/editar/bono/:id', component: EditarBono, props: true, name: 'editar-bono', meta: { requiresAuth: true, allowedAdminRoles: ['RAIZ', 'TARIFAS'] } },
+  { path: '/editar/descuento/:id', component: EditarDescuento, props: true, name: 'editar-descuento', meta: { requiresAuth: true, allowedAdminRoles: ['RAIZ', 'TARIFAS'] } },
 ]
 
 

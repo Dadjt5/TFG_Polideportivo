@@ -56,6 +56,7 @@ class Command(BaseCommand):
                 dias_maximo_reserva_actividad=7,
                 dias_minimo_cancelacion=1,
                 horas_previas_notificacion=2,
+                porcentaje_maximo=100,
                 titulo_cambios_cancelaciones="Aviso sobre cancelaciones",
                 titulo_avisos_actividades="Nueva actividad",
                 titulo_problemas_pago="Fallo en el pago",

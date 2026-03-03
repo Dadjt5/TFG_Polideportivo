@@ -34,7 +34,7 @@ class Descuento(models.Model):
 
         if actividad:
             descuentos = cls.objects.filter(
-                deportes__in=actividad.deportes.all(),
+                deportes__in=[actividad.deportes],
                 fechaInicio__lte=hoy,
                 fechaFinValidez__gte=hoy
             ).distinct()

@@ -1740,3 +1740,94 @@ class ConfirmarPagoView(APIView):
         else:
             pago.cancelarPago()
             return Response({"respuesta": "Error al pagar"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+from django.db.models import Sum, Count
+from django.utils.timezone import now
+from django.db.models.functions import TruncMonth
+from datetime import timedelta
+
+# Obtener estadisticas para el admin
+class ObtenerEstadisticasAdministradorView(APIView):
+    permission_classes = [IsAdministrador]
+    
+    def get(self, request):
+        hoy = now()
+        reservas_mes = ReservaActividad.objects.filter(
+            created_at__year=hoy.year,
+            created_at__month=hoy.month
+        ).count()
+        
+        alquiler_mes = Alquiler.objects.filter(
+            created_at__year=hoy.year,
+            created_at__month=hoy.month
+        ).count()
+        
+        ingresos_mes = Pago.objects.filter(
+            fecha__year=hoy.year,
+            fecha__month=hoy.month,
+            estadoPago=EstadoPago.PAGADO
+        ).aggregate(total=Sum("costeFinal"))["total"] or 0
+        
+        reservas_12_meses = (
+            ReservaActividad.objects
+            .filter(created_at__gte=hoy - timedelta(days=365))
+            .annotate(mes=TruncMonth("created_at"))
+            .values("mes")
+            .annotate(total=Count("id"))
+            .order_by("mes")
+        )
+        
+        reservas_por_mes = [
+            {
+                "mes": r["mes"].strftime("%Y-%m"),
+                "total": r["total"]
+            }
+            for r in reservas_12_meses
+        ]
+        
+        actividades_top = (
+            ReservaActividad.objects
+            .values("actividad__nombre")
+            .annotate(total=Count("id"))
+            .order_by("-total")[:5]
+        )
+
+        actividades_mas_reservadas = [
+            {
+                "actividad": a["actividad__nombre"],
+                "total": a["total"]
+            }
+            for a in actividades_top
+        ]
+        
+        uso_pabellones = []
+        for pab in Pabellon.objects.all():
+            horas = Sesion.objects.filter(actividad__instalacion__pabellon=pab).count() * 1
+
+            capacidad_total = 200
+            ocupacion = min(int((horas / capacidad_total) * 100), 100)
+
+            uso_pabellones.append({
+                "nombre": pab.nombre,
+                "horas": horas,
+                "ocupacion": ocupacion
+            })
+
+        data = {
+            "instalaciones": Instalacion.contar(),
+            "actividades": Actividad.contar(),
+            "sesiones": Sesion.contar(),
+            "pabellones": Pabellon.contar(),
+            "deportes": Deporte.contar(),
+            "usuarios": UsuarioFinal.contar(),
+            "monitores": Monitor.contar(),
+            "dinero": Pago.contarDinero(),
+            "reservas_mes": reservas_mes+alquiler_mes,
+            "ingresos_mes": ingresos_mes,
+            "reservas_12_meses": reservas_por_mes,
+            "actividades_top": actividades_mas_reservadas,
+            "uso_pabellones": uso_pabellones,
+        }
+
+        return Response(data)

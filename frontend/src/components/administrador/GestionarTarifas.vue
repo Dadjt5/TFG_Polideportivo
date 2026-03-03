@@ -25,6 +25,12 @@
                 {{ t.subscription }}
               </button>
             </li>
+
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#descuentos" type="button">
+                {{ t.discounts }}
+              </button>
+            </li>
           </ul>
 
           <div class="tab-content">
@@ -104,6 +110,33 @@
                     @click="bonoDetail(bono.id)">
                     <div class="fw-medium text-primary">
                       {{ t.bonus }} {{ bono.nombreInstalacion }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- TAB DESCUENTOS -->
+            <div class="tab-pane fade" id="descuentos">
+              <!-- DESCUENTOS -->
+              <div>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h5 class="fw-semibold text-success">
+                    <i class="bi bi-ticket-perforated me-2"></i>{{ t.discounts }}
+                  </h5>
+
+                  <router-link to="/crear/descuento" class="btn btn-primary rounded-pill">
+                    <i class="bi bi-plus-lg me-1"></i> {{ t.newDiscount }}
+                  </router-link>
+                </div>
+
+                <div class="list-group list-group-flush">
+                  <div v-for="descuento in descuentos" :key="descuento.id"
+                    class="list-group-item rounded-3 mb-2 shadow-sm d-flex justify-content-between align-items-center"
+                    @click="descuentoDetail(descuento.id)">
+                    <div class="fw-medium text-primary">
+                      {{ descuento.nombre }}
                     </div>
                   </div>
                 </div>
@@ -241,7 +274,7 @@ import { getTarifas } from "@/services/gestionService"
 
 import type { Language } from "@/useI18N"
 import { useI18n } from "@/useI18N"
-import { getAbonos, getBonos } from "@/services/abonoBonoService"
+import { getAbonos, getBonos, getDescuentos } from "@/services/abonoBonoService"
 
 const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);
@@ -251,6 +284,7 @@ const router = useRouter();
 const abonosDeportivos = ref<any[]>([]);
 const abonosVerano = ref<any[]>([]);
 const bonos = ref<any[]>([]);
+const descuentos = ref<any[]>([]);
 const tarifasInstalacion = ref<any[]>([]);
 const tarifasTDA = ref<any[]>([]);
 const tarifasActividadComun = ref<any[]>([]);
@@ -275,6 +309,13 @@ const abonoDetail = (id: number, tipo: string) => {
 const bonoDetail = (id: number) => {
   router.push({
     name: "editar-bono",
+    params: { id }
+  })
+};
+
+const descuentoDetail = (id: number) => {
+  router.push({
+    name: "editar-descuento",
     params: { id }
   })
 };
@@ -319,6 +360,7 @@ onMounted(async () => {
     const data = await getTarifas();
     const abonos = await getAbonos();
     bonos.value = await getBonos();
+    descuentos.value = await getDescuentos();
 
     abonosDeportivos.value = abonos.abonosDeportivos
     abonosVerano.value = abonos.abonosVerano

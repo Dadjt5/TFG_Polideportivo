@@ -72,6 +72,16 @@
           </div>
         </div>
 
+        <!-- PORCENTAJE MAXIMO -->
+        <div class="col-md-4">
+          <div class="card h-100 shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">{{ t.maxPercentage }}</h5>
+              <input type="number" class="form-control" v-model.number="configuracionStore.porcentaje_maximo" />
+            </div>
+          </div>
+        </div>
+
       </div>
     </form>
 
@@ -83,7 +93,7 @@
 
     <!-- CAMBIOS Y CANCELACIONES -->
     <div class="mb-4">
-      <label class="form-label fw-semibold">Título - {{ t.textChangesCancellations }}</label>
+      <label class="form-label fw-semibold">{{ t.title }} - {{ t.textChangesCancellations }}</label>
       <input type="text" class="form-control mb-2"
         v-model="configuracionStore.titulo_cambios_cancelaciones" />
 
@@ -94,7 +104,7 @@
 
     <!-- AVISOS ACTIVIDADES -->
     <div class="mb-4">
-      <label class="form-label fw-semibold">Título - {{ t.textActivityNotices }}</label>
+      <label class="form-label fw-semibold">{{ t.title }} - {{ t.textActivityNotices }}</label>
       <input type="text" class="form-control mb-2"
         v-model="configuracionStore.titulo_avisos_actividades" />
 
@@ -105,7 +115,7 @@
 
     <!-- PROBLEMAS PAGO -->
     <div class="mb-4">
-      <label class="form-label fw-semibold">Título - {{ t.textPaymentProblems }}</label>
+      <label class="form-label fw-semibold">{{ t.title }} - {{ t.textPaymentProblems }}</label>
       <input type="text" class="form-control mb-2"
         v-model="configuracionStore.titulo_problemas_pago" />
 
@@ -116,7 +126,7 @@
 
     <!-- SALIDA LISTA ESPERA -->
     <div class="mb-4">
-      <label class="form-label fw-semibold">Título - {{ t.textWaitingListExit }}</label>
+      <label class="form-label fw-semibold">{{ t.title }} - {{ t.textWaitingListExit }}</label>
       <input type="text" class="form-control mb-2"
         v-model="configuracionStore.titulo_salida_lista_espera" />
 
@@ -127,7 +137,7 @@
 
     <!-- AUSENCIAS -->
     <div class="mb-4">
-      <label class="form-label fw-semibold">Título - {{ t.textAbsences }}</label>
+      <label class="form-label fw-semibold">{{ t.title }} - {{ t.textAbsences }}</label>
       <input type="text" class="form-control mb-2"
         v-model="configuracionStore.titulo_ausencias" />
 
@@ -138,7 +148,7 @@
 
     <!-- MATERIAL ESPECIAL -->
     <div class="mb-4">
-      <label class="form-label fw-semibold">Título - {{ t.textSpecialMaterial }}</label>
+      <label class="form-label fw-semibold">{{ t.title }} - {{ t.textSpecialMaterial }}</label>
       <input type="text" class="form-control mb-2"
         v-model="configuracionStore.titulo_material_especial" />
 

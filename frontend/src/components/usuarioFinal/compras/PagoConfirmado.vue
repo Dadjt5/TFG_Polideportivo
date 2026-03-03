@@ -14,28 +14,28 @@
 
         <!-- TITULO -->
         <h2 class="fw-bold text-success mb-3">
-          Pago realizado correctamente
+          {{ t.confirmPayTitle }}
         </h2>
 
         <p class="text-muted mb-4">
-          La operación se ha completado con éxito. Aquí tienes el resumen:
+          {{ t.confirmPaySubtitle }}
         </p>
 
         <!-- RESUMEN -->
         <div v-if="pago" class="text-start mt-4">
 
           <div class="row mb-2">
-            <div class="col-6 fw-semibold">Concepto:</div>
+            <div class="col-6 fw-semibold">{{ t.concept }}:</div>
             <div class="col-6 text-end">{{ pago.concepto }}</div>
           </div>
 
           <div class="row mb-2">
-            <div class="col-6 fw-semibold">Importe base:</div>
+            <div class="col-6 fw-semibold">{{ t.basePrice }}:</div>
             <div class="col-6 text-end">{{ pago.coste }} €</div>
           </div>
 
           <div class="row mb-2" v-if="pago.descuentoAplicado > 0">
-            <div class="col-6 fw-semibold text-success">Descuento aplicado:</div>
+            <div class="col-6 fw-semibold text-success">{{ t.discount }}:</div>
             <div class="col-6 text-end text-success">
               - {{ pago.descuentoAplicado }} €
             </div>
@@ -44,21 +44,21 @@
           <hr>
 
           <div class="row mb-3">
-            <div class="col-6 fw-bold">Total pagado:</div>
+            <div class="col-6 fw-bold">{{ t.price }}:</div>
             <div class="col-6 text-end fw-bold text-success">
               {{ pago.costeFinal }} €
             </div>
           </div>
 
           <div class="row mb-2">
-            <div class="col-6 fw-semibold">Fecha:</div>
+            <div class="col-6 fw-semibold">{{ t.date }}:</div>
             <div class="col-6 text-end">
               {{ pago.fecha }}
             </div>
           </div>
 
           <div class="row mb-4">
-            <div class="col-6 fw-semibold">Estado del pago:</div>
+            <div class="col-6 fw-semibold">{{ t.payState }}:</div>
             <div class="col-6 text-end">
               <span class="badge bg-success">
                 {{ pago.estadoPago }}
@@ -70,12 +70,8 @@
 
         <!-- BOTONES -->
         <div class="d-flex justify-content-center gap-3 mt-4">
-          <router-link to="/mis-pagos" class="btn btn-outline-primary rounded-3 px-4">
-            Ver mis pagos
-          </router-link>
-
           <router-link to="/" class="btn btn-success rounded-3 px-4">
-            Volver al inicio
+            {{ t.returnHome }}
           </router-link>
         </div>
 

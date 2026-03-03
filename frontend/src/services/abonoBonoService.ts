@@ -12,6 +12,12 @@ export const getBonos = async () => {
   return response.data;
 };
 
+/* Función para obtener todos los descuentos */
+export const getDescuentos = async () => {
+  const response = await api.get('/api/v1/descuentos/');
+  return response.data;
+};
+
 
 /* Función para obtener los detalles del abono deportivo */
 export const getAbonoDeportivoDetalle = async (id: number) => {

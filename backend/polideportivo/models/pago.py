@@ -6,7 +6,8 @@ from django.contrib.contenttypes.models import ContentType
 from .abono import CompraAbono
 from .bono import CompraBono
 from .reserva import ReservaActividad
-from .constantes import EstadoPago
+from .configuracion import Configuracion
+from .constantes import EstadoPago, TipoActividad
 
 
 class Pago(models.Model):
@@ -53,6 +54,15 @@ class Pago(models.Model):
         return cls.objects.count()
     
     @classmethod
+    def contarDinero(cls):
+        dinero = 0
+        for pago in cls.objects.all():
+            if pago.estadoPago == EstadoPago.PAGADO:
+                dinero += pago.costeFinal
+
+        return dinero
+    
+    @classmethod
     def nuevoPago(cls, concepto, usuario, objeto, complementos=None):
         porcentaje = 0
         if not isinstance(objeto, (CompraBono, CompraAbono)):
@@ -66,15 +76,23 @@ class Pago(models.Model):
             )
 
         elif isinstance(objeto, ReservaActividad):
-            coste = objeto.calcular_precio(
-                usuario,
-                numeroHorasSemana=complementos["numeroHorasSemana"],
-                numeroPersonas=complementos["numeroPersonas"],
-                tipoPago=complementos["tipoPago"],
-                tipoSesion=complementos["tipoSesion"]
-            )
+            coste = objeto.calcular_precio()
+
+            if usuario.tieneAbono():
+                if usuario.abono.abonoDeportivo:
+                    if usuario.actividadesRealizadas == 0:
+                        porcentaje += usuario.abono.abonoDeportivo.descuentoPrimeraActividad
+                    else:
+                        porcentaje += usuario.abono.abonoDeportivo.descuentoRestoActividades
+                    
+                    if objeto.actividad.exterior:
+                        porcentaje += usuario.abono.abonoDeportivo.descuentoActividadesExteriores
+
         else:
             coste = objeto.calcular_precio(usuario)
+
+        config = Configuracion.objects.first()
+        porcentaje = min(porcentaje, config.porcentaje_maximo)
 
         costeFinal = coste - (coste * porcentaje / 100)
         content_type = ContentType.objects.get_for_model(objeto)

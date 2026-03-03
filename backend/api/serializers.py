@@ -195,18 +195,16 @@ class AbonoVeranoSerializer(serializers.ModelSerializer):
 
 class CompraAbonoSerializer(serializers.ModelSerializer):
     abonoDeportivo = AbonoDeportivoSerializer(read_only=True)
+    AbonoVerano = AbonoVeranoSerializer(read_only=True)
 
     class Meta:
-        model = CompraBono
+        model = CompraAbono
         fields = (
             "id",
             "fecha",
-            "fechaExpiracion",
-            "valido",
-            "diasRestantes"
+            "estado",
             "abonoDeportivo",
             "abonoVerano",
-            "pago"
         )
 
 
@@ -485,8 +483,6 @@ class BonoSerializer(serializers.ModelSerializer):
 
 class CompraBonoSerializer(serializers.ModelSerializer):
     bono = BonoSerializer(read_only=True)
-    usosRestantes = serializers.ReadOnlyField()
-    valido = serializers.ReadOnlyField()
 
     class Meta:
         model = CompraBono
@@ -495,12 +491,9 @@ class CompraBonoSerializer(serializers.ModelSerializer):
             "fecha",
             "fechaExpiracion",
             "vecesUsado",
-            "valido",
-            "usosRestantes",
             "bono",
-            "pago"
+            "estado"
         )
-
 
 # --------------------
 # Configuración

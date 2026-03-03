@@ -69,6 +69,7 @@ router.register(r'monitoresSimple', views.MonitorSimpleViewSet, basename="monito
 urlpatterns = [
     path("me/", views.meAPIView.as_view(), name="me"),
     path("estadisticas/", views.EstadisticasView.as_view(), name="estadisticas"),
+    path("estadisticas/administrador/", views.ObtenerEstadisticasAdministradorView.as_view(), name="estadisticas-admin"),
     path("tipos/", views.TiposViews.as_view(), name="tipos"),
     path("buscar/", views.BuscarView.as_view(), name="busqueda"),
     path("registrarse/", views.RegistroView.as_view(), name="registro"),
