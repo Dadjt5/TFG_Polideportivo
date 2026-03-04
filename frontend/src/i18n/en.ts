@@ -258,6 +258,7 @@ export default {
   facilityReservationTitle: "Installation reservation",
   facilityReservationRule: "Select a maximum of 2 consecutive hours.",
   selectedDate: "Selected date",
+  noDays: "There is no schedule for that date.",
 
   /* Reservar actividad */
   activityBookingTitle: "Booking confirmation",

@@ -167,6 +167,8 @@ onMounted(async () => {
     const resumenResponse = await getResumenPago(parseInt(props.id), props.tipo)
     resumen.value = resumenResponse
 
+    console.log(resumenResponse)
+
     if (resumen.value.estado !== "PENDIENTE") {
       router.replace("/")
       return
@@ -185,10 +187,6 @@ onMounted(async () => {
     error.value = "Error al cargar el pago"
     console.error(e)
   }
-
-  const paymentElement = elements.create("payment")
-  paymentElement.mount("#payment-element")
-  cardElement = paymentElement
 })
 
 </script>

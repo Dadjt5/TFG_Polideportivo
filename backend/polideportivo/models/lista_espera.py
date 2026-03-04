@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 class ListaEspera(models.Model):
     """Modelo para representar la lista de espera"""
 
-    actividad = models.ForeignKey('Actividad', on_delete=models.CASCADE, related_name='lista_espera')
+    actividad = models.OneToOneField('Actividad', on_delete=models.CASCADE, related_name='lista_espera')
 
     def __str__(self):
         return f'Lista de espera para {self.actividad}'

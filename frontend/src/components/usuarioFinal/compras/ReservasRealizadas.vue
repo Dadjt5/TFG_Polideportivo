@@ -18,26 +18,32 @@
 
               <div>
                 <h5 class="mb-1">
-                  <span v-if="reserva.tipo === 'alquiler'">
+                  <!-- ICONO SEGÚN TIPO -->
+                  <span v-if="reserva.tipo === 'ALQUILER'">
                     <i class="bi bi-building me-2"></i>
+                    {{ reserva.instalacion?.nombre }}
                   </span>
+
                   <span v-else>
                     <i class="bi bi-activity me-2"></i>
+                    {{ reserva.actividad?.nombre }}
                   </span>
-                  {{ reserva.titulo }}
                 </h5>
 
+                <!-- ESTADO -->
                 <p class="mb-1 text-muted">
-                  <i class="bi bi-calendar-event me-1"></i>
-                  {{ reserva.fechaInicio }}
+                  <i class="bi bi-info-circle me-1"></i>
+                  {{ reserva.estado }}
                 </p>
 
-                <p class="mb-0 text-muted">
-                  <i class="bi bi-credit-card me-1"></i>
-                  {{ reserva.pago.coste }} €
+                <!-- DÍAS (solo si es actividad) -->
+                <p v-if="reserva.actividad" class="mb-0 text-muted">
+                  <i class="bi bi-calendar-event me-1"></i>
+                  {{ reserva.actividad.dias.join(", ") }}
                 </p>
 
               </div>
+
             </div>
           </div>
         </div>
@@ -60,26 +66,32 @@ import { useI18n } from "@/useI18N";
 const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);
 
-type Reservas = {
+type Reserva = {
   id: number
-  tipo: 'alquiler' | 'actividad'
-  fechaInicio: string
-  titulo: string
-  id_obj: number
-  horario: string
-  dias: string
-  pago: {
-    coste: number
-    estadoPago: string
+  estado: string
+  tipo: 'ALQUILER' | 'RESERVA'
+  descuentos: {
+    id: number
+  }[]
+  actividad: {
+    id: number
+    nombre: string
+    horasSemanales: number
+    dias: string[]
+    estado: string
+  }
+  instalacion: {
+    id: number
+    nombre: string
   }
 }
 
-const reservas = ref<Reservas[]>([])
+const reservas = ref<Reserva[]>([])
 
 onMounted(async () => {
   try {
     reservas.value = await getReservasRealizadas()
-  } catch(e) {
+  } catch (e) {
     console.log("Error al obtener las reservas realizadas", e)
   }
 })

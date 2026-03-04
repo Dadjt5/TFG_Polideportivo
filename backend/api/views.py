@@ -14,6 +14,10 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.db.models.deletion import RestrictedError
 from django.conf import settings
+from django.db.models import Sum, Count
+from django.utils.timezone import now
+from django.db.models.functions import TruncMonth
+from datetime import timedelta, datetime
 
 from .permissions import IsAdministradorRaiz, IsAdministradorEspacios, IsAdministradorTarifas, IsAdministradorUsuarios, IsMonitor, IsUsuarioFinal, IsAdministrador
 
@@ -74,7 +78,7 @@ class CompraAbonoViewSet(viewsets.ModelViewSet):
         serializer.save(usuarioFinal=usuario_final)
 
     def get_queryset(self):
-        return CompraAbono.objects.filter(usuarioFinal__user=self.request.user)
+        return CompraAbono.objects.filter(usuarioFinal__user=self.request.user, estado=EstadoReserva.CONFIRMADA)
 
 
 # ----------------
@@ -175,7 +179,7 @@ class CompraBonoViewSet(viewsets.ModelViewSet):
     permission_classes = [IsUsuarioFinal]
     
     def get_queryset(self):
-        return CompraBono.objects.filter(usuarioFinal__user=self.request.user)
+        return CompraBono.objects.filter(usuarioFinal__user=self.request.user, estado=EstadoReserva.CONFIRMADA)
 
     def perform_create(self, serializer):
         usuario_final = UsuarioFinal.objects.get(user=self.request.user)
@@ -846,8 +850,8 @@ class ReservasView(APIView):
         user = request.user
         reservas = []
 
-        alquileres = Alquiler.objects.filter(usuarioFinal__user=user)
-        actividades = ReservaActividad.objects.filter(usuarioFinal__user=user)
+        alquileres = Alquiler.objects.filter(usuarioFinal__user=user, estado=EstadoReserva.CONFIRMADA)
+        actividades = ReservaActividad.objects.filter(usuarioFinal__user=user, estado=EstadoReserva.CONFIRMADA)
 
         for alquiler in alquileres:
             serializer = AlquilerSerializer(alquiler)
@@ -1420,16 +1424,27 @@ class TarifaInstalacionView(APIView):
             dia_modelo = mapa_dias[dia_semana]
             dia = Agenda.objects.filter(dia__iexact=dia_modelo).first()
 
-        if not dia:
-            return Response({"respuesta": "No hay horarios para esa fecha"}, status=status.HTTP_400_BAD_REQUEST)
+        if dia:
+            reservas_serializer = MapaReservasSerializer(dia.mapa_reservas.all(), many=True)
+            reservas = reservas_serializer.data
+            horaApertura = dia.horaApertura
+            horaCierre = dia.horaCierre
+            abierto = dia.abierto
+        else:
+            reservas = []
+            horaApertura = ""
+            horaCierre = ""
+            abierto = False
 
         data = {
             "tarifa": {
+                "idInstalacion": instalacion.id,
                 "nombre": instalacion.nombre,
-                "horaApertura": dia.horaApertura,
-                "horaCierre": dia.horaCierre,
+                "horaApertura": horaApertura,
+                "horaCierre": horaCierre,
+                "abierto": abierto,
                 "datos": precios,
-                "reservas": dia.mapa_reservas.all()
+                "reservas": reservas
             },
             "descuento": {
                 "porcentaje_total": 0,
@@ -1548,7 +1563,11 @@ class ReservarActividadView(APIView):
         complementos = request.data.get('complementos')
 
         res = ReservaActividad.nuevaReserva(request.user.usuario_final, actividad)
+        if not res:
+            return Response({"respuesta": "Error al reservar la actividad"}, status=status.HTTP_400_BAD_REQUEST)
+
         pago = Pago.nuevoPago("Pago por reserva de la actividad", request.user.usuario_final, res, complementos)
+
 
         if res and pago:
             return Response({"idPago": pago.id})
@@ -1561,9 +1580,22 @@ class ReservaInstalacionView(APIView):
     
     def post(self, request, instalacion_id):
         instalacion = get_object_or_404(Instalacion, id=instalacion_id)
-        complementos = request.data.get('complementos')
 
-        res = Alquiler.nuevaReserva(request.user.usuario_final, instalacion, complementos)
+        complementos = request.data.get('complementos')
+        fecha_str = complementos.get("fecha")
+        fecha = datetime.strptime(fecha_str, "%Y-%m-%d").date()
+        horas = complementos.get("horas")
+
+        if not horas or len(horas) == 0:
+            return Response({"respuesta": "Debe seleccionar horas"}, status=status.HTTP_400_BAD_REQUEST)
+
+        horas.sort()
+
+        hora_inicio = datetime.strptime(horas[0], "%H:%M:%S").time()
+        ultima = datetime.strptime(horas[-1], "%H:%M:%S")
+        hora_fin = (ultima + timedelta(hours=1)).time()
+
+        res = Alquiler.nuevaReserva(request.user.usuario_final, instalacion, fecha, hora_inicio, hora_fin)
         if not res:
             return Response({"respuesta": "Error al alquilar, la instalacion esta ocupada"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -1643,7 +1675,7 @@ class ResumenPagoView(APIView):
                 }
             })
 
-        elif tipo == "aquiler_instalacion":
+        elif tipo == "alquiler_instalacion":
             alquiler = objeto  # objeto es un alquiler
             return Response({
                 "id": alquiler.id,
@@ -1741,11 +1773,6 @@ class ConfirmarPagoView(APIView):
             pago.cancelarPago()
             return Response({"respuesta": "Error al pagar"}, status=status.HTTP_400_BAD_REQUEST)
 
-
-from django.db.models import Sum, Count
-from django.utils.timezone import now
-from django.db.models.functions import TruncMonth
-from datetime import timedelta
 
 # Obtener estadisticas para el admin
 class ObtenerEstadisticasAdministradorView(APIView):

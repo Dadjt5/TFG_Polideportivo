@@ -47,7 +47,7 @@ class ReservaActividad(Reserva):
     def calcular_precio(self):
         """Calcula el precio final de la reserva usando la actividad"""
         return self.actividad._calcular_precio_base(
-            usuario=self.usuario,
+            usuario=self.usuarioFinal,
             numeroHorasSemana=self.numeroHorasSemana,
             numeroPersonas=self.numeroPersonas,
             tipoPago=self.tipoPago,
@@ -55,11 +55,12 @@ class ReservaActividad(Reserva):
         )
     
     def confirmarCompra(self):
-        self.usuarioFinal.actividadesRealizadas += 1
-        self.usuarioFinal.save()
+        if self.estado != EstadoReserva.CONFIRMADA:
+            self.usuarioFinal.actividadesRealizadas += 1
+            self.usuarioFinal.save()
 
-        self.estado = EstadoReserva.CONFIRMADA
-        self.save()
+            self.estado = EstadoReserva.CONFIRMADA
+            self.save()
 
     def cancelarCompra(self):
         self.actividad.lista_espera.salirLista(self.usuarioFinal)
@@ -68,8 +69,9 @@ class ReservaActividad(Reserva):
         self.estado = EstadoReserva.CANCELADO
         self.save()
 
-        self.usuarioFinal.actividadesRealizadas -= 1
-        self.usuarioFinal.save()
+        if self.estado == EstadoReserva.CONFIRMADA:
+            self.usuarioFinal.actividadesRealizadas -= 1
+            self.usuarioFinal.save()
 
         lista_espera = self.actividad.lista_espera
         while self.actividad.plazasReservadas < self.actividad.plazasMaximas:
@@ -136,7 +138,7 @@ class ReservaActividad(Reserva):
 class Alquiler(Reserva):
     """Modelo para representar un alquiler en una instalacion"""
 
-    fecha = models.TimeField(default=timezone.now)
+    fecha = models.DateField(default=timezone.now)
     horaInicio = models.TimeField()
     horaFin = models.TimeField()
     numeroHoras = models.FloatField(default=0.0)
@@ -148,7 +150,7 @@ class Alquiler(Reserva):
     
     def calcular_precio(self):
         """Calcula el precio final de la reserva usando la instalacion"""
-        return self.instalacion._calcular_precio_base(usuario=self.usuario)
+        return self.instalacion._calcular_precio_base(usuario=self.usuarioFinal)
 
     def confirmarCompra(self):
         self.estado = EstadoReserva.CONFIRMADA
@@ -163,13 +165,13 @@ class Alquiler(Reserva):
         return cls.objects.count()
     
     @classmethod
-    def nuevaReserva(cls, usuario, instalacion, complementos):
+    def nuevaReserva(cls, usuario, instalacion, fecha, horaInicio, horaFin):
         with transaction.atomic():
             instalacion.refresh_from_db()
 
             descuentos = Descuento.obtener_descuentos(instalacion=instalacion)
 
-            if not instalacion.controlarAlquiler(complementos["fecha"], complementos["horaInicio"], complementos["horaFin"]):
+            if not instalacion.controlarAlquiler(fecha, horaInicio, horaFin):
                 return None
 
             reservasPrevias = cls.objects.filter(usuarioFinal=usuario, instalacion=instalacion, estado=EstadoReserva.PENDIENTE)
@@ -180,9 +182,9 @@ class Alquiler(Reserva):
             reserva = cls.objects.create(
                 usuarioFinal=usuario,
                 instalacion=instalacion,
-                fecha=complementos["fecha"],
-                horaInicio=complementos["horaInicio"],
-                horaFin=complementos["horaFin"],
+                fecha=fecha,
+                horaInicio=horaInicio,
+                horaFin=horaFin,
                 estado=EstadoReserva.PENDIENTE
             )
 

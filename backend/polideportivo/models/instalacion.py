@@ -3,8 +3,8 @@ from django.utils.translation import gettext_lazy as _
 from datetime import time
 
 from .agenda import Agenda
-from .constantes import TipoInstalacion
 from .actividad import Sesion
+from .constantes import TipoInstalacion, Dia
 
 
 class Pabellon(models.Model):
@@ -118,18 +118,24 @@ class Instalacion(models.Model):
             return False
         
         return True
-    
-    def controlarAlquiler(self, dia, horaInicio, horaFin):
-        if isinstance(horaInicio, str):
-            h, m = map(int, horaInicio.split(":"))
-            horaInicio = time(h, m)
-        if isinstance(horaFin, str):
-            h, m = map(int, horaFin.split(":"))
-            horaFin = time(h, m)
 
-        agenda = self.agenda.filter(fecha=dia)
+    def controlarAlquiler(self, dia, horaInicio, horaFin):
+        agenda = self.agenda.filter(fecha=dia).first()
         if not agenda:
-            agenda = self.agenda.filter(dia_iexact=dia)
+            dia_semana = dia.strftime("%A").upper()
+
+            mapa_dias = {
+                "MONDAY": Dia.LUNES,
+                "TUESDAY": Dia.MARTES,
+                "WEDNESDAY": Dia.MIERCOLES,
+                "THURSDAY": Dia.JUEVES,
+                "FRIDAY": Dia.VIERNES,
+                "SATURDAY": Dia.SABADO,
+                "SUNDAY": Dia.DOMINGO,
+            }
+
+            dia_modelo = mapa_dias[dia_semana]
+            agenda = Agenda.objects.filter(dia__iexact=dia_modelo).first()
 
         if agenda.estaOcupado(horaInicio, horaFin):
             return False

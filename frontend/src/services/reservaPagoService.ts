@@ -33,6 +33,12 @@ export const reservarActividad = async(id: number) => {
   return response.data;
 }
 
+/* Función para alquilar una instalacion */
+export const alquilar = async(id: number, complementos: any) => {
+  const response = await api.post(`api/v1/instalaciones/${id}/alquilar/`, complementos)
+  return response.data;
+}
+
 /* Función para comprar un abono */
 export const comprarAbono = async(id: number, tipo: string, forma: string, familiar: boolean) => {
   const response = await api.post(`api/v1/abonos/${id}/comprar/`, {"tipoAbono": tipo, "complementos": {"forma": forma, "familiar": familiar}})

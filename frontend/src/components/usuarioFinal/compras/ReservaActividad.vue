@@ -361,7 +361,7 @@ const total = computed(() => {
 const continuarPago = async () => {
   const response = await reservarActividad(reserva.value.tarifa.idActividad)
 
-  const idPago = response.data.idPago
+  const idPago = response.idPago
 
   router.push({
     name: 'pasarela-pago',

@@ -79,7 +79,7 @@ class Actividad(models.Model):
             if usuario.esUAM:
                 precio = self.tarifa.actividadcomun.precioUAM
 
-            return precio * (numeroHorasSemana/self.tarifa.actividadcomun.numeroHorasSemana)
+            return precio * (self.calcularHorasSemanales()/self.tarifa.actividadcomun.numeroHorasSemana)
 
         elif self.tipoActividad == TipoActividad.GRUPOS_REDUCIDOS:
             if self.tarifa.gruporeducido.numeroHoras == 0 or self.tarifa.gruporeducido.numeroPersonas == 0:

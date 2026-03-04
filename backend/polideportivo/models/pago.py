@@ -78,7 +78,7 @@ class Pago(models.Model):
         elif isinstance(objeto, ReservaActividad):
             coste = objeto.calcular_precio()
 
-            if usuario.tieneAbono():
+            if usuario.tieneAbono:
                 if usuario.abono.abonoDeportivo:
                     if usuario.actividadesRealizadas == 0:
                         porcentaje += usuario.abono.abonoDeportivo.descuentoPrimeraActividad
@@ -89,13 +89,14 @@ class Pago(models.Model):
                         porcentaje += usuario.abono.abonoDeportivo.descuentoActividadesExteriores
 
         else:
-            coste = objeto.calcular_precio(usuario)
+            coste = objeto.calcular_precio()
 
         config = Configuracion.objects.first()
         porcentaje = min(porcentaje, config.porcentaje_maximo)
 
         costeFinal = coste - (coste * porcentaje / 100)
         content_type = ContentType.objects.get_for_model(objeto)
+        print(coste, costeFinal, porcentaje)
 
         return cls.objects.create(
             concepto=concepto,

@@ -10,9 +10,12 @@
     <!-- INFO INSTALACIÓN -->
     <div class="card shadow-sm mb-4">
       <div class="card-body">
-        <h5 class="fw-bold mb-2">{{ reserva.tarifa.nombre }}</h5>
-        <p class="mb-0">
+        <h5 class="fw-bold mb-2 fs-3">{{ reserva.tarifa.nombre }}</h5>
+        <p v-if="reserva.tarifa.abierto" class="mb-0 fs-4 text-primary">
           {{ t.timetable }}: {{ reserva.tarifa.horaApertura }} - {{ reserva.tarifa.horaCierre }}
+        </p>
+        <p v-else class="mb-0 fs-4 text-danger">
+          {{ t.close }}
         </p>
       </div>
     </div>
@@ -77,7 +80,11 @@
 
         <h5 class="fw-bold mt-3 mb-3">{{ t.timetable }}</h5>
 
-        <div class="d-flex flex-wrap gap-2">
+        <div v-if="mensaje" class="text-center mt-5 fs-5">
+          <p class="text-danger">{{ mensaje }}</p>
+        </div>
+
+        <div v-else class="d-flex flex-wrap gap-2">
           <button v-for="hora in reserva.tarifa.reservas" :key="hora.horaInicio" class="btn" :class="claseHora(hora)" :disabled="estaBloqueada(hora)"
             @click="toggleHora(hora)">
             {{ hora.horaInicio }} - {{ hora.horaFin }}
@@ -98,7 +105,7 @@
             {{ t.cancel }}
           </button>
 
-          <button class="btn btn-primary" :disabled="horasSeleccionadas.length === 0" @click="continuar">
+          <button class="btn btn-primary" :disabled="horasSeleccionadas.length === 0" @click="continuarPago">
             {{ t.continue }}
           </button>
         </div>
@@ -114,7 +121,7 @@
 import { computed, watch, onMounted, inject, type Ref, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { getTarifaDescuentoInstalacion } from '@/services/reservaPagoService';
+import { alquilar, getTarifaDescuentoInstalacion } from '@/services/reservaPagoService';
 
 import { useUserStore } from '@/stores/usuarioFinal'
 
@@ -136,14 +143,16 @@ const otroCaso = ref(false)
 
 const reserva = ref({
   tarifa: {
+    idInstalacion: 0,
     nombre: '',
     horaApertura: '',
     horaCierre: '',
+    abierto: true,
     datos: {} as any,
     reservas: [] as {
       horaInicio: string,
       horaFin: string,
-      estado: 'Libre' | 'Reserva usuario' | 'Reserva actividad'
+      estado: 'LIBRE' | 'USUARIO' | 'ACTIVIDAD'
     }[]
   },
   seleccion: {
@@ -162,42 +171,36 @@ const reserva = ref({
   }
 })
 
-
+const mensaje = ref("")
 const horasSeleccionadas = ref<string[]>([])
 
 const horaATime = (horaStr: string) => {
   return parseInt(horaStr.split(':')[0])
 }
 
-const estaBloqueada = (hora: any) => {
-  return reserva.value.tarifa.reservas.some(r => {
-    const inicio = horaATime(r.horaInicio)
-    const fin = horaATime(r.horaFin)
-    return hora >= inicio && hora < fin && r.estado !== 'Libre'
-  })
+const estaBloqueada = (intervalo: any) => {
+  return intervalo.estado !== 'LIBRE'
 }
 
-const claseHora = (hora: any) => {
-  if (horasSeleccionadas.value.includes(hora)) {
+const claseHora = (intervalo: any) => {
+
+  if (horasSeleccionadas.value.includes(intervalo.horaInicio)) {
     return 'btn-primary'
   }
 
-  const reservaHora = reserva.value.tarifa.reservas.find(r => {
-    const inicio = horaATime(r.horaInicio)
-    const fin = horaATime(r.horaFin)
-    return hora >= inicio && hora < fin
-  })
+  if (intervalo.estado === 'USUARIO') {
+    return 'btn-danger'
+  }
 
-  if (reservaHora) {
-    if (reservaHora.estado === 'Reserva usuario') return 'btn-danger'
-    if (reservaHora.estado === 'Reserva actividad') return 'btn-warning'
+  if (intervalo.estado === 'ACTIVIDAD') {
+    return 'btn-warning'
   }
 
   return 'btn-outline-success'
 }
 
 const toggleHora = (intervalo: any) => {
-  if (intervalo.estado !== 'Libre') return
+  if (intervalo.estado !== 'LIBRE') return
 
   const key = intervalo.horaInicio
 
@@ -231,13 +234,19 @@ const total = computed(() => {
   return base - descuento
 })
 
-const continuar = () => {
+const continuarPago = async () => {
+  const complementos = {
+    fecha: reserva.value.seleccion.fecha,
+    horas: horasSeleccionadas.value
+  }
+
+  const response = await alquilar(reserva.value.tarifa.idInstalacion, { complementos })
+
+  const idPago = response.idPago
+
   router.push({
-    name: 'resumen-alquiler',
-    state: {
-      instalacionId: parseInt(props.id),
-      horas: horasSeleccionadas.value
-    }
+    name: 'pasarela-pago',
+    params: { tipo: "alquiler_instalacion", id: idPago }
   })
 }
 
@@ -249,15 +258,16 @@ watch(
   () => reserva.value.seleccion.fecha,
   async (nuevaFecha) => {
     if (!nuevaFecha) return;
-
+    mensaje.value = ""
     try {
       const id = parseInt(props.id);
       const data = await getTarifaDescuentoInstalacion(id, reserva.value.seleccion.fecha)
 
       reserva.value.tarifa = data.tarifa
       reserva.value.descuento = data.descuento
-    } catch (error) {
-      console.error("Error al actualizar la fecha:", error);
+    } catch (e: any) {
+      mensaje.value = e.response?.data?.respuesta
+      console.error("Error al actualizar la fecha:", e);
     }
   }
 );
@@ -265,9 +275,15 @@ watch(
 
 onMounted(async () => {
   const id = parseInt(props.id);
-  const data = await getTarifaDescuentoInstalacion(id, reserva.value.seleccion.fecha)
 
-  reserva.value.tarifa = data.tarifa
-  reserva.value.descuento = data.descuento
+  try {
+    const data = await getTarifaDescuentoInstalacion(id, reserva.value.seleccion.fecha)
+
+    reserva.value.tarifa = data.tarifa
+    reserva.value.descuento = data.descuento
+  } catch(e: any) {
+    mensaje.value = e.response?.data?.respuesta
+    console.error("Error al actualizar la fecha:", e);
+  }
 });
 </script>
