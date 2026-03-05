@@ -125,7 +125,7 @@ const routes = [
 
   /* Comprar */
   { path: '/comprar-abonos', component: ComprarAbonosBonos, meta: { requiresAuth: true, allowedRoles: ['usuario_final'] } },
-  { path: '/realizar-compra', component: ConfigurarAbono, name: 'configurar-abono', meta: { requiresAuth: true, allowedRoles: ['usuario_final'] } },
+  { path: '/abonos/:id/:tipo/confirmar', component: ConfigurarAbono, name: 'configurar-abono', props: true, meta: { requiresAuth: true, allowedRoles: ['usuario_final'] } },
   { path: '/reservas-realizadas', component: ReservasRealizadas, meta: { requiresAuth: true, allowedRoles: ['usuario_final'] } },
 
   { path: '/actividad/:id/reservar', component: ReservaActividad, name: 'reservar-actividad', props: true, meta: { requiresAuth: true, allowedRoles: ['usuario_final'] } },

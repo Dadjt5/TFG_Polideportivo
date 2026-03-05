@@ -52,6 +52,26 @@
           </div>
         </div>
 
+        <!-- DIAS MAXIMO ALQUILER -->
+        <div class="col-md-4">
+          <div class="card h-100 shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">{{ t.maxDaysFacilityReservation }}</h5>
+              <input type="number" class="form-control" v-model.number="configuracionStore.dias_maximo_alquiler" />
+            </div>
+          </div>
+        </div>
+
+        <!-- DIAS MAXIMO ALQUILER -->
+        <div class="col-md-4">
+          <div class="card h-100 shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">{{ t.consecutiveHours }}</h5>
+              <input type="number" class="form-control" v-model.number="configuracionStore.horas_alquiler_consecutivas" />
+            </div>
+          </div>
+        </div>
+
         <!-- DIAS MINIMO CANCELACION -->
         <div class="col-md-4">
           <div class="card h-100 shadow-sm">

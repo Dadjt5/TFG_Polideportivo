@@ -275,6 +275,12 @@ export default {
   payContinue: "Continuar con el pago",
   prices: "Precios",
 
+  /* Configurar compra abono */
+  configurationSubscription: "Configurar compra abono",
+  configurationSubscSubtitle: "Revisa las opciones antes de continuar al pago",
+  family: "Familiar",
+  others: "Otros",
+
   /* Descuentos */
   newDiscount: "Nuevo descuento",
   modifyDiscount: "Modificar descuento",
@@ -474,6 +480,8 @@ export default {
   minCancellationDays: "Cantidad de días mínima para cancelar la reserva",
   previousNotificationHours: "Horas previas para enviar una notificación",
   maxPercentage: "Porcentaje máximo aplicable",
+  maxDaysFacilityReservation: "Días hasta los que se puede alquilar",
+  consecutiveHours: "Máximas horas consecutivas para alquilar",
 
   /* Foro administrador */
   channelName: "Nombre del canal",

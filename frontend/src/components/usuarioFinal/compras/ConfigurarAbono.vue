@@ -4,10 +4,10 @@
     <!-- TÍTULO -->
     <div class="text-center mb-4">
       <h2 class="fw-bold">
-        Configurar abono
+        {{ t.configurationSubscription }}
       </h2>
       <p class="text-muted">
-        Revisa las opciones antes de continuar al pago
+        {{ t.configurationSubscSubtitle }}
       </p>
     </div>
 
@@ -19,21 +19,18 @@
           {{ abono.nombre }}
         </h5>
 
-        <!-- ========================= -->
         <!-- ABONO DEPORTIVO -->
-        <!-- ========================= -->
         <div v-if="esDeportivo">
 
           <!-- FORMA DE PAGO -->
           <div class="mb-3">
             <label class="form-label fw-semibold">
-              Forma de pago
+              {{ t.paymentMethod }}
             </label>
 
-            <select class="form-select"
-                    v-model="seleccion.forma">
-              <option value="MENSUAL">Mensual</option>
-              <option value="TOTAL">Pago único</option>
+            <select class="form-select" v-model="seleccion.forma" :disabled="seleccion.familiar">
+              <option value="MENSUAL">{{ t.monthly }}</option>
+              <option value="TOTAL">{{ t.fullPayment }}</option>
             </select>
           </div>
 
@@ -46,7 +43,7 @@
 
             <label class="form-check-label"
                    for="familiar">
-              Abono familiar
+              {{ t.family }}
             </label>
           </div>
 
@@ -55,35 +52,35 @@
             <table class="table table-sm">
               <tbody>
                 <tr>
-                  <td>Mensual UAM</td>
+                  <td>{{ t.monthlyPriceUAM }}</td>
                   <td class="text-end">
                     {{ abono.precioTotalMensual }} €
                   </td>
                 </tr>
 
                 <tr>
-                  <td>Mensual Otros</td>
+                  <td>{{ t.monthlyPriceOthers }}</td>
                   <td class="text-end">
                     {{ abono.precioTotalMensualOtros }} €
                   </td>
                 </tr>
 
                 <tr>
-                  <td>Pago único UAM</td>
+                  <td>{{ t.totalPriceUAM }}</td>
                   <td class="text-end">
                     {{ abono.precioPagoUnicoUAM }} €
                   </td>
                 </tr>
 
                 <tr>
-                  <td>Pago único Otros</td>
+                  <td>{{ t.totalPriceOthers }}</td>
                   <td class="text-end">
                     {{ abono.precioPagoUnicoOtros }} €
                   </td>
                 </tr>
 
                 <tr>
-                  <td>Familiar</td>
+                  <td>{{ t.family }}</td>
                   <td class="text-end">
                     {{ abono.precioFamiliar }} €
                   </td>
@@ -94,9 +91,7 @@
 
         </div>
 
-        <!-- ========================= -->
         <!-- ABONO VERANO -->
-        <!-- ========================= -->
         <div v-else>
 
           <div class="table-responsive mb-4">
@@ -117,7 +112,7 @@
                 </tr>
 
                 <tr>
-                  <td>Otros</td>
+                  <td>{{ t.others }}</td>
                   <td class="text-end">
                     {{ abono.precioOtros }} €
                   </td>
@@ -131,7 +126,7 @@
         <!-- TOTAL -->
         <div class="border-top pt-3 mt-3">
           <div class="d-flex justify-content-between fs-5">
-            <span class="fw-bold">Total</span>
+            <span class="fw-bold">{{ t.price }}</span>
             <span class="fw-bold text-primary">
               {{ total }} €
             </span>
@@ -142,12 +137,12 @@
         <div class="d-flex justify-content-end gap-2 mt-4">
           <button class="btn btn-outline-secondary"
                   @click="cancelar">
-            Cancelar
+            {{ t.cancel }}
           </button>
 
           <button class="btn btn-primary"
                   @click="continuarPago">
-            Continuar al pago
+            {{ t.payContinue }}
           </button>
         </div>
 
@@ -158,20 +153,25 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { type Ref, ref, computed, onMounted, inject } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
 import { useUserStore } from '@/stores/usuarioFinal'
-
 import { comprarAbono } from '@/services/reservaPagoService'
 import { getAbonoDeportivoDetalle, getAbonoVeranoDetalle } from '@/services/abonoBonoService'
+
+import { useI18n } from "@/useI18N"
+import type { Language } from "@/useI18N"
+
+const language = inject<Ref<Language>>("language")!
+const t = useI18n(language)
 
 const router = useRouter()
 const route = useRoute()
 const usuarioStore = useUserStore()
 
-const id = parseInt(route.params.id as string)
-const tipo = route.params.tipo as string
+const id = Number(route.params.id)
+const tipo = String(route.params.tipo)
 
 const abono = ref<any>(null)
 
@@ -183,10 +183,6 @@ const seleccion = ref({
 const esDeportivo = computed(() => {
   return tipo === 'abono_deportivo'
 })
-
-/* ========================= */
-/* CÁLCULO PRECIO            */
-/* ========================= */
 
 const total = computed(() => {
   if (!abono.value) return 0
@@ -220,9 +216,6 @@ const total = computed(() => {
   return abono.value.precioOtros
 })
 
-/* ========================= */
-/* ACCIONES                  */
-/* ========================= */
 
 const continuarPago = async () => {
   const response = await comprarAbono(
@@ -232,7 +225,7 @@ const continuarPago = async () => {
     seleccion.value.familiar
   )
 
-  const idPago = response.data.idPago
+  const idPago = response.idPago
 
   router.push({
     name: 'pasarela-pago',
@@ -244,9 +237,6 @@ function cancelar() {
   router.back()
 }
 
-/* ========================= */
-/* CARGA DATOS               */
-/* ========================= */
 
 onMounted(async () => {
   let data

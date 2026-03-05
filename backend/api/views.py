@@ -18,6 +18,7 @@ from django.db.models import Sum, Count
 from django.utils.timezone import now
 from django.db.models.functions import TruncMonth
 from datetime import timedelta, datetime
+from django.utils import timezone
 
 from .permissions import IsAdministradorRaiz, IsAdministradorEspacios, IsAdministradorTarifas, IsAdministradorUsuarios, IsMonitor, IsUsuarioFinal, IsAdministrador
 
@@ -1427,11 +1428,14 @@ class TarifaInstalacionView(APIView):
         if dia:
             reservas_serializer = MapaReservasSerializer(dia.mapa_reservas.all(), many=True)
             reservas = reservas_serializer.data
+            alquileres_serializer = AlquilerSimpleSerializer(Alquiler.objects.filter(fecha=fecha), many=True)
+            alquileres = alquileres_serializer.data
             horaApertura = dia.horaApertura
             horaCierre = dia.horaCierre
             abierto = dia.abierto
         else:
             reservas = []
+            alquileres = []
             horaApertura = ""
             horaCierre = ""
             abierto = False
@@ -1444,7 +1448,8 @@ class TarifaInstalacionView(APIView):
                 "horaCierre": horaCierre,
                 "abierto": abierto,
                 "datos": precios,
-                "reservas": reservas
+                "reservas": reservas,
+                "alquileres": alquileres
             },
             "descuento": {
                 "porcentaje_total": 0,
@@ -1568,7 +1573,6 @@ class ReservarActividadView(APIView):
 
         pago = Pago.nuevoPago("Pago por reserva de la actividad", request.user.usuario_final, res, complementos)
 
-
         if res and pago:
             return Response({"idPago": pago.id})
 
@@ -1580,6 +1584,7 @@ class ReservaInstalacionView(APIView):
     
     def post(self, request, instalacion_id):
         instalacion = get_object_or_404(Instalacion, id=instalacion_id)
+        config = Configuracion.objects.first()
 
         complementos = request.data.get('complementos')
         fecha_str = complementos.get("fecha")
@@ -1589,11 +1594,27 @@ class ReservaInstalacionView(APIView):
         if not horas or len(horas) == 0:
             return Response({"respuesta": "Debe seleccionar horas"}, status=status.HTTP_400_BAD_REQUEST)
 
+        if fecha < timezone.localdate() or fecha > (fecha + timedelta(days=config.dias_maximo_alquiler)):
+            return Response({"respuesta": "No se puede reservar en esta fecha"}, status=status.HTTP_400_BAD_REQUEST)
+
         horas.sort()
+        
+        if len(horas) > config.horas_alquiler_consecutivas:
+            return Response({"respuesta": f'Solo se pueden reservar máximo {config.horas_alquiler_consecutivas} horas'}, status=status.HTTP_400_BAD_REQUEST)
+
+        for i in range(len(horas) - 1):
+            h1 = datetime.strptime(horas[i], "%H:%M:%S")
+            h2 = datetime.strptime(horas[i+1], "%H:%M:%S")
+
+            if (h2 - h1) != timedelta(hours=1):
+                return Response({"respuesta": "Las horas deben ser consecutivas"}, status=status.HTTP_400_BAD_REQUEST)
 
         hora_inicio = datetime.strptime(horas[0], "%H:%M:%S").time()
         ultima = datetime.strptime(horas[-1], "%H:%M:%S")
         hora_fin = (ultima + timedelta(hours=1)).time()
+
+        if fecha == timezone.localdate() and hora_inicio <= timezone.localtime().time():
+            return Response({"respuesta": "No se puede reservar en horas anteriores a la actual"}, status=status.HTTP_400_BAD_REQUEST)
 
         res = Alquiler.nuevaReserva(request.user.usuario_final, instalacion, fecha, hora_inicio, hora_fin)
         if not res:
@@ -1615,9 +1636,9 @@ class ComprarAbonoView(APIView):
         tipoAbono = request.data.get('tipoAbono')
         complementos = request.data.get('complementos')
 
-        if tipoAbono == "abono deportivo":
+        if tipoAbono == "abono_deportivo":
             abono = get_object_or_404(AbonoDeportivo, id=abono_id)
-        elif tipoAbono == "abono verano":
+        elif tipoAbono == "abono_verano":
             abono = get_object_or_404(AbonoVerano, id=abono_id)
 
         compra = CompraAbono.compraAbono(abono, request.user.usuario_final, tipoAbono)
@@ -1772,6 +1793,58 @@ class ConfirmarPagoView(APIView):
         else:
             pago.cancelarPago()
             return Response({"respuesta": "Error al pagar"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+# Cancelar una reserva de actividad
+class CancelarReservaActividadView(APIView):
+    permission_classes = [IsUsuarioFinal]
+    
+    def delete(self, request, reserva_id):
+        reserva = get_object_or_404(ReservaActividad, id=reserva_id)
+        
+        reserva.cancelarCompra()
+        reserva.delete()
+        
+        return Response({"respuesta": "Reserva eliminada"}, status=status.HTTP_200_OK)
+
+
+# Cancelar un alquiler
+class CancelarAlquilerView(APIView):
+    permission_classes = [IsUsuarioFinal]
+    
+    def delete(self, request, alquiler_id):
+        alquiler = get_object_or_404(Alquiler, id=alquiler_id)
+        
+        alquiler.cancelarCompra()
+        alquiler.delete()
+        
+        return Response({"respuesta": "Alquiler eliminado"}, status=status.HTTP_200_OK)
+
+
+# Cancelar un abono
+class CancelarAbonoView(APIView):
+    permission_classes = [IsUsuarioFinal]
+
+    def delete(self, request, compra_id):
+        compra = get_object_or_404(CompraAbono, id=compra_id)
+
+        compra.cancelarCompra()
+        compra.delete()
+        
+        return Response({"respuesta": "Compra de abono eliminado"}, status=status.HTTP_200_OK)
+
+
+# Cancelar un abono
+class CancelarBonoView(APIView):
+    permission_classes = [IsUsuarioFinal]
+    
+    def delete(self, request, compra_id):
+        compra = get_object_or_404(CompraBono, id=compra_id)
+        
+        compra.cancelarCompra()
+        compra.delete()
+        
+        return Response({"respuesta": "Compra de bono eliminado"}, status=status.HTTP_200_OK)
 
 
 # Obtener estadisticas para el admin

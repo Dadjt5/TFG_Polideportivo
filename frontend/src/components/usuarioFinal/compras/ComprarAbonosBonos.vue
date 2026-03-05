@@ -268,7 +268,8 @@ const bonos = ref<any[]>([])
 
 const nuevoAbono = async (id: number, tipoAbono: string) => {
   router.push({
-    name: 'configurar-abono'
+    name: 'configurar-abono',
+    params: {"id": id, "tipo": tipoAbono}
   })
 }
 

@@ -96,7 +96,6 @@ class Pago(models.Model):
 
         costeFinal = coste - (coste * porcentaje / 100)
         content_type = ContentType.objects.get_for_model(objeto)
-        print(coste, costeFinal, porcentaje)
 
         return cls.objects.create(
             concepto=concepto,

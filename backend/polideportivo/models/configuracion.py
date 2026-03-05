@@ -9,8 +9,10 @@ class Configuracion(models.Model):
     max_deportes_por_usuario = models.PositiveIntegerField(default=5)
     dias_minimo_reserva_actividad = models.PositiveIntegerField(default=1)
     dias_maximo_reserva_actividad = models.PositiveIntegerField(default=7)
+    dias_maximo_alquiler = models.PositiveIntegerField(default=7)
     dias_minimo_cancelacion = models.PositiveIntegerField(default=1)
     horas_previas_notificacion = models.PositiveIntegerField(default=1)
+    horas_alquiler_consecutivas = models.PositiveIntegerField(default=2)
     porcentaje_maximo = models.PositiveIntegerField(default=100, validators=[MinValueValidator(0), MaxValueValidator(100)])
 
     titulo_cambios_cancelaciones = models.CharField(max_length=1024, blank=True)

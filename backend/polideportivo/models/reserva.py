@@ -170,6 +170,9 @@ class Alquiler(Reserva):
             instalacion.refresh_from_db()
 
             descuentos = Descuento.obtener_descuentos(instalacion=instalacion)
+            
+            if cls.objects.filter(fecha=fecha, horaInicio=horaInicio, estado=EstadoReserva.CONFIRMADA).exists() or cls.objects.filter(fecha=fecha, horaFin=horaFin, estado=EstadoReserva.CONFIRMADA).exists():
+                return None
 
             if not instalacion.controlarAlquiler(fecha, horaInicio, horaFin):
                 return None

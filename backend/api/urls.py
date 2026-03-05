@@ -108,5 +108,9 @@ urlpatterns = [
     path("pagos/resumen/<str:tipo>/<int:pago_id>/", views.ResumenPagoView.as_view(), name="resumen-pago"),
     path("pagos/<int:pago_id>/comenzar/", views.CrearIntentoPagoView.as_view(), name="intentar-pago"),
     path("pagos/<int:pago_id>/confirmar/", views.ConfirmarPagoView.as_view(), name="confirmar-pago"),
+    path("reservas/<int:reserva_id>/cancelar/", views.CancelarReservaActividadView.as_view(), name="cancelar-reserva"),
+    path("alquileres/<int:alquiler_id>/cancelar/", views.CancelarAlquilerView.as_view(), name="cancelar-alquiler"),
+    path("abonos/<int:compra_id>/cancelar/", views.CancelarAbonoView.as_view(), name="cancelar-abono"),
+    path("bonos/<int:compra_id>/cancelar/", views.CancelarBonoView.as_view(), name="cancelar-bono"),
     path('', include(router.urls)),
 ]

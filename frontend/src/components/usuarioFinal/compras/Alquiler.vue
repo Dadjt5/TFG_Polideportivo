@@ -29,7 +29,7 @@
 
         <div class="mb-3">
           <label class="form-label">{{ t.selectedDate }}</label>
-          <input type="date" class="form-control" v-model="reserva.seleccion.fecha" />
+          <input type="date" class="form-control" v-model="reserva.seleccion.fecha" :min="hoy" :max="maxFechaStr" />
         </div>
 
         <h6 class="fw-bold">{{ t.prices }}</h6>
@@ -124,6 +124,7 @@ import { useRouter } from 'vue-router'
 import { alquilar, getTarifaDescuentoInstalacion } from '@/services/reservaPagoService';
 
 import { useUserStore } from '@/stores/usuarioFinal'
+import { useConfiguracionStore } from '@/stores/configuracion';
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
 import type { Language } from "@/useI18N";
@@ -138,6 +139,7 @@ const t = useI18n(language);
 
 const router = useRouter();
 const usuarioFinalStore = useUserStore();
+const configuracionStore = useConfiguracionStore();
 
 const otroCaso = ref(false)
 
@@ -153,13 +155,18 @@ const reserva = ref({
       horaInicio: string,
       horaFin: string,
       estado: 'LIBRE' | 'USUARIO' | 'ACTIVIDAD'
+    }[],
+    alquileres: [] as {
+      id: number,
+      fecha: string,
+      horaFin: string,
+      horaInicio: string,
+      nombre: string,
+      numeroHoras: number
     }[]
   },
   seleccion: {
     fecha: new Date().toISOString().slice(0, 10),
-    horas1: "",
-    horas2: "",
-    modalidad: 'total',
   },
   descuento: {
     porcentaje_total: 0,
@@ -174,32 +181,53 @@ const reserva = ref({
 const mensaje = ref("")
 const horasSeleccionadas = ref<string[]>([])
 
-const horaATime = (horaStr: string) => {
-  return parseInt(horaStr.split(':')[0])
+const estaBloqueada = (hora: any) => {
+  if (esAlquilerUsuario(hora)) return true
+  return hora.estado !== "LIBRE"
 }
 
-const estaBloqueada = (intervalo: any) => {
-  return intervalo.estado !== 'LIBRE'
+const esAlquilerUsuario = (hora: any) => {
+  const fechaSeleccionada = reserva.value.seleccion.fecha
+
+  return reserva.value.tarifa.alquileres.some(a => {
+    if (a.fecha !== fechaSeleccionada) return false
+
+    return hora.horaInicio >= a.horaInicio && hora.horaInicio < a.horaFin
+  })
 }
 
-const claseHora = (intervalo: any) => {
+const claseHora = (hora: any) => {
+  if (esAlquilerUsuario(hora)) return "btn-danger"
 
-  if (horasSeleccionadas.value.includes(intervalo.horaInicio)) {
-    return 'btn-primary'
+  if (hora.estado === "ACTIVIDAD") return "btn-warning"
+  if (hora.estado === "LIBRE") {
+    return horasSeleccionadas.value.includes(hora.horaInicio)
+      ? "btn-primary"
+      : "btn-success"
   }
 
-  if (intervalo.estado === 'USUARIO') {
-    return 'btn-danger'
-  }
-
-  if (intervalo.estado === 'ACTIVIDAD') {
-    return 'btn-warning'
-  }
-
-  return 'btn-outline-success'
+  return "btn-secondary"
 }
+
+const hoy = new Date().toISOString().slice(0,10)
+
+const maxFecha = new Date()
+maxFecha.setDate(maxFecha.getDate() + 7)
+const maxFechaStr = maxFecha.toISOString().slice(0,10)
 
 const toggleHora = (intervalo: any) => {
+  const hoy = new Date()
+  hoy.setHours(0,0,0,0)
+
+  const fechaSeleccionada = new Date(reserva.value.seleccion.fecha)
+  fechaSeleccionada.setHours(0,0,0,0)
+
+  const maxFecha = new Date()
+  maxFecha.setDate(maxFecha.getDate() + configuracionStore.dias_maximo_alquiler)
+  maxFecha.setHours(0,0,0,0)
+
+  if (fechaSeleccionada < hoy || fechaSeleccionada > maxFecha) return
+
   if (intervalo.estado !== 'LIBRE') return
 
   const key = intervalo.horaInicio
@@ -210,9 +238,22 @@ const toggleHora = (intervalo: any) => {
     return
   }
 
-  if (horasSeleccionadas.value.length >= 2) return
+  if (horasSeleccionadas.value.length >= configuracionStore.horas_alquiler_consecutivas) return
 
-  horasSeleccionadas.value.push(key)
+  if (horasSeleccionadas.value.length === 0) {
+    horasSeleccionadas.value.push(key)
+    return
+  }
+
+  const horas = reserva.value.tarifa.reservas.map(r => r.horaInicio)
+
+  const indexActual = horas.indexOf(key)
+  const indexSeleccionada = horas.indexOf(horasSeleccionadas.value[0])
+
+  if (Math.abs(indexActual - indexSeleccionada) === 1) {
+    horasSeleccionadas.value.push(key)
+    horasSeleccionadas.value.sort()
+  }
 }
 
 const total = computed(() => {
@@ -240,14 +281,19 @@ const continuarPago = async () => {
     horas: horasSeleccionadas.value
   }
 
-  const response = await alquilar(reserva.value.tarifa.idInstalacion, { complementos })
+  try {
+    const response = await alquilar(reserva.value.tarifa.idInstalacion, { complementos })
 
-  const idPago = response.idPago
+    const idPago = response.idPago
 
-  router.push({
-    name: 'pasarela-pago',
-    params: { tipo: "alquiler_instalacion", id: idPago }
-  })
+    router.push({
+      name: 'pasarela-pago',
+      params: { tipo: "alquiler_instalacion", id: idPago }
+    })
+  } catch(e: any) {
+    mensaje.value = e.response?.data?.respuesta
+    console.error("Error al reservar:", e);
+  }
 }
 
 const cancelar = () => {

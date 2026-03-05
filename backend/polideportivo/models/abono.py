@@ -39,7 +39,7 @@ class AbonoVerano(Abono):
     precioTDA = models.FloatField(default=0.0)
     precioUAM = models.FloatField(default=0.0)
     precioOtros = models.FloatField(default=0.0)
-    
+
     def __str__(self):
         return f'Abono de verano para junio, julio y agosto de coste {self.precioUAM} para la comunidad UAM'
 
@@ -52,7 +52,7 @@ class CompraAbono(models.Model):
     usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.RESTRICT, related_name="abono")
     abonoDeportivo = models.ForeignKey('AbonoDeportivo', on_delete=models.RESTRICT, related_name="compras_deportivo", blank=True, null=True)
     abonoVerano = models.ForeignKey('AbonoVerano', on_delete=models.RESTRICT, related_name="compras_verano", blank=True, null=True)
-    
+
     estado = models.CharField(default=EstadoReserva.PENDIENTE, choices=EstadoReserva.choices)
 
     @classmethod
@@ -60,7 +60,7 @@ class CompraAbono(models.Model):
         return cls.objects.count()
     
     def calcular_precio(self, usuario, forma="", familiar=False):
-        if isinstance(self, AbonoDeportivo):
+        if self.abonoDeportivo:
             precio = self.abonoDeportivo.precioPagoUnicoOtros
 
             if forma == "MENSUAL":
@@ -75,7 +75,7 @@ class CompraAbono(models.Model):
             if familiar:
                 precio = self.abonoDeportivo.precioFamiliar
             
-        elif isinstance(self, AbonoVerano):
+        elif self.abonoVerano:
             precio = self.abonoVerano.precioOtros
             if usuario.esUAM:
                 precio = self.abonoVerano.precioUAM
@@ -85,6 +85,9 @@ class CompraAbono(models.Model):
         return precio
     
     def confirmarCompra(self):
+        self.usuarioFinal.tieneAbono = True
+        self.usuarioFinal.save()
+
         self.estado = EstadoReserva.CONFIRMADA
         self.save()
     
@@ -114,7 +117,7 @@ class CompraAbono(models.Model):
                 if cls.objects.filter(usuarioFinal=usuario, abonoVerano=abono, estado=EstadoReserva.CONFIRMADA).exists():
                     return None
                 
-                for comAbono in cls.objects.filter(usuarioFinal=usuario, AbonoVerano=abono, estado=EstadoReserva.PENDIENTE):
+                for comAbono in cls.objects.filter(usuarioFinal=usuario, abonoVerano=abono, estado=EstadoReserva.PENDIENTE):
                     comAbono.cancelarCompra()
         
                 compra = cls.objects.create(

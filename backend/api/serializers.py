@@ -195,7 +195,7 @@ class AbonoVeranoSerializer(serializers.ModelSerializer):
 
 class CompraAbonoSerializer(serializers.ModelSerializer):
     abonoDeportivo = AbonoDeportivoSerializer(read_only=True)
-    AbonoVerano = AbonoVeranoSerializer(read_only=True)
+    abonoVerano = AbonoVeranoSerializer(read_only=True)
 
     class Meta:
         model = CompraAbono
@@ -793,7 +793,6 @@ class AlquilerSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "fecha",
-            "tarifa",
             "pago",
             "instalacion",
         )

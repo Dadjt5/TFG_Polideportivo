@@ -140,8 +140,6 @@ class Instalacion(models.Model):
         if agenda.estaOcupado(horaInicio, horaFin):
             return False
 
-        agenda.alquilarHoras(horaInicio, horaFin)
-
         return True
 
     def nuevoHorario(self, dia, horaApertura, horaCierre, abierto):

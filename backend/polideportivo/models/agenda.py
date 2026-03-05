@@ -44,20 +44,6 @@ class Agenda(models.Model):
             inicio = siguiente
 
         return False
-    
-    def alquilarHoras(self, horaInicio, horaFin, minutos=60):
-        inicio = datetime.combine(datetime.today(), horaInicio)
-        fin = datetime.combine(datetime.today(), horaFin)
-
-        while inicio < fin:
-            siguiente = inicio + timedelta(minutes=minutos)
-            
-            mapa = self.mapa_reservas.filter(horaInicio=inicio.time(), horaFin=siguiente.time()).first()
-            mapa.estado = TipoReserva.USUARIO
-            mapa.save()
-            
-            inicio = siguiente
-
 
     def generarMapa(self, minutos=60):
         if not self.abierto:

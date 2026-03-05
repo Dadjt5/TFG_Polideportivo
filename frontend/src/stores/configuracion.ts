@@ -8,8 +8,10 @@ export const useConfiguracionStore = defineStore("configuracion", {
 		max_deportes_por_usuario: 0,
 		dias_minimo_reserva_actividad: 0,
 		dias_maximo_reserva_actividad: 0,
+		dias_maximo_alquiler: 0,
 		dias_minimo_cancelacion: 0,
 		horas_previas_notificacion: 0,
+		horas_alquiler_consecutivas: 0,
 		porcentaje_maximo: 0,
 		titulo_cambios_cancelaciones: '',
 		titulo_avisos_actividades: '',
@@ -38,6 +40,8 @@ export const useConfiguracionStore = defineStore("configuracion", {
 				this.dias_minimo_cancelacion = data.dias_minimo_cancelacion;
 				this.horas_previas_notificacion = data.horas_previas_notificacion;
 				this.porcentaje_maximo = data.porcentaje_maximo;
+				this.dias_maximo_alquiler = data.dias_maximo_alquiler;
+				this.horas_alquiler_consecutivas = data.horas_alquiler_consecutivas;
 
 				this.titulo_cambios_cancelaciones = data.titulo_cambios_cancelaciones;
 				this.titulo_avisos_actividades = data.titulo_avisos_actividades;
@@ -70,6 +74,8 @@ export const useConfiguracionStore = defineStore("configuracion", {
 					dias_minimo_cancelacion: this.dias_minimo_cancelacion,
 					horas_previas_notificacion: this.horas_previas_notificacion,
 					porcentaje_maximo: this.porcentaje_maximo,
+					dias_maximo_alquiler: this.dias_maximo_alquiler,
+					horas_alquiler_consecutivas: this.horas_alquiler_consecutivas,
 					titulo_cambios_cancelaciones: this.titulo_cambios_cancelaciones,
 					titulo_avisos_actividades: this.titulo_avisos_actividades,
 					titulo_problemas_pago: this.titulo_problemas_pago,
@@ -104,6 +110,8 @@ export const useConfiguracionStore = defineStore("configuracion", {
 				dias_minimo_cancelacion: this.dias_minimo_cancelacion,
 				horas_previas_notificacion: this.horas_previas_notificacion,
 				porcentaje_maximo: this.porcentaje_maximo,
+				dias_maximo_alquiler: this.dias_maximo_alquiler,
+				horas_alquiler_consecutivas: this.horas_alquiler_consecutivas,
 				titulo_cambios_cancelaciones: this.titulo_cambios_cancelaciones,
 				titulo_avisos_actividades: this.titulo_avisos_actividades,
 				titulo_problemas_pago: this.titulo_problemas_pago,

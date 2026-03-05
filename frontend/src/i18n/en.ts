@@ -273,6 +273,12 @@ export default {
   payContinue: "Proceed with payment",
   prices: "Prices",
 
+  /* Configurar compra abono */
+  configurationSubscription: "Configure subscription purchase",
+  configurationSubscSubtitle: "Review options before proceeding to payment",
+  family: "Family",
+  others: "Others",
+
   /* Descuentos */
   newDiscount: "New discount",
   modifyDiscount: "Modify discount",
@@ -473,6 +479,8 @@ export default {
   minCancellationDays: "Minimum number of days required to cancel a reservation",
   previousNotificationHours: "Hours in advance to send a notification",
   maxPercentage: "Maximum applicable percentage",
+  maxDaysFacilityReservation: "Maximum number of days for which the facility can be rented",
+  consecutiveHours: "Maximum consecutive hours for hire",
 
   /* Nueva notificacion */
   newNotification: "New notification",

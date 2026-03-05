@@ -36,11 +36,7 @@
                 </p>
 
                 <div class="progress mb-3" style="height: 8px;">
-                  <div
-                    class="progress-bar"
-                    role="progressbar"
-                    :style="{ width: porcentajeUso(b) + '%' }"
-                  ></div>
+                  <div class="progress-bar" role="progressbar" :style="{ width: porcentajeUso(b) + '%' }"></div>
                 </div>
 
                 <p>
@@ -48,6 +44,12 @@
                   {{ new Date(b.fechaExpiracion).toLocaleDateString() }}
                 </p>
               </div>
+            </div>
+            <div class="mt-3 text-end" v-if="b.valido">
+              <button class="btn btn-outline-danger btn-sm" @click="cancelarCompraBono(b.id)">
+                <i class="bi bi-x-circle me-1"></i>
+                {{ t.cancel }}
+              </button>
             </div>
           </div>
         </div>
@@ -78,21 +80,25 @@
                   </span>
                 </h3>
 
-                <p><strong>{{ t.startDate }}:</strong> {{ a.fecha }}</p>
-                <p><strong>{{ t.endDate }}:</strong> {{ a.fechaExpiracion }}</p>
+                <p><strong>{{ t.startDate }}:</strong> {{ fechaInicio(a) }}</p>
+                <p><strong>{{ t.endDate }}:</strong> {{ fechaFin(a) }}</p>
 
                 <p>
                   <strong>{{ t.remainingDays }}:</strong>
-                  {{ a.diasRestantes }}
+                  {{ diasRestantes(a) }}
                 </p>
-  
-                <span
-                  class="badge"
-                  :class="a.valido ? 'bg-success' : 'bg-secondary'"
-                >
-                  {{ a.valido ? t.active : t.expires }}
+
+                <span class="badge" :class="esValido(a) ? 'bg-success' : 'bg-secondary'">
+                  {{ esValido(a) ? t.active : t.expires }}
                 </span>
               </div>
+            </div>
+
+            <div class="mt-3 text-end" v-if="esValido(a)">
+              <button class="btn btn-outline-danger btn-sm" @click="cancelarCompraAbono(a.id)">
+                <i class="bi bi-x-circle me-1"></i>
+                {{ t.cancel }}
+              </button>
             </div>
           </div>
         </div>
@@ -106,6 +112,7 @@
 import { onMounted, ref, inject, type Ref } from 'vue'
 
 import { getAbonos, getBonos } from '@/services/usuarioFinalService'
+import { cancelarAbono, cancelarBono } from '@/services/cancelarService'
 
 import type { Language } from "@/useI18N"
 import { useI18n } from "@/useI18N"
@@ -136,10 +143,7 @@ const porcentajeUso = (b: BonoComprado) =>
 type AbonoActivo = {
   id: number
   fecha: string
-  fechaExpiracion: string
-  valido: boolean
-  diasRestantes: number
-  pago: number
+  estado: string
   abonoDeportivo: {
     id: number,
     meses: number
@@ -157,11 +161,75 @@ type AbonoActivo = {
 
 const abonos = ref<AbonoActivo[]>([])
 
+const getInicioVerano = () => {
+  const year = new Date().getFullYear()
+  return new Date(year, 5, 1)
+}
+
+const getFinVerano = () => {
+  const year = new Date().getFullYear()
+  return new Date(year, 7, 31)
+}
+
+const fechaInicio = (a: AbonoActivo) => {
+  if (a.abonoVerano) {
+    return getInicioVerano().toLocaleDateString()
+  }
+
+  return new Date(a.fecha).toLocaleDateString()
+}
+
+const diasRestantes = (a: AbonoActivo) => {
+  if (a.abonoVerano) {
+    const hoy = new Date()
+    const fin = getFinVerano()
+
+    const diff = fin.getTime() - hoy.getTime()
+    return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)))
+  }
+
+  return a.diasRestantes
+}
+
+const fechaFin = (a: AbonoActivo) => {
+  if (a.abonoVerano) {
+    return getFinVerano().toLocaleDateString()
+  }
+
+  return new Date(a.fechaExpiracion).toLocaleDateString()
+}
+
+const esValido = (a: AbonoActivo) => {
+  if (a.abonoVerano) {
+    return new Date() <= getFinVerano()
+  }
+
+  return a.valido
+}
+
+const cancelarCompraBono = async (id: number) => {
+  try {
+    await cancelarBono(id)
+    bonos.value = bonos.value.filter(b => b.id !== id)
+  } catch (e) {
+    console.error("Error cancelando bono", e)
+  }
+}
+
+const cancelarCompraAbono = async (id: number) => {
+  try {
+    await cancelarAbono(id)
+    abonos.value = abonos.value.filter(a => a.id !== id)
+  } catch (e) {
+    console.error("Error cancelando abono", e)
+  }
+}
+
 onMounted(async () => {
   try {
     bonos.value = await getBonos();
     abonos.value = await getAbonos();
-  } catch(e) {
+  } catch (e) {
     console.log("Error al obtener los bonos o abonos comprados", e)
   }
 })
