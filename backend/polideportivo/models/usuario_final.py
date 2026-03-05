@@ -31,15 +31,23 @@ class UsuarioFinal(Usuario):
     
     def save(self, *args, **kwargs):
         if self.rol == Rol.EXTERNO:
-            esUAM = False
+            self.esUAM = False
         else:
-            esUAM = True
+            self.esUAM = True
 
         super().save(*args, **kwargs)
 
     def __str__(self):
         return f'Usuario: {self.id}, nacido el {self.fechaNacimiento}'
     
+    def comprobarAbono(self):
+        if self.abono.exists():
+            self.tieneAbono = True
+        else:
+            self.tieneAbono = False
+
+        self.save(update_fields=["tieneAbono"])
+
     def marcarAbono(self, abono):
         if abono:
             self.tieneAbono = True

@@ -1,11 +1,14 @@
 <template>
-  <div class="min-vh-100 bg-light">
+  <div class="min-vh-100" style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
     <div class="container py-5">
-      <h2 class="text-center mb-5 fw-semibold">
-        <i class="bi bi-bell-fill text-primary fs-4 me-3"></i>
+
+      <!-- Título -->
+      <h2 class="text-center mb-5 fw-bold text-primary">
+        <i class="bi bi-bell-fill fs-4 me-3"></i>
         {{ t.notifications }}
       </h2>
 
+      <!-- Botón nueva notificación -->
       <div v-if="userStore.isAdmin" class="text-center mb-3">
         <router-link to="/notificaciones/nueva" class="btn btn-primary rounded-pill">
           <i class="bi bi-megaphone-fill me-2"></i>
@@ -13,61 +16,64 @@
         </router-link>
       </div>
 
+      <!-- Sin notificaciones -->
       <p v-if="activeStore.sortedNotifications.length === 0" class="text-center text-muted">
         {{ t.empty }}
       </p>
 
+      <!-- Lista de notificaciones -->
       <div class="d-flex flex-column gap-3">
-        <div v-for="notif in activeStore.sortedNotifications" :key="notif.id" class="card rounded-4 shadow-sm"
-          :class="notif.leido ? 'bg-white' : 'bg-primary bg-opacity-10'">
+        <div v-for="notif in activeStore.sortedNotifications" :key="notif.id"
+             class="card rounded-4 shadow-sm"
+             :class="notif.leido ? 'bg-white' : 'bg-primary bg-opacity-10'"
+             style="backdrop-filter: blur(6px);">
           <div class="card-body py-3 px-4">
+
             <div class="d-flex justify-content-between align-items-start">
 
+              <!-- Contenido de la notificación -->
               <div class="d-flex gap-3 w-100">
-                <div v-if="!notif.leido" class="rounded-circle bg-primary mt-1" style="width: 10px; height: 10px;">
-                </div>
+                <div v-if="!notif.leido" class="rounded-circle bg-primary mt-1" 
+                     style="width: 10px; height: 10px;"></div>
 
                 <div>
-                  <h6 class="fw-semibold mb-1">
+                  <h6 class="fw-semibold mb-1 text-primary">
                     {{ notif.titulo }}
                   </h6>
 
-                  <p class="text-muted mb-2">
+                  <p class="text-secondary mb-2">
                     {{ notif.descripcion }}
                   </p>
 
-                  <!-- ACTIVIDAD ASOCIADA -->
+                  <!-- Actividad asociada -->
                   <div v-if="notif.actividad" class="mb-2">
                     <small class="fw-semibold text-primary d-block">
                       {{ t.activity }}
                     </small>
-
-                    <span class="text-primary fw-medium" style="cursor: pointer;"
-                      @click="activityDetail(notif.actividad.id)">
+                    <span class="fw-medium text-primary" style="cursor: pointer;"
+                          @click="activityDetail(notif.actividad.id)">
                       {{ notif.actividad.nombre }}
                     </span>
                   </div>
 
-                  <!-- INSTALACIÓN ASOCIADA -->
+                  <!-- Instalación asociada -->
                   <div v-if="notif.instalacion" class="mb-2">
                     <small class="fw-semibold text-success d-block">
                       {{ t.facility }}
                     </small>
-
-                    <span class="text-primary fw-medium" style="cursor: pointer;"
-                      @click="facilityDetail(notif.instalacion.id)">
+                    <span class="fw-medium text-primary" style="cursor: pointer;"
+                          @click="facilityDetail(notif.instalacion.id)">
                       {{ notif.instalacion.nombre }}
                     </span>
                   </div>
 
-                  <!-- PABELLÓN ASOCIADO -->
+                  <!-- Pabellón asociado -->
                   <div v-if="notif.pabellon" class="mb-2">
                     <small class="fw-semibold text-warning d-block">
                       {{ t.pavilion }}
                     </small>
-
-                    <span class="text-primary fw-medium" style="cursor: pointer;"
-                      @click="pavilionDetail(notif.pabellon.id)">
+                    <span class="fw-medium text-primary" style="cursor: pointer;"
+                          @click="pavilionDetail(notif.pabellon.id)">
                       {{ notif.pabellon.nombre }}
                     </span>
                   </div>
@@ -78,29 +84,32 @@
                 </div>
               </div>
 
+              <!-- Botones de acción -->
               <div class="d-flex gap-1 ms-3">
                 <button class="btn btn-sm btn-light rounded-circle" @click="togglePin(notif.id)"
-                  :title="notif.fijado ? t.unpin : t.pin">
+                        :title="notif.fijado ? t.unpin : t.pin">
                   <i v-if="notif.fijado" class="bi bi-pin text-primary fs-4"></i>
                   <i v-else class="bi bi-pin-fill text-primary fs-4"></i>
                 </button>
 
                 <button class="btn btn-sm btn-light rounded-circle" @click="markRead(notif.id)"
-                  :title="notif.leido ? t.markUnread : t.markRead">
+                        :title="notif.leido ? t.markUnread : t.markRead">
                   <i v-if="notif.leido" class="bi bi-envelope-open text-primary fs-4"></i>
                   <i v-else class="bi bi-envelope text-primary fs-4"></i>
                 </button>
 
-                <button class="btn btn-sm btn-light rounded-circle" @click="deleteNotif(notif.id)" :title="t.delete">
-                  <i class="bi bi-trash fs-4 text-danger" title="Eliminar notificación"></i>
+                <button class="btn btn-sm btn-light rounded-circle" @click="deleteNotif(notif.id)"
+                        :title="t.delete">
+                  <i class="bi bi-trash fs-4 text-danger"></i>
                 </button>
               </div>
+
             </div>
           </div>
         </div>
       </div>
-    </div>
 
+    </div>
   </div>
 </template>
 

@@ -16,11 +16,11 @@ from django.db.models.deletion import RestrictedError
 from django.conf import settings
 from django.db.models import Sum, Count
 from django.utils.timezone import now
-from django.db.models.functions import TruncMonth
+from django.db.models.functions import TruncMonth, ExtractWeekDay
 from datetime import timedelta, datetime
 from django.utils import timezone
 
-from .permissions import IsAdministradorRaiz, IsAdministradorEspacios, IsAdministradorTarifas, IsAdministradorUsuarios, IsMonitor, IsUsuarioFinal, IsAdministrador
+from .permissions import IsAdministradorRaiz, IsAdministradorEspacios, IsAdministradorTarifas, IsAdministradorUsuarios, IsMonitor, IsUsuarioFinal, IsAdministrador, IsSuperUser
 
 from .serializers import (
     AbonoDeportivoSerializer, AbonoVeranoSerializer, BonoSerializer,
@@ -39,7 +39,7 @@ from .serializers import (
     FisioterapiaSerializer, TarifaInstalacionSimpleSerializer, TarifaTDASimpleSerializer,
     ActividadComunSimpleSerializer, GrupoReducidoSimpleSerializer, FisioterapiaSimpleSerializer,
     CanalSerializer, CanalAdministradorSerializer, ReservaActividadSimpleSerializer,
-    AlquilerSimpleSerializer
+    AlquilerSimpleSerializer, FeedbackSerializer
 )
 
 from polideportivo.models import (
@@ -50,8 +50,32 @@ from polideportivo.models import (
     ReservaActividad, Alquiler, Administrador, User, CompraBono, CompraAbono,
     Mensaje, Sesion, MapaReservas, TipoActividad, TipoInstalacion, FormaReserva,
     Terreno, Estado, Dia, ActividadComun, GrupoReducido, Fisioterapia, EstadoPago,
-    EstadoReserva, Periodo
+    EstadoReserva, Periodo, Feedback
 )
+
+
+# ----------------
+# Feedback
+# ----------------
+
+class FeedbackViewSet(viewsets.ModelViewSet):
+
+    queryset = Feedback.objects.all()
+    serializer_class = FeedbackSerializer
+
+    def get_permissions(self):
+        if self.action == "list":
+            return [IsSuperUser]
+        elif self.action == "create":
+            return [IsAuthenticated]
+        else:
+            return [IsSuperUser]
+
+    def get_queryset(self):
+        if self.request.user.is_superuser:
+            return Feedback.objects.all().order_by("-fecha")
+
+        return Feedback.objects.none()
 
 
 # ----------------
@@ -1928,6 +1952,147 @@ class ObtenerEstadisticasAdministradorView(APIView):
             "reservas_12_meses": reservas_por_mes,
             "actividades_top": actividades_mas_reservadas,
             "uso_pabellones": uso_pabellones,
+        }
+
+        return Response(data)
+
+
+class ObtenerEstadisticasUsuarioFinalView(APIView):
+    permission_classes = [IsUsuarioFinal]
+
+    def get(self, request):
+        usuario = request.user.usuario_final
+        hoy = now()
+
+        # RESERVAS TOTALES
+        reservas_totales = ReservaActividad.objects.filter(
+            usuarioFinal=usuario
+        ).count()
+
+        # RESERVAS ESTE MES
+        reservas_mes = ReservaActividad.objects.filter(
+            usuarioFinal=usuario,
+            created_at__year=hoy.year,
+            created_at__month=hoy.month
+        ).count()
+
+        # CANCELACIONES
+        cancelaciones = ReservaActividad.objects.filter(
+            usuarioFinal=usuario,
+            estado=EstadoReserva.CANCELADO
+        ).count()
+
+        # DINERO GASTADO
+        dinero_total = Pago.objects.filter(
+            usuarioFinal=usuario,
+            estadoPago=EstadoPago.PAGADO
+        ).aggregate(total=Sum("costeFinal"))["total"] or 0
+
+
+        # RESERVAS POR MES (12 MESES)
+        reservas_12_meses = (
+            ReservaActividad.objects
+            .filter(
+                usuarioFinal=usuario,
+                created_at__gte=hoy - timedelta(days=365)
+            )
+            .annotate(mes=TruncMonth("created_at"))
+            .values("mes")
+            .annotate(total=Count("id"))
+            .order_by("mes")
+        )
+
+        reservas_labels = []
+        reservas_data = []
+
+        for r in reservas_12_meses:
+            reservas_labels.append(r["mes"].strftime("%b"))
+            reservas_data.append(r["total"])
+
+
+        # ACTIVIDADES MÁS RESERVADAS POR EL USUARIO
+        actividades_top = (
+            ReservaActividad.objects
+            .filter(usuarioFinal=usuario)
+            .values("actividad__nombre")
+            .annotate(total=Count("id"))
+            .order_by("-total")[:5]
+        )
+
+        actividades_labels = []
+        actividades_data = []
+
+        for a in actividades_top:
+            actividades_labels.append(a["actividad__nombre"])
+            actividades_data.append(a["total"])
+
+
+        # ACTIVIDAD FAVORITA
+        actividad_favorita = (
+            ReservaActividad.objects
+            .filter(usuarioFinal=usuario)
+            .values("actividad__nombre")
+            .annotate(total=Count("id"))
+            .order_by("-total")
+            .first()
+        )
+
+        actividad_favorita = actividad_favorita["actividad__nombre"] if actividad_favorita else "-"
+
+
+        # PABELLÓN FAVORITO
+        pabellon_favorito = (
+            ReservaActividad.objects
+            .filter(usuarioFinal=usuario)
+            .values("actividad__instalacion__pabellon__nombre")
+            .annotate(total=Count("id"))
+            .order_by("-total")
+            .first()
+        )
+
+        pabellon_favorito = pabellon_favorito["actividad__instalacion__pabellon__nombre"] if pabellon_favorito else "-"
+
+
+        # RESERVAS POR DÍA DE LA SEMANA
+        reservas_por_dia_qs = (
+            ReservaActividad.objects
+            .filter(usuarioFinal=usuario)
+            .annotate(dia=ExtractWeekDay("created_at"))
+            .values("dia")
+            .annotate(total=Count("id"))
+        )
+
+        dias_labels = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"]
+        dias_data = [0] * 7
+
+        for r in reservas_por_dia_qs:
+            indice = r["dia"] - 1
+            dias_data[indice] = r["total"]
+
+
+        data = {
+            "reservas_totales": reservas_totales,
+            "reservas_mes": reservas_mes,
+            "cancelaciones": cancelaciones,
+            "dinero_total": dinero_total,
+
+            "actividad_favorita": actividad_favorita,
+            "pabellon_favorito": pabellon_favorito,
+
+            "reservas_por_mes": {
+                "labels": reservas_labels,
+                "data": reservas_data
+            },
+
+            "actividades_usuario": {
+                "labels": actividades_labels,
+                "data": actividades_data
+            },
+
+            "reservas_por_dia": {
+                "labels": dias_labels,
+                "data": dias_data
+            }
         }
 
         return Response(data)

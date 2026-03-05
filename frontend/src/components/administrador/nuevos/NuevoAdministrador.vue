@@ -59,25 +59,34 @@
 
           <!-- PASSWORD -->
           <div class="col-md-6">
-            <label class="form-label fw-semibold">{{ t.passwordPlaceholder }}</label>
-            <input
-              type="password"
-              class="form-control form-control-lg"
-              :class="{ 'is-invalid': errores.password }"
-              v-model="administrador.password"
-            />
-          </div>
+              <label class="form-label fw-semibold">{{ t.passwordPlaceholder }}</label>
+              <div class="position-relative d-flex align-items-center">
+                <input :type="showPassword ? 'text' : 'password'" class="form-control pe-5"
+                  :class="{ 'is-invalid': errores.password }" v-model="administrador.password" />
 
-          <!-- CONFIRM PASSWORD -->
-          <div class="col-md-6">
-            <label class="form-label fw-semibold">{{ t.passwordConfirm }}</label>
-            <input
-              type="password"
-              class="form-control form-control-lg"
-              :class="{ 'is-invalid': errores.password }"
-              v-model="administrador.confirmPassword"
-            />
-          </div>
+                <button type="button"
+                  class="position-absolute end-0 me-3 border-0 bg-transparent d-flex align-items-center justify-content-center"
+                  style="height: 100%; top: 0;" @click="togglePassword">
+                  <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"
+                    style="font-size: 1.2rem; color: #6c757d;"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">{{ t.passwordConfirm }}</label>
+              <div class="position-relative d-flex align-items-center">
+                <input :type="showConfirmPassword ? 'text' : 'password'" class="form-control pe-5"
+                  :class="{ 'is-invalid': errores.password }" v-model="administrador.confirmPassword" />
+
+                <button type="button"
+                  class="position-absolute end-0 me-3 border-0 bg-transparent d-flex align-items-center justify-content-center"
+                  style="height: 100%; top: 0;" @click="toggleConfirmPassword">
+                  <i :class="showConfirmPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"
+                    style="font-size: 1.2rem; color: #6c757d;"></i>
+                </button>
+              </div>
+            </div>
         </div>
 
         <!-- MENSAJE ERROR -->
@@ -119,7 +128,17 @@ const language = inject<Ref<Language>>("language")!
 const t = useI18n(language)
 
 const router = useRouter()
-const continuar = ref(true)
+
+const showPassword = ref(false)
+const showConfirmPassword = ref(false)
+
+const togglePassword = () => {
+  showPassword.value = !showPassword.value
+}
+
+const toggleConfirmPassword = () => {
+  showConfirmPassword.value = !showConfirmPassword.value
+}
 
 const administrador = ref({
   nombre: "",

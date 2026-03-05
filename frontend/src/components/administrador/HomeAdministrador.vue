@@ -1,7 +1,15 @@
 <template>
   <div class="min-vh-100 bg-light">
+
+    <!-- Fondo con overlay oscuro -->
+    <div class="position-absolute top-0 start-0 w-100 h-100" style="
+        background:
+          linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),
+          url('/images/Polideportivo.jpg') center/cover no-repeat;
+      "></div>
+
     <main class="container py-4">
-      <h1 class="text-center fs-2 fw-bold mb-5">{{ t.monitorHomeTitle }} {{ administradorStore.administrador?.nombre }}</h1>
+      <h1 class="text-center text-white fs-2 fw-bold mb-5">{{ t.monitorHomeTitle }} {{ administradorStore.administrador?.nombre }}</h1>
 
       <!-- Notificaciones -->
         <div class="col-lg-12">
@@ -44,12 +52,12 @@
       <div class="row g-4 mt-4">
         <div class="col-md-6" v-if="userStore.isAdminRaiz || userStore.isAdminUsuarios">
           <router-link to="/gestion/usuarios" class="text-decoration-none text-dark">
-            <div class="card shadow-sm h-100 option-card">
+            <div class="card shadow-sm mb-3 bg-white bg-opacity-10 border border-white border-opacity-25">
               <div class="card-body">
                 <div class="d-flex align-items-center gap-3">
                   <i class="bi bi-person-fill text-primary fs-3"></i>
                   <div>
-                    <h6 class="mb-1">{{ t.manageUsers }}</h6>
+                    <h6 class="mb-1 text-white">{{ t.manageUsers }}</h6>
                   </div>
                 </div>
               </div>
@@ -59,12 +67,12 @@
 
         <div class="col-md-6" v-if="userStore.isAdminRaiz || userStore.isAdminEspacios">
           <router-link to="/gestion/espacios" class="text-decoration-none text-dark">
-            <div class="card shadow-sm h-100 option-card">
+            <div class="card shadow-sm mb-3 bg-white bg-opacity-10 border border-white border-opacity-25">
               <div class="card-body">
                 <div class="d-flex align-items-center gap-3">
-                  <i class="bi bi-building text-primary fs-3"></i>
+                  <i class="bi bi-building-fill text-primary fs-3"></i>
                   <div>
-                    <h6 class="mb-1">{{ t.manageSpaces }}</h6>
+                    <h6 class="mb-1 text-white">{{ t.manageSpaces }}</h6>
                   </div>
                 </div>
               </div>
@@ -74,12 +82,12 @@
 
         <div class="col-md-6" v-if="userStore.isAdminRaiz || userStore.isAdminEspacios">
           <router-link to="/gestion/actividades" class="text-decoration-none text-dark">
-            <div class="card shadow-sm h-100 option-card">
+            <div class="card shadow-sm mb-3 bg-white bg-opacity-10 border border-white border-opacity-25">
               <div class="card-body">
                 <div class="d-flex align-items-center gap-3">
                   <i class="bi bi-activity text-primary fs-3"></i>
                   <div>
-                    <h6 class="mb-1">{{ t.manageActivities }}</h6>
+                    <h6 class="mb-1 text-white">{{ t.manageActivities }}</h6>
                   </div>
                 </div>
               </div>
@@ -89,12 +97,12 @@
 
         <div class="col-md-6" v-if="userStore.isAdminRaiz || userStore.isAdminTarifas">
           <router-link to="/gestion/tarifas" class="text-decoration-none text-dark">
-            <div class="card shadow-sm h-100 option-card">
+            <div class="card shadow-sm mb-3 bg-white bg-opacity-10 border border-white border-opacity-25">
               <div class="card-body">
                 <div class="d-flex align-items-center gap-3">
-                  <i class="bi bi-ticket-perforated text-primary fs-3"></i>
+                  <i class="bi bi-ticket-fill text-primary fs-3"></i>
                   <div>
-                    <h6 class="mb-1">{{ t.manageRates }}</h6>
+                    <h6 class="mb-1 text-white">{{ t.manageRates }}</h6>
                   </div>
                 </div>
               </div>
@@ -104,12 +112,12 @@
 
         <div class="col-md-6" v-if="userStore.isAdminRaiz || userStore.isAdminRaiz">
           <router-link to="/configuracion" class="text-decoration-none text-dark">
-            <div class="card shadow-sm h-100 option-card">
+            <div class="card shadow-sm mb-3 bg-white bg-opacity-10 border border-white border-opacity-25">
               <div class="card-body">
                 <div class="d-flex align-items-center gap-3">
-                  <i class="bi bi-nut text-primary fs-3"></i>
+                  <i class="bi bi-nut-fill text-primary fs-3"></i>
                   <div>
-                    <h6 class="mb-1">{{ t.systemSettings }}</h6>
+                    <h6 class="mb-1 text-white">{{ t.systemSettings }}</h6>
                   </div>
                 </div>
               </div>
@@ -119,12 +127,12 @@
 
         <div class="col-md-6">
           <router-link to="/estadisticas/administrador" class="text-decoration-none text-dark">
-            <div class="card shadow-sm h-100 option-card">
+            <div class="card shadow-sm mb-3 bg-white bg-opacity-10 border border-white border-opacity-25">
               <div class="card-body">
                 <div class="d-flex align-items-center gap-3">
                   <i class="bi bi-bar-chart-fill text-primary fs-3"></i>
                   <div>
-                    <h6 class="mb-1">{{ t.reports }}</h6>
+                    <h6 class="mb-1 text-white">{{ t.reports }}</h6>
                   </div>
                 </div>
               </div>
@@ -170,10 +178,19 @@ onMounted(async () => {
 });
 </script>
 
+
 <style scoped>
+.home-background {
+  background-image: url('/images/Polideportivo.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
 .card.cursor-pointer {
   cursor: pointer;
 }
+
 .card.cursor-pointer:hover {
   box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
   transition: 0.3s;

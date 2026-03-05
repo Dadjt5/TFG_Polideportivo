@@ -1,11 +1,20 @@
 <template>
   <div class="min-vh-100 bg-light">
+
+    <!-- Fondo con overlay oscuro -->
+    <div class="position-absolute top-0 start-0 w-100 h-100" style="
+        background:
+          linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),
+          url('/images/Polideportivo.jpg') center/cover no-repeat;
+      "></div>
+
     <main class="container py-4">
-      <h1 class="text-center fs-2 fw-bold mb-4">{{ t.monitorHomeTitle }} {{ monitorStore.monitor?.nombre }}</h1>
+      <h1 class="text-center text-white fs-2 fw-bold mb-4">{{ t.monitorHomeTitle }} {{ monitorStore.monitor?.nombre }}
+      </h1>
       <div class="row g-4">
 
         <!-- Notificaciones -->
-        <div class="col-lg-8">
+        <div class="col-lg-12">
           <div class="card shadow-sm h-100 bg-white bg-opacity-10 border border-white border-opacity-25">
             <div class="card-body">
               <div class="d-flex justify-content-between align-items-center mb-3">
@@ -42,27 +51,33 @@
         </div>
 
         <div class="col-lg-12">
-          <div class="card shadow-sm border-0">
+          <div class="card shadow-sm mb-3 bg-white bg-opacity-10 border border-white border-opacity-25">
             <div class="card-body">
-              <h5 class="mb-3 d-flex align-items-center gap-2">
-                <i class="bi bi-calendar text-primary fs-4"></i>
+              <h5 class="mb-3 d-flex align-items-center text-white gap-2">
+                <i class="bi bi-calendar-fill text-primary fs-4"></i>
                 {{ t.weeklyActivities }}
               </h5>
 
               <div class="row g-3">
                 <div v-for="dia in diasOrdenados" :key="dia" class="col-md-3">
-                  <div class="border rounded p-2 bg-light h-100">
-                    <div class="text-capitalize fw-semibold mb-2 border-bottom pb-1">
+                  <div
+                    class="card h-100 shadow-sm bg-white bg-opacity-10 border border-white border-opacity-25 rounded-3 p-3"
+                    style="backdrop-filter: blur(10px);">
+                    <!-- Header del día -->
+                    <div class="text-capitalize text-white fw-semibold mb-3 border-bottom pb-2">
                       {{ dia }}
                     </div>
 
+                    <!-- Si no hay sesiones -->
                     <div v-if="sesionesPorDia[dia].length === 0" class="text-muted small py-2">
                       -
                     </div>
 
+                    <!-- Lista de sesiones -->
                     <div v-else class="d-flex flex-column gap-2">
                       <button v-for="sesion in sesionesPorDia[dia]" :key="sesion.idSesion"
-                        class="btn btn-outline-primary btn-sm" @click="sesionDetail(sesion.idActividad, sesion.idSesion)">
+                        class="btn btn-outline-primary btn-sm text-start"
+                        @click="sesionDetail(sesion.idActividad, sesion.idSesion)">
                         {{ sesion.nombre }}
                         <small class="d-block text-muted">
                           {{ sesion.horaInicio }} - {{ sesion.horaFin }}
@@ -161,6 +176,13 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+.home-background {
+  background-image: url('/images/Polideportivo.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
 .card {
   border-radius: 1rem;
 }

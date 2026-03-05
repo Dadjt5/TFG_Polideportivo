@@ -1,5 +1,5 @@
 <template>
-  <div class="min-vh-100 bg-light">
+  <div class="min-vh-100" style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
     <main class="container py-4">
 
       <!-- TÍTULO -->
@@ -21,7 +21,7 @@
 
         <div class="row g-4">
           <div class="col-md-6" v-for="b in bonos" :key="b.id">
-            <div class="card h-100 shadow-sm rounded-4">
+            <div class="card h-100 rounded-4" style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(8px);">
               <div class="card-body">
                 <p v-if="b.bono.nombreInstalacion">
                   <strong>{{ t.facility }}:</strong> {{ b.bono.nombreInstalacion }}
@@ -36,7 +36,7 @@
                 </p>
 
                 <div class="progress mb-3" style="height: 8px;">
-                  <div class="progress-bar" role="progressbar" :style="{ width: porcentajeUso(b) + '%' }"></div>
+                  <div class="progress-bar bg-primary" role="progressbar" :style="{ width: porcentajeUso(b) + '%' }"></div>
                 </div>
 
                 <p>
@@ -68,25 +68,18 @@
 
         <div class="row g-4">
           <div class="col-md-6" v-for="a in abonos" :key="a.id">
-            <div class="card h-100 shadow-sm rounded-4 p-2">
+            <div class="card h-100 rounded-4 p-2" style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(8px);">
               <div class="card-body">
                 <h3 class="h5 fw-semibold mb-3">
                   <i class="bi bi-info-circle text-primary me-2 fs-4"></i>
-                  <span v-if="a.abonoDeportivo">
-                    {{ t.sportsSubscription }}
-                  </span>
-                  <span v-else>
-                    {{ t.summerSubscription }}
-                  </span>
+                  <span v-if="a.abonoDeportivo">{{ t.sportsSubscription }}</span>
+                  <span v-else>{{ t.summerSubscription }}</span>
                 </h3>
 
                 <p><strong>{{ t.startDate }}:</strong> {{ fechaInicio(a) }}</p>
                 <p><strong>{{ t.endDate }}:</strong> {{ fechaFin(a) }}</p>
 
-                <p>
-                  <strong>{{ t.remainingDays }}:</strong>
-                  {{ diasRestantes(a) }}
-                </p>
+                <p><strong>{{ t.remainingDays }}:</strong> {{ diasRestantes(a) }}</p>
 
                 <span class="badge" :class="esValido(a) ? 'bg-success' : 'bg-secondary'">
                   {{ esValido(a) ? t.active : t.expires }}

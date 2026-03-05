@@ -1,15 +1,20 @@
 <template>
-  <div class="min-vh-100 bg-light">
+  <div class="min-vh-100" style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
     <main class="container-fluid mt-2 px-5 py-4">
 
+      <!-- Cabecera -->
       <div class="text-center mt-4 mb-5">
-        <h1 class="fw-semibold">{{ instalacion.nombre }}</h1>
+        <h1 class="fw-semibold text-primary mb-0" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.2);">
+          <i class="bi bi-building me-2"></i>{{ instalacion.nombre }}
+        </h1>
       </div>
 
       <div class="row g-4">
 
+        <!-- DETALLES -->
         <div class="col-lg-6">
-          <div class="bg-white rounded-3 shadow-sm p-4 h-100">
+          <div class="rounded-3 shadow-sm p-4 h-100 card-hover"
+               style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(8px);">
             <div class="d-flex justify-content-between align-items-start mb-3">
               <h4 class="mb-3 d-flex align-items-center">
                 <i class="bi bi-info-circle-fill text-primary me-2"></i>
@@ -17,77 +22,52 @@
               </h4>
 
               <button v-if="usuarioFinalStore.isLogged" class="btn btn-link p-0 text-warning"
-                @click.stop="cambiarFavorito">
-                <i :class="[
-                  'bi',
-                  usuarioFinalStore.facilityIsFavorite(instalacion.id) ? 'bi-star-fill' : 'bi-star'
-                ]" class="fs-2"></i>
+                      @click.stop="cambiarFavorito" :title="usuarioFinalStore.facilityIsFavorite(instalacion.id) ? 'Quitar de favoritos' : 'Agregar a favoritos'">
+                <i :class="[ 'bi', usuarioFinalStore.facilityIsFavorite(instalacion.id) ? 'bi-star-fill' : 'bi-star']" class="fs-2"></i>
               </button>
             </div>
+
             <div class="row g-3">
-
               <div class="col-12 col-sm-6">
-                <p>
-                  <span class="fw-medium">{{ t.capacity }}:</span>
-                  {{ instalacion.aforoMaximo }}
-                </p>
+                <p><i class="bi bi-people-fill text-success me-1"></i><span class="fw-medium">{{ t.capacity }}:</span> {{ instalacion.aforoMaximo }}</p>
               </div>
 
               <div class="col-12 col-sm-6">
-                <p>
-                  <span class="fw-medium">{{ t.light }}:</span>
-                  {{ instalacion.luz ? t.yes : "No" }}
-                </p>
+                <p><i class="bi bi-lightbulb-fill text-warning me-1"></i><span class="fw-medium">{{ t.light }}:</span> {{ instalacion.luz ? t.yes : "No" }}</p>
               </div>
 
               <div class="col-12 col-sm-6">
-                <p>
-                  <span class="fw-medium">{{ t.tdaPercent }}:</span>
-                  {{ instalacion.porcentajeTDA }} %
-                </p>
+                <p><i class="bi bi-percent text-info me-1"></i><span class="fw-medium">{{ t.tdaPercent }}:</span> {{ instalacion.porcentajeTDA }} %</p>
               </div>
 
               <div class="col-12 col-sm-6" v-if="instalacion.pabellon">
-                <p>
-                  <span class="fw-medium">{{ t.pavilion }}:</span>
-                  {{ instalacion.pabellon.nombre }}
-                </p>
+                <p><i class="bi bi-building text-secondary me-1"></i><span class="fw-medium">{{ t.pavilion }}:</span> {{ instalacion.pabellon.nombre }}</p>
               </div>
 
               <div class="col-12 col-sm-6" v-if="instalacion.pabellon">
-                <p>
-                  <span class="fw-medium">{{ t.address }}:</span>
-                  {{ instalacion.pabellon.direccion }}
-                </p>
+                <p><i class="bi bi-geo-alt-fill text-danger me-1"></i><span class="fw-medium">{{ t.address }}:</span> {{ instalacion.pabellon.direccion }}</p>
               </div>
 
               <div class="col-12 col-sm-6" v-if="instalacion.tipoInstalacion">
-                <p>
-                  <span class="fw-medium">{{ t.facilityType }}:</span>
-                  {{ instalacion.tipoInstalacion }}
-                </p>
+                <p><i class="bi bi-door-open-fill text-primary me-1"></i><span class="fw-medium">{{ t.facilityType }}:</span> {{ instalacion.tipoInstalacion }}</p>
               </div>
 
               <div class="col-12 col-sm-6" v-if="instalacion.horaApertura">
-                <p>
-                  <span class="fw-medium">{{ t.openHour }}:</span>
-                  {{ instalacion.horaApertura }}
-                </p>
+                <p><i class="bi bi-clock-fill text-success me-1"></i><span class="fw-medium">{{ t.openHour }}:</span> {{ instalacion.horaApertura }}</p>
               </div>
 
               <div class="col-12 col-sm-6" v-if="instalacion.horaCierre">
-                <p>
-                  <span class="fw-medium">{{ t.closeHour }}:</span>
-                  {{ instalacion.horaCierre }}
-                </p>
+                <p><i class="bi bi-clock text-danger me-1"></i><span class="fw-medium">{{ t.closeHour }}:</span> {{ instalacion.horaCierre }}</p>
               </div>
             </div>
           </div>
         </div>
 
+        <!-- IMÁGENES -->
         <div class="col-lg-6 d-flex flex-column gap-4">
-
-          <div class="bg-white rounded-3 shadow-sm p-4" v-if="instalacion.imagenURL">
+          <div class="rounded-3 shadow-sm p-4 card-hover"
+               v-if="instalacion.imagenURL"
+               style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(8px);">
             <h4 class="mb-3 d-flex align-items-center gap-2">
               <i class="bi bi-images text-primary"></i>
               {{ t.images }}
@@ -95,18 +75,16 @@
 
             <div class="row g-2">
               <div class="col-6" v-for="(img, i) in instalacion.imagenURL" :key="i">
-
-                <img :src="img" class="img-fluid rounded" alt="Instalacion" />
+                <img :src="img" class="img-fluid rounded shadow-sm img-hover" alt="Instalacion" />
               </div>
             </div>
           </div>
-
         </div>
       </div>
 
       <!-- Reserva y Volver -->
       <div class="d-flex justify-content-center mt-5">
-        <button v-if="usuarioFinalStore.isLogged" class="btn btn-success btn-lg px-5 me-4" @click="reservar">
+        <button v-if="usuarioFinalStore.isLogged" class="btn btn-gradient btn-lg px-5 me-4" @click="reservar">
           {{ t.booking }}
         </button>
 
@@ -118,7 +96,6 @@
     </main>
   </div>
 </template>
-
 
 <script setup lang="ts">
 import { inject, ref, onMounted, type Ref } from 'vue';
@@ -178,3 +155,29 @@ onMounted(async () => {
   }
 });
 </script>
+
+<style scoped>
+.card-hover {
+  transition: all 0.3s ease;
+}
+.card-hover:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+
+.img-hover {
+  transition: transform 0.3s ease;
+}
+.img-hover:hover {
+  transform: scale(1.05);
+}
+
+.btn-gradient {
+  background: linear-gradient(135deg, #56ab2f, #a8e063);
+  border: none;
+  color: white;
+}
+.btn-gradient:hover {
+  filter: brightness(1.1);
+}
+</style>

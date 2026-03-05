@@ -35,3 +35,9 @@ export const getEstadisticasAdministrador = async () => {
   const response = await api.get('api/v1/estadisticas/administrador/')
   return response.data;
 }
+
+/* Función para obtener las estadísticas para el usuario final */
+export const getEstadisticasUsuarioFinal = async () => {
+  const response = await api.get('api/v1/estadisticas/usuarioFinal/')
+  return response.data;
+}

@@ -1,15 +1,21 @@
 <template>
-  <div class="min-vh-100 bg-light">
+  <div class="min-vh-100" style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
     <main class="container-fluid mt-2 px-5 py-4">
 
+      <!-- Cabecera -->
       <div class="text-center mt-4 mb-5">
-        <h1 class="fw-semibold">{{ actividad.nombre }}</h1>
+        <h1 class="fw-semibold text-primary mb-0" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.2);">
+          <i class="bi bi-calendar2-event me-2"></i>{{ actividad.nombre }}
+        </h1>
       </div>
 
       <div class="row g-4">
-        <div class="col-lg-6">
-          <div class="bg-white rounded-3 shadow-sm p-4 h-100">
 
+        <!-- DETALLES -->
+        <div class="col-lg-6">
+          <div class="rounded-3 shadow-sm p-4 h-100 card-hover"
+               style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(8px);">
+            
             <div class="d-flex justify-content-between align-items-start mb-3">
               <h4 class="mb-3 d-flex align-items-center">
                 <i class="bi bi-info-circle-fill text-primary me-2"></i>
@@ -17,107 +23,69 @@
               </h4>
 
               <button v-if="usuarioFinalStore.isLogged" class="btn btn-link p-0 text-warning"
-                @click.stop="cambiarFavorito">
-                <i :class="[
-                  'bi',
-                  usuarioFinalStore.activityIsFavorite(actividad.id) ? 'bi-star-fill' : 'bi-star'
-                ]" class="fs-2"></i>
+                      @click.stop="cambiarFavorito"
+                      :title="usuarioFinalStore.activityIsFavorite(actividad.id) ? 'Quitar de favoritos' : 'Agregar a favoritos'">
+                <i :class="[ 'bi', usuarioFinalStore.activityIsFavorite(actividad.id) ? 'bi-star-fill' : 'bi-star']" class="fs-2"></i>
               </button>
             </div>
 
             <div class="row g-3">
               <div class="col-12 col-sm-4" v-if="actividad.periodo">
-                <p>
-                  <span class="fw-medium">{{ t.period }}:</span>
-                  {{ actividad.periodo }}
-                </p>
+                <p><i class="bi bi-clock-fill text-success me-1"></i><span class="fw-medium">{{ t.period }}:</span> {{ actividad.periodo }}</p>
               </div>
 
               <div class="col-12 col-sm-4" v-if="actividad.estado">
-                <p>
-                  <span class="fw-medium">{{ t.status }}:</span>
-                  {{ actividad.estado }}
-                </p>
+                <p><i class="bi bi-info-circle text-info me-1"></i><span class="fw-medium">{{ t.status }}:</span> {{ actividad.estado }}</p>
               </div>
 
               <div class="col-12 col-sm-4" v-if="actividad.edadMinima">
-                <p>
-                  <span class="fw-medium">{{ t.minimumAge }}:</span>
-                  {{ actividad.edadMinima }}
-                </p>
+                <p><i class="bi bi-person-fill text-warning me-1"></i><span class="fw-medium">{{ t.minimumAge }}:</span> {{ actividad.edadMinima }}</p>
               </div>
 
               <div class="col-12 col-sm-4">
-                <p>
-                  <span class="fw-medium">{{ t.availablePlaces }}:</span>
-                  {{ actividad.plazasMaximas }}
-                </p>
+                <p><i class="bi bi-people-fill text-success me-1"></i><span class="fw-medium">{{ t.availablePlaces }}:</span> {{ actividad.plazasMaximas }}</p>
               </div>
 
               <div class="col-12 col-sm-4" v-if="actividad.nivel">
-                <p>
-                  <span class="fw-medium">{{ t.level }}:</span>
-                  {{ actividad.nivel }}
-                </p>
+                <p><i class="bi bi-bar-chart-fill text-primary me-1"></i><span class="fw-medium">{{ t.level }}:</span> {{ actividad.nivel }}</p>
               </div>
 
               <div class="col-12 col-sm-4" v-if="actividad.tipoReserva">
-                <p>
-                  <span class="fw-medium">{{ t.reserveType }}:</span>
-                  {{ actividad.tipoReserva }}
-                </p>
+                <p><i class="bi bi-journal-check text-info me-1"></i><span class="fw-medium">{{ t.reserveType }}:</span> {{ actividad.tipoReserva }}</p>
               </div>
 
               <div class="col-12 col-sm-4" v-if="actividad.tipoActividad">
-                <p>
-                  <span class="fw-medium">{{ t.activityType }}:</span>
-                  {{ actividad.tipoActividad }}
-                </p>
+                <p><i class="bi bi-activity text-warning me-1"></i><span class="fw-medium">{{ t.activityType }}:</span> {{ actividad.tipoActividad }}</p>
               </div>
 
               <div class="col-12 col-sm-4" v-if="actividad.terreno">
-                <p>
-                  <span class="fw-medium">{{ t.terrainType }}:</span>
-                  {{ actividad.terreno }}
-                </p>
+                <p><i class="bi bi-signpost-split-fill text-secondary me-1"></i><span class="fw-medium">{{ t.terrainType }}:</span> {{ actividad.terreno }}</p>
               </div>
 
               <div class="col-12 col-sm-4">
-                <p>
-                  <span class="fw-medium">{{ t.credits }}:</span>
-                  {{ actividad.numeroCreditos }}
-                </p>
+                <p><i class="bi bi-credit-card-2-front-fill text-success me-1"></i><span class="fw-medium">{{ t.credits }}:</span> {{ actividad.numeroCreditos }}</p>
               </div>
 
               <div class="col-12 col-sm-4" v-if="actividad.año">
-                <p>
-                  <span class="fw-medium">{{ t.academicYear }}:</span>
-                  {{ actividad.año }}
-                </p>
+                <p><i class="bi bi-calendar-year text-info me-1"></i><span class="fw-medium">{{ t.academicYear }}:</span> {{ actividad.año }}</p>
               </div>
 
               <div class="col-12 col-sm-4" v-if="actividad.instalacion">
                 <p>
+                  <i class="bi bi-building text-primary me-1"></i>
                   <span class="fw-medium">{{ t.facility }}: </span>
-                  <span class="text-primary fw-medium" style="cursor: pointer;"
-                    @click="facilityDetail(actividad.instalacion.id)">
+                  <span class="text-primary fw-medium" style="cursor: pointer;" @click="facilityDetail(actividad.instalacion.id)">
                     {{ actividad.instalacion.nombre }}
                   </span>
                 </p>
               </div>
 
               <div class="col-12 col-sm-4" v-if="actividad.material">
-                <p>
-                  <span class="fw-medium">{{ t.material }}:</span>
-                  {{ actividad.material }}
-                </p>
+                <p><i class="bi bi-tools text-warning me-1"></i><span class="fw-medium">{{ t.material }}:</span> {{ actividad.material }}</p>
               </div>
 
               <div class="col-12 col-sm-4" v-if="actividad.monitor">
-                <p>
-                  <span class="fw-medium">{{ t.monitorName }}:</span>
-                  {{ actividad.monitor.nombre || "-" }}
-                </p>
+                <p><i class="bi bi-person-badge text-info me-1"></i><span class="fw-medium">{{ t.monitorName }}:</span> {{ actividad.monitor.nombre || "-" }}</p>
               </div>
             </div>
           </div>
@@ -127,8 +95,9 @@
         <div class="col-lg-6 d-flex flex-column gap-4">
 
           <!-- IMÁGENES -->
-          <div class="bg-white rounded-3 shadow-sm p-4">
-
+          <div class="rounded-3 shadow-sm p-4 card-hover"
+               v-if="actividad.imagenURL"
+               style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(8px);">
             <h4 class="mb-3 d-flex align-items-center gap-2">
               <i class="bi bi-images text-primary"></i>
               {{ t.images }}
@@ -136,28 +105,24 @@
 
             <div class="row g-2">
               <div class="col-6" v-for="(img, i) in actividad.imagenURL" :key="i">
-
-                <img :src="img" class="img-fluid rounded" alt="Actividad" />
+                <img :src="img" class="img-fluid rounded shadow-sm img-hover" alt="Actividad" />
               </div>
             </div>
-
           </div>
 
           <!-- SESIONES -->
-          <div class="bg-white rounded-3 shadow-sm p-4">
-
+          <div class="rounded-3 shadow-sm p-4 card-hover"
+               style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(8px);">
             <h4 class="mb-3 d-flex align-items-center gap-2">
               <i class="bi bi-calendar-event text-primary"></i>
               {{ t.sessions }}
             </h4>
 
             <div v-for="s in actividad.sesiones" :key="s.id"
-              class="d-flex justify-content-between align-items-center p-3 mb-2 border rounded-3 bg-light">
+                 class="d-flex justify-content-between align-items-center p-3 mb-2 border rounded-3 bg-light session-hover">
               <div>
                 <div class="fw-semibold">{{ s.dia }}</div>
-                <div class="text-muted">
-                  {{ s.horaInicio }} - {{ s.horaFin }}
-                </div>
+                <div class="text-muted">{{ s.horaInicio }} - {{ s.horaFin }}</div>
               </div>
             </div>
           </div>
@@ -166,7 +131,7 @@
 
       <!-- Reserva y Volver -->
       <div class="d-flex justify-content-center mt-5">
-        <button v-if="usuarioFinalStore.isLogged" class="btn btn-success btn-lg px-5 me-4" @click="reservar">
+        <button v-if="usuarioFinalStore.isLogged" class="btn btn-gradient btn-lg px-5 me-4" @click="reservar">
           {{ t.booking }}
         </button>
 
@@ -263,3 +228,37 @@ onMounted(async () => {
   actividad.value = await getActividadDetalle(id);
 });
 </script>
+
+<style scoped>
+.card-hover {
+  transition: all 0.3s ease;
+}
+.card-hover:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+
+.img-hover {
+  transition: transform 0.3s ease;
+}
+.img-hover:hover {
+  transform: scale(1.05);
+}
+
+.session-hover {
+  transition: all 0.2s ease;
+}
+.session-hover:hover {
+  transform: translateY(-2px);
+  background-color: rgba(255,255,255,0.95);
+}
+
+.btn-gradient {
+  background: linear-gradient(135deg, #56ab2f, #a8e063);
+  border: none;
+  color: white;
+}
+.btn-gradient:hover {
+  filter: brightness(1.1);
+}
+</style>

@@ -9,11 +9,22 @@ from polideportivo.models import (
     EntradaListaEspera, TarifaTDA, Monitor, Notificacion, Pago, TarifaActividad, 
     TarifaInstalacion, TDA, UsuarioFinal, AbonoDeportivo, AbonoVerano, Pabellon, 
     ReservaActividad, Alquiler, Administrador, CompraBono, CompraAbono, Sesion,
-    Mensaje, MapaReservas, GrupoReducido, ActividadComun, Fisioterapia
+    Mensaje, MapaReservas, GrupoReducido, ActividadComun, Fisioterapia, TipoInstalacion,
+    Feedback
 )
 
 
 User = get_user_model()
+
+
+# --------------------
+# Feedback
+# --------------------
+
+class FeedbackSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Feedback
+        fields = '__all__'
 
 
 # --------------------
@@ -510,6 +521,8 @@ class ConfiguracionSerializer(serializers.ModelSerializer):
 # --------------------
 
 class DescuentoSerializer(serializers.ModelSerializer):
+    tiposInstalacion = serializers.ListField(child=serializers.ChoiceField(choices=TipoInstalacion.choices))
+
     class Meta:
         model = Descuento
         fields = '__all__'

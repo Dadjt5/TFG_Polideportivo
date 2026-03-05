@@ -51,44 +51,70 @@
 
             <div class="col-md-4">
               <label class="form-label">{{ t.phoneNumber }}</label>
-              <input type="text" class="form-control" :class="{ 'is-invalid': errores.telefono }" v-model="usuario.telefono">
+              <input type="text" class="form-control" :class="{ 'is-invalid': errores.telefono }"
+                v-model="usuario.telefono">
             </div>
 
             <div class="col-md-4">
               <label class="form-label">{{ t.province }}</label>
-              <input type="text" class="form-control" :class="{ 'is-invalid': errores.provincia }" v-model="usuario.provincia">
+              <input type="text" class="form-control" :class="{ 'is-invalid': errores.provincia }"
+                v-model="usuario.provincia">
             </div>
 
             <div class="col-md-4">
               <label class="form-label">{{ t.municipality }}</label>
-              <input type="text" class="form-control" :class="{ 'is-invalid': errores.municipio }" v-model="usuario.municipio">
+              <input type="text" class="form-control" :class="{ 'is-invalid': errores.municipio }"
+                v-model="usuario.municipio">
             </div>
 
             <div class="col-md-4">
               <label class="form-label">{{ t.locality }}</label>
-              <input type="text" class="form-control" :class="{ 'is-invalid': errores.localidad }" v-model="usuario.localidad">
+              <input type="text" class="form-control" :class="{ 'is-invalid': errores.localidad }"
+                v-model="usuario.localidad">
             </div>
 
             <div class="col-md-4 mt-3">
               <label class="form-label">{{ t.postalCode }}</label>
-              <input type="text" class="form-control" :class="{ 'is-invalid': errores.codigoPostal }" v-model="usuario.codigoPostal">
+              <input type="text" class="form-control" :class="{ 'is-invalid': errores.codigoPostal }"
+                v-model="usuario.codigoPostal">
             </div>
 
             <div class="col-md-4 mt-3">
               <label class="form-label">{{ t.passwordPlaceholder }}</label>
-              <input type="password" class="form-control" :class="{ 'is-invalid': errores.password }" v-model="usuario.password">
+              <div class="position-relative d-flex align-items-center">
+                <input :type="showPassword ? 'text' : 'password'" class="form-control pe-5"
+                  :class="{ 'is-invalid': errores.password }" v-model="usuario.password" />
+
+                <button type="button"
+                  class="position-absolute end-0 me-3 border-0 bg-transparent d-flex align-items-center justify-content-center"
+                  style="height: 100%; top: 0;" @click="togglePassword">
+                  <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"
+                    style="font-size: 1.2rem; color: #6c757d;"></i>
+                </button>
+              </div>
             </div>
 
             <div class="col-md-4 mt-3">
               <label class="form-label">{{ t.passwordConfirm }}</label>
-              <input type="password" class="form-control" :class="{ 'is-invalid': errores.password }" v-model="usuario.confirmPassword">
+              <div class="position-relative d-flex align-items-center">
+                <input :type="showConfirmPassword ? 'text' : 'password'" class="form-control pe-5"
+                  :class="{ 'is-invalid': errores.password }" v-model="usuario.confirmPassword" />
+
+                <button type="button"
+                  class="position-absolute end-0 me-3 border-0 bg-transparent d-flex align-items-center justify-content-center"
+                  style="height: 100%; top: 0;" @click="toggleConfirmPassword">
+                  <i :class="showConfirmPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"
+                    style="font-size: 1.2rem; color: #6c757d;"></i>
+                </button>
+              </div>
             </div>
           </div>
 
           <!-- CUENTA -->
           <div class="mb-4 mt-4">
             <h5 class="fw-semibold mb-3">{{ t.account }}</h5>
-            <input type="text" class="form-control" :class="{ 'is-invalid': errores.cuentaBancaria }" v-model="usuario.cuentaBancaria">
+            <input type="text" class="form-control" :class="{ 'is-invalid': errores.cuentaBancaria }"
+              v-model="usuario.cuentaBancaria">
           </div>
         </div>
       </div>
@@ -200,6 +226,18 @@ const errores = ref({
   password: false,
 })
 
+const showPassword = ref(false)
+const showConfirmPassword = ref(false)
+
+const togglePassword = () => {
+  showPassword.value = !showPassword.value
+}
+
+const toggleConfirmPassword = () => {
+  showConfirmPassword.value = !showConfirmPassword.value
+}
+
+
 const deportesRestantes = ref(configuracionStore.max_deportes_por_usuario)
 
 const favoritosSeleccionados = computed(() => {
@@ -238,7 +276,7 @@ function validarFormulario() {
     usuario.value.password === usuario.value.confirmPassword
 
   for (const key in errores.value) {
-    if(errores.value[key]) {
+    if (errores.value[key]) {
       valido = false
     }
   }
@@ -250,42 +288,42 @@ function validarFormulario() {
 function camposModificados() {
   const data: any = {}
 
-  if(usuarioFinalStore.usuarioFinal.sexo != usuario.value.sexo) {
-      data["sexo"] = usuario.value.sexo
+  if (usuarioFinalStore.usuarioFinal.sexo != usuario.value.sexo) {
+    data["sexo"] = usuario.value.sexo
   }
 
-  if(usuarioFinalStore.usuarioFinal.telefono != usuario.value.telefono) {
+  if (usuarioFinalStore.usuarioFinal.telefono != usuario.value.telefono) {
     data["telefono"] = usuario.value.telefono
   }
 
-  if(usuarioFinalStore.usuarioFinal.provincia != usuario.value.provincia) {
+  if (usuarioFinalStore.usuarioFinal.provincia != usuario.value.provincia) {
     data["provincia"] = usuario.value.provincia
   }
 
-  if(usuarioFinalStore.usuarioFinal.municipio != usuario.value.municipio) {
+  if (usuarioFinalStore.usuarioFinal.municipio != usuario.value.municipio) {
     data["municipio"] = usuario.value.municipio
   }
 
-  if(usuarioFinalStore.usuarioFinal.localidad != usuario.value.localidad) {
+  if (usuarioFinalStore.usuarioFinal.localidad != usuario.value.localidad) {
     data["localidad"] = usuario.value.localidad
   }
 
-  if(usuarioFinalStore.usuarioFinal.codigoPostal != usuario.value.codigoPostal) {
+  if (usuarioFinalStore.usuarioFinal.codigoPostal != usuario.value.codigoPostal) {
     data["codigoPostal"] = usuario.value.codigoPostal
   }
 
-  if(usuarioFinalStore.usuarioFinal.cuentaBancaria != usuario.value.cuentaBancaria) {
+  if (usuarioFinalStore.usuarioFinal.cuentaBancaria != usuario.value.cuentaBancaria) {
     data["cuentaBancaria"] = usuario.value.cuentaBancaria
   }
 
-  if(usuario.value.password) {
+  if (usuario.value.password) {
     data["password"] = usuario.value.password
   }
 
-  const favoritosActuales = ((usuarioFinalStore.usuarioFinal.deportes as {id: number, titulo: string}[]) || []).map(d => d.id).sort()
+  const favoritosActuales = ((usuarioFinalStore.usuarioFinal.deportes as { id: number, titulo: string }[]) || []).map(d => d.id).sort()
   const favoritosNuevosIds = [...usuario.value.deportesFavoritos].sort()
 
-  if(JSON.stringify(favoritosActuales) !== JSON.stringify(favoritosNuevosIds)) {
+  if (JSON.stringify(favoritosActuales) !== JSON.stringify(favoritosNuevosIds)) {
     data["deportes_ids"] = favoritosNuevosIds
   }
 
@@ -294,10 +332,10 @@ function camposModificados() {
 
 const guardarCambios = async () => {
   try {
-    if(!validarFormulario) return
+    if (!validarFormulario) return
 
     const data = camposModificados()
-    if(Object.keys(data).length > 0) {
+    if (Object.keys(data).length > 0) {
       await modificarUsuarioFinal(usuario.value.id, data)
       await usuarioFinalStore.fetchUser(usuario.value.id)
       router.push({
@@ -312,7 +350,7 @@ const guardarCambios = async () => {
 /* La variable usuario nos permite cambiar el usuario final unicamente en esta pantalla */
 onMounted(async () => {
   const data = usuarioFinalStore.usuarioFinal
-  if(data) {
+  if (data) {
     usuario.value = {
       ...usuario.value,
       ...data,

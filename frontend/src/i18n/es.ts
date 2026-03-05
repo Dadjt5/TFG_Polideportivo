@@ -20,8 +20,15 @@ export default {
   modifyPersonalData: "Modificar datos personales",
   moreModifyPersonalData: "Modifica tu nombre, contraseña, email y otra información",
   viewTickets: "Ver Abonos y bonos",
-  moreViewTickets: "Revisa los abonos y bonos en posesión",
   emptyFields: "Hay campos obligatorios vacios.",
+  moreUserStats: "Revisa tus estadísticas",
+  bonusSubscriptionsOwn: "Bonos y abonos propios",
+
+  /* Estadisticas de usuario final */
+  myStadistics: "Mis estadísticas",
+  myBookingsByMonth: "Mis reservas por mes",
+  moreReservedActivities: "Actividades favoritas",
+  weeklyDayReservations: "Reservas en la semana",
 
   /* Home - Buscar */
   welcome: "Bienvenido al Polideportivo XX",

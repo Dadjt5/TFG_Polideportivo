@@ -1,3 +1,5 @@
+import { m } from "vue-router/dist/router-CWoNjPRp.mjs";
+
 export default {
   /* Navbar */
   home: "Home",
@@ -18,8 +20,15 @@ export default {
   modifyPersonalData: "Manage personal data",
   moreModifyPersonalData: "Manage your name, password, email, and other information",
   viewTickets: "View passes and vouchers",
-  moreViewTickets: "Review your owned passes and vouchers",
   emptyFields: "There are empty mandatory fields.",
+  moreUserStats: "Check your statistics",
+  bonusSubscriptionsOwn: "Own bonus and subscriptions",
+
+  /* Estadisticas de usuario final */
+  myStadistics: "My statistics",
+  myBookingsByMonth: "My bookings by month",
+  moreReservedActivities: "Favourite activities",
+  weeklyDayReservations: "Weekly bookings",
 
   /* Home - Buscar */
   welcome: "Welcome to Sports Center XX",

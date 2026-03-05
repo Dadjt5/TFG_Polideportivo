@@ -7,6 +7,8 @@ from django.views.generic import RedirectView
 router = routers.DefaultRouter()
 
 # En el router vamos agnadiendo los endpoints a los viewsets
+router.register(r'feedback', views.FeedbackViewSet, basename="feedback")
+
 router.register(r'abonosDeportivos', views.AbonoDeportivoViewSet, basename="abono-deportivo")
 router.register(r'abonosVerano', views.AbonoVeranoViewSet, basename="abono-verano")
 
@@ -70,6 +72,7 @@ urlpatterns = [
     path("me/", views.meAPIView.as_view(), name="me"),
     path("estadisticas/", views.EstadisticasView.as_view(), name="estadisticas"),
     path("estadisticas/administrador/", views.ObtenerEstadisticasAdministradorView.as_view(), name="estadisticas-admin"),
+    path("estadisticas/usuarioFinal/", views.ObtenerEstadisticasUsuarioFinalView.as_view(), name="estadisticas-usuarioFinal"),
     path("tipos/", views.TiposViews.as_view(), name="tipos"),
     path("buscar/", views.BuscarView.as_view(), name="busqueda"),
     path("registrarse/", views.RegistroView.as_view(), name="registro"),

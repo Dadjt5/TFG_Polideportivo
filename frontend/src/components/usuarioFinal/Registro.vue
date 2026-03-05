@@ -1,36 +1,31 @@
 <template>
-  <div class="min-vh-100 bg-light">
-    <!-- CONTENIDO -->
+  <div class="min-vh-100" style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
     <div class="container py-5">
-      <h1 class="text-center mb-2">{{ t.registerPage }}</h1>
+
+      <!-- Título -->
+      <h1 class="text-center mb-2 fw-bold text-primary">{{ t.registerPage }}</h1>
       <p class="text-center text-secondary mb-4">{{ t.instructionsRegister }}</p>
 
-      <div class="card shadow rounded-4 p-4">
+      <!-- Card registro -->
+      <div class="card rounded-4 p-4 mx-auto" style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(10px);">
+
         <!-- PASO 1: Datos personales -->
         <div v-if="step === 1">
-          <h4 class="mb-3">{{ t.personalData }}</h4>
+          <h4 class="mb-3 text-primary">{{ t.personalData }}</h4>
           <div class="row g-3">
             <div class="col-md-6">
-              <input
-                type="text"
-                class="form-control"
-                :class="{ 'is-invalid': errores.nombre }"
-                :placeholder=t.name
-                v-model="formData.nombre"
-              >
+              <input type="text" class="form-control" 
+                     :class="{ 'is-invalid': errores.nombre }"
+                     :placeholder=t.name v-model="formData.nombre">
             </div>
             <div class="col-md-6">
-              <input
-                type="text"
-                class="form-control"
-                :class="{ 'is-invalid': errores.apellidos }"
-                :placeholder= t.surnames
-                v-model="formData.apellidos"
-              >
+              <input type="text" class="form-control" 
+                     :class="{ 'is-invalid': errores.apellidos }"
+                     :placeholder=t.surnames v-model="formData.apellidos">
             </div>
 
             <div class="col-12">
-              <label class="form-label">{{ t.sex }}</label>
+              <label class="form-label text-primary">{{ t.sex }}</label>
               <select class="form-select" :class="{ 'is-invalid': errores.sexo }" v-model="formData.sexo">
                 <option value="">{{ t.selectOption }}</option>
                 <option value="MUJER">{{ t.male }}</option>
@@ -40,144 +35,112 @@
             </div>
 
             <div class="col-12">
-              <label class="form-label">{{ t.birth }}</label>
-              <input
-                type="date"
-                class="form-control"
-                :class="{ 'is-invalid': errores.fechaNacimiento }"
-                v-model="formData.fechaNacimiento"
-                @change="checkAge"
-              >
+              <label class="form-label text-primary">{{ t.birth }}</label>
+              <input type="date" class="form-control" 
+                     :class="{ 'is-invalid': errores.fechaNacimiento }"
+                     v-model="formData.fechaNacimiento" @change="checkAge">
             </div>
 
             <div class="col-12" v-if="!formData.esMenor">
-              <input
-                type="text"
-                class="form-control"
-                :class="{ 'is-invalid': errores.dni }"
-                placeholder="DNI"
-                v-model="formData.dni"
-              >
+              <input type="text" class="form-control" 
+                     :class="{ 'is-invalid': errores.dni }"
+                     placeholder="DNI" v-model="formData.dni">
             </div>
           </div>
         </div>
 
         <!-- PASO 2: Contacto y dirección -->
         <div v-if="step === 2">
-          <h4 class="mb-3">{{ t.contact }}</h4>
+          <h4 class="mb-3 text-primary">{{ t.contact }}</h4>
           <div class="row g-3">
             <div class="col-md-6">
-              <input
-                type="text"
-                class="form-control"
-                :class="{ 'is-invalid': errores.telefono }"
-                :placeholder= t.phoneNumber
-                v-model="formData.telefono"
-              >
+              <input type="text" class="form-control" 
+                     :class="{ 'is-invalid': errores.telefono }"
+                     :placeholder=t.phoneNumber v-model="formData.telefono">
             </div>
             <div class="col-md-6">
-              <input
-                type="email"
-                class="form-control"
-                :class="{ 'is-invalid': errores.email }"
-                :placeholder= t.email
-                v-model="formData.email"
-              >
+              <input type="email" class="form-control" 
+                     :class="{ 'is-invalid': errores.email }"
+                     :placeholder=t.email v-model="formData.email">
             </div>
           </div>
 
-          <h4 class="mt-4 mb-3">{{ t.address }}</h4>
+          <h4 class="mt-4 mb-3 text-primary">{{ t.address }}</h4>
           <div class="row g-3">
             <div class="col-md-6">
-              <input
-                type="text"
-                class="form-control"
-                :class="{ 'is-invalid': errores.provincia }"
-                :placeholder= t.province
-                v-model="formData.provincia"
-              >
+              <input type="text" class="form-control" 
+                     :class="{ 'is-invalid': errores.provincia }"
+                     :placeholder=t.province v-model="formData.provincia">
             </div>
             <div class="col-md-6">
-              <input
-                type="text"
-                class="form-control"
-                :class="{ 'is-invalid': errores.municipio }"
-                :placeholder= t.municipality
-                v-model="formData.municipio"
-              >
+              <input type="text" class="form-control" 
+                     :class="{ 'is-invalid': errores.municipio }"
+                     :placeholder=t.municipality v-model="formData.municipio">
             </div>
             <div class="col-md-6">
-              <input
-                type="text"
-                class="form-control"
-                :class="{ 'is-invalid': errores.localidad }"
-                :placeholder= t.locality
-                v-model="formData.localidad"
-              >
+              <input type="text" class="form-control" 
+                     :class="{ 'is-invalid': errores.localidad }"
+                     :placeholder=t.locality v-model="formData.localidad">
             </div>
             <div class="col-md-6">
-              <input
-                type="text"
-                class="form-control"
-                :class="{ 'is-invalid': errores.codigoPostal }"
-                :placeholder= t.postalCode
-                v-model="formData.codigoPostal"
-              >
+              <input type="text" class="form-control" 
+                     :class="{ 'is-invalid': errores.codigoPostal }"
+                     :placeholder=t.postalCode v-model="formData.codigoPostal">
             </div>
           </div>
         </div>
 
         <!-- PASO 3: Credenciales y pago -->
         <div v-if="step === 3">
-          <h4 class="mb-3">{{ t.credentials }}</h4>
+          <h4 class="mb-3 text-primary">{{ t.credentials }}</h4>
           <div class="row g-3">
-            <div class="col-md-6">
-              <input
-                type="password"
-                class="form-control"
-                :class="{ 'is-invalid': errores.password }"
-                :placeholder= t.passwordPlaceholder
-                v-model="formData.password"
-              >
+            <div class="col-md-6 position-relative">
+              <input :type="showPassword ? 'text' : 'password'" class="form-control"
+                     :class="{ 'is-invalid': errores.password }"
+                     :placeholder=t.passwordPlaceholder v-model="formData.password">
+              <button type="button" class="position-absolute top-50 end-0 translate-middle-y me-3 border-0 bg-transparent p-1"
+                      @click="togglePassword">
+                <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'" 
+                   style="font-size: 1.2rem; color: #0072ff;"></i>
+              </button>
             </div>
-            <div class="col-md-6">
-              <input
-                type="password"
-                class="form-control"
-                :class="{ 'is-invalid': errores.confirmPassword }"
-                :placeholder=t.passwordConfirm
-                v-model="formData.confirmPassword"
-              >
+
+            <div class="col-md-6 position-relative">
+              <input :type="showConfirmPassword ? 'text' : 'password'" class="form-control"
+                     :class="{ 'is-invalid': errores.confirmPassword }"
+                     :placeholder=t.passwordConfirm v-model="formData.confirmPassword">
+              <button type="button" class="position-absolute top-50 end-0 translate-middle-y me-3 border-0 bg-transparent p-1"
+                      @click="toggleConfirmPassword">
+                <i :class="showConfirmPassword ? 'bi bi-eye-slash' : 'bi bi-eye'" 
+                   style="font-size: 1.2rem; color: #0072ff;"></i>
+              </button>
             </div>
           </div>
 
-          <h4 class="mt-4 mb-3">{{t.payment}}</h4>
+          <h4 class="mt-4 mb-3 text-primary">{{ t.payment }}</h4>
           <div class="form-check mb-2">
             <input type="checkbox" class="form-check-input" id="pagoFraccionado" v-model="formData.pagoFraccionado">
-            <label class="form-check-label" for="pagoFraccionado">{{ t.account }}</label>
+            <label class="form-check-label text-primary" for="pagoFraccionado">{{ t.account }}</label>
           </div>
           <div v-if="formData.pagoFraccionado">
-            <input
-              type="text"
-              class="form-control"
-              :class="{ 'is-invalid': errores.cuentaBancaria }"
-              :placeholder= t.account
-              v-model="formData.cuentaBancaria"
-            >
+            <input type="text" class="form-control" 
+                   :class="{ 'is-invalid': errores.cuentaBancaria }"
+                   :placeholder=t.account v-model="formData.cuentaBancaria">
           </div>
         </div>
 
-        <!-- BOTONES -->
+        <!-- Botones -->
         <div class="d-flex justify-content-between mt-4">
           <button class="btn btn-outline-primary" :disabled="step === 1" @click="step--">{{ t.back }}</button>
           <button class="btn btn-primary" v-if="step < 3" @click="siguiente()">{{ t.next }}</button>
           <button class="btn btn-success" v-else @click="handleFinish">{{ t.finish }}</button>
         </div>
 
-        <!-- MENSAJE -->
-        <p v-if="mensaje" class="text-center">
+        <!-- Mensaje -->
+        <p v-if="mensaje" class="text-center mt-3 fw-medium" :class="step === 3 ? 'text-primary' : 'text-secondary'">
           {{ mensaje }}
         </p>
+
       </div>
     </div>
   </div>
@@ -331,6 +294,17 @@ const siguiente = () => {
   if(continuar.value) {
     step.value += 1
   }
+}
+
+const showPassword = ref(false)
+const showConfirmPassword = ref(false)
+
+const togglePassword = () => {
+  showPassword.value = !showPassword.value
+}
+
+const toggleConfirmPassword = () => {
+  showConfirmPassword.value = !showConfirmPassword.value
 }
 
 const checkAge = () => {

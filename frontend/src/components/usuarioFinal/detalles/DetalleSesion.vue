@@ -1,10 +1,11 @@
 <template>
-  <div class="min-vh-100 bg-light">
+  <div class="min-vh-100" style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
     <main class="container py-4">
 
       <!-- TÍTULO -->
       <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="fw-semibold">
+        <h1 class="fw-semibold text-primary mb-0" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.2);">
+          <i class="bi bi-calendar2-check me-2"></i>
           {{ sesion.actividad.nombre }}
         </h1>
 
@@ -17,7 +18,7 @@
 
         <!-- DETALLES -->
         <div class="col-lg-6">
-          <div class="bg-white rounded-3 shadow-sm p-4 h-100">
+          <div class="bg-white rounded-3 shadow-sm p-4 h-100 card-hover">
 
             <h4 class="mb-3 d-flex align-items-center gap-2">
               <i class="bi bi-info-circle-fill text-primary"></i>
@@ -26,24 +27,28 @@
 
             <div class="row g-3">
               <div class="col-6">
+                <i class="bi bi-clock-fill text-success me-1"></i>
                 <span class="fw-medium">{{ t.period }}:</span>
                 {{ sesion.actividad.periodo }}
               </div>
 
               <div class="col-6">
+                <i class="bi bi-info-circle text-info me-1"></i>
                 <span class="fw-medium">{{ t.status }}:</span>
                 {{ sesion.actividad.estado }}
               </div>
 
               <div class="col-6">
+                <i class="bi bi-building text-primary me-1"></i>
                 <span class="fw-medium">{{ t.facility }}: </span>
                 <span class="text-primary fw-medium" style="cursor: pointer;"
                     @click="facilityDetail(sesion.actividad.instalacion.id)">
                     {{ sesion.actividad.instalacion.nombre }}
-                  </span>
+                </span>
               </div>
 
               <div class="col-6">
+                <i class="bi bi-bar-chart-fill text-info me-1"></i>
                 <span class="fw-medium">{{ t.level }}:</span>
                 {{ sesion.actividad.nivel }}
               </div>
@@ -53,7 +58,7 @@
 
         <!-- PASAR LISTA -->
         <div class="col-lg-6">
-          <div class="bg-white rounded-3 shadow-sm p-4 h-100">
+          <div class="bg-white rounded-3 shadow-sm p-4 h-100 card-hover">
 
             <h4 class="mb-3 d-flex align-items-center gap-2">
               <i class="bi bi-person-check-fill text-primary"></i>
@@ -63,13 +68,13 @@
             <div
               v-for="u in sesion.participantes"
               :key="u.id"
-              class="d-flex justify-content-between align-items-center p-3 mb-2 border rounded-3 bg-light"
+              class="d-flex justify-content-between align-items-center p-3 mb-2 border rounded-3 bg-light participant-hover"
             >
               <span class="fw-medium">{{ u.nombre }}</span>
 
               <button
                 class="btn btn-sm"
-                :class="u.presente ? 'btn-success' : 'btn-outline-secondary'"
+                :class="u.presente ? 'btn-gradient-success' : 'btn-outline-secondary'"
                 @click="cambiarAsistencia(u)"
               >
                 <i :class="u.presente ? 'bi bi-check-lg' : 'bi bi-x-lg'"></i>
@@ -81,7 +86,7 @@
       </div>
 
       <div class="d-flex justify-content-center mt-5 gap-3">
-        <button class="btn btn-success btn-lg px-5" @click="actualizarAsistencia">
+        <button class="btn btn-gradient-success btn-lg px-5" @click="actualizarAsistencia">
           {{ t.save }}
         </button>
 
@@ -164,3 +169,30 @@ onMounted(async () => {
 	}
 });
 </script>
+
+<style scoped>
+.card-hover {
+  transition: all 0.3s ease;
+}
+.card-hover:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+
+.participant-hover {
+  transition: all 0.2s ease;
+}
+.participant-hover:hover {
+  transform: translateY(-2px);
+  background-color: rgba(255,255,255,0.95);
+}
+
+.btn-gradient-success {
+  background: linear-gradient(135deg, #56ab2f, #a8e063);
+  border: none;
+  color: white;
+}
+.btn-gradient-success:hover {
+  filter: brightness(1.1);
+}
+</style>

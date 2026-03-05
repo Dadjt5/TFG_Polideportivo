@@ -10,8 +10,7 @@
             <div class="col-md-3 text-center mb-3 mb-md-0">
               <div
                 class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center mx-auto"
-                style="width: 110px; height: 110px;"
-              >
+                style="width: 110px; height: 110px;">
                 <i class="bi bi-shield-lock text-primary fs-1"></i>
               </div>
             </div>
@@ -23,7 +22,7 @@
 
               <p class="text-muted mb-0">
                 <i class="bi bi-person-badge me-2"></i>
-                Administrador Raíz
+                {{ t.rootAdmin }}
               </p>
             </div>
 
@@ -48,29 +47,33 @@
             </div>
 
             <div>
-              <label class="form-label fw-medium">
-                {{ t.passwordPlaceholder }}
-              </label>
-              <input
-                type="password"
-                class="form-control"
-                :class="{ 'is-invalid': errores.password }"
-                placeholder="********"
-                v-model="administrador.password"
-              />
+              <label class="form-label">{{ t.passwordPlaceholder }}</label>
+              <div class="position-relative d-flex align-items-center">
+                <input :type="showPassword ? 'text' : 'password'" class="form-control pe-5"
+                  :class="{ 'is-invalid': errores.password }" v-model="administrador.password" />
+
+                <button type="button"
+                  class="position-absolute end-0 me-3 border-0 bg-transparent d-flex align-items-center justify-content-center"
+                  style="height: 100%; top: 0;" @click="togglePassword">
+                  <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"
+                    style="font-size: 1.2rem; color: #6c757d;"></i>
+                </button>
+              </div>
             </div>
 
             <div>
-              <label class="form-label fw-medium">
-                {{ t.passwordConfirm }}
-              </label>
-              <input
-                type="password"
-                class="form-control"
-                :class="{ 'is-invalid': errores.password }"
-                placeholder="********"
-                v-model="administrador.confirmPassword"
-              />
+              <label class="form-label">{{ t.passwordConfirm }}</label>
+              <div class="position-relative d-flex align-items-center">
+                <input :type="showConfirmPassword ? 'text' : 'password'" class="form-control pe-5"
+                  :class="{ 'is-invalid': errores.password }" v-model="administrador.confirmPassword" />
+
+                <button type="button"
+                  class="position-absolute end-0 me-3 border-0 bg-transparent d-flex align-items-center justify-content-center"
+                  style="height: 100%; top: 0;" @click="toggleConfirmPassword">
+                  <i :class="showConfirmPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"
+                    style="font-size: 1.2rem; color: #6c757d;"></i>
+                </button>
+              </div>
             </div>
 
             <button class="btn btn-primary rounded-3 px-4 py-2">
@@ -82,10 +85,7 @@
 
       <!-- LOGOUT -->
       <div class="mt-5 d-flex justify-content-center">
-        <button
-          class="btn btn-danger rounded-3 px-4 d-flex align-items-center gap-2"
-          @click="logout"
-        >
+        <button class="btn btn-danger rounded-3 px-4 d-flex align-items-center gap-2" @click="logout">
           <i class="bi bi-box-arrow-right"></i>
           {{ t.logout }}
         </button>
@@ -116,6 +116,17 @@ const router = useRouter()
 
 const continuar = ref(true);
 
+const showPassword = ref(false)
+const showConfirmPassword = ref(false)
+
+const togglePassword = () => {
+  showPassword.value = !showPassword.value
+}
+
+const toggleConfirmPassword = () => {
+  showConfirmPassword.value = !showConfirmPassword.value
+}
+
 const administrador = ref({
   password: '',
   confirmPassword: ''
@@ -127,38 +138,38 @@ const errores = ref({
 
 /* Solo mandamos al backend para modificar los campos que se hayan modificado */
 function camposModificados() {
-	const data: any = {}
+  const data: any = {}
   continuar.value = true
   errores.value.password = false
 
-	if (administrador.value.password) {
-    if(administrador.value.password != administrador.value.confirmPassword) {
+  if (administrador.value.password) {
+    if (administrador.value.password != administrador.value.confirmPassword) {
       errores.value.password = true
       continuar.value = false
     }
 
     data.password = administrador.value.password
-	}
+  }
 
-	return data
+  return data
 }
 
 const guardarCambios = async () => {
   try {
     const data = camposModificados()
 
-    if(!continuar.value) return
+    if (!continuar.value) return
 
     await modificarAdministrador(administradorStore.administrador.id, data)
 
-		if (data.password) {
+    if (data.password) {
       administradorStore.cerrarSesion()
-   		authStore.logout()
-  		router.push("/login")
-  		return
-		}
+      authStore.logout()
+      router.push("/login")
+      return
+    }
 
-		await administradorStore.fetchUser(administradorStore.administrador.id)
+    await administradorStore.fetchUser(administradorStore.administrador.id)
   } catch (e) {
     console.error("Error al modificar el administrador", e)
   }

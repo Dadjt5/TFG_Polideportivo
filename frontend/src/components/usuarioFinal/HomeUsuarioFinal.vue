@@ -53,16 +53,16 @@
           </div>
         </div>
 
-        <!-- Estadísticas -->
+        <!-- Abonos y bonos -->
         <div class="col-lg-4">
           <div class="card shadow-sm mb-3 bg-white bg-opacity-10 border border-white border-opacity-25">
             <div class="card-body">
               <div class="d-flex align-items-center gap-2 mb-2">
-                <i class="bi bi-bar-chart-fill text-primary me-2 fs-4"></i>
-                <h6 class="mb-0 text-white">{{ t.userStats }}</h6>
+                <i class="bi bi-ticket-fill text-primary me-2 fs-4"></i>
+                <h6 class="mb-0 text-white">{{ t.bonusSubscriptionsOwn }}</h6>
               </div>
-              <router-link to="/estadisticas/usuarioFinal" v-if="userStore.user" class="btn btn-success w-100">
-                {{ t.viewUserStats }}
+              <router-link to="/ver-abonos" v-if="userStore.user" class="btn btn-success w-100">
+                {{ t.viewTickets }}
               </router-link>
             </div>
           </div>

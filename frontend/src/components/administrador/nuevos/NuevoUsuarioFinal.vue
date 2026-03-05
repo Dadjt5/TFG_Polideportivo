@@ -12,29 +12,17 @@
           <h5 class="fw-semibold mb-3">{{ t.personalData }}</h5>
           <div class="row g-3 mb-4">
             <div class="col-md-6">
-              <input
-                class="form-control"
-                :class="{ 'is-invalid': errores.nombre }"
-                :placeholder="t.name"
-                v-model="usuarioFinal.nombre"
-              />
+              <input class="form-control" :class="{ 'is-invalid': errores.nombre }" :placeholder="t.name"
+                v-model="usuarioFinal.nombre" />
             </div>
 
             <div class="col-md-6">
-              <input
-                class="form-control"
-                :class="{ 'is-invalid': errores.apellidos }"
-                :placeholder="t.surnames"
-                v-model="usuarioFinal.apellidos"
-              />
+              <input class="form-control" :class="{ 'is-invalid': errores.apellidos }" :placeholder="t.surnames"
+                v-model="usuarioFinal.apellidos" />
             </div>
 
             <div class="col-md-6">
-              <select
-                class="form-select"
-                :class="{ 'is-invalid': errores.sexo }"
-                v-model="usuarioFinal.sexo"
-              >
+              <select class="form-select" :class="{ 'is-invalid': errores.sexo }" v-model="usuarioFinal.sexo">
                 <option value="">{{ t.selectOption }}</option>
                 <option value="male">{{ t.male }}</option>
                 <option value="female">{{ t.female }}</option>
@@ -43,22 +31,13 @@
             </div>
 
             <div class="col-md-6">
-              <input
-                type="date"
-                class="form-control"
-                :class="{ 'is-invalid': errores.fechaNacimiento }"
-                v-model="usuarioFinal.fechaNacimiento"
-                @change="checkAge"
-              />
+              <input type="date" class="form-control" :class="{ 'is-invalid': errores.fechaNacimiento }"
+                v-model="usuarioFinal.fechaNacimiento" @change="checkAge" />
             </div>
 
-             <div class="col-md-6" v-if="!esMenor">
-              <input
-                class="form-control"
-                :class="{ 'is-invalid': errores.DNI }"
-                placeholder="DNI"
-                v-model="usuarioFinal.dni"
-              />
+            <div class="col-md-6" v-if="!esMenor">
+              <input class="form-control" :class="{ 'is-invalid': errores.DNI }" placeholder="DNI"
+                v-model="usuarioFinal.dni" />
             </div>
           </div>
 
@@ -66,21 +45,13 @@
           <h5 class="fw-semibold mb-3">{{ t.contact }}</h5>
           <div class="row g-3 mb-4">
             <div class="col-md-6">
-              <input
-                class="form-control"
-                :class="{ 'is-invalid': errores.telefono }"
-                :placeholder="t.phoneNumber"
-                v-model="usuarioFinal.telefono"
-              />
+              <input class="form-control" :class="{ 'is-invalid': errores.telefono }" :placeholder="t.phoneNumber"
+                v-model="usuarioFinal.telefono" />
             </div>
 
             <div class="col-md-6">
-              <input
-                class="form-control"
-                :class="{ 'is-invalid': errores.email }"
-                :placeholder="t.email"
-                v-model="usuarioFinal.email"
-              />
+              <input class="form-control" :class="{ 'is-invalid': errores.email }" :placeholder="t.email"
+                v-model="usuarioFinal.email" />
             </div>
           </div>
 
@@ -88,63 +59,59 @@
           <h5 class="fw-semibold mb-3">{{ t.address }}</h5>
           <div class="row g-3 mb-4">
             <div class="col-md-6">
-              <input
-                class="form-control"
-                :class="{ 'is-invalid': errores.provincia }"
-                :placeholder="t.province"
-                v-model="usuarioFinal.provincia"
-              />
+              <input class="form-control" :class="{ 'is-invalid': errores.provincia }" :placeholder="t.province"
+                v-model="usuarioFinal.provincia" />
             </div>
 
             <div class="col-md-6">
-              <input
-                class="form-control"
-                :class="{ 'is-invalid': errores.municipio }"
-                :placeholder="t.municipality"
-                v-model="usuarioFinal.municipio"
-              />
+              <input class="form-control" :class="{ 'is-invalid': errores.municipio }" :placeholder="t.municipality"
+                v-model="usuarioFinal.municipio" />
             </div>
 
             <div class="col-md-6">
-              <input
-                class="form-control"
-                :class="{ 'is-invalid': errores.localidad }"
-                :placeholder="t.locality"
-                v-model="usuarioFinal.localidad"
-              />
+              <input class="form-control" :class="{ 'is-invalid': errores.localidad }" :placeholder="t.locality"
+                v-model="usuarioFinal.localidad" />
             </div>
 
             <div class="col-md-6">
-              <input
-                class="form-control"
-                :class="{ 'is-invalid': errores.codigoPostal }"
-                :placeholder="t.postalCode"
-                v-model="usuarioFinal.codigoPostal"
-              />
+              <input class="form-control" :class="{ 'is-invalid': errores.codigoPostal }" :placeholder="t.postalCode"
+                v-model="usuarioFinal.codigoPostal" />
             </div>
           </div>
 
           <!-- CREDENCIALES -->
           <h5 class="fw-semibold mb-3">{{ t.credentials }}</h5>
           <div class="row g-3 mb-4">
+
+            <!-- PASSWORD -->
             <div class="col-md-6">
-              <input
-                type="password"
-                class="form-control"
-                :class="{ 'is-invalid': errores.password }"
-                :placeholder="t.passwordPlaceholder"
-                v-model="usuarioFinal.password"
-              />
+              <label class="form-label fw-semibold">{{ t.passwordPlaceholder }}</label>
+              <div class="position-relative d-flex align-items-center">
+                <input :type="showPassword ? 'text' : 'password'" class="form-control pe-5"
+                  :class="{ 'is-invalid': errores.password }" v-model="usuarioFinal.password" />
+
+                <button type="button"
+                  class="position-absolute end-0 me-3 border-0 bg-transparent d-flex align-items-center justify-content-center"
+                  style="height: 100%; top: 0;" @click="togglePassword">
+                  <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"
+                    style="font-size: 1.2rem; color: #6c757d;"></i>
+                </button>
+              </div>
             </div>
 
             <div class="col-md-6">
-              <input
-                type="password"
-                class="form-control"
-                :class="{ 'is-invalid': errores.confirmPassword }"
-                :placeholder="t.passwordConfirm"
-                v-model="usuarioFinal.confirmPassword"
-              />
+              <label class="form-label fw-semibold">{{ t.passwordConfirm }}</label>
+              <div class="position-relative d-flex align-items-center">
+                <input :type="showConfirmPassword ? 'text' : 'password'" class="form-control pe-5"
+                  :class="{ 'is-invalid': errores.password }" v-model="usuarioFinal.confirmPassword" />
+
+                <button type="button"
+                  class="position-absolute end-0 me-3 border-0 bg-transparent d-flex align-items-center justify-content-center"
+                  style="height: 100%; top: 0;" @click="toggleConfirmPassword">
+                  <i :class="showConfirmPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"
+                    style="font-size: 1.2rem; color: #6c757d;"></i>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -217,7 +184,7 @@ const errores = ref({
   municipio: false,
   localidad: false,
   codigoPostal: false,
-	pagoFraccionado: false,
+  pagoFraccionado: false,
   cuentaBancaria: false,
   password: false,
   confirmPassword: false,
@@ -225,6 +192,17 @@ const errores = ref({
 
 const mensaje = ref('');
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const showPassword = ref(false)
+const showConfirmPassword = ref(false)
+
+const togglePassword = () => {
+  showPassword.value = !showPassword.value
+}
+
+const toggleConfirmPassword = () => {
+  showConfirmPassword.value = !showConfirmPassword.value
+}
 
 const checkAge = () => {
   if (!usuarioFinal.value.fechaNacimiento) return
@@ -248,9 +226,9 @@ function validarFormulario() {
   errores.value.municipio = usuarioFinal.value.municipio === ''
   errores.value.localidad = usuarioFinal.value.localidad === ''
   errores.value.codigoPostal = usuarioFinal.value.codigoPostal === ''
-	errores.value.email =
-		usuarioFinal.value.email === '' ||
-		!emailRegex.test(usuarioFinal.value.email)
+  errores.value.email =
+    usuarioFinal.value.email === '' ||
+    !emailRegex.test(usuarioFinal.value.email)
   errores.value.cuentaBancaria =
     usuarioFinal.value.cuentaBancaria !== '' &&
     usuarioFinal.value.cuentaBancaria.length < 20
@@ -258,7 +236,7 @@ function validarFormulario() {
   errores.value.confirmPassword = usuarioFinal.value.password !== usuarioFinal.value.confirmPassword
 
   for (const key in errores.value) {
-    if(errores.value[key]) {
+    if (errores.value[key]) {
       valido = false
     }
   }
@@ -267,9 +245,9 @@ function validarFormulario() {
 }
 
 const nuevoUsuario = async () => {
-  if(!validarFormulario()) return
+  if (!validarFormulario()) return
 
-	try {
+  try {
     const data = await registrarse(usuarioFinal.value);
     mensaje.value = data.mensaje;
     router.push({ name: 'gestion-usuarios' });

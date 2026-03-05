@@ -90,11 +90,20 @@ class CompraAbono(models.Model):
 
         self.estado = EstadoReserva.CONFIRMADA
         self.save()
-    
+
     def cancelarCompra(self):
+        if self.estado == EstadoReserva.CONFIRMADA:
+            usuario = self.usuarioFinal
+
+            self.usuarioFinal = None
+            self.save(update_fields=["usuarioFinal"])
+
+            if usuario:
+                usuario.marcarAbono(abono=self)
+
         self.estado = EstadoReserva.CANCELADO
-        self.save()
-    
+        self.save(update_fields=["estado"])
+
     @classmethod
     def compraAbono(cls, abono, usuario, tipoAbono):
         with transaction.atomic():

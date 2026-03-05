@@ -128,18 +128,18 @@
 
               <div v-else class="d-flex flex-wrap gap-3">
                 <div
-                  v-for="tipo in tiposInstalacion"
-                  :key="tipo.value"
+                  v-for="tipo in estadisticasStore.data.tiposInstalacion"
+                  :key="tipo[0]"
                   class="form-check"
                 >
                   <input
                     type="checkbox"
                     class="form-check-input"
-                    :value="tipo.value"
+                    :value="tipo[0]"
                     v-model="descuento.tiposInstalacion"
                   />
                   <label class="form-check-label">
-                    {{ tipo.label }}
+                    {{ tipo[1] }}
                   </label>
                 </div>
               </div>
@@ -226,6 +226,7 @@ import { useRouter } from "vue-router"
 
 import { getDescuentoDetalle, modificarDescuento, eliminarDescuento } from "@/services/detalleService"
 import { getDeportes } from "@/services/listadoService"
+import { useEstadisticasStore } from "@/stores/estadisticas"
 
 import type { Language } from "@/useI18N"
 import { useI18n } from "@/useI18N"
@@ -234,8 +235,9 @@ const props = defineProps<{ id: string }>()
 
 const language = inject<Ref<Language>>("language")!
 const t = useI18n(language)
-const router = useRouter()
 
+const estadisticasStore = useEstadisticasStore()
+const router = useRouter()
 const editando = ref(false)
 
 const descuento = ref<any>({

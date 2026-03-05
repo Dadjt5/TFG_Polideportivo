@@ -15,6 +15,7 @@ import FAQ from '@/components/FAQ.vue'
 import HomeUsuarioFinal from '@/components/usuarioFinal/HomeUsuarioFinal.vue'
 import Buscar from '@/components/usuarioFinal/Buscar.vue'
 import Registro from '@/components/usuarioFinal/Registro.vue'
+import VerAbonosBonos from '@/components/usuarioFinal/VerAbonosBonos.vue'
 
 // Detalles
 import DetallePabellon from '@/components/usuarioFinal/detalles/DetallePabellon.vue'
@@ -23,9 +24,9 @@ import DetalleActividad from '@/components/usuarioFinal/detalles/DetalleActivida
 import DetalleSesion from '@/components/usuarioFinal/detalles/DetalleSesion.vue'
 
 // Perfil
-import VerAbonosBonos from '@/components/usuarioFinal/perfil/VerAbonosBonos.vue'
 import TarjetaDeportivaAnual from '@/components/usuarioFinal/perfil/TarjetaDeportivaAnual.vue'
 import ModificarDatosPersonales from '@/components/usuarioFinal/perfil/ModificarDatosPersonales.vue'
+import EstadisticasUsuarios from '@/components/usuarioFinal/perfil/EstadisticasUsuarios.vue'
 
 // Compras
 import ComprarAbonosBonos from '@/components/usuarioFinal/compras/ComprarAbonosBonos.vue'
@@ -116,12 +117,13 @@ const routes = [
   },
   { path: '/notificaciones', component: Notificaciones, name: 'notificaciones', meta: { requiresAuth: true, } },
   { path: '/registrarse', component: Registro, meta: { public: true } },
+  { path: '/ver-abonos', component: VerAbonosBonos, meta: { requiresAuth: true, allowedRoles: ['usuario_final'] } },
 
   /* Perfil */
   { path: '/perfil', component: Perfil, meta: { requiresAuth: true } },
   { path: '/ver-tda', component: TarjetaDeportivaAnual, meta: { requiresAuth: true, allowedRoles: ['usuario_final'] } },
-  { path: '/ver-abonos', component: VerAbonosBonos, meta: { requiresAuth: true, allowedRoles: ['usuario_final'] } },
   { path: '/modificar-datos', component: ModificarDatosPersonales, meta: { requiresAuth: true, allowedRoles: ['usuario_final'] } },
+  { path: '/estadisticas/usuarioFinal', component: EstadisticasUsuarios, meta: { requiresAuth: true, allowedRoles: ['usuario_final'] } },
 
   /* Comprar */
   { path: '/comprar-abonos', component: ComprarAbonosBonos, meta: { requiresAuth: true, allowedRoles: ['usuario_final'] } },

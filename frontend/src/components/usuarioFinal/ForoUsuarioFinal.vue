@@ -1,22 +1,17 @@
 <template>
-  <div class="min-vh-100 bg-light">
-
-    <!-- CONTENIDO -->
+  <div class="min-vh-100" style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
     <div class="container py-5">
-      <h1 class="text-center fw-semibold mb-3">{{ t.forumTitle }}</h1>
+
+      <!-- Título -->
+      <h1 class="text-center fw-semibold mb-3 text-primary">{{ t.forumTitle }}</h1>
       <p class="text-center text-secondary fs-5 mb-5">{{ t.forumSubtitle }}</p>
 
       <!-- LISTA DE CANALES -->
       <div v-if="!canalSeleccionado" class="row g-4">
-        <div
-          v-for="canal in canales"
-          :key="canal.id"
-          class="col-sm-6 col-lg-4"
-        >
-          <div
-            class="card h-100 shadow-sm border-0 rounded-4 text-center cursor-pointer"
-            @click="canalSeleccionado=canal, abrirCanal(canal.id)"
-          >
+        <div v-for="canal in canales" :key="canal.id" class="col-sm-6 col-lg-4">
+          <div class="card h-100 shadow-sm border-0 rounded-4 text-center cursor-pointer"
+               style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(8px);"
+               @click="canalSeleccionado = canal; abrirCanal(canal.id)">
             <div class="card-body py-5">
               <i class="bi bi-chat-dots fs-1 text-primary mb-3"></i>
               <h5 class="fw-medium">{{ canal.titulo }}</h5>
@@ -26,54 +21,43 @@
       </div>
 
       <!-- CANAL SELECCIONADO -->
-      <div v-else class="card shadow-lg border-0 rounded-4 p-4">
-        <button
-          class="btn btn-secondary mb-4 align-self-start"
-          @click="canalSeleccionado=undefined"
-        >
+      <div v-else class="card shadow-lg border-0 rounded-4 p-4" style="background-color: rgba(255,255,255,0.9); backdrop-filter: blur(10px);">
+        <button class="btn btn-secondary mb-4 align-self-start" @click="canalSeleccionado = undefined">
           ← {{ t.back }}
         </button>
 
-        <h2 class="fw-semibold mb-4">{{ canalSeleccionado.titulo }}</h2>
+        <h2 class="fw-semibold mb-4 text-primary">{{ canalSeleccionado.titulo }}</h2>
         <p class="text-center text-secondary fs-5 mb-5">{{ canalSeleccionado.tema }}</p>
 
-        <div
-          class="border rounded-4 p-3 mb-4 overflow-auto"
-          style="max-height: 320px"
-        >
+        <div class="border rounded-4 p-3 mb-4 overflow-auto" style="max-height: 320px; background-color: rgba(255,255,255,0.6);">
           <div v-if="!canalSeleccionado.secreto">
-            <div
-              v-for="m in mensajes"
-              :key="m.id"
-              class="border rounded-3 p-3 mb-2"
-              :class="m.es_admin ? 'bg-primary text-white' : 'bg-white text-secondary'">
+            <div v-for="m in mensajes" :key="m.id" class="border rounded-3 p-3 mb-2"
+                 :class="m.es_admin ? 'bg-primary text-white' : 'bg-white text-secondary'"
+                 style="backdrop-filter: blur(4px);">
               <p class="fw-medium mb-1">{{ m.nombre }}</p>
               <p class="mb-0">{{ m.texto }}</p>
             </div>
           </div>
 
-          <p
-            v-else
-            class="text-center text-muted fst-italic"
-          >
+          <p v-else class="text-center text-muted fst-italic">
             {{ t.hiddenMessages }}
           </p>
         </div>
 
         <div class="d-flex gap-3">
-          <input
-            type="text"
-            class="form-control form-control-lg rounded-3"
-            v-model="textoMensaje"
-            :disabled="canalSeleccionado.silenciado"
-            :placeholder="canalSeleccionado.silenciado === false ? t.writeMessage : t.cantWriteMessage"
-          />
+          <input type="text" class="form-control form-control-lg rounded-3"
+                 v-model="textoMensaje"
+                 :disabled="canalSeleccionado.silenciado"
+                 :placeholder="canalSeleccionado.silenciado === false ? t.writeMessage : t.cantWriteMessage">
           <span v-if="!canalSeleccionado.silenciado">
-            <button class="btn btn-primary px-4 rounded-3" @keyup.enter="enviar(canalSeleccionado.id)" @click="enviar(canalSeleccionado.id)">
+            <button class="btn btn-primary px-4 rounded-3" 
+                    @keyup.enter="enviar(canalSeleccionado.id)" 
+                    @click="enviar(canalSeleccionado.id)">
               {{ t.send }}
             </button>
           </span>
         </div>
+
       </div>
     </div>
   </div>

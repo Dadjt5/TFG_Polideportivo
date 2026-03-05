@@ -1,14 +1,20 @@
 <template>
-  <div class="min-vh-100 bg-light">
+  <div class="min-vh-100" style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
     <main class="container-fluid mt-2 px-5 py-4">
 
+      <!-- Cabecera -->
       <div class="text-center mt-4 mb-5">
-        <h1 class="fw-semibold">{{ pabellon.nombre }}</h1>
+        <h1 class="fw-semibold text-primary mb-0" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.2);">
+          <i class="bi bi-building me-2"></i>{{ pabellon.nombre }}
+        </h1>
       </div>
 
       <div class="row g-4">
+
+        <!-- DETALLES -->
         <div class="col-lg-6">
-          <div class="bg-white rounded-3 shadow-sm p-4 h-100">
+          <div class="bg-white rounded-3 shadow-sm p-4 h-100 card-hover">
+
             <h4 class="mb-3 d-flex align-items-center">
               <i class="bi bi-info-circle-fill text-primary me-2"></i>
               {{ t.pavilionDetail }}
@@ -27,6 +33,7 @@
 
               <div class="col-12">
                 <p>
+                  <i class="bi bi-geo-alt-fill text-danger me-1"></i>
                   <span class="fw-medium">{{ t.address }}:</span>
                   {{ pabellon.direccion }}
                 </p>
@@ -35,11 +42,11 @@
             </div>
 
             <div v-if="editando" class="mt-4 d-flex gap-3">
-              <button class="btn btn-success" @click="guardarCambios">
+              <button class="btn btn-gradient-success" @click="guardarCambios">
                 <i class="bi bi-check-lg me-1"></i>{{ t.save }}
               </button>
 
-              <button class="btn btn-secondary" @click="cancelarEdicion">
+              <button class="btn btn-secondary btn-lg" @click="cancelarEdicion">
                 {{ t.cancel }}
               </button>
             </div>
@@ -47,9 +54,9 @@
           </div>
         </div>
 
+        <!-- IMÁGENES -->
         <div class="col-lg-6 d-flex flex-column gap-4">
-
-          <div class="bg-white rounded-3 shadow-sm p-4" v-if="pabellon.imagenURL">
+          <div class="bg-white rounded-3 shadow-sm p-4 card-hover" v-if="pabellon.imagenURL">
             <h4 class="mb-3 d-flex align-items-center gap-2">
               <i class="bi bi-images text-primary"></i>
               {{ t.images }}
@@ -57,23 +64,22 @@
 
             <div class="row g-2">
               <div class="col-6" v-for="(img, i) in pabellon.imagenURL" :key="i">
-                <img :src="img" class="img-fluid rounded" alt="Pabellon" />
+                <img :src="img" class="img-fluid rounded shadow-sm img-hover" alt="Pabellon" />
               </div>
             </div>
           </div>
-
         </div>
 
       </div>
 
       <!-- Botones -->
-       <div class="d-flex justify-content-center gap-4 mt-5">
-        <button v-if="authStore.role === 'administrador'" class="btn btn-danger btn-lg px-4" @click="activarEdicion">
+      <div class="d-flex justify-content-center gap-4 mt-5">
+        <button v-if="authStore.role === 'administrador'" class="btn btn-gradient-danger btn-lg px-4" @click="activarEdicion">
           <i class="bi bi-pencil me-1"></i>
           {{ t.modifyPavilion }}
         </button>
 
-        <button v-if="authStore.role === 'administrador'" class="btn btn-danger btn-lg px-4" @click="eliminar">
+        <button v-if="authStore.role === 'administrador'" class="btn btn-gradient-danger btn-lg px-4" @click="eliminar">
           <i class="bi bi-trash me-1"></i>
           {{ t.delete }}
         </button>
@@ -86,6 +92,7 @@
     </main>
   </div>
 </template>
+
 
 <script setup lang="ts">
 import { inject, ref, onMounted, type Ref } from "vue"
@@ -201,3 +208,38 @@ onMounted(async () => {
 	}
 });
 </script>
+
+<style scoped>
+.card-hover {
+  transition: all 0.3s ease;
+}
+.card-hover:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+
+.img-hover {
+  transition: transform 0.3s ease;
+}
+.img-hover:hover {
+  transform: scale(1.05);
+}
+
+.btn-gradient-success {
+  background: linear-gradient(135deg, #56ab2f, #a8e063);
+  border: none;
+  color: white;
+}
+.btn-gradient-success:hover {
+  filter: brightness(1.1);
+}
+
+.btn-gradient-danger {
+  background: linear-gradient(135deg, #e53935, #ff6f61);
+  border: none;
+  color: white;
+}
+.btn-gradient-danger:hover {
+  filter: brightness(1.1);
+}
+</style>
