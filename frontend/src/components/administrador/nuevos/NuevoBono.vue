@@ -56,7 +56,7 @@
             {{ t.createBonuses }}
           </button>
 
-          <button class="btn btn-danger btn-lg px-5 rounded-pill shadow-sm" @click="volver">
+          <button class="btn btn-outline-secondary btn-lg px-5 rounded-pill shadow-sm" @click="volver">
             {{ t.return }}
           </button>
         </div>

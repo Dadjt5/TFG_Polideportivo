@@ -18,7 +18,7 @@
                 :class="{ active: tab === 'pabellones' }"
                 @click="tab = 'pabellones'"
               >
-                <i class="bi bi-building me-1"></i>
+                <i class="bi bi-geo-alt me-1"></i>
                 {{ t.pavilions }}
               </button>
             </li>
@@ -29,7 +29,7 @@
                 :class="{ active: tab === 'instalaciones' }"
                 @click="tab = 'instalaciones'"
               >
-                <i class="bi bi-geo-alt me-1"></i>
+                <i class="bi bi-building me-1"></i>
                 {{ t.facilities }}
               </button>
             </li>

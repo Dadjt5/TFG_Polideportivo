@@ -5,7 +5,7 @@
         {{ t.newSession }}
       </h1>
 
-      <div class="card shadow-lg border-0 rounded-4 p-4" style="background-color: rgba(255,255,255,0.75); backdrop-filter: blur(10px);">
+      <div class="card shadow-lg border-0 rounded-4 p-4" style="background-color: rgba(180,220,255,0.6); backdrop-filter: blur(10px);">
         <div class="row g-4">
           <!-- DÍA -->
           <div class="col-md-12">
@@ -35,7 +35,7 @@
             {{ t.newSession }}
           </button>
 
-          <button class="btn btn-danger btn-lg px-5 rounded-pill shadow-sm" @click="volver">
+          <button class="btn btn-outline-secondary btn-lg px-5 rounded-pill shadow-sm" @click="volver">
             {{ t.return }}
           </button>
         </div>

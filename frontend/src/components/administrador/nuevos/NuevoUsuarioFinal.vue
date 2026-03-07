@@ -1,11 +1,13 @@
 <template>
-  <div class="min-vh-100 bg-light">
-    <div class="container py-5" style="max-width: 1100px">
-      <h1 class="text-center fw-semibold mb-4">
+  <div class="min-vh-100" style="background: linear-gradient(135deg, #e0f7ff, #ffffff);">
+    <div class="container py-5" style="max-width: 1120px">
+       <h1 class="text-center fw-bold mb-5 text-primary">
         {{ t.newUserNoQues }}
       </h1>
+      
 
-      <div class="card shadow-sm rounded-4">
+      <div class="card shadow-lg border-0 rounded-4 p-4"
+           style="background-color: rgba(180,220,255,0.6); backdrop-filter: blur(10px);">
         <div class="card-body p-4 p-md-5">
 
           <!-- DATOS PERSONALES -->
@@ -145,7 +147,7 @@
               {{ t.newUserNoQues }}
             </button>
 
-            <button class="btn btn-secondary btn-lg px-5" @click="volver">
+            <button class="btn btn-outline-secondary btn-lg px-5" @click="volver">
               {{ t.return }}
             </button>
           </div>

@@ -1,11 +1,12 @@
 <template>
-  <div class="min-vh-100 bg-light pb-5">
-    <main class="container py-5" style="max-width: 1100px;">
-      <h1 class="text-center fw-bold mb-5 display-6">
-        {{ t.newActivity }}
+ <div class="min-vh-100" style="background: linear-gradient(135deg, #fff4e0, #e0f7ff);">
+    <main class="container py-5" style="max-width: 1120px;">
+      <h1 class="text-center fw-bold mb-5 text-primary">
+        {{ t.newFacility }}
       </h1>
 
-      <div class="card border-0 shadow-lg rounded-4 p-4">
+      <div class="card shadow-lg border-0 rounded-4 p-4"
+        style="background-color: rgba(180,220,255,0.6); backdrop-filter: blur(10px);">
 
         <!-- TABS -->
         <ul class="nav nav-tabs nav-fill mb-4">
@@ -422,13 +423,12 @@
         </div>
 
         <!-- BOTONES -->
-        <div class="d-flex justify-content-between mt-3">
-          <button class="btn btn-outline-secondary" type="button" @click="volver">
-            {{ t.return }}
-          </button>
-
-          <button class="btn btn-success px-4" type="button" @click="crearActividad">
+        <div class="d-flex justify-content-center gap-3 mt-4">
+          <button class="btn btn-success btn-lg px-5 rounded-pill shadow-sm" @click="crearActividad">
             {{ t.createActivity }}
+          </button>
+          <button class="btn btn-outline-secondary btn-lg px-5 rounded-pill shadow-sm" @click="volver">
+            {{ t.return }}
           </button>
         </div>
 
