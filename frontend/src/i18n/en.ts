@@ -23,6 +23,7 @@ export default {
   emptyFields: "There are empty mandatory fields.",
   moreUserStats: "Check your statistics",
   bonusSubscriptionsOwn: "Own bonus and subscriptions",
+  loginCode: "Identifier",
 
   /* Recuperar y resetar contraseña */
   recoverPassword: "Recover password",

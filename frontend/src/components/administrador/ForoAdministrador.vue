@@ -1,27 +1,32 @@
 <template>
-  <div class="min-vh-100 bg-light">
+  <div class="min-vh-100" style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
 
     <!-- CABECERA -->
     <div class="container py-5">
-      <h1 class="text-center fw-semibold mb-3">{{ t.forumTitle }}</h1>
-      <p class="text-center text-secondary fs-5 mb-5">{{ t.forumSubtitle }}</p>
+      <h1 class="text-center fw-bold text-primary mb-3">
+        <i class="bi bi-chat-left-dots-fill me-2"></i>
+        {{ t.forumTitle }}
+      </h1>
+      <p class="text-center text-dark fs-5 mb-5">{{ t.forumSubtitle }}</p>
 
       <!-- LISTADO DE CANALES / CREAR CANAL -->
       <div v-if="!canalSeleccionado">
         <div class="row g-4">
           <div v-for="canal in foro.canales" :key="canal.id" class="col-sm-6 col-lg-4">
-            <div class="card h-100 shadow-sm border-0 rounded-4 text-center cursor-pointer"
+            <div class="card h-100 shadow-lg border-0 rounded-4 text-center cursor-pointer"
+              style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(10px);"
               @click="seleccionarCanal(canal.id)">
               <div class="card-body py-5">
                 <i class="bi bi-chat-dots fs-1 text-primary mb-3"></i>
-                <h5 class="fw-medium">{{ canal.titulo }}</h5>
+                <h5 class="fw-semibold">{{ canal.titulo }}</h5>
               </div>
             </div>
           </div>
         </div>
 
         <div class="d-flex justify-content-center gap-3 mt-5">
-          <button class="btn btn-primary btn-lg" @click="crearCanal(foro.id)">
+          <button class="btn btn-primary btn-lg rounded-pill px-4 shadow-sm" @click="crearCanal(foro.id)">
+            <i class="bi bi-plus-circle me-2"></i>
             {{ t.newChannel }}
           </button>
         </div>
@@ -36,16 +41,18 @@
           <!-- FILA SUPERIOR -->
           <div class="d-flex justify-content-between align-items-center mb-3">
 
-            <button class="btn btn-secondary" @click="canalSeleccionado = null">
+            <button class="btn btn-secondary rounded-pill px-3" @click="canalSeleccionado = null">
               ← {{ t.return }}
             </button>
 
             <div class="d-flex gap-2">
-              <button class="btn btn-outline-primary" @click="modificarCanal(foro.id, canalSeleccionado.id)">
+              <button class="btn btn-outline-primary rounded-pill px-3" @click="modificarCanal(foro.id, canalSeleccionado.id)">
+                <i class="bi bi-pencil me-1"></i>
                 {{ t.modifyChannel }}
               </button>
 
-              <button class="btn btn-outline-danger" @click="borrarCanal">
+              <button class="btn btn-outline-danger rounded-pill px-3" @click="borrarCanal">
+                <i class="bi bi-trash me-1"></i>
                 {{ t.delete }}
               </button>
             </div>
@@ -53,7 +60,7 @@
           </div>
 
           <!-- TÍTULO -->
-          <h2 class="fw-semibold mb-4">
+          <h2 class="fw-bold text-primary mb-4">
             {{ canalSeleccionado.titulo }}
           </h2>
 
@@ -61,37 +68,44 @@
 
         <!-- MENSAJES -->
         <div class="col-lg-8">
-          <div class="border rounded-4 p-3 mb-3 overflow-auto" style="max-height: 400px;">
+          <div class="border-0 rounded-4 p-3 mb-3 overflow-auto shadow-sm"
+               style="max-height: 400px; background-color: rgba(255,255,255,0.85); backdrop-filter: blur(10px);">
+
             <div v-for="(msg, idx) in mensajes" :key="idx"
-            class="border rounded-3 p-3 mb-2"
-            :class="msg.es_admin ? 'bg-primary text-white' : 'bg-white text-secondary'">
-              <p class="fw-medium mb-1">{{ msg.nombre }}</p>
+            class="rounded-3 p-3 mb-2"
+            :class="msg.es_admin ? 'bg-primary text-white' : 'bg-white text-secondary border'">
+              <p class="fw-semibold mb-1">{{ msg.nombre }}</p>
               <p class="mb-0">{{ msg.texto }}</p>
             </div>
+
           </div>
 
           <div class="d-flex gap-3">
-            <input type="text" class="form-control form-control-lg rounded-3" v-model="textoMensaje"
+            <input type="text" class="form-control form-control-lg rounded-3 shadow-sm" v-model="textoMensaje"
               :placeholder="t.writeMessage" @keyup.enter="enviarMensajeCanal" />
-            <button class="btn btn-primary btn-lg" @click="enviarMensajeCanal">
-              {{ t.send }}
+            <button class="btn btn-primary btn-lg rounded-3 px-4 shadow-sm" @click="enviarMensajeCanal">
+              <i class="bi bi-send-fill"></i>
             </button>
           </div>
         </div>
 
         <!-- USUARIOS DEL CANAL -->
         <div class="col-lg-4">
-          <div class="card shadow-sm border-0 rounded-4 p-3">
-            <h5 class="fw-semibold mb-3">{{ t.channelUsers }}</h5>
+          <div class="card shadow-lg border-0 rounded-4 p-3"
+               style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(10px);">
+            <h5 class="fw-bold text-primary mb-3">
+              <i class="bi bi-people-fill me-2"></i>
+              {{ t.channelUsers }}
+            </h5>
             <div v-for="user in canalSeleccionado.usuarios || []" :key="user.usuarioFinal"
               class="d-flex justify-content-between align-items-center mb-2 p-2 bg-light rounded-3">
-              <span>{{ user.nombre }}</span>
+              <span class="fw-medium">{{ user.nombre }}</span>
               <div class="d-flex gap-2">
-                <button class="btn btn-warning btn-sm" @click="alterarSilencioUsuario(user.usuarioFinal)">
+                <button class="btn btn-warning btn-sm rounded-pill px-3" @click="alterarSilencioUsuario(user.usuarioFinal)">
                   {{ user.silenciado ? t.unmute : t.mute }}
                 </button>
 
-                <button class="btn btn-danger btn-sm" @click="alterarExpulsionUsuario(user.usuarioFinal)">
+                <button class="btn btn-danger btn-sm rounded-pill px-3" @click="alterarExpulsionUsuario(user.usuarioFinal)">
                   {{ user.expulsado ? t.unkick : t.kick }}
                 </button>
               </div>

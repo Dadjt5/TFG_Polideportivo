@@ -1,17 +1,17 @@
 <template>
-  <div class="min-vh-100" style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
+  <div class="min-vh-100" style="background: linear-gradient(135deg, #e0f7ff, #ffffff);">
     <main class="container py-4" style="max-width: 720px">
 
       <!-- Tarjeta de perfil -->
-      <div class="card border-0 mb-4 rounded-4 mx-auto"
-           style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(10px);">
+      <div class="card border-0 mb-4 rounded-4 mx-auto shadow-lg"
+           style="background-color: rgba(180,220,255,0.6); backdrop-filter: blur(10px);">
         <div class="card-body p-4">
           <div class="row align-items-center">
 
             <!-- Avatar -->
             <div class="col-md-3 text-center mb-3 mb-md-0">
               <div
-                class="rounded-circle d-flex align-items-center justify-content-center mx-auto"
+                class="rounded-circle d-flex align-items-center justify-content-center mx-auto shadow"
                 style="width: 110px; height: 110px; background: linear-gradient(135deg, #0072ff, #00c6ff);">
                 <i class="bi bi-person text-white fs-1"></i>
               </div>
@@ -30,6 +30,10 @@
               <p class="mb-0">
                 <span class="fw-medium text-secondary">DNI:</span> {{ monitorStore.monitor?.DNI }}
               </p>
+
+              <p class="mb-0">
+                <span class="fw-medium text-secondary">{{ t.loginCode }}:</span> {{ monitorStore.monitor?.codigo_usuario }}
+              </p>
             </div>
 
           </div>
@@ -37,8 +41,8 @@
       </div>
 
       <!-- Edición -->
-      <div class="card border rounded-4 mx-auto"
-           style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(10px);">
+      <div class="card border-0 rounded-4 mx-auto shadow-lg"
+           style="background-color: rgba(180,220,255,0.6); backdrop-filter: blur(10px);">
         <div class="card-body p-4 p-md-5">
           <h2 class="fs-3 fw-semibold mb-4 text-primary">
             {{ t.editableData }}
@@ -89,7 +93,7 @@
             </div>
 
             <!-- Guardar cambios -->
-            <button class="btn btn-primary rounded-3 px-4 py-2" @click="guardarCambios">
+            <button class="btn btn-primary rounded-pill px-4 py-2 shadow-sm" @click="guardarCambios">
               {{ t.saveChanges }}
             </button>
           </form>
@@ -98,7 +102,7 @@
 
       <!-- Logout -->
       <div class="mt-5 d-flex justify-content-center">
-        <button class="btn btn-danger rounded-3 px-4 d-flex align-items-center gap-2" @click="logout">
+        <button class="btn btn-danger rounded-pill px-4 d-flex align-items-center gap-2 shadow-sm" @click="logout">
           <i class="bi bi-box-arrow-right"></i>
           {{ t.logout }}
         </button>

@@ -1,20 +1,24 @@
 <template>
-  <div class="min-vh-100 bg-light">
+  <div class="min-vh-100" style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
     <main class="container-fluid mt-2 px-5 py-4">
 
       <!-- CABECERA -->
       <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold m-0">Estadísticas Generales</h2>
+        <h2 class="fw-bold m-0 text-primary">
+          <i class="bi bi-bar-chart-line-fill me-2"></i>
+          Estadísticas Generales
+        </h2>
       </div>
 
       <!-- KPIs -->
       <div class="row g-4 mb-4">
 
         <div class="col-md-4 col-xl-2" v-for="kpi in kpis" :key="kpi.title">
-          <div class="card shadow-sm border-0 rounded-4 h-100">
-            <div class="card-body text-center">
-              <h6 class="text-muted">{{ kpi.title }}</h6>
-              <h3 class="fw-bold">{{ kpi.value }}</h3>
+          <div class="card shadow-lg border-0 rounded-4 h-100 text-center"
+               style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(10px);">
+            <div class="card-body d-flex flex-column justify-content-center">
+              <h6 class="text-muted mb-2">{{ kpi.title }}</h6>
+              <h3 class="fw-bold text-dark">{{ kpi.value }}</h3>
             </div>
           </div>
         </div>
@@ -26,9 +30,13 @@
 
         <!-- Reservas por mes -->
         <div class="col-lg-6">
-          <div class="card shadow-sm border-0 rounded-4">
+          <div class="card shadow-lg border-0 rounded-4"
+               style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(10px);">
             <div class="card-body">
-              <h5 class="fw-bold mb-3">Reservas últimos 12 meses</h5>
+              <h5 class="fw-bold mb-3 text-primary">
+                <i class="bi bi-graph-up-arrow me-2"></i>
+                Reservas últimos 12 meses
+              </h5>
               <div class="chart-placeholder">
                 <!-- Aquí irá Chart.js -->
                 <p class="text-muted text-center m-0">
@@ -41,9 +49,13 @@
 
         <!-- Actividades más reservadas -->
         <div class="col-lg-6">
-          <div class="card shadow-sm border-0 rounded-4">
+          <div class="card shadow-lg border-0 rounded-4"
+               style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(10px);">
             <div class="card-body">
-              <h5 class="fw-bold mb-3">Actividades más reservadas</h5>
+              <h5 class="fw-bold mb-3 text-primary">
+                <i class="bi bi-trophy-fill me-2"></i>
+                Actividades más reservadas
+              </h5>
               <div class="chart-placeholder">
                 <p class="text-muted text-center m-0">
                   Gráfico de actividades
@@ -56,12 +68,16 @@
       </div>
 
       <!-- USO DE PABELLONES -->
-      <div class="card shadow-sm border-0 rounded-4">
+      <div class="card shadow-lg border-0 rounded-4"
+           style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(10px);">
         <div class="card-body">
-          <h5 class="fw-bold mb-3">Uso de pabellones</h5>
+          <h5 class="fw-bold mb-3 text-primary">
+            <i class="bi bi-building me-2"></i>
+            Uso de pabellones
+          </h5>
 
           <div class="table-responsive">
-            <table class="table align-middle">
+            <table class="table align-middle mb-0">
               <thead class="table-light">
                 <tr>
                   <th>{{ t.pavilion }}</th>
@@ -71,7 +87,7 @@
               </thead>
               <tbody>
                 <tr v-for="pabellon in usoPabellones" :key="pabellon.id">
-                  <td>{{ pabellon.nombre }}</td>
+                  <td class="fw-medium">{{ pabellon.nombre }}</td>
                   <td>{{ pabellon.horas }}</td>
                   <td style="min-width: 150px;">
                     <div class="progress" style="height: 8px;">
@@ -92,7 +108,8 @@
       </div>
 
       <div class="text-center">
-        <button class="btn btn-primary fs-4 mt-4 rounded-pill" @click="volver">
+        <button class="btn btn-primary fs-5 mt-4 rounded-pill px-4 shadow-sm" @click="volver">
+          <i class="bi bi-arrow-left me-2"></i>
           {{ t.return }}
         </button>
       </div>

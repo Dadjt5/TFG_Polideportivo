@@ -1,45 +1,81 @@
 <template>
-  <div class="min-vh-100 bg-light">
-    <main class="container py-5" style="max-width: 1000px">
-      <h1 class="text-center mb-5 fw-semibold">
+  <div class="min-vh-100" style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
+    <main class="container py-5" style="max-width: 1100px">
+      <h1 class="fw-bold text-primary mb-4 text-center">
+        <i class="bi bi-grid-1x2-fill me-2"></i>
         {{ t.manageSpaces }}
       </h1>
 
-      <div class="card shadow-sm rounded-4">
+      <div class="card shadow-lg border-0 rounded-4"
+           style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(10px);">
         <div class="card-body p-4">
 
+          <!-- TABS -->
+          <ul class="nav nav-tabs mb-4">
+            <li class="nav-item">
+              <button
+                class="nav-link"
+                :class="{ active: tab === 'pabellones' }"
+                @click="tab = 'pabellones'"
+              >
+                <i class="bi bi-building me-1"></i>
+                {{ t.pavilions }}
+              </button>
+            </li>
+
+            <li class="nav-item">
+              <button
+                class="nav-link"
+                :class="{ active: tab === 'instalaciones' }"
+                @click="tab = 'instalaciones'"
+              >
+                <i class="bi bi-geo-alt me-1"></i>
+                {{ t.facilities }}
+              </button>
+            </li>
+          </ul>
+
           <!-- PABELLONES -->
-          <div class="mb-5">
+          <div v-if="tab === 'pabellones'">
+
             <div class="d-flex justify-content-between align-items-center mb-3">
               <h5 class="fw-semibold text-success">
-                <i class="bi bi-building me-2"></i>{{ t.pavilions }}
+                {{ t.pavilions }}
               </h5>
-              <router-link to="/crear/pabellon" class="btn btn-primary rounded-pill">
-                <i class="bi bi-plus-lg me-1"></i> {{ t.newPavilion }}
+
+              <router-link to="/crear/pabellon" class="btn btn-primary rounded-pill shadow-sm">
+                <i class="bi bi-plus-lg me-1"></i>
+                {{ t.newPavilion }}
               </router-link>
             </div>
-
             <div class="list-group list-group-flush">
+
               <div
                 v-for="p in espacios.pabellones"
                 :key="p.id"
-                class="list-group-item d-flex justify-content-between align-items-center rounded-3 mb-2 shadow-sm"
-                @click="PabellonDetail(p.id)">
-                <div class="text-primary fw-medium" style="cursor: pointer;">
-                  <span class="fw-medium">{{ p.nombre }}</span>
-                </div>
+                class="list-group-item d-flex justify-content-between align-items-center rounded-3 mb-2 shadow-sm border-0"
+                style="background-color: rgba(255,255,255,0.9); cursor:pointer"
+                @click="PabellonDetail(p.id)"
+              >
+                <span class="fw-medium text-primary">
+                  {{ p.nombre }}
+                </span>
+                <i class="bi bi-chevron-right text-muted"></i>
               </div>
             </div>
           </div>
 
           <!-- INSTALACIONES -->
-          <div>
+          <div v-if="tab === 'instalaciones'">
+
             <div class="d-flex justify-content-between align-items-center mb-3">
               <h5 class="fw-semibold text-success">
-                <i class="bi bi-geo-alt me-2"></i>{{ t.facilities }}
+                {{ t.facilities }}
               </h5>
-              <router-link to="/crear/instalacion" class="btn btn-primary rounded-pill">
-                <i class="bi bi-plus-lg me-1"></i> {{ t.newFacility }}
+
+              <router-link to="/crear/instalacion" class="btn btn-primary rounded-pill shadow-sm">
+                <i class="bi bi-plus-lg me-1"></i>
+                {{ t.newFacility }}
               </router-link>
             </div>
 
@@ -47,12 +83,14 @@
               <div
                 v-for="i in espacios.instalaciones"
                 :key="i.id"
-                class="list-group-item d-flex justify-content-between align-items-center rounded-3 mb-2 shadow-sm"
-                @click="InstalacionDetail(i.id)">
-								<div class="text-primary fw-medium" style="cursor: pointer;">
-                  <span class="fw-medium">{{ i.nombre }}</span>
-                </div>
-
+                class="list-group-item d-flex justify-content-between align-items-center rounded-3 mb-2 shadow-sm border-0"
+                style="background-color: rgba(255,255,255,0.9); cursor:pointer"
+                @click="InstalacionDetail(i.id)"
+              >
+                <span class="fw-medium text-primary">
+                  {{ i.nombre }}
+                </span>
+                <i class="bi bi-chevron-right text-muted"></i>
               </div>
             </div>
           </div>
@@ -75,6 +113,7 @@ import { useI18n } from "@/useI18N";
 const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);
 
+const tab = ref("pabellones")
 const router = useRouter()
 
 const espacios = ref({

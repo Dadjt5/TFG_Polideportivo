@@ -23,9 +23,12 @@
               <label class="form-label">DNI</label>
               <input type="text" class="form-control" v-model="usuario.DNI" disabled>
             </div>
-          </div>
 
-          <div class="row g-3 mt-3">
+            <div class="col-md-4">
+              <label class="form-label">{{ t.loginCode }}</label>
+              <input type="text" class="form-control" v-model="usuario.codigo_usuario" disabled>
+            </div>
+
             <div class="col-md-4">
               <label class="form-label">{{ t.birth }}</label>
               <input type="date" class="form-control" v-model="usuario.fechaNacimiento" disabled>
@@ -202,6 +205,7 @@ const usuario = ref({
   nombre: '',
   apellidos: '',
   DNI: '',
+  codigo_usuario: '',
   fechaNacimiento: '',
   telefono: '',
   provincia: '',

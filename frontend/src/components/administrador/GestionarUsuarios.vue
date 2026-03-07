@@ -1,46 +1,35 @@
 <template>
-  <div class="min-vh-100 bg-light">
+  <div class="min-vh-100" style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
     <main class="container py-5" style="max-width: 1100px">
-      <h1 class="text-center mb-5 fw-semibold">{{ t.usersHandle }}</h1>
+      <h1 class="fw-bold text-primary mb-5 text-center">
+        <i class="bi bi-people-fill me-2"></i>{{ t.usersHandle }}
+      </h1>
 
-      <!-- TABS -->
-      <div class="card shadow-sm rounded-4">
+      <div class="card shadow-lg border-0 rounded-4" style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(10px);">
         <div class="card-body p-4">
-          <ul class="nav nav-tabs mb-4" role="tablist">
+          <ul class="nav nav-tabs mb-4">
             <li class="nav-item">
-              <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#admins">
-                {{ t.admin }}
-              </button>
+              <button class="nav-link" :class="{ active: tab==='admins' }" @click="tab='admins'">{{ t.admin }}</button>
             </li>
             <li class="nav-item">
-              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#monitores">
-                Monitores
-              </button>
+              <button class="nav-link" :class="{ active: tab==='monitores' }" @click="tab='monitores'">{{ t.monitors }}</button>
             </li>
             <li class="nav-item">
-              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#usuarios">
-                {{ t.finalUser }}
-              </button>
+              <button class="nav-link" :class="{ active: tab==='usuarios' }" @click="tab='usuarios'">{{ t.finalUser }}</button>
             </li>
           </ul>
 
           <div class="tab-content">
 
             <!-- ADMINISTRADORES -->
-            <div class="tab-pane fade show active" id="admins">
+            <div v-show="tab==='admins'">
               <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="fw-semibold">{{ t.admins }}</h5>
-                <router-link to="/registrar/administrador" class="btn btn-primary rounded-pill">
-                  {{ t.newAdminTitle }}
-                </router-link>
+                <router-link to="/registrar/administrador" class="btn btn-primary rounded-pill shadow-sm">{{ t.newAdminTitle }}</router-link>
               </div>
-
               <div class="list-group list-group-flush">
-                <div v-for="a in usuarios.administradores" :key="a.id"
-                  class="list-group-item d-flex justify-content-between align-items-center rounded-3 mb-2 shadow-sm"
-                  @click="AdministradorDetail(a.id)">
-
-                  <div class="text-primary fw-medium" style="cursor: pointer;">
+                <div v-for="a in usuarios.administradores" :key="a.id" class="list-group-item d-flex justify-content-between align-items-center rounded-3 mb-2 shadow-sm border-0" style="background-color: rgba(255,255,255,0.9); cursor:pointer" @click="AdministradorDetail(a.id)">
+                  <div class="text-primary fw-medium" style="cursor:pointer;">
                     <span class="fw-medium me-2">{{ a.nombre }}</span>
                     <span class="fw-medium me-2">{{ a.DNI }}</span>
                     <span class="text-muted">({{ a.rol }})</span>
@@ -50,20 +39,14 @@
             </div>
 
             <!-- MONITORES -->
-            <div class="tab-pane fade" id="monitores">
+            <div v-show="tab==='monitores'">
               <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="fw-semibold">{{ t.monitors }}</h5>
-                <router-link to="/registrar/monitor" class="btn btn-primary rounded-pill">
-                  {{ t.newMonitorTitle }}
-                </router-link>
+                <router-link to="/registrar/monitor" class="btn btn-primary rounded-pill shadow-sm">{{ t.newMonitorTitle }}</router-link>
               </div>
-
-              <input v-model="searchMonitores" type="text" class="form-control mb-3" placeholder="Buscar monitor..." />
-
+              <input v-model="searchMonitores" type="text" class="form-control mb-3 shadow-sm" placeholder="Buscar monitor..." />
               <div class="list-group list-group-flush">
-                <div v-for="m in filteredMonitores" :key="m.id"
-                  class="list-group-item d-flex justify-content-between align-items-center rounded-3 mb-2 shadow-sm"
-                  @click="MonitorDetail(m.id)">
+                <div v-for="m in filteredMonitores" :key="m.id" class="list-group-item d-flex justify-content-between align-items-center rounded-3 mb-2 shadow-sm border-0" style="background-color: rgba(255,255,255,0.9); cursor:pointer" @click="MonitorDetail(m.id)">
                   <div class="text-primary fw-medium" style="cursor: pointer;">
                     <span class="fw-medium me-2">{{ m.nombre }}</span>
                     <span class="fw-medium">{{ m.DNI }}</span>
@@ -73,36 +56,25 @@
             </div>
 
             <!-- USUARIOS FINALES -->
-            <div class="tab-pane fade" id="usuarios">
+            <div v-show="tab==='usuarios'">
               <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="fw-semibold">{{ t.finalUsers }}</h5>
-                <router-link to="/registrar/usuario" class="btn btn-primary rounded-pill">
-                  {{ t.newFinalUser }}
-                </router-link>
+                <router-link to="/registrar/usuario" class="btn btn-primary rounded-pill shadow-sm">{{ t.newFinalUser }}</router-link>
               </div>
-
-              <input v-model="searchUsuarios" type="text" class="form-control mb-3" placeholder="Buscar usuario..." />
-
+              <input v-model="searchUsuarios" type="text" class="form-control mb-3 shadow-sm" placeholder="Buscar usuario..." />
               <div class="list-group list-group-flush">
-                <div v-for="u in filteredUsuarios" :key="u.id"
-                  class="list-group-item d-flex justify-content-between align-items-center rounded-3 mb-2 shadow-sm"
-                  @click="UsuarioFinalDetail(u.id)">
-                  <div class="text-primary fw-medium" style="cursor: pointer;">
+                <div v-for="u in filteredUsuarios" :key="u.id" class="list-group-item d-flex justify-content-between align-items-center rounded-3 mb-2 shadow-sm border-0" style="background-color: rgba(255,255,255,0.9); cursor:pointer" @click="UsuarioFinalDetail(u.id)">
+                  <div class="text-primary fw-medium" style="cursor:pointer;">
                     <span class="fw-medium me-2">{{ u.nombre }}</span>
                     <span class="fw-medium me-2">{{ u.DNI }}</span>
-                      <span class="badge me-2" :class="u.esUAM ? 'bg-success' : 'bg-secondary'">
-                        {{ u.esUAM ? t.UAMuser : t.externalUser }} 
-                      </span>
-                      <span class="badge me-2" :class="u.tieneAbono ? 'bg-primary' : 'bg-secondary'">
-                        {{ u.tieneAbono ? t.hasSubscripcion : t.hasntSubscripcion }} 
-                      </span>
-                      <span class="badge" :class="u.tieneTDA ? 'bg-warning text-dark' : 'bg-secondary'">
-                        {{ u.tieneTDA ? t.hasTDA : t.hasntTDA }}
-                      </span>
+                    <span class="badge me-2" :class="u.esUAM ? 'bg-success' : 'bg-secondary'">{{ u.esUAM ? t.UAMuser : t.externalUser }}</span>
+                    <span class="badge me-2" :class="u.tieneAbono ? 'bg-primary' : 'bg-secondary'">{{ u.tieneAbono ? t.hasSubscripcion : t.hasntSubscripcion }}</span>
+                    <span class="badge" :class="u.tieneTDA ? 'bg-warning text-dark' : 'bg-secondary'">{{ u.tieneTDA ? t.hasTDA : t.hasntTDA }}</span>
                   </div>
                 </div>
               </div>
             </div>
+
           </div>
         </div>
       </div>
@@ -127,6 +99,7 @@ const router = useRouter();
 
 const searchMonitores = ref('')
 const searchUsuarios = ref('')
+const tab = ref('admins')
 
 const usuarios = ref({
   finales: [] as {

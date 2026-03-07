@@ -1,11 +1,13 @@
 <template>
-  <div class="min-vh-100 bg-light">
-    <main class="container py-5" style="max-width: 1000px">
-      <h1 class="text-center mb-5 fw-semibold">
+  <div class="min-vh-100" style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
+    <main class="container py-5" style="max-width: 1100px">
+      <h1 class="fw-bold text-primary mb-4 text-center">
+        <i class="bi bi-gear-fill me-2"></i>
         {{ t.manageActivities }}
       </h1>
 
-      <div class="card shadow-sm rounded-4">
+      <div class="card shadow-lg border-0 rounded-4"
+           style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(10px);">
         <div class="card-body p-4">
 
           <!-- TABS -->
@@ -16,6 +18,7 @@
                 :class="{ active: tab === 'actividades' }"
                 @click="tab = 'actividades'"
               >
+                <i class="bi bi-calendar-event me-1"></i>
                 {{ t.activities }}
               </button>
             </li>
@@ -25,6 +28,7 @@
                 :class="{ active: tab === 'deportes' }"
                 @click="tab = 'deportes'"
               >
+                <i class="bi bi-trophy me-1"></i>
                 {{ t.sports }}
               </button>
             </li>
@@ -36,13 +40,13 @@
               <h5 class="fw-semibold text-success">
                 {{ t.activities }}
               </h5>
-              <router-link to="/crear/actividad" class="btn btn-primary rounded-pill">
+              <router-link to="/crear/actividad" class="btn btn-primary rounded-pill shadow-sm">
                 <i class="bi bi-plus-lg me-1"></i> {{ t.newActivity }}
               </router-link>
             </div>
 
             <div class="mb-4">
-              <div class="input-group">
+              <div class="input-group shadow-sm">
                 <span class="input-group-text bg-white">
                   <i class="bi bi-search"></i>
                 </span>
@@ -63,9 +67,9 @@
               <div
                 v-for="a in actividadesFiltradas"
                 :key="a.id"
-                class="list-group-item d-flex justify-content-between align-items-center rounded-3 mb-2 shadow-sm"
+                class="list-group-item d-flex justify-content-between align-items-center rounded-3 mb-2 shadow-sm border-0"
                 @click="actividadDetail(a.id)"
-                style="cursor:pointer"
+                style="cursor:pointer; background-color: rgba(255,255,255,0.9);"
               >
                 <span class="fw-medium text-primary">
                   {{ a.nombre }}
@@ -81,7 +85,7 @@
                 {{ t.sports }}
               </h5>
               <button
-                class="btn btn-primary rounded-pill"
+                class="btn btn-primary rounded-pill shadow-sm"
                 @click="abrirModalCrear"
               >
                 <i class="bi bi-plus-lg me-1"></i> {{ t.newSport }}
@@ -89,7 +93,7 @@
             </div>
 
             <div class="mb-4">
-              <div class="input-group">
+              <div class="input-group shadow-sm">
                 <span class="input-group-text bg-white">
                   <i class="bi bi-search"></i>
                 </span>
@@ -110,7 +114,8 @@
               <div
                 v-for="d in deportesFiltrados"
                 :key="d.id"
-                class="list-group-item d-flex justify-content-between align-items-center rounded-3 mb-2 shadow-sm"
+                class="list-group-item d-flex justify-content-between align-items-center rounded-3 mb-2 shadow-sm border-0"
+                style="background-color: rgba(255,255,255,0.9);"
               >
                 <span class="fw-medium text-primary">
                   {{ d.titulo }}
@@ -146,10 +151,10 @@
       style="display:block; background: rgba(0,0,0,0.4)"
     >
       <div class="modal-dialog">
-        <div class="modal-content rounded-4">
+        <div class="modal-content rounded-4 border-0 shadow-lg">
 
           <div class="modal-header">
-            <h5 class="modal-title">
+            <h5 class="modal-title fw-semibold">
               {{ modoEdicion ? t.modifySport : t.newSport }}
             </h5>
             <button type="button" class="btn-close" @click="cerrarModal"></button>
@@ -159,7 +164,7 @@
             <label class="form-label fw-semibold">{{ t.title }}</label>
             <input
               type="text"
-              class="form-control"
+              class="form-control rounded-3"
               v-model="nombreDeporte"
               placeholder="Ej: Pádel"
               @keyup.enter="guardarDeporte"

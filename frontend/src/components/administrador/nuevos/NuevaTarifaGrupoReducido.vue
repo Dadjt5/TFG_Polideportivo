@@ -1,81 +1,83 @@
 <template>
-	<div class="min-vh-100 bg-light pb-5">
-		<main class="container py-5">
-			<h1 class="text-center fw-bold mb-5">
-				{{ t.newSmallGroupsTariff }}
-			</h1>
+  <div class="min-vh-100" style="background: linear-gradient(135deg, #fff4e0, #e0f7ff);">
+    <main class="container py-5" style="max-width: 1120px;">
+      <h1 class="text-center fw-bold mb-5 text-primary">
+        {{ t.newSmallGroupsTariff }}
+      </h1>
 
-			<div class="card shadow-sm border-0 rounded-4 p-4">
-				<div class="row g-4">
+      <div class="card shadow-lg border-0 rounded-4 p-4"
+           style="background-color: rgba(255,255,255,0.75); backdrop-filter: blur(10px);">
 
-					<div class="col-12">
-						<label class="form-label fw-semibold">
-							{{ t.title }}
-						</label>
-						<input type="text" class="form-control form-control-lg"
-							:class="{ 'is-invalid': errores.titulo }" v-model="tarifa.titulo" />
-					</div>
+        <div class="row g-4">
 
-					<!-- Nº HORAS -->
-					<div class="col-md-6">
-						<label class="form-label fw-semibold">
-							{{ t.numberOfHours }}
-						</label>
-						<input type="number" min="1" class="form-control form-control-lg"
-							:class="{ 'is-invalid': errores.numeroHoras }" v-model.number="tarifa.numeroHoras" />
-					</div>
+          <div class="col-12">
+            <label class="form-label fw-semibold">
+              {{ t.title }}
+            </label>
+            <input type="text" class="form-control form-control-lg"
+                   :class="{ 'is-invalid': errores.titulo }" v-model="tarifa.titulo" />
+          </div>
 
-					<!-- Nº PERSONAS -->
-					<div class="col-md-6">
-						<label class="form-label fw-semibold">
-							{{ t.numberOfPeople }}
-						</label>
-						<input type="number" min="1" class="form-control form-control-lg"
-							:class="{ 'is-invalid': errores.numeroPersonas }" v-model.number="tarifa.numeroPersonas" />
-					</div>
+          <!-- Nº HORAS -->
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">
+              {{ t.numberOfHours }}
+            </label>
+            <input type="number" min="1" class="form-control form-control-lg"
+                   :class="{ 'is-invalid': errores.numeroHoras }" v-model.number="tarifa.numeroHoras" />
+          </div>
 
-					<!-- PRECIO BASE -->
-					<div class="col-md-4">
-						<label class="form-label fw-semibold">
-							{{ t.basePrice }}
-						</label>
-						<input type="number" step="0.01" class="form-control form-control-lg"
-							:class="{ 'is-invalid': errores.precio }" v-model.number="tarifa.precio" />
-					</div>
+          <!-- Nº PERSONAS -->
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">
+              {{ t.numberOfPeople }}
+            </label>
+            <input type="number" min="1" class="form-control form-control-lg"
+                   :class="{ 'is-invalid': errores.numeroPersonas }" v-model.number="tarifa.numeroPersonas" />
+          </div>
 
-					<!-- PRECIO CUATRIMESTRE -->
-					<div class="col-md-4">
-						<label class="form-label fw-semibold">
-							{{ t.quarterPrice }}
-						</label>
-						<input type="number" step="0.01" class="form-control form-control-lg"
-							:class="{ 'is-invalid': errores.precioCuatrimestre }" v-model.number="tarifa.precioCuatrimestre" />
-					</div>
+          <!-- PRECIO BASE -->
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">
+              {{ t.basePrice }}
+            </label>
+            <input type="number" step="0.01" class="form-control form-control-lg"
+                   :class="{ 'is-invalid': errores.precio }" v-model.number="tarifa.precio" />
+          </div>
 
-					<!-- PRECIO MENSUAL -->
-					<div class="col-md-4">
-						<label class="form-label fw-semibold">
-							{{ t.monthlyPrice }}
-						</label>
-						<input type="number" step="0.01" class="form-control form-control-lg"
-							:class="{ 'is-invalid': errores.precioMensual }" v-model.number="tarifa.precioMensual" />
-					</div>
+          <!-- PRECIO CUATRIMESTRE -->
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">
+              {{ t.quarterPrice }}
+            </label>
+            <input type="number" step="0.01" class="form-control form-control-lg"
+                   :class="{ 'is-invalid': errores.precioCuatrimestre }" v-model.number="tarifa.precioCuatrimestre" />
+          </div>
 
-				</div>
+          <!-- PRECIO MENSUAL -->
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">
+              {{ t.monthlyPrice }}
+            </label>
+            <input type="number" step="0.01" class="form-control form-control-lg"
+                   :class="{ 'is-invalid': errores.precioMensual }" v-model.number="tarifa.precioMensual" />
+          </div>
 
-				<!-- BOTONES -->
-				<div class="d-flex justify-content-center gap-3 mt-5">
-					<button class="btn btn-primary btn-lg px-5" @click="crearTarifa">
-						{{ t.save }}
-					</button>
+        </div>
 
-					<button class="btn btn-danger btn-lg px-5" @click="volver">
-						{{ t.return }}
-					</button>
-				</div>
-			</div>
-		</main>
-	</div>
+        <!-- BOTONES -->
+        <div class="d-flex justify-content-center gap-3 mt-5">
+          <button class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm" @click="crearTarifa">
+            {{ t.save }}
+          </button>
+
+          <button class="btn btn-danger btn-lg px-5 rounded-pill shadow-sm" @click="volver">
+            {{ t.return }}
+          </button>
+        </div>
+      </div>
+    </main>
+  </div>
 </template>
 
 <script setup lang="ts">

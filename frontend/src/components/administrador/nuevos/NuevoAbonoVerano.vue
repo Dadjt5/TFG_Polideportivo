@@ -1,53 +1,47 @@
 <template>
-  <div class="min-vh-100 bg-light pb-5">
-    <main class="container py-5">
-      <h1 class="text-center fw-bold mb-5">
+  <div class="min-vh-100" style="background: linear-gradient(135deg, #fff4e0, #e0f7ff);">
+    <main class="container py-5" style="max-width: 1120px;">
+      <h1 class="text-center fw-bold mb-5 text-primary">
         {{ t.newSummerSubscription }}
       </h1>
 
-      <div class="card shadow-sm border-0 rounded-4 p-4">
+      <div class="card shadow-lg border-0 rounded-4 p-4"
+           style="background-color: rgba(255,255,255,0.7); backdrop-filter: blur(10px);">
+
         <div class="row g-4">
 
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.name }}</label>
-            <input class="form-control form-control-lg"
-              v-model="abono.nombre" />
+            <input class="form-control form-control-lg" v-model="abono.nombre" />
           </div>
 
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.priceTDA }}</label>
-            <input type="number" step="0.01"
-              class="form-control form-control-lg"
-              v-model.number="abono.precioTDA" />
+            <input type="number" step="0.01" class="form-control form-control-lg" v-model.number="abono.precioTDA" />
           </div>
 
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.priceUAM }}</label>
-            <input type="number" step="0.01"
-              class="form-control form-control-lg"
-              v-model.number="abono.precioUAM" />
+            <input type="number" step="0.01" class="form-control form-control-lg" v-model.number="abono.precioUAM" />
           </div>
 
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.priceOthers }}</label>
-            <input type="number" step="0.01"
-              class="form-control form-control-lg"
-              v-model.number="abono.precioOtros" />
+            <input type="number" step="0.01" class="form-control form-control-lg" v-model.number="abono.precioOtros" />
           </div>
 
         </div>
 
         <div class="d-flex justify-content-center gap-3 mt-5">
-          <button class="btn btn-primary btn-lg px-5"
-            @click="crear">
+          <button class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm" @click="crear">
             {{ t.createSummerSubscription }}
           </button>
 
-          <button class="btn btn-danger btn-lg px-5"
-            @click="volver">
+          <button class="btn btn-danger btn-lg px-5 rounded-pill shadow-sm" @click="volver">
             {{ t.return }}
           </button>
         </div>
+
       </div>
     </main>
   </div>

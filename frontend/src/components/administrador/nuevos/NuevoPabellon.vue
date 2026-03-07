@@ -1,11 +1,13 @@
 <template>
-  <div class="min-vh-100 bg-light pb-5">
-    <main class="container py-5">
-      <h1 class="text-center fw-bold mb-5">
+  <div class="min-vh-100" style="background: linear-gradient(135deg, #e0f7ff, #ffffff);">
+    <main class="container py-5" style="max-width: 1120px">
+      <h1 class="text-center fw-bold mb-5 text-primary">
         {{ t.newPavilion }}
       </h1>
 
-      <div class="card shadow-sm border-0 rounded-4 p-4">
+      <div class="card shadow-lg border-0 rounded-4 p-4"
+           style="background-color: rgba(180,220,255,0.6); backdrop-filter: blur(10px);">
+
         <div class="row g-4">
 
           <!-- NOMBRE -->
@@ -61,14 +63,14 @@
         <!-- BOTONES -->
         <div class="d-flex justify-content-center gap-3 mt-5">
           <button
-            class="btn btn-primary btn-lg px-5"
+            class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm"
             @click="crearPabellon"
           >
             {{ t.newPavilion }}
           </button>
 
           <button
-            class="btn btn-danger btn-lg px-5"
+            class="btn btn-danger btn-lg px-5 rounded-pill shadow-sm"
             @click="volver"
           >
             {{ t.return }}

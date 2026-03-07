@@ -1,42 +1,44 @@
 <template>
-  <div class="min-vh-100 bg-light pb-5">
-    <main class="container py-5" style="max-width: 900px;">
-      <h1 class="text-center fw-bold mb-5">
+  <div class="min-vh-100" style="background: linear-gradient(135deg, #e0f7ff, #ffffff);">
+    <main class="container py-5" style="max-width: 1120px;">
+      <h1 class="text-center fw-bold mb-5 text-primary">
         {{ t.newDiscount }}
       </h1>
 
-      <div class="card shadow-sm border-0 rounded-4 p-4">
+      <div class="card shadow-lg border-0 rounded-4 p-4"
+           style="background-color: rgba(180,220,255,0.6); backdrop-filter: blur(10px);">
+
         <div class="row g-4">
 
           <!-- NOMBRE -->
           <div class="col-md-6">
             <label class="form-label fw-semibold">{{ t.name }}</label>
-            <input type="text" class="form-control form-control-lg" :class="{ 'is-invalid': errores.nombre }"
-              v-model="descuento.nombre" />
+            <input type="text" class="form-control form-control-lg"
+                   :class="{ 'is-invalid': errores.nombre }" v-model="descuento.nombre" />
           </div>
 
           <!-- PORCENTAJE -->
           <div class="col-md-6">
             <label class="form-label fw-semibold">{{ t.percentage }}</label>
             <input type="number" min="0" max="100" class="form-control form-control-lg"
-              :class="{ 'is-invalid': errores.porcentaje }" v-model="descuento.porcentaje" />
+                   :class="{ 'is-invalid': errores.porcentaje }" v-model="descuento.porcentaje" />
           </div>
 
           <!-- DESCRIPCIÓN -->
           <div class="col-12">
             <label class="form-label fw-semibold">{{ t.description }}</label>
-            <textarea class="form-control" rows="3" v-model="descuento.descripcion"></textarea>
+            <textarea class="form-control form-control-lg" rows="3" v-model="descuento.descripcion"></textarea>
           </div>
 
           <!-- FECHAS -->
           <div class="col-md-6">
             <label class="form-label fw-semibold">{{ t.startDate }}</label>
-            <input type="date" class="form-control" v-model="descuento.fechaInicio" />
+            <input type="date" class="form-control form-control-lg" v-model="descuento.fechaInicio" />
           </div>
 
           <div class="col-md-6">
             <label class="form-label fw-semibold">{{ t.endDate }}</label>
-            <input type="date" class="form-control" v-model="descuento.fechaFinValidez" />
+            <input type="date" class="form-control form-control-lg" v-model="descuento.fechaFinValidez" />
           </div>
 
           <!-- CHECKS -->
@@ -62,9 +64,9 @@
 
             <div class="row g-3">
               <div v-for="tipo in estadisticasStore.data.tiposInstalacion" :key="tipo[0]" class="col-md-4">
-                <div class="border rounded-3 p-3 h-100 cursor-pointer"
-                  :class="{ 'border-primary bg-light': descuento.tiposInstalacion.includes(tipo[0]) }"
-                  @click="toggleTipo(tipo[0])">
+                <div class="border rounded-3 p-3 h-100 cursor-pointer text-center"
+                     :class="{ 'border-primary bg-white shadow-sm': descuento.tiposInstalacion.includes(tipo[0]) }"
+                     @click="toggleTipo(tipo[0])">
                   {{ tipo[1] }}
                 </div>
               </div>
@@ -79,9 +81,9 @@
 
             <div class="row g-3">
               <div v-for="deporte in deportes" :key="deporte.id" class="col-md-3">
-                <div class="border rounded-3 p-3 h-100 cursor-pointer text-center" :class="{
-                  'border-primary bg-light': descuento.deportes.includes(deporte.id)
-                }" @click="toggleDeporte(deporte.id)">
+                <div class="border rounded-3 p-3 h-100 cursor-pointer text-center"
+                     :class="{ 'border-primary bg-white shadow-sm': descuento.deportes.includes(deporte.id) }"
+                     @click="toggleDeporte(deporte.id)">
                   {{ deporte.titulo }}
                 </div>
               </div>
@@ -97,14 +99,15 @@
 
         <!-- BOTONES -->
         <div class="d-flex justify-content-center gap-3 mt-5">
-          <button class="btn btn-primary btn-lg px-5" @click="crearDescuento">
+          <button class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm" @click="crearDescuento">
             {{ t.newDiscount }}
           </button>
 
-          <button class="btn btn-danger btn-lg px-5" @click="volver">
+          <button class="btn btn-danger btn-lg px-5 rounded-pill shadow-sm" @click="volver">
             {{ t.return }}
           </button>
         </div>
+
       </div>
     </main>
   </div>

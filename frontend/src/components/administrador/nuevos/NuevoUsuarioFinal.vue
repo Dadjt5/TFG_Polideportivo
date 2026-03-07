@@ -133,7 +133,7 @@
             ¡{{ t.usuarioFinalIdentifier }}: <span class="text-success">{{ userIdentifier }}</span>!
           </p>
 
-          <!-- Botón para ir al login -->
+          <!-- Botón para ir a login -->
           <button class="btn btn-primary btn-sm" @click="gestionUsuarios">
             {{ t.login }}
           </button>

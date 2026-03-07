@@ -1,11 +1,11 @@
 <template>
-  <div class="min-vh-100 bg-light pb-5">
-    <main class="container py-5">
-      <h1 class="text-center fw-bold mb-5">
+  <div class="min-vh-100" style="background: linear-gradient(135deg, #fff4e0, #e0f7ff);">
+    <main class="container py-5" style="max-width: 1120px;">
+      <h1 class="text-center fw-bold mb-5 text-primary">
         {{ t.newSession }}
       </h1>
 
-      <div class="card shadow-sm border-0 rounded-4 p-4">
+      <div class="card shadow-lg border-0 rounded-4 p-4" style="background-color: rgba(255,255,255,0.75); backdrop-filter: blur(10px);">
         <div class="row g-4">
           <!-- DÍA -->
           <div class="col-md-12">
@@ -23,20 +23,19 @@
             <label class="form-label fw-semibold">{{ t.schedule }}</label>
             <div class="d-flex gap-2">
               <input type="time" class="form-control" v-model="sesion.horaInicio"
-                :class="{ 'is-invalid': errores.horaInicio }" />
+                     :class="{ 'is-invalid': errores.horaInicio }" />
               <input type="time" class="form-control" v-model="sesion.horaFin"
-                :class="{ 'is-invalid': errores.horaFin }" />
+                     :class="{ 'is-invalid': errores.horaFin }" />
             </div>
           </div>
         </div>
 
-        <!-- BOTONES -->
         <div class="d-flex justify-content-center gap-3 mt-5">
-          <button class="btn btn-primary btn-lg px-5" @click="crearSesion">
+          <button class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm" @click="crearSesion">
             {{ t.newSession }}
           </button>
 
-          <button class="btn btn-danger btn-lg px-5" @click="volver">
+          <button class="btn btn-danger btn-lg px-5 rounded-pill shadow-sm" @click="volver">
             {{ t.return }}
           </button>
         </div>

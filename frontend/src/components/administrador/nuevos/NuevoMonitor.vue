@@ -1,11 +1,13 @@
 <template>
-  <div class="min-vh-100 bg-light pb-5">
-    <main class="container py-5">
-      <h1 class="text-center fw-bold mb-5">
+  <div class="min-vh-100" style="background: linear-gradient(135deg, #e0f7ff, #ffffff);">
+    <main class="container py-5" style="max-width: 1120px">
+      <h1 class="text-center fw-bold mb-5 text-primary">
         {{ t.newMonitorTitle }}
       </h1>
 
-      <div class="card shadow-sm border-0 rounded-4 p-4">
+      <div class="card shadow-lg border-0 rounded-4 p-4"
+           style="background-color: rgba(180,220,255,0.6); backdrop-filter: blur(10px);">
+
         <div class="row g-4">
 
           <div class="col-md-6">
@@ -13,7 +15,7 @@
             <input
               type="text"
               class="form-control form-control-lg"
-							:class="{ 'is-invalid': errores.nombre }"
+              :class="{ 'is-invalid': errores.nombre }"
               v-model="monitor.nombre"
             />
           </div>
@@ -23,7 +25,7 @@
             <input
               type="text"
               class="form-control form-control-lg"
-							:class="{ 'is-invalid': errores.apellidos }"
+              :class="{ 'is-invalid': errores.apellidos }"
               v-model="monitor.apellidos"
             />
           </div>
@@ -33,7 +35,7 @@
             <input
               type="text"
               class="form-control form-control-lg"
-							:class="{ 'is-invalid': errores.dni }"
+              :class="{ 'is-invalid': errores.dni }"
               v-model="monitor.dni"
             />
           </div>
@@ -43,55 +45,53 @@
             <input
               type="email"
               class="form-control form-control-lg"
-							:class="{ 'is-invalid': errores.email }"
+              :class="{ 'is-invalid': errores.email }"
               v-model="monitor.email"
             />
           </div>
 
           <!-- PASSWORD -->
-            <div class="col-md-6">
-              <label class="form-label fw-semibold">{{ t.passwordPlaceholder }}</label>
-              <div class="position-relative d-flex align-items-center">
-                <input :type="showPassword ? 'text' : 'password'" class="form-control pe-5"
-                  :class="{ 'is-invalid': errores.password }" v-model="monitor.password" />
-
-                <button type="button"
-                  class="position-absolute end-0 me-3 border-0 bg-transparent d-flex align-items-center justify-content-center"
-                  style="height: 100%; top: 0;" @click="togglePassword">
-                  <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"
-                    style="font-size: 1.2rem; color: #6c757d;"></i>
-                </button>
-              </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">{{ t.passwordPlaceholder }}</label>
+            <div class="position-relative d-flex align-items-center">
+              <input :type="showPassword ? 'text' : 'password'" class="form-control pe-5"
+                     :class="{ 'is-invalid': errores.password }" v-model="monitor.password" />
+              <button type="button"
+                      class="position-absolute end-0 me-3 border-0 bg-transparent d-flex align-items-center justify-content-center"
+                      style="height: 100%; top: 0;" @click="togglePassword">
+                <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"
+                   style="font-size: 1.2rem; color: #0072ff;"></i>
+              </button>
             </div>
+          </div>
 
-            <div class="col-md-6">
-              <label class="form-label fw-semibold">{{ t.passwordConfirm }}</label>
-              <div class="position-relative d-flex align-items-center">
-                <input :type="showConfirmPassword ? 'text' : 'password'" class="form-control pe-5"
-                  :class="{ 'is-invalid': errores.password }" v-model="monitor.confirmPassword" />
-
-                <button type="button"
-                  class="position-absolute end-0 me-3 border-0 bg-transparent d-flex align-items-center justify-content-center"
-                  style="height: 100%; top: 0;" @click="toggleConfirmPassword">
-                  <i :class="showConfirmPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"
-                    style="font-size: 1.2rem; color: #6c757d;"></i>
-                </button>
-              </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">{{ t.passwordConfirm }}</label>
+            <div class="position-relative d-flex align-items-center">
+              <input :type="showConfirmPassword ? 'text' : 'password'" class="form-control pe-5"
+                     :class="{ 'is-invalid': errores.password }" v-model="monitor.confirmPassword" />
+              <button type="button"
+                      class="position-absolute end-0 me-3 border-0 bg-transparent d-flex align-items-center justify-content-center"
+                      style="height: 100%; top: 0;" @click="toggleConfirmPassword">
+                <i :class="showConfirmPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"
+                   style="font-size: 1.2rem; color: #0072ff;"></i>
+              </button>
             </div>
+          </div>
         </div>
 
-				<p v-if="mensaje" class="text-center text-danger mt-4">
-        	{{ mensaje }}
-	      </p>
+        <p v-if="mensaje" class="text-center text-danger mt-4">
+          {{ mensaje }}
+        </p>
 
-         <!-- Mensaje del identificador único -->
+        <!-- Mensaje del identificador único -->
         <div v-if="showIdentifier" class="text-center mt-3">
           <p class="fw-bold text-primary mb-2">
             ¡{{ t.monitorIdentifier }}: <span class="text-success">{{ userIdentifier }}</span>!
           </p>
 
           <!-- Botón para ir al login -->
-          <button class="btn btn-primary btn-sm" @click="gestionUsuarios">
+          <button class="btn btn-primary btn-sm shadow-sm" @click="gestionUsuarios">
             {{ t.login }}
           </button>
         </div>
@@ -99,21 +99,21 @@
         <!-- BOTONES -->
         <div class="d-flex justify-content-center gap-3 mt-5">
           <button
-            class="btn btn-primary btn-lg px-5"
+            class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm"
             @click="crearMonitor"
           >
             {{ t.createMonitor }}
           </button>
 
           <button
-            class="btn btn-danger btn-lg px-5"
+            class="btn btn-danger btn-lg px-5 rounded-pill shadow-sm"
             @click="volver"
           >
             {{ t.return }}
           </button>
         </div>
-      </div>
 
+      </div>
     </main>
   </div>
 </template>

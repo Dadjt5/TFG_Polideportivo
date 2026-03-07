@@ -1,128 +1,77 @@
 <template>
-  <div class="min-vh-100 bg-light pb-5">
-    <main class="container py-5">
-      <h1 class="text-center fw-bold mb-5">
+  <div class="min-vh-100" style="background: linear-gradient(135deg, #fff4e0, #e0f7ff);">
+    <main class="container py-5" style="max-width: 1120px;">
+      <h1 class="text-center fw-bold mb-5 text-primary">
         {{ t.newPhysiotherapyTariff }}
       </h1>
 
-      <div class="card shadow-sm border-0 rounded-4 p-4">
+      <div class="card shadow-lg border-0 rounded-4 p-4"
+           style="background-color: rgba(255,255,255,0.75); backdrop-filter: blur(10px);">
+
         <div class="row g-4">
 
           <div class="col-12">
-						<label class="form-label fw-semibold">
-							{{ t.title }}
-						</label>
-						<input type="text" class="form-control form-control-lg"
-							:class="{ 'is-invalid': errores.titulo }" v-model="tarifa.titulo" />
-					</div>
+            <label class="form-label fw-semibold">
+              {{ t.title }}
+            </label>
+            <input type="text" class="form-control form-control-lg"
+                   :class="{ 'is-invalid': errores.titulo }" v-model="tarifa.titulo" />
+          </div>
 
           <!-- CONSULTA -->
           <h5 class="fw-semibold mt-3">{{ t.consultationPrice }}</h5>
-
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.priceTDA }}</label>
-            <input
-              type="number"
-              step="0.01"
-              class="form-control form-control-lg"
-              :class="{ 'is-invalid': errores.precioConsultaTDA }"
-              v-model.number="tarifa.precioConsultaTDA"
-            />
+            <input type="number" step="0.01" class="form-control form-control-lg"
+                   :class="{ 'is-invalid': errores.precioConsultaTDA }" v-model.number="tarifa.precioConsultaTDA" />
           </div>
-
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.priceUAM }}</label>
-            <input
-              type="number"
-              step="0.01"
-              class="form-control form-control-lg"
-              :class="{ 'is-invalid': errores.precioConsultaUAM }"
-              v-model.number="tarifa.precioConsultaUAM"
-            />
+            <input type="number" step="0.01" class="form-control form-control-lg"
+                   :class="{ 'is-invalid': errores.precioConsultaUAM }" v-model.number="tarifa.precioConsultaUAM" />
           </div>
-
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.priceOthers }}</label>
-            <input
-              type="number"
-              step="0.01"
-              class="form-control form-control-lg"
-              :class="{ 'is-invalid': errores.precioConsultaOtros }"
-              v-model.number="tarifa.precioConsultaOtros"
-            />
+            <input type="number" step="0.01" class="form-control form-control-lg"
+                   :class="{ 'is-invalid': errores.precioConsultaOtros }" v-model.number="tarifa.precioConsultaOtros" />
           </div>
 
           <!-- SESIONES 1-5 -->
           <h5 class="fw-semibold mt-4">{{ t.sessions1to5 }}</h5>
-
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.priceTDA }}</label>
-            <input
-              type="number"
-              step="0.01"
-              class="form-control form-control-lg"
-              :class="{ 'is-invalid': errores.precioSesiones1_5TDA }"
-              v-model.number="tarifa.precioSesiones1_5TDA"
-            />
+            <input type="number" step="0.01" class="form-control form-control-lg"
+                   :class="{ 'is-invalid': errores.precioSesiones1_5TDA }" v-model.number="tarifa.precioSesiones1_5TDA" />
           </div>
-
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.priceUAM }}</label>
-            <input
-              type="number"
-              step="0.01"
-              class="form-control form-control-lg"
-              :class="{ 'is-invalid': errores.precioSesiones1_5UAM }"
-              v-model.number="tarifa.precioSesiones1_5UAM"
-            />
+            <input type="number" step="0.01" class="form-control form-control-lg"
+                   :class="{ 'is-invalid': errores.precioSesiones1_5UAM }" v-model.number="tarifa.precioSesiones1_5UAM" />
           </div>
-
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.priceOthers }}</label>
-            <input
-              type="number"
-              step="0.01"
-              class="form-control form-control-lg"
-              :class="{ 'is-invalid': errores.precioSesiones1_5Otros }"
-              v-model.number="tarifa.precioSesiones1_5Otros"
-            />
+            <input type="number" step="0.01" class="form-control form-control-lg"
+                   :class="{ 'is-invalid': errores.precioSesiones1_5Otros }" v-model.number="tarifa.precioSesiones1_5Otros" />
           </div>
 
           <!-- SESIONES 6+ -->
           <h5 class="fw-semibold mt-4">{{ t.sessions6plus }}</h5>
-
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.priceTDA }}</label>
-            <input
-              type="number"
-              step="0.01"
-              class="form-control form-control-lg"
-              :class="{ 'is-invalid': errores.precioSesiones6TDA }"
-              v-model.number="tarifa.precioSesiones6TDA"
-            />
+            <input type="number" step="0.01" class="form-control form-control-lg"
+                   :class="{ 'is-invalid': errores.precioSesiones6TDA }" v-model.number="tarifa.precioSesiones6TDA" />
           </div>
-
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.priceUAM }}</label>
-            <input
-              type="number"
-              step="0.01"
-              class="form-control form-control-lg"
-              :class="{ 'is-invalid': errores.precioSesiones6UAM }"
-              v-model.number="tarifa.precioSesiones6UAM"
-            />
+            <input type="number" step="0.01" class="form-control form-control-lg"
+                   :class="{ 'is-invalid': errores.precioSesiones6UAM }" v-model.number="tarifa.precioSesiones6UAM" />
           </div>
-
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.priceOthers }}</label>
-            <input
-              type="number"
-              step="0.01"
-              class="form-control form-control-lg"
-              :class="{ 'is-invalid': errores.precioSesiones6Otros }"
-              v-model.number="tarifa.precioSesiones6Otros"
-            />
+            <input type="number" step="0.01" class="form-control form-control-lg"
+                   :class="{ 'is-invalid': errores.precioSesiones6Otros }" v-model.number="tarifa.precioSesiones6Otros" />
           </div>
+
         </div>
 
         <p v-if="mensaje" class="text-center text-danger mt-4">
@@ -131,11 +80,11 @@
 
         <!-- BOTONES -->
         <div class="d-flex justify-content-center gap-3 mt-5">
-          <button class="btn btn-primary btn-lg px-5" @click="crearTarifa">
+          <button class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm" @click="crearTarifa">
             {{ t.save }}
           </button>
 
-          <button class="btn btn-danger btn-lg px-5" @click="volver">
+          <button class="btn btn-danger btn-lg px-5 rounded-pill shadow-sm" @click="volver">
             {{ t.return }}
           </button>
         </div>

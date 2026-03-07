@@ -1,172 +1,57 @@
 <template>
-  <div class="min-vh-100 bg-light">
+  <div class="min-vh-100" style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
     <main class="container py-5" style="max-width: 1100px">
-      <h1 class="text-center mb-5 fw-semibold">
-        {{ t.manageRates }}
+      <h1 class="fw-bold text-primary mb-5 text-center">
+        <i class="bi bi-cash-stack me-2"></i>{{ t.manageRates }}
       </h1>
 
-      <div class="card shadow-sm rounded-4">
+      <div class="card shadow-lg border-0 rounded-4" style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(10px);">
         <div class="card-body p-4">
 
           <!-- TABS -->
-          <ul class="nav nav-tabs mb-4" role="tablist">
+          <ul class="nav nav-tabs mb-4">
             <li class="nav-item">
-              <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tarifas" type="button">
-                {{ t.manageRates }}
+              <button class="nav-link" :class="{ active: tab==='tarifas' }" @click="tab='tarifas'">
+                <i class="bi bi-currency-dollar me-1"></i>{{ t.manageRates }}
               </button>
             </li>
             <li class="nav-item">
-              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#bonos" type="button">
-                {{ t.bonus }}
+              <button class="nav-link" :class="{ active: tab==='bonos' }" @click="tab='bonos'">
+                <i class="bi bi-ticket-perforated me-1"></i>{{ t.bonus }}
               </button>
             </li>
             <li class="nav-item">
-              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#abonos" type="button">
-                {{ t.subscription }}
+              <button class="nav-link" :class="{ active: tab==='abonos' }" @click="tab='abonos'">
+                <i class="bi bi-ticket-perforated me-1"></i>{{ t.subscription }}
               </button>
             </li>
-
             <li class="nav-item">
-              <button class="nav-link" data-bs-toggle="tab" data-bs-target="#descuentos" type="button">
-                {{ t.discounts }}
+              <button class="nav-link" :class="{ active: tab==='descuentos' }" @click="tab='descuentos'">
+                <i class="bi bi-percent me-1"></i>{{ t.discounts }}
               </button>
             </li>
           </ul>
 
           <div class="tab-content">
 
-            <!-- TAB ABONOS -->
-            <div class="tab-pane fade" id="abonos">
-
-              <!-- ABONOS -->
-              <div class="mb-5">
-
-                <!-- ABONOS DEPORTIVOS -->
-                <div class="mb-4">
-                  <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h5 class="fw-semibold text-success">
-                      <i class="bi bi-ticket-perforated me-2"></i>{{ t.sportsSubscription }}
-                    </h5>
-
-                    <router-link to="/crear/abono/deportivo" class="btn btn-primary rounded-pill">
-                      <i class="bi bi-plus-lg me-1"></i> {{ t.newSportSubscription }}
-                    </router-link>
-                  </div>
-
-                  <div class="list-group list-group-flush">
-                    <div v-for="abono in abonosDeportivos" :key="abono.id"
-                      class="list-group-item rounded-3 mb-2 shadow-sm d-flex justify-content-between align-items-center"
-                      @click="abonoDetail(abono.id, 'deportivo')">
-                      <div class="fw-medium text-primary">
-                        {{ abono.nombre }}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- ABONOS VERANO -->
-                <div class="mb-4">
-                  <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="fw-semibold text-success">
-                      <i class="bi bi-ticket-perforated me-2"></i>{{ t.summerSubscription }}
-                    </h5>
-
-                    <router-link to="/crear/abono/verano" class="btn btn-primary rounded-pill">
-                      <i class="bi bi-plus-lg me-1"></i> {{ t.newSummerSubscription }}
-                    </router-link>
-                  </div>
-
-                  <div class="list-group list-group-flush">
-                    <div v-for="abono in abonosVerano" :key="abono.id"
-                      class="list-group-item rounded-3 mb-2 shadow-sm d-flex justify-content-between align-items-center"
-                      @click="abonoDetail(abono.id, 'verano')">
-                      <div class="fw-medium text-primary">
-                        {{ abono.nombre }}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-
-            <!-- TAB BONOS -->
-            <div class="tab-pane fade" id="bonos">
-              <!-- BONOS -->
-              <div>
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                  <h5 class="fw-semibold text-success">
-                    <i class="bi bi-ticket-perforated me-2"></i>{{ t.bonus }}
-                  </h5>
-
-                  <router-link to="/crear/bono" class="btn btn-primary rounded-pill">
-                    <i class="bi bi-plus-lg me-1"></i> {{ t.newBonus }}
-                  </router-link>
-                </div>
-
-                <div class="list-group list-group-flush">
-                  <div v-for="bono in bonos" :key="bono.id"
-                    class="list-group-item rounded-3 mb-2 shadow-sm d-flex justify-content-between align-items-center"
-                    @click="bonoDetail(bono.id)">
-                    <div class="fw-medium text-primary">
-                      {{ t.bonus }} {{ bono.nombreInstalacion }}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-
-            <!-- TAB DESCUENTOS -->
-            <div class="tab-pane fade" id="descuentos">
-              <!-- DESCUENTOS -->
-              <div>
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                  <h5 class="fw-semibold text-success">
-                    <i class="bi bi-ticket-perforated me-2"></i>{{ t.discounts }}
-                  </h5>
-
-                  <router-link to="/crear/descuento" class="btn btn-primary rounded-pill">
-                    <i class="bi bi-plus-lg me-1"></i> {{ t.newDiscount }}
-                  </router-link>
-                </div>
-
-                <div class="list-group list-group-flush">
-                  <div v-for="descuento in descuentos" :key="descuento.id"
-                    class="list-group-item rounded-3 mb-2 shadow-sm d-flex justify-content-between align-items-center"
-                    @click="descuentoDetail(descuento.id)">
-                    <div class="fw-medium text-primary">
-                      {{ descuento.nombre }}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-
-            <!-- TAB TARIFAS -->
-            <div class="tab-pane fade show active" id="tarifas">
-
+            <!-- TARIFAS INSTALACIÓN -->
+            <div v-if="tab==='tarifas'">
               <!-- TARIFAS INSTALACIÓN -->
               <div class="mb-5">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                   <h5 class="fw-semibold text-success">
                     <i class="bi bi-geo-alt me-2"></i>{{ t.facilityTariff }}
                   </h5>
-                  <router-link to="/crear/tarifa/instalacion" class="btn btn-primary rounded-pill">
+                  <router-link to="/crear/tarifa/instalacion" class="btn btn-primary rounded-pill shadow-sm">
                     <i class="bi bi-plus-lg me-1"></i> {{ t.newTariff }}
                   </router-link>
                 </div>
-
                 <div class="list-group list-group-flush">
                   <div v-for="tarifa in tarifasInstalacion" :key="tarifa.id"
-                    class="list-group-item rounded-3 mb-2 shadow-sm d-flex justify-content-between align-items-center"
-                    @click="tarifaInstalacionDetail(tarifa.id)">
-                    <div>
-                      <div class="fw-medium text-primary">
-                        {{ tarifa.titulo }}
-                      </div>
-                    </div>
+                       class="list-group-item rounded-3 mb-2 shadow-sm border-0"
+                       style="background-color: rgba(255,255,255,0.9); cursor:pointer;"
+                       @click="tarifaInstalacionDetail(tarifa.id)">
+                    <div class="fw-medium text-primary">{{ tarifa.titulo }}</div>
                   </div>
                 </div>
               </div>
@@ -177,41 +62,36 @@
                   <h5 class="fw-semibold text-success">
                     <i class="bi bi-geo-alt me-2"></i>{{ t.TDATariff }}
                   </h5>
-                  <router-link to="/crear/tarifa/TDA" class="btn btn-primary rounded-pill">
+                  <router-link to="/crear/tarifa/TDA" class="btn btn-primary rounded-pill shadow-sm">
                     <i class="bi bi-plus-lg me-1"></i> {{ t.newTariff }}
                   </router-link>
                 </div>
-
                 <div class="list-group list-group-flush">
                   <div v-for="tarifa in tarifasTDA" :key="tarifa.id"
-                    class="list-group-item rounded-3 mb-2 shadow-sm d-flex justify-content-between align-items-center"
-                    @click="tarifaTDADetail(tarifa.id)">
-                    <div>
-                      <div class="fw-medium text-primary">
-                        {{ tarifa.titulo }}
-                      </div>
-                    </div>
+                       class="list-group-item rounded-3 mb-2 shadow-sm border-0"
+                       style="background-color: rgba(255,255,255,0.9); cursor:pointer;"
+                       @click="tarifaTDADetail(tarifa.id)">
+                    <div class="fw-medium text-primary">{{ tarifa.titulo }}</div>
                   </div>
                 </div>
               </div>
 
-              <!-- ACTIVIDAD COMÚN -->
+              <!-- TARIFAS ACTIVIDAD COMÚN -->
               <div class="mb-5">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                   <h5 class="fw-semibold text-success">
                     <i class="bi bi-people me-2"></i>{{ t.commonActivityTariff }}
                   </h5>
-                  <router-link to="/crear/tarifa/comun" class="btn btn-primary rounded-pill">
+                  <router-link to="/crear/tarifa/comun" class="btn btn-primary rounded-pill shadow-sm">
                     <i class="bi bi-plus-lg me-1"></i> {{ t.newTariff }}
                   </router-link>
                 </div>
-
                 <div class="list-group list-group-flush">
                   <div v-for="tarifa in tarifasActividadComun" :key="tarifa.id"
-                    class="list-group-item rounded-3 mb-2 shadow-sm" @click="tarifaActividadComunDetail(tarifa.id)">
-                    <div class="fw-medium text-primary">
-                      {{ tarifa.titulo }}
-                    </div>
+                       class="list-group-item rounded-3 mb-2 shadow-sm border-0"
+                       style="background-color: rgba(255,255,255,0.9); cursor:pointer;"
+                       @click="tarifaActividadComunDetail(tarifa.id)">
+                    <div class="fw-medium text-primary">{{ tarifa.titulo }}</div>
                   </div>
                 </div>
               </div>
@@ -222,17 +102,16 @@
                   <h5 class="fw-semibold text-success">
                     <i class="bi bi-person-badge me-2"></i>{{ t.smallGroupsTariff }}
                   </h5>
-                  <router-link to="/crear/tarifa/grupos" class="btn btn-primary rounded-pill">
+                  <router-link to="/crear/tarifa/grupos" class="btn btn-primary rounded-pill shadow-sm">
                     <i class="bi bi-plus-lg me-1"></i> {{ t.newTariff }}
                   </router-link>
                 </div>
-
                 <div class="list-group list-group-flush">
                   <div v-for="tarifa in tarifasGrupoReducido" :key="tarifa.id"
-                    class="list-group-item rounded-3 mb-2 shadow-sm" @click="tarifaGrupoReducidoDetail(tarifa.id)">
-                    <div class="fw-medium text-primary">
-                      {{ tarifa.titulo }}
-                    </div>
+                       class="list-group-item rounded-3 mb-2 shadow-sm border-0"
+                       style="background-color: rgba(255,255,255,0.9); cursor:pointer;"
+                       @click="tarifaGrupoReducidoDetail(tarifa.id)">
+                    <div class="fw-medium text-primary">{{ tarifa.titulo }}</div>
                   </div>
                 </div>
               </div>
@@ -243,18 +122,84 @@
                   <h5 class="fw-semibold text-success">
                     <i class="bi bi-heart-pulse me-2"></i>{{ t.physiotherapyTariff }}
                   </h5>
-                  <router-link to="/crear/tarifa/fisioterapia" class="btn btn-primary rounded-pill">
+                  <router-link to="/crear/tarifa/fisioterapia" class="btn btn-primary rounded-pill shadow-sm">
                     <i class="bi bi-plus-lg me-1"></i> {{ t.newTariff }}
                   </router-link>
                 </div>
-
                 <div class="list-group list-group-flush">
                   <div v-for="tarifa in tarifasFisioterapia" :key="tarifa.id"
-                    class="list-group-item rounded-3 mb-2 shadow-sm" @click="tarifaFisioterapiaDetail(tarifa.id)">
-                    <div class="fw-medium text-primary">
-                      {{ tarifa.titulo }}
-                    </div>
+                       class="list-group-item rounded-3 mb-2 shadow-sm border-0"
+                       style="background-color: rgba(255,255,255,0.9); cursor:pointer;"
+                       @click="tarifaFisioterapiaDetail(tarifa.id)">
+                    <div class="fw-medium text-primary">{{ tarifa.titulo }}</div>
                   </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- TAB BONOS -->
+            <div v-if="tab==='bonos'">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-semibold text-success"><i class="bi bi-ticket-perforated me-2"></i>{{ t.bonus }}</h5>
+                <router-link to="/crear/bono" class="btn btn-primary rounded-pill shadow-sm"><i class="bi bi-plus-lg me-1"></i> {{ t.newBonus }}</router-link>
+              </div>
+              <div class="list-group list-group-flush">
+                <div v-for="bono in bonos" :key="bono.id"
+                     class="list-group-item rounded-3 mb-2 shadow-sm border-0"
+                     style="background-color: rgba(255,255,255,0.9); cursor:pointer;"
+                     @click="bonoDetail(bono.id)">
+                  <div class="fw-medium text-primary">{{ t.bonus }} {{ bono.nombreInstalacion }}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- TAB ABONOS -->
+            <div v-if="tab==='abonos'">
+              <!-- ABONOS DEPORTIVOS -->
+              <div class="mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <h5 class="fw-semibold text-success"><i class="bi bi-ticket-perforated me-2"></i>{{ t.sportsSubscription }}</h5>
+                  <router-link to="/crear/abono/deportivo" class="btn btn-primary rounded-pill shadow-sm"><i class="bi bi-plus-lg me-1"></i> {{ t.newSportSubscription }}</router-link>
+                </div>
+                <div class="list-group list-group-flush">
+                  <div v-for="abono in abonosDeportivos" :key="abono.id"
+                       class="list-group-item rounded-3 mb-2 shadow-sm border-0"
+                       style="background-color: rgba(255,255,255,0.9); cursor:pointer;"
+                       @click="abonoDetail(abono.id,'deportivo')">
+                    <div class="fw-medium text-primary">{{ abono.nombre }}</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ABONOS VERANO -->
+              <div class="mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h5 class="fw-semibold text-success"><i class="bi bi-ticket-perforated me-2"></i>{{ t.summerSubscription }}</h5>
+                  <router-link to="/crear/abono/verano" class="btn btn-primary rounded-pill shadow-sm"><i class="bi bi-plus-lg me-1"></i> {{ t.newSummerSubscription }}</router-link>
+                </div>
+                <div class="list-group list-group-flush">
+                  <div v-for="abono in abonosVerano" :key="abono.id"
+                       class="list-group-item rounded-3 mb-2 shadow-sm border-0"
+                       style="background-color: rgba(255,255,255,0.9); cursor:pointer;"
+                       @click="abonoDetail(abono.id,'verano')">
+                    <div class="fw-medium text-primary">{{ abono.nombre }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- TAB DESCUENTOS -->
+            <div v-if="tab==='descuentos'">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-semibold text-success"><i class="bi bi-percent me-2"></i>{{ t.discounts }}</h5>
+                <router-link to="/crear/descuento" class="btn btn-primary rounded-pill shadow-sm"><i class="bi bi-plus-lg me-1"></i> {{ t.newDiscount }}</router-link>
+              </div>
+              <div class="list-group list-group-flush">
+                <div v-for="descuento in descuentos" :key="descuento.id"
+                     class="list-group-item rounded-3 mb-2 shadow-sm border-0"
+                     style="background-color: rgba(255,255,255,0.9); cursor:pointer;"
+                     @click="descuentoDetail(descuento.id)">
+                  <div class="fw-medium text-primary">{{ descuento.nombre }}</div>
                 </div>
               </div>
             </div>
@@ -280,6 +225,7 @@ const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);
 
 const router = useRouter();
+const tab = ref("tarifas")
 
 const abonosDeportivos = ref<any[]>([]);
 const abonosVerano = ref<any[]>([]);

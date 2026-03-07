@@ -27,7 +27,7 @@
               <h3 class="fw-semibold mb-1">
                 {{ monitor.nombre }} {{ monitor.apellidos }}
               </h3>
-              <p class="text-muted mb-0">Monitor</p>
+              <p class="text-muted mb-0">{{ t.monitor }}</p>
             </div>
           </div>
 
@@ -65,14 +65,16 @@
             <!-- DNI -->
             <div class="col-md-4">
               <label class="form-label">DNI</label>
-              <input
-                v-if="isEditing"
-                class="form-control"
-                v-model="monitor.DNI"
-                :class="{ 'is-invalid': errores.DNI }"
-              />
-              <p v-else class="form-control-plaintext">
+              <p class="form-control-plaintext">
                 {{ monitor.DNI || '-' }}
+              </p>
+            </div>
+
+            <!-- Codigo usuarios -->
+            <div class="col-md-4">
+              <label class="form-label">{{ t.loginCode }}</label>
+              <p class="form-control-plaintext">
+                {{ monitor.codigo_usuario || '-' }}
               </p>
             </div>
 
@@ -155,6 +157,7 @@ const monitor = ref({
   nombre: '',
   apellidos: '',
   DNI: '',
+  codigo_usuario: '',
   email:''
 })
 
@@ -163,7 +166,6 @@ const monitorOriginal = ref<any>(null)
 const errores = ref({
   nombre: false,
   apellidos: false,
-  DNI: false
 })
 
 function validarFormulario() {
@@ -171,8 +173,6 @@ function validarFormulario() {
 
   errores.value.nombre = monitor.value.nombre === ''
   errores.value.apellidos = monitor.value.apellidos === ''
-  errores.value.DNI =
-    monitor.value.DNI === '' || monitor.value.DNI.length !== 9
 
   for (const key in errores.value) {
     if (errores.value[key as keyof typeof errores.value]) {

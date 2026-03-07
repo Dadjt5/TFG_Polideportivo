@@ -64,14 +64,16 @@
             <!-- DNI -->
             <div class="col-md-4">
               <label class="form-label">DNI</label>
-              <input
-                v-if="isEditing"
-                class="form-control"
-                v-model="usuario.DNI"
-								:class="{ 'is-invalid': errores.DNI }"
-              />
-              <p v-else class="form-control-plaintext">
+              <p class="form-control-plaintext">
                 {{ usuario.DNI || '-' }}
+              </p>
+            </div>
+
+            <!-- Codigo usuario -->
+            <div class="col-md-4">
+              <label class="form-label">{{ t.loginCode }}</label>
+              <p class="form-control-plaintext">
+                {{ usuario.codigo_usuario || '-' }}
               </p>
             </div>
 
@@ -305,6 +307,7 @@ const usuario = ref({
   nombre: '',
   apellidos: '',
   DNI: '',
+  codigo_usuario: '',
   email: '',
   sexo: '',
   fechaNacimiento: '',
@@ -324,7 +327,6 @@ const usuario = ref({
 const errores = ref({
 	nombre: false,
   apellidos: false,
-  DNI: false,
   sexo: false,
   fechaNacimiento: false,
   telefono: false,
@@ -343,9 +345,6 @@ function validarFormulario() {
 
 	errores.value.nombre = usuario.value.nombre === ''
 	errores.value.apellidos = usuario.value.apellidos === ''
-	errores.value.DNI = 
-		usuario.value.DNI === '' ||
-		usuario.value.DNI.length !== 9
   errores.value.sexo = usuario.value.sexo === ''
   errores.value.fechaNacimiento = usuario.value.fechaNacimiento === ''
   errores.value.telefono = usuario.value.telefono === ''

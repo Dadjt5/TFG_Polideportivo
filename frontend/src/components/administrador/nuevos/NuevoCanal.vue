@@ -1,44 +1,35 @@
 <template>
-  <div class="min-vh-100 bg-light pb-5">
-    <main class="container py-5">
-      <h1 class="text-center fw-bold mb-5">
+  <div class="min-vh-100" style="background: linear-gradient(135deg, #e0f7ff, #ffffff);">
+    <main class="container py-5" style="max-width: 1120px;">
+      <h1 class="text-center fw-bold mb-5 text-primary">
         {{ t.newChannel }}
       </h1>
 
-      <div class="card shadow-sm border-0 rounded-4 p-4">
+      <div class="card shadow-lg border-0 rounded-4 p-4"
+           style="background-color: rgba(180,220,255,0.6); backdrop-filter: blur(10px);">
+
         <div class="row g-4">
 
           <!-- TÍTULO -->
-          <div class="col-md-12">
+          <div class="col-12">
             <label class="form-label fw-semibold">{{ t.channelName }}</label>
-            <input
-              type="text"
-              class="form-control form-control-lg"
-              v-model="canal.titulo"
-              :class="{ 'is-invalid': errores.titulo }"
-            />
+            <input type="text" class="form-control form-control-lg"
+                   v-model="canal.titulo"
+                   :class="{ 'is-invalid': errores.titulo }" />
           </div>
 
           <!-- TEMA -->
-          <div class="col-md-12">
+          <div class="col-12">
             <label class="form-label fw-semibold">{{ t.theme }}</label>
-            <input
-              type="text"
-              class="form-control form-control-lg"
-              v-model="canal.tema"
-              :class="{ 'is-invalid': errores.tema }"
-            />
+            <input type="text" class="form-control form-control-lg"
+                   v-model="canal.tema"
+                   :class="{ 'is-invalid': errores.tema }" />
           </div>
 
           <!-- OPCIONES -->
           <div class="col-md-6">
             <div class="form-check form-switch fs-5">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                v-model="canal.secreto"
-                id="secretoSwitch"
-              />
+              <input class="form-check-input" type="checkbox" v-model="canal.secreto" id="secretoSwitch" />
               <label class="form-check-label" for="secretoSwitch">
                 {{ t.secret }}
               </label>
@@ -47,12 +38,7 @@
 
           <div class="col-md-6">
             <div class="form-check form-switch fs-5">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                v-model="canal.oculto"
-                id="ocultoSwitch"
-              />
+              <input class="form-check-input" type="checkbox" v-model="canal.oculto" id="ocultoSwitch" />
               <label class="form-check-label" for="ocultoSwitch">
                 {{ t.hidden }}
               </label>
@@ -63,14 +49,15 @@
 
         <!-- BOTONES -->
         <div class="d-flex justify-content-center gap-3 mt-5">
-          <button class="btn btn-primary btn-lg px-5" @click="crearCanal">
+          <button class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm" @click="crearCanal">
             {{ t.newChannel }}
           </button>
 
-          <button class="btn btn-danger btn-lg px-5" @click="volver">
+          <button class="btn btn-danger btn-lg px-5 rounded-pill shadow-sm" @click="volver">
             {{ t.return }}
           </button>
         </div>
+
       </div>
     </main>
   </div>

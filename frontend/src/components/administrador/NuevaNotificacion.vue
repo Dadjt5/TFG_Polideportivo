@@ -1,45 +1,52 @@
 <template>
-  <div class="container py-5">
-    <h2 class="mb-4">{{ t.newNotification }}</h2>
+  <div class="min-vh-100" style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
+    <div class="container py-5">
+      <h2 class="mb-4 fw-bold text-primary d-flex align-items-center gap-2">
+        <i class="bi bi-bell-fill"></i>
+        {{ t.newNotification }}
+      </h2>
 
-    <div class="card p-4 shadow-sm rounded-4">
+      <div class="card p-4 shadow-lg border-0 rounded-4"
+           style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(10px);">
 
-      <div class="mb-3">
-        <label class="form-label">{{ t.title }}</label>
-        <input v-model="form.titulo" class="form-control" />
+        <div class="mb-3">
+          <label class="form-label fw-medium">{{ t.title }}</label>
+          <input v-model="form.titulo" class="form-control rounded-3" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-medium">{{ t.description }}</label>
+          <textarea v-model="form.descripcion" class="form-control rounded-3" rows="3"></textarea>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-medium">{{ t.recipients }}</label>
+          <select v-model="form.tipo" class="form-select rounded-3">
+            <option value="TODOS">{{ t.allUsers }}</option>
+            <option value="USUARIOS_FINALES">{{ t.finalUsers }}</option>
+            <option value="MONITORES">{{ t.monitors }}</option>
+            <option value="ADMINISTRADORES">{{ t.admins }}</option>
+            <option value="ACTIVIDAD">{{ t.byActivity }}</option>
+            <option value="INSTALACION">{{ t.byFacility }}</option>
+            <option value="PABELLON">{{ t.byPavilion }}</option>
+          </select>
+        </div>
+
+        <div v-if="form.tipo === 'ACTIVIDAD'" class="mb-3">
+          <label class="form-label fw-medium">{{ t.activity }}</label>
+          <select v-model="form.actividad_id" class="form-select rounded-3">
+            <option v-for="act in actividades" :key="act.id" :value="act.id">
+              {{ act.nombre }}
+            </option>
+          </select>
+        </div>
+
+        <button class="btn btn-primary mt-3 rounded-3 px-4 py-2 fw-semibold d-flex align-items-center gap-2" @click="enviar">
+          <i class="bi bi-send-fill"></i>
+          {{ t.sendNotification }}
+        </button>
+
       </div>
-
-      <div class="mb-3">
-        <label class="form-label">{{ t.description }}</label>
-        <textarea v-model="form.descripcion" class="form-control"></textarea>
-      </div>
-
-      <div class="mb-3">
-        <label class="form-label">{{ t.recipients }}</label>
-        <select v-model="form.tipo" class="form-select">
-          <option value="TODOS">{{ t.allUsers }}</option>
-          <option value="USUARIOS_FINALES">{{ t.finalUsers }}</option>
-          <option value="MONITORES">{{ t.monitors }}</option>
-          <option value="ADMINISTRADORES">{{ t.admins }}</option>
-          <option value="ACTIVIDAD">{{ t.byActivity }}</option>
-          <option value="INSTALACION">{{ t.byFacility }}</option>
-          <option value="PABELLON">{{ t.byPavilion }}</option>
-        </select>
-      </div>
-
-      <div v-if="form.tipo === 'ACTIVIDAD'" class="mb-3">
-        <label class="form-label">{{ t.activity }}</label>
-        <select v-model="form.actividad_id" class="form-select">
-          <option v-for="act in actividades" :key="act.id" :value="act.id">
-            {{ act.nombre }}
-          </option>
-        </select>
-      </div>
-
-      <button class="btn btn-primary mt-3" @click="enviar">
-        {{ t.sendNotification }}
-      </button>
-
     </div>
   </div>
 </template>

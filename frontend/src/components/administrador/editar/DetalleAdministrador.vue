@@ -46,9 +46,16 @@
             <!-- DNI -->
             <div class="col-md-4">
               <label class="form-label">DNI</label>
-              <input v-if="isEditing" class="form-control" v-model="admin.DNI" :class="{ 'is-invalid': errores.DNI }" />
-              <p v-else class="form-control-plaintext">
+              <p class="form-control-plaintext">
                 {{ admin.DNI || '-' }}
+              </p>
+            </div>
+
+            <!-- Codigo usuario -->
+            <div class="col-md-4">
+              <label class="form-label">{{ t.loginCode }}</label>
+              <p class="form-control-plaintext">
+                {{ admin.codigo_usuario || '-' }}
               </p>
             </div>
 
@@ -132,6 +139,7 @@ const admin = ref({
   id: 0,
   nombre: '',
   DNI: '',
+  codigo_usuario: '',
   email: '',
   rol: ''
 })
@@ -140,7 +148,6 @@ const adminOriginal = ref<any>(null)
 
 const errores = ref({
   nombre: false,
-  DNI: false,
   rol: false
 })
 
@@ -148,8 +155,6 @@ function validarFormulario() {
   let valido = true
 
   errores.value.nombre = admin.value.nombre === ''
-  errores.value.DNI =
-    admin.value.DNI === '' || admin.value.DNI.length !== 9
   errores.value.rol = admin.value.rol === ''
 
   for (const key in errores.value) {
