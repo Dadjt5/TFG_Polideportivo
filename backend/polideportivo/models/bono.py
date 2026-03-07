@@ -64,7 +64,7 @@ class CompraBono(models.Model):
     def calcular_precio(self):
         precio = self.bono.precioOtros
         if self.usuarioFinal.tieneAbono:
-            precio = self.bono.precioAbonado
+            precio = self.bono.precioAbono
         elif self.usuarioFinal.esUAM:
             precio = self.bono.precioUAM
         elif self.usuarioFinal.tieneTDA:

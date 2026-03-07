@@ -64,6 +64,6 @@ class Administrador(models.Model):
             )
 
         return {
-            "respuesta": "Monitor registrado correctamente",
+            "respuesta": admin,
             "error": False
         }

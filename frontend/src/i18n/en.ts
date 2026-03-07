@@ -24,6 +24,18 @@ export default {
   moreUserStats: "Check your statistics",
   bonusSubscriptionsOwn: "Own bonus and subscriptions",
 
+  /* Recuperar y resetar contraseña */
+  recoverPassword: "Recover password",
+  sendToken: "Send link",
+  recoverPasswordAdvice: "Enter your email address and you will receive a link to reset your password.",
+  resetPassword: "Reset password",
+  newPassword: "New password",
+  changePassword: "Change password",
+  yourIdentifier: "Your unique identifier is",
+  monitorIdentifier: "The end user identifier created is",
+  usuarioFinalIdentifier: "The monitor identifier created is",
+  adminIdentifier: "The administrator identifier created is",
+
   /* Estadisticas de usuario final */
   myStadistics: "My statistics",
   myBookingsByMonth: "My bookings by month",
@@ -127,6 +139,7 @@ export default {
   duplicatedEmail: "There is already a user with that email.",
   unexpectedError: "Something has gone wrong, try again later",
   registerSuccess: "Registration completed",
+  UAMmember: "UAM member",
 
   /* Detalle Actividad */
   activityDetails: "Activity details",
@@ -219,6 +232,7 @@ export default {
   endDate: "End date",
   remainingDays: "Remaining days",
   remainingUses: "Remaining uses",
+  advantagesWithPrices: "Better prices for multiple payments",
 
   /* Datos personales */
   personalDataTitle: "Modify personal data",

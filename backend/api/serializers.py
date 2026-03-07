@@ -73,6 +73,7 @@ class UsuarioFinalSerializer(serializers.ModelSerializer):
             "nombre",
             "apellidos",
             "DNI",
+            "codigo_usuario",
             "fechaNacimiento",
             "telefono",
             "provincia",
@@ -133,6 +134,7 @@ class MonitorSerializer(serializers.ModelSerializer):
             "id",
             "nombre",
             "apellidos",
+            "codigo_usuario",
             "DNI",
             "user",
             "email",
@@ -183,7 +185,7 @@ class AdministradorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Administrador
-        fields = ('id', 'DNI', 'nombre', 'user', 'email', 'rol')
+        fields = ('id', 'DNI', 'nombre', 'user', 'email', 'rol', 'codigo_usuario')
 
     def get_email(self, obj):
         return obj.user.email

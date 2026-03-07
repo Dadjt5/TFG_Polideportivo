@@ -24,6 +24,18 @@ export default {
   moreUserStats: "Revisa tus estadísticas",
   bonusSubscriptionsOwn: "Bonos y abonos propios",
 
+  /* Recuperar y resetear constraseña */
+  recoverPassword: "Recuperar contraseña",
+  recoverPasswordAdvice: "Ingresa tu correo y recibirás un enlace para restablecer tu contraseña",
+  sendToken: "Enviar enlace",
+  resetPassword: "Restablecer contraseña",
+  newPassword: "Nueva contraseña",
+  changePassword: "Cambiar contraseña",
+  yourIdentifier: "Tu identificador único es",
+  monitorIdentifier: "El identificador del usuario final creado es",
+  usuarioFinalIdentifier: "El identificador del monitor creado es",
+  adminIdentifier: "El identificador del administrador creado es",
+
   /* Estadisticas de usuario final */
   myStadistics: "Mis estadísticas",
   myBookingsByMonth: "Mis reservas por mes",
@@ -127,6 +139,7 @@ export default {
   duplicatedEmail: "Ya existe un usuario con ese correo electrónico",
   unexpectedError: "Ha ocurrido un error, pruebe mas tarde",
   registerSuccess: "Registro completado",
+  UAMmember: "Miembro de la UAM",
 
   /* Detalle Actividad */
   activityDetails: "Detalles de la actividad",
@@ -219,6 +232,7 @@ export default {
   endDate: "Fecha de finalización",
   remainingDays: "Dias restantes",
   remainingUses: "Usos restantes",
+  advantagesWithPrices: "Precios mejores en mútiples pagos",
 
   /* Datos personales */
   personalDataTitle: "Modificar datos personales",

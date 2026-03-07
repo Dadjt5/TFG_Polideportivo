@@ -4,12 +4,15 @@ import { useAuthStore } from '@/stores/auth'
 /* Genericos */
 import Home from '@/components/Home.vue'
 import Login from '@/components/Login.vue'
+import RecuperarPassword from '@/components/RecuperarPassword.vue'
+import ResetPassword from '@/components/ResetPassword.vue'
 import ListaDeActividades from '@/components/ListaDeActividades.vue'
 import Perfil from '@/components/Perfil.vue'
 import Foro from '@/components/Foro.vue'
 import Notificaciones from '@/components/Notificaciones.vue'
 import Contacto from '@/components/Contacto.vue'
 import FAQ from '@/components/FAQ.vue'
+import Feedback from '@/components/Feedback.vue'
 
 /*********** Usuario final ***********/
 import HomeUsuarioFinal from '@/components/usuarioFinal/HomeUsuarioFinal.vue'
@@ -102,11 +105,14 @@ const routes = [
   /******************* GENÉRICAS *******************/
   { path: '/home', component: Home, meta: { public: true } },
   { path: '/login', component: Login, meta: { public: true } },
+  { path: '/recuperar-password', component: RecuperarPassword, meta: { public: true } },
+  { path: '/reset-password/:token', name: ResetPassword },
   { path: '/buscar', component: Buscar, meta: { public: true } },
   { path: '/actividades', component: ListaDeActividades, meta: { public: true } },
   { path: '/foro', component: Foro, meta: { requiresAuth: true } },
   { path: '/contacto', component: Contacto, meta: { public: true } },
   { path: '/faq', component: FAQ, meta: { public: true } },
+  { path: '/feedback', component: Feedback, meta: { public: true } },
 
 
   /******************* USUARIO FINAL *******************/

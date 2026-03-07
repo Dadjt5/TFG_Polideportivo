@@ -1,9 +1,12 @@
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
+import uuid
+from django.db import models
 
 from .constantes import RolAdministrador
 
 class User(AbstractUser):
+    codigo_usuario = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
 
     @property
     def is_usuario_final(self):

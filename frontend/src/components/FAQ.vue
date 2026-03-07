@@ -3,7 +3,7 @@
 
     <div class="container py-5">
       <!-- Header -->
-      <div class="text-center mb-5">
+      <div class="text-center mt-3 mb-5">
         <h1 class="fw-bold text-primary">
           {{ t.faqTitle }}
         </h1>

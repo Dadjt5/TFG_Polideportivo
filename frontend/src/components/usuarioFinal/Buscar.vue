@@ -1,11 +1,12 @@
 <template>
-  <div class="min-vh-100 bg-light">
-    <main class="container-fluid mt-2 px-5 py-1">
+  <div class="min-vh-100" style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
+    <main class="container-fluid mt-2 px-5 py-3">
 
-      <div class="text-center mt-5 mb-4">
-        <div class="container-fluid mt-4">
-          <div class="d-flex align-items-center bg-white rounded-3 shadow p-2 border gap-3">
-            <Search class="text-secondary"/>
+      <!-- BUSCADOR -->
+      <div class="text-center mt-3 mb-5">
+
+        <div class="container-fluid">
+          <div class="search-hero">
 
             <input
               type="text"
@@ -15,43 +16,43 @@
               @keyup.enter="buscar"
             />
 
-            <button class="btn btn-primary btn-lg px-4" @click="buscar">
+            <button class="btn btn-search px-4" @click="buscar">
               {{ t.searchButton }}
             </button>
+
           </div>
         </div>
+
       </div>
 
-      <ul class="nav nav-tabs justify-content-center mb-3">
-        <li class="nav-item fs-5">
-          <button
-            class="nav-link"
-            :class="{ active: activeTab === 'activities' }"
-            @click="activeTab = 'activities'"
-            type="button"
-          >
-            {{ t.activities }}
-          </button>
-        </li>
 
-        <li class="nav-item fs-5">
-          <button
-            class="nav-link"
-            :class="{ active: activeTab === 'facilities' }"
-            @click="activeTab = 'facilities'"
-            type="button"
-          >
-            {{ t.facilities }}
-          </button>
-        </li>
-      </ul>
+      <!-- TABS -->
+      <div class="tabs-hero mb-3">
 
-      <div class="tab-content">
+        <button :class="{ active: activeTab === 'activities' }" @click="activeTab = 'activities'">
+          {{ t.activities }}
+        </button>
+
+        <button :class="{ active: activeTab === 'facilities' }" @click="activeTab = 'facilities'">
+          {{ t.facilities }}
+        </button>
+
+      </div>
+
+
+      <!-- FILTROS -->
+      <div class="filter-container mb-4">
+
+        <div class="tab-content">
+
+          <!-- ACTIVIDADES -->
           <div
             class="tab-pane fade"
             :class="{ show: activeTab === 'activities', active: activeTab === 'activities' }"
           >
+
             <div class="row g-4">
+
               <div class="col-md-4">
                 <FilterCard
                   :icon="Calendar"
@@ -62,146 +63,113 @@
                 />
               </div>
 
-            <div class="col-md-4">
-              <FilterCard
-                :icon="Activity"
-                :title="t.activityType"
-                :subtitle="selectedActivityTypes.join(', ')"
-                @click="activar('A2')"
-                :theme="'light'"
-              />
+              <div class="col-md-4">
+                <FilterCard
+                  :icon="Activity"
+                  :title="t.activityType"
+                  :subtitle="selectedActivityTypes.join(', ')"
+                  @click="activar('A2')"
+                  :theme="'light'"
+                />
+              </div>
+
+              <div class="col-md-4">
+                <FilterCard
+                  :icon="Clock"
+                  :title="t.sessionTime"
+                  :subtitle="activityStartTime || activityEndTime ? `${activityStartTime} - ${activityEndTime}`: ''"
+                  @click="activar('A3')"
+                  :theme="'light'"
+                />
+              </div>
+
             </div>
 
-            <div class="col-md-4">
-              <FilterCard
-                :icon="Clock"
-                :title="t.sessionTime"
-                :subtitle="activityStartTime || activityEndTime ? `${activityStartTime} - ${activityEndTime}`: ''"
-                @click="activar('A3')"
-                :theme="'light'"
-              />
-            </div>
           </div>
+
+          <!-- INSTALACIONES -->
+          <div
+            class="tab-pane fade"
+            :class="{ show: activeTab === 'facilities', active: activeTab === 'facilities' }"
+          >
+
+            <div class="row g-4">
+
+              <div class="col-md-6">
+                <FilterCard
+                  :icon="Building2"
+                  :title="t.facilityType"
+                  :subtitle="selectedFacilityTypes.join(', ')"
+                  @click="activar('I1')"
+                  :theme="'light'"
+                />
+              </div>
+
+              <div class="col-md-6">
+                <FilterCard
+                  :icon="Clock"
+                  :title="t.openingHours"
+                  :subtitle="facilityStartTime || facilityEndTime ? `${facilityStartTime} - ${facilityEndTime}`: ''"
+                  @click="activar('I2')"
+                  :theme="'light'"
+                />
+              </div>
+
+            </div>
+
+          </div>
+
         </div>
 
-        <div
-          class="tab-pane fade"
-          :class="{ show: activeTab === 'facilities', active: activeTab === 'facilities' }"
-        >
-          <div class="row g-4 justify-content-center">
-            <div class="col-md-6">
-              <FilterCard
-                :icon="Building2"
-                :title="t.facilityType"
-                :subtitle="selectedFacilityTypes.join(', ')"
-                @click="activar('I1')"
-                :theme="'light'"
-              />
-            </div>
-
-            <div class="col-md-6">
-              <FilterCard
-                :icon="Clock"
-                :title="t.openingHours"
-                :subtitle="facilityStartTime || facilityEndTime ? `${facilityStartTime} - ${facilityEndTime}`: ''"
-                @click="activar('I2')"
-                :theme="'light'"
-              />
-            </div>
-          </div>
-        </div>
       </div>
 
-      <DayOfWeekFilter
-        :open="dayFilterOpen"
-        @update:open="dayFilterOpen = $event"
-        :selectedDays="selectedDays"
-        @apply="selectedDays = $event"
-        :theme="'light'"
-      />
 
-      <ActivityTypeFilter
-        :open="activityTypeFilterOpen"
-        @update:open="activityTypeFilterOpen = $event"
-        :selectedTypes="selectedActivityTypes"
-        @apply="selectedActivityTypes = $event"
-        :tiposActividad="estadisticas.tiposActividad"
-        :theme="'light'"
-      />
+      <!-- ORDEN -->
+      <div class="d-flex justify-content-end mb-4">
 
-      <TimeRangeFilter
-        :open="activityTimeFilterOpen"
-        @update:open="activityTimeFilterOpen = $event"
-        :startTime="activityStartTime"
-        :endTime="activityEndTime"
-        @apply="({ start, end }) => { activityStartTime = start; activityEndTime = end }"
-        title="Horario de sesión"
-        description="Selecciona el rango horario."
-        :theme="'light'"
-      />
+        <select
+  class="form-select order-select"
+  v-model="orderBy"
+>
+        
+          <option value="nombre_asc">{{ t.orderByNameAsc }}</option>
+          <option value="nombre_desc">{{ t.orderByNameDesc }}</option>
+        </select>
 
-      <FacilityTypeFilter
-        :open="facilityTypeFilterOpen"
-        @update:open="facilityTypeFilterOpen = $event"
-        :selectedTypes="selectedFacilityTypes"
-        @apply="selectedFacilityTypes = $event"
-        :tiposInstalacion="estadisticas.tiposInstalacion"
-        :theme="'light'"
-      />
-
-      <TimeRangeFilter
-        :open="facilityTimeFilterOpen"
-        @update:open="facilityTimeFilterOpen = $event"
-        :startTime="facilityStartTime"
-        :endTime="facilityEndTime"
-        @apply="({ start, end }) => { facilityStartTime = start; facilityEndTime = end }"
-        title="Horario de apertura"
-        description="Selecciona el horario de la instalación."
-        :theme="'light'"
-      />
-
-      <div class="mt-4">
-        <div class="d-flex justify-content-end mb-3">
-          <select
-            class="form-select w-auto"
-            v-model="orderBy"
-            >
-            <option value="nombre_asc">
-              {{ t.orderByNameAsc }}
-            </option>
-            <option value="nombre_desc">
-              {{ t.orderByNameDesc }}
-            </option>
-          </select>
-        </div>
       </div>
 
-      <!-- RESULTADOS DE LA BUSQUEDA -->
-      <div class="container-fluid mt-4 row">
-        <p class="fs-2 fw-semibold text-center">{{ t.activities }}</p>
-        <p class="fs-3 text-center" v-if="sinActividades">{{ t.noResults }}</p>
+
+      <!-- RESULTADOS -->
+      <div class="results-container">
+
+        <p class="section-title">{{ t.activities }}</p>
+        <p class="fs-4 text-center" v-if="sinActividades">{{ t.noResults }}</p>
+
+        <div class="row">
           <div
             v-for="act in actividadesOrdenadas"
             :key="act.id"
-            class="col-12 col-sm-6 col-lg-4 mt-3"
+            class="col-12 col-sm-6 col-lg-4 mt-3 card-hover"
             @click="activityDetail(act.id)"
-            v-else
           >
-          <ActivityCard
-            :icon="Activity"
-            :actividad="act"
-            :theme="'light'"
-          />
+            <ActivityCard
+              :icon="Activity"
+              :actividad="act"
+              :theme="'light'"
+            />
           </div>
+        </div>
 
-        <p class="fs-2 fw-semibold text-center mt-5">{{ t.facilities }}</p>
-        <p class="fs-3 text-center" v-if="sinInstalaciones">{{ t.noResults }}</p>
+
+        <p class="section-title mt-5">{{ t.facilities }}</p>
+        <p class="fs-4 text-center" v-if="sinInstalaciones">{{ t.noResults }}</p>
+
+        <div class="row">
           <div
             v-for="inst in instalacionesOrdenadas"
             :key="inst.id"
-            class="col-12 col-sm-6 col-lg-4 mt-3"
+            class="col-12 col-sm-6 col-lg-4 mt-3 card-hover"
             @click="facilityDetail(inst.id)"
-            v-else
           >
             <FacilityCard
               :icon="Building2"
@@ -209,11 +177,13 @@
               :theme="'light'"
             />
           </div>
+        </div>
+
       </div>
+
     </main>
   </div>
 </template>
-
 
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router'
@@ -485,3 +455,111 @@ onMounted(async () => {
 })
 
 </script>
+
+<style scoped>
+.btn-search {
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  border: none;
+  color: white;
+  font-weight: 500;
+  border-radius: 12px;
+  padding: 10px 26px;
+  transition: all .25s;
+}
+
+.btn-search:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+}
+
+.tabs-hero{
+  display:flex;
+  justify-content:center;
+  gap:6px;
+
+  background:white;
+  border-radius:40px;
+  padding:6px;
+
+  width:fit-content;
+  margin:auto;
+
+  box-shadow:0 4px 12px rgba(0,0,0,0.08);
+}
+
+.tabs-hero button{
+  border:none;
+  background:transparent;
+  color:#555;
+  padding:10px 28px;
+  border-radius:30px;
+  font-weight:500;
+  transition:all .25s;
+}
+
+.tabs-hero button.active{
+  background:linear-gradient(135deg,#4facfe,#00f2fe);
+  color:white;
+}
+
+.tabs-hero button:hover{
+  background:rgba(255,255,255,0.2);
+}
+
+.order-select{
+  width:220px;
+  border-radius:12px;
+  border:1px solid rgba(0,0,0,0.08);
+  box-shadow:0 4px 12px rgba(0,0,0,0.06);
+}
+
+.search-hero{
+  display:flex;
+  align-items:center;
+  gap:15px;
+
+  background:white;
+  border-radius:16px;
+  padding:14px 18px;
+
+  border:1px solid rgba(0,0,0,0.08);
+
+  box-shadow:0 6px 20px rgba(0,0,0,0.08);
+
+  max-width:900px;
+  margin:auto;
+}
+
+.filter-container{
+  background:rgba(255,255,255,0.85);
+  backdrop-filter:blur(10px);
+  border-radius:20px;
+  padding:30px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.1);
+}
+
+.results-container{
+  padding-bottom:40px;
+  margin-top:20px;
+}
+
+.section-title{
+  font-size:1.6rem;
+  font-weight:600;
+  text-align:center;
+  margin-bottom:25px;
+  color:#333;
+}
+
+.card-hover{
+  transition:all .25s;
+}
+
+.card-hover:hover{
+  transform:translateY(-6px);
+}
+
+.results-container{
+  padding-bottom:40px;
+}
+</style>

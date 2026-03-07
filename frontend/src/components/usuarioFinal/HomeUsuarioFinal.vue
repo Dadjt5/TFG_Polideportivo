@@ -10,7 +10,7 @@
 
     <main class="position-relative container py-4">
 
-      <h1 class="text-center text-white fw-bold mb-4">
+      <h1 class="text-center text-white fw-bold mt-3 mb-4">
         {{ t.welcome }}
       </h1>
 
@@ -86,21 +86,12 @@
       <!-- BUSQUEDAS -->
       <div class="text-center mt-5 mb-4">
         <div class="container-fluid mt-4">
-          <div class="d-flex align-items-center 
-            bg-white bg-opacity-10 
-            backdrop-blur 
-            rounded-4 
-            shadow-lg 
-            p-3 
-            border border-white border-opacity-25 
-            gap-3">
-
-            <Search class="text-secondary" />
+          <div class="search-hero">
 
             <input type="text" v-model="textoBusqueda" class="form-control border-0 bg-transparent text-white fs-5"
               :placeholder="t.searchPlaceholder" @keyup.enter="buscar" />
 
-            <button class="btn btn-primary btn-lg px-4" @click="buscar">
+            <button class="btn btn-search px-4" @click="buscar">
               {{ t.searchButton }}
             </button>
           </div>
@@ -108,21 +99,17 @@
       </div>
 
       <!-- Tabs -->
-      <ul class="nav nav-tabs justify-content-center mb-4">
-        <li class="nav-item fs-5">
-          <button class="nav-link" :class="{ active: activeTab === 'activities' }" @click="activeTab = 'activities'"
-            type="button">
-            {{ t.activities }}
-          </button>
-        </li>
+      <div class="tabs-hero mb-3">
 
-        <li class="nav-item fs-5">
-          <button class="nav-link" :class="{ active: activeTab === 'facilities' }" @click="activeTab = 'facilities'"
-            type="button">
-            {{ t.facilities }}
-          </button>
-        </li>
-      </ul>
+        <button :class="{ active: activeTab === 'activities' }" @click="activeTab = 'activities'">
+          {{ t.activities }}
+        </button>
+
+        <button :class="{ active: activeTab === 'facilities' }" @click="activeTab = 'facilities'">
+          {{ t.facilities }}
+        </button>
+
+      </div>
 
       <!-- Contenido Tabs -->
       <div class="tab-content">
@@ -446,5 +433,68 @@ input::placeholder {
   height: 1px;
   background-color: #ddd;
   margin: 1rem 0;
+}
+
+.btn-search {
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  border: none;
+  color: white;
+  font-weight: 500;
+  border-radius: 12px;
+  padding: 10px 26px;
+  transition: all .25s;
+}
+
+.btn-search:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+}
+
+.tabs-hero{
+  display:flex;
+  justify-content:center;
+  gap:6px;
+  background:rgba(255,255,255,0.15);
+  backdrop-filter:blur(10px);
+  border-radius:40px;
+  padding:6px;
+  width:fit-content;
+  margin:auto;
+}
+
+.tabs-hero button{
+  border:none;
+  background:transparent;
+  color:white;
+  padding:10px 28px;
+  border-radius:30px;
+  font-weight:500;
+  transition:all .25s;
+}
+
+.tabs-hero button.active{
+  background:white;
+  color:black;
+}
+
+.tabs-hero button:hover{
+  background:rgba(255,255,255,0.2);
+}
+
+.search-hero{
+  display:flex;
+  align-items:center;
+  gap:15px;
+
+  background:rgba(255,255,255,0.12);
+  backdrop-filter:blur(12px);
+
+  border-radius:20px;
+  padding:14px 20px;
+
+  border:1px solid rgba(255,255,255,0.25);
+
+  max-width:900px;
+  margin:auto;
 }
 </style>

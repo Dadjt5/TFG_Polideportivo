@@ -84,6 +84,18 @@
         	{{ mensaje }}
 	      </p>
 
+         <!-- Mensaje del identificador único -->
+        <div v-if="showIdentifier" class="text-center mt-3">
+          <p class="fw-bold text-primary mb-2">
+            ¡{{ t.monitorIdentifier }}: <span class="text-success">{{ userIdentifier }}</span>!
+          </p>
+
+          <!-- Botón para ir al login -->
+          <button class="btn btn-primary btn-sm" @click="gestionUsuarios">
+            {{ t.login }}
+          </button>
+        </div>
+
         <!-- BOTONES -->
         <div class="d-flex justify-content-center gap-3 mt-5">
           <button
@@ -120,7 +132,9 @@ const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);
 
 const router = useRouter();
-const continuar = ref(true);
+
+const userIdentifier = ref("");
+const showIdentifier = ref(false);
 
 const monitor = ref({
   nombre: "",
@@ -184,9 +198,10 @@ const crearMonitor = async () => {
 
 	try {
     const data = await registrarMonitor(monitor.value);
-    mensaje.value = data.mensaje;
 
-    router.push({ name: 'gestion-usuarios' });
+    userIdentifier.value = data.codigo_usuario;
+    showIdentifier.value = true;
+    mensaje.value = data.mensaje;
   } catch (error: any) {
     if (error.response && error.response.data?.mensaje) {
       mensaje.value = error.response.data.mensaje;
@@ -198,5 +213,9 @@ const crearMonitor = async () => {
 
 function volver() {
   router.back()
+}
+
+const gestionUsuarios = () => {
+  router.push({ name: 'gestion-usuarios' });
 }
 </script>

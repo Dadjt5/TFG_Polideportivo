@@ -93,6 +93,11 @@
                       {{ t.unlimitedGym }}
                     </span>
 
+                    <span class="badge bg-white text-primary px-3 py-2 rounded-pill shadow-sm">
+                      <i class="bi bi-lightning-charge me-2"></i>
+                      {{ t.advantagesWithPrices }}
+                    </span>
+
                   </div>
                 </div>
               </div>
@@ -169,6 +174,11 @@
                     <span class="badge bg-white text-primary px-3 py-2 rounded-pill shadow-sm">
                       <i class="bi bi-water me-2"></i>
                       {{ t.unlimitedPool }}
+                    </span>
+                    
+                    <span class="badge bg-white text-primary px-3 py-2 rounded-pill shadow-sm">
+                      <i class="bi bi-lightning-charge me-2"></i>
+                      {{ t.advantagesWithPrices }}
                     </span>
                   </div>
                 </div>

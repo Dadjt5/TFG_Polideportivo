@@ -39,6 +39,13 @@ DEBUG = os.getenv("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'polideportivo.ayuda@gmail.com'
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD')
+DEFAULT_FROM_EMAIL = 'Polideportivo <polideportivo.ayuda@gmail.com>'
 
 # Application definition
 
@@ -54,6 +61,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "django_rest_passwordreset",
 ]
 
 MIDDLEWARE = [
@@ -85,8 +93,12 @@ DJOSER = {
     'TOKEN_MODEL': None,
 }
 
-CORS_ORIGIN_ALLOW_ALL = True
-#CORS_ORIGIN_WHITELIST = os.getenv('CORS_ORIGIN_WHITELIST', '').split(',')
+AUTHENTICATION_BACKENDS = [
+    'polideportivo.backends.DNIoCodigoBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+CORS_ORIGIN_WHITELIST = os.getenv('CORS_ORIGIN_WHITELIST', '').split(',')
 CORS_ALLOW_CREDENTIALS = True
 
 SPECTACULAR_SETTINGS = {

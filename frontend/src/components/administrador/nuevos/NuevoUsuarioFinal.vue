@@ -39,6 +39,13 @@
               <input class="form-control" :class="{ 'is-invalid': errores.DNI }" placeholder="DNI"
                 v-model="usuarioFinal.dni" />
             </div>
+
+            <div class="col-md-6">
+              <div class="form-check mb-2">
+                <input type="checkbox" class="form-check-input" id="esUAM" v-model="usuarioFinal.esUAM">
+                <label class="form-check-label" for="esUAM">{{ t.UAMmember }}</label>
+              </div>
+            </div>
           </div>
 
           <!-- CONTACTO -->
@@ -120,6 +127,18 @@
             {{ mensaje }}
           </p>
 
+          <!-- Mensaje del identificador único -->
+        <div v-if="showIdentifier" class="text-center mt-3">
+          <p class="fw-bold text-primary mb-2">
+            ¡{{ t.usuarioFinalIdentifier }}: <span class="text-success">{{ userIdentifier }}</span>!
+          </p>
+
+          <!-- Botón para ir al login -->
+          <button class="btn btn-primary btn-sm" @click="gestionUsuarios">
+            {{ t.login }}
+          </button>
+        </div>
+
           <!-- BOTONES -->
           <div class="d-flex justify-content-center gap-4 mt-4">
             <button class="btn btn-primary btn-lg px-5" @click="nuevoUsuario">
@@ -151,6 +170,8 @@ const router = useRouter();
 const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);
 
+const userIdentifier = ref("");
+const showIdentifier = ref(false);
 const esMenor = ref(false)
 
 const usuarioFinal = ref({
@@ -158,6 +179,7 @@ const usuarioFinal = ref({
   apellidos: '',
   dni: '',
   sexo: '',
+  esUAM: false,
   esMenor: false,
   fechaNacimiento: '',
   telefono: '',
@@ -249,8 +271,10 @@ const nuevoUsuario = async () => {
 
   try {
     const data = await registrarse(usuarioFinal.value);
+
+    userIdentifier.value = data.codigo_usuario;
+    showIdentifier.value = true;
     mensaje.value = data.mensaje;
-    router.push({ name: 'gestion-usuarios' });
   } catch (e) {
     console.log("Error al registrar el usuario final", e)
   }
@@ -258,5 +282,9 @@ const nuevoUsuario = async () => {
 
 function volver() {
   router.back()
+}
+
+const gestionUsuarios = () => {
+  router.push({ name: 'gestion-usuarios' });
 }
 </script>

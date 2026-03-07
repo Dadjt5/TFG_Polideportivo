@@ -9,6 +9,7 @@ export interface User {
   is_usuario_final: boolean;
   is_monitor: boolean;
   is_administrador: boolean;
+  is_superuser: boolean;
 
   usuario_final_id: number,
   monitor_id: number,
@@ -27,6 +28,7 @@ export const useAuthStore = defineStore("auth", {
 
   getters: {
     isAuthenticated: (state) => !!state.access,
+    isSuperUser: (state) => state.user?.is_superuser,
 
     isUsuarioFinal: (state) => state.user?.is_usuario_final ?? false,
     isMonitor: (state) => state.user?.is_monitor ?? false,

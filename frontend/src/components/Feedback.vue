@@ -1,6 +1,6 @@
 <template>
   <div class="min-vh-100 bg-light p-4">
-    <div v-if="!isSuperUser">
+    <div v-if="!authStore.isSuperUser">
       <!-- FORMULARIO DE ENVÍO PARA USUARIOS -->
       <div class="card shadow-sm p-4 rounded-4 mx-auto" style="max-width: 600px;">
         <h3 class="fw-bold mb-4 text-center">Enviar Feedback</h3>
@@ -130,9 +130,12 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+
+import { useAuthStore } from '@/stores/auth'
 import { nuevoFeedback, getFeedback } from '@/services/feedbackService'
 
-// --- Estado del formulario ---
+const authStore = useAuthStore();
+
 const tipo = ref('GENERAL')
 const valoracion = ref<number | null>(null)
 const mensaje = ref('')
@@ -140,12 +143,9 @@ const loading = ref(false)
 const success = ref(false)
 const error = ref('')
 
-// --- Estado admin ---
 const feedbacks = ref<any[]>([])
 const filtroTipo = ref('')
-const isSuperUser = ref(false) // Se detectará desde backend o token
 
-// --- Funciones del formulario ---
 const enviarFeedback = async () => {
   if (!mensaje.value) return
 
@@ -184,14 +184,8 @@ const feedbacksFiltrados = computed(() => {
   return feedbacks.value.filter(fb => fb.tipo === filtroTipo.value)
 })
 
-// --- Detectar superuser y cargar feedbacks si aplica ---
 onMounted(async () => {
-  // Aquí podrías obtener info del usuario desde el backend
-  // Por ejemplo, un endpoint /api/v1/me que devuelva { is_superuser: true }
-  // Para demo, lo ponemos a true o false
-  isSuperUser.value = /* lógica para detectar superuser */ false
-
-  if (isSuperUser.value) {
+  if (authStore.isSuperUser) {
     await cargarFeedbacks()
   }
 })

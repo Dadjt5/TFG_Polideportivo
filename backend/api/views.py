@@ -551,6 +551,7 @@ class meAPIView(APIView):
             "is_monitor": user.is_monitor,
             "is_usuario_final": user.is_usuario_final,
             "is_administrador": user.is_administrador,
+            "is_superuser": user.is_superuser
         }
 
         if user.is_usuario_final:
@@ -667,14 +668,12 @@ class RegistroView(APIView):
         )
 
         if respuesta["error"]:
-            sta = status.HTTP_400_BAD_REQUEST
-        else:
-            sta = status.HTTP_201_CREATED
+            return Response({"mensaje": respuesta["respuesta"]}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(
-            {"mensaje": respuesta["respuesta"]},
-            status=sta
-        )
+        serializer = UsuarioFinalSerializer(respuesta["respuesta"])
+        usuarioFinal = serializer.data
+
+        return Response(usuarioFinal)
 
 
 # Registrar monitor
@@ -694,14 +693,12 @@ class RegistroMonitorView(APIView):
         )
 
         if respuesta["error"]:
-            sta = status.HTTP_400_BAD_REQUEST
-        else:
-            sta = status.HTTP_201_CREATED
+            return Response({"mensaje": respuesta["respuesta"]}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(
-            {"mensaje": respuesta["respuesta"]},
-            status=sta
-        )
+        serializer = MonitorSerializer(respuesta["respuesta"])
+        monitor = serializer.data
+
+        return Response(monitor)
 
 # Registrar administrador
 class RegistroAdministradorView(APIView):

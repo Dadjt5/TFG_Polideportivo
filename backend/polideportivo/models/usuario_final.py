@@ -125,6 +125,6 @@ class UsuarioFinal(Usuario):
                 canal.añadirUsuario(usuarioFinal)
 
         return {
-            "respuesta": "Usuario registrado correctamente",
+            "respuesta": usuarioFinal,
             "error": False
         }

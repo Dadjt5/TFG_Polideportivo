@@ -42,7 +42,7 @@ class Monitor(Usuario):
             )
 
         return {
-            "respuesta": "Monitor registrado correctamente",
+            "respuesta": monitor,
             "error": False
         }
 
