@@ -1,12 +1,13 @@
 <template>
-  <div class="min-vh-100 bg-light pb-5">
-    <main class="container py-5" style="max-width: 900px">
+  <div class="min-vh-100 pt-4" style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
+    <main class="container-fluid px-5 py-4" style="max-width: 1600px;">
+
       <div class="d-flex justify-content-between align-items-center mb-4">
         <button class="btn btn-secondary rounded-pill" @click="volver">
           ← {{ t.return }}
         </button>
 
-        <h1 class="fw-semibold mb-0">{{ t.monitorDetail }}</h1>
+        <h1 class="fw-semibold mb-0">{{ monitor.nombre }}</h1>
 
         <div style="width: 100px"></div>
       </div>
@@ -88,40 +89,26 @@
 
           </div>
 
-          <!-- ACCIONES -->
+         <!-- ACCIONES -->
           <div class="d-flex justify-content-center gap-4 mt-5">
 
-            <button
-              v-if="!isEditing"
-              class="btn btn-primary btn-lg rounded-pill"
-              @click="activarEdicion"
-            >
+            <button v-if="!isEditing" class="btn btn-primary btn-lg rounded-pill" @click="activarEdicion">
               <i class="bi bi-pencil me-2"></i>
               {{ t.modifyUser }}
             </button>
 
             <template v-else>
-              <button
-                class="btn btn-success btn-lg rounded-pill"
-                @click="guardarCambios"
-              >
+              <button class="btn btn-success btn-lg rounded-pill" @click="guardarCambios">
                 <i class="bi bi-check-lg me-2"></i>
                 {{ t.saveChanges }}
               </button>
 
-              <button
-                class="btn btn-secondary btn-lg rounded-pill"
-                @click="cancelarEdicion"
-              >
+              <button class="btn btn-secondary btn-lg rounded-pill" @click="cancelarEdicion">
                 {{ t.cancel }}
               </button>
             </template>
 
-            <button
-              v-if="!isEditing"
-              class="btn btn-danger btn-lg rounded-pill"
-              @click="eliminar"
-            >
+            <button v-if="!isEditing" class="btn btn-danger btn-lg rounded-pill" @click="eliminar">
               <i class="bi bi-trash me-2"></i>
               {{ t.deleteUser }}
             </button>

@@ -109,7 +109,7 @@ const routes = [
   { path: '/reset-password/:token', name: ResetPassword },
   { path: '/buscar', component: Buscar, meta: { public: true } },
   { path: '/actividades', component: ListaDeActividades, meta: { public: true } },
-  { path: '/foro', component: Foro, meta: { requiresAuth: true } },
+  { path: '/foro', component: Foro, name: 'foro', meta: { requiresAuth: true } },
   { path: '/contacto', component: Contacto, meta: { public: true } },
   { path: '/faq', component: FAQ, meta: { public: true } },
   { path: '/feedback', component: Feedback, meta: { public: true } },

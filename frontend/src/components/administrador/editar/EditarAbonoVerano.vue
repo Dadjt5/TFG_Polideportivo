@@ -1,16 +1,15 @@
 <template>
-  <div class="min-vh-100 bg-light">
-    <main class="container-fluid mt-2 px-5 py-4">
+  <div class="min-vh-100 pt-4" style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
+    <main class="container-fluid px-5 py-4" style="max-width: 1600px;">
 
       <!-- CABECERA -->
-      <div class="d-flex justify-content-between align-items-center mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-4 mt-3">
         <button class="btn btn-secondary rounded-pill" @click="volver">
           ← {{ t.return }}
         </button>
 
-        <h1 class="fw-semibold mb-0">
-          <i class="bi bi-calendar-check text-primary me-2"></i>
-          <span>{{ t.summerSubscription }}</span>
+        <h1 class="fw-semibold text-primary mb-2" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.2);">
+          {{ abono.nombre }}
         </h1>
 
         <div style="width: 100px"></div>
@@ -18,7 +17,13 @@
 
       <div class="row justify-content-center">
         <div class="col-lg-6">
-          <div class="bg-white rounded-3 shadow-sm p-4">
+          <div class="card shadow-lg rounded-4 p-4"
+            style="background-color: rgba(255,255,255,0.75); backdrop-filter: blur(10px);">
+
+            <h4 class="mb-3 d-flex align-items-center">
+              <i class="bi bi-currency-euro text-primary me-2"></i>
+              {{ t.summerSubscriptionDetail }}
+            </h4>
 
             <!-- nombre -->
               <div class="col-6">
@@ -81,41 +86,22 @@
       </div>
 
       <!-- ACCIONES -->
-      <div class="d-flex justify-content-center gap-4 mt-5">
-
-        <button
-          v-if="!editando"
-          class="btn btn-primary btn-lg rounded-pill"
-          @click="activarEdicion"
-        >
-          <i class="bi bi-pencil me-2"></i>
-          {{ t.modifySummerSubscription }}
+      <div class="d-flex justify-content-center gap-3 mt-5">
+        <button v-if="!editando" class="btn btn-primary btn-lg rounded-pill" @click="activarEdicion">
+          <i class="bi bi-pencil me-2"></i> {{ t.modifySummerSubscription }}
         </button>
 
         <template v-else>
-          <button
-            class="btn btn-success btn-lg rounded-pill"
-            @click="guardarCambios"
-          >
-            <i class="bi bi-check-lg me-2"></i>
-            {{ t.saveChanges }}
+          <button class="btn btn-success btn-lg rounded-pill" @click="guardarCambios">
+            <i class="bi bi-check-lg me-2"></i> {{ t.saveChanges }}
           </button>
-
-          <button
-            class="btn btn-secondary btn-lg rounded-pill"
-            @click="cancelarEdicion"
-          >
+          <button class="btn btn-secondary btn-lg rounded-pill" @click="cancelarEdicion">
             {{ t.cancel }}
           </button>
         </template>
 
-        <button
-          v-if="!editando"
-          class="btn btn-danger btn-lg rounded-pill"
-          @click="eliminar"
-        >
-          <i class="bi bi-trash me-2"></i>
-          {{ t.delete }}
+        <button v-if="!editando" class="btn btn-danger btn-lg rounded-pill" @click="eliminar">
+          <i class="bi bi-trash me-2"></i> {{ t.delete }}
         </button>
 
       </div>

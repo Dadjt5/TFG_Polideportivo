@@ -22,58 +22,58 @@
           <div class="col-md-3">
             <label class="form-label fw-semibold">{{ t.months }}</label>
             <input type="number" min="1" class="form-control form-control-lg"
-                   v-model.number="abono.meses" />
+                   v-model.number="abono.meses" :class="{ 'is-invalid': errores.meses }"/>
           </div>
 
           <!-- PRECIO MENSUAL UAM -->
           <div class="col-md-3">
             <label class="form-label fw-semibold">{{ t.monthlyPriceUAM }}</label>
             <input type="number" step="0.01" min="0" class="form-control form-control-lg"
-                   v-model.number="abono.precioTotalMensual" />
+                   v-model.number="abono.precioTotalMensual" :class="{ 'is-invalid': errores.precioTotalMensual }"/>
           </div>
 
           <!-- PRECIOS -->
           <div class="col-md-3">
             <label class="form-label fw-semibold">{{ t.totalPriceUAM }}</label>
             <input type="number" step="0.01" class="form-control form-control-lg"
-                   v-model.number="abono.precioPagoUnicoUAM" />
+                   v-model.number="abono.precioPagoUnicoUAM" :class="{ 'is-invalid': errores.precioPagoUnicoUAM }"/>
           </div>
 
           <div class="col-md-3">
             <label class="form-label fw-semibold">{{ t.familyPrice }}</label>
             <input type="number" step="0.01" class="form-control form-control-lg"
-                   v-model.number="abono.precioFamiliar" />
+                   v-model.number="abono.precioFamiliar" :class="{ 'is-invalid': errores.precioFamiliar }"/>
           </div>
 
           <div class="col-md-3">
             <label class="form-label fw-semibold">{{ t.monthlyPriceOthers }}</label>
             <input type="number" step="0.01" class="form-control form-control-lg"
-                   v-model.number="abono.precioTotalMensualOtros" />
+                   v-model.number="abono.precioTotalMensualOtros" :class="{ 'is-invalid': errores.precioTotalMensualOtros }"/>
           </div>
 
           <div class="col-md-3">
             <label class="form-label fw-semibold">{{ t.totalPriceOthers }}</label>
             <input type="number" step="0.01" class="form-control form-control-lg"
-                   v-model.number="abono.precioPagoUnicoOtros" />
+                   v-model.number="abono.precioPagoUnicoOtros" :class="{ 'is-invalid': errores.precioPagoUnicoOtros }"/>
           </div>
 
           <!-- DESCUENTOS -->
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.firstActivityDiscount }} (%)</label>
             <input type="number" step="0.1" class="form-control form-control-lg"
-                   v-model.number="abono.descuentoPrimeraActividad" />
+                   v-model.number="abono.descuentoPrimeraActividad" :class="{ 'is-invalid': errores.descuentoPrimeraActividad }"/>
           </div>
 
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.otherActivitiesDiscount }} (%)</label>
             <input type="number" step="0.1" class="form-control form-control-lg"
-                   v-model.number="abono.descuentoRestoActividades" />
+                   v-model.number="abono.descuentoRestoActividades" :class="{ 'is-invalid': errores.descuentoRestoActividades }"/>
           </div>
 
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.outdoorDiscount }} (%)</label>
             <input type="number" step="0.1" class="form-control form-control-lg"
-                   v-model.number="abono.descuentoActividadesExteriores" />
+                   v-model.number="abono.descuentoActividadesExteriores" :class="{ 'is-invalid': errores.descuentoActividadesExteriores }"/>
           </div>
 
         </div>
@@ -121,11 +121,43 @@ const abono = ref({
   precioPagoUnicoOtros: 0
 })
 
-const errores = ref({ nombre: false })
+const errores = ref({
+  nombre: false,
+  meses: false,
+  descuentoPrimeraActividad: false,
+  descuentoRestoActividades: false,
+  descuentoActividadesExteriores: false,
+  precioTotalMensual: false,
+  precioPagoUnicoUAM: false,
+  precioFamiliar: false,
+  precioTotalMensualOtros: false,
+  precioPagoUnicoOtros: false
+})
 
 function validar() {
+  let valido = true
+
   errores.value.nombre = abono.value.nombre === ""
-  return !errores.value.nombre
+  errores.value.precioTotalMensual = abono.value.precioTotalMensual <= 0
+  errores.value.precioPagoUnicoUAM = abono.value.precioPagoUnicoUAM <= 0
+  errores.value.precioFamiliar = abono.value.precioFamiliar <= 0
+  errores.value.precioTotalMensualOtros = abono.value.precioTotalMensualOtros <= 0
+  errores.value.precioPagoUnicoOtros = abono.value.precioPagoUnicoOtros <= 0
+
+  errores.value.descuentoPrimeraActividad = 
+    abono.value.descuentoPrimeraActividad <= 0 || abono.value.descuentoPrimeraActividad > 100
+
+  errores.value.descuentoRestoActividades = 
+    abono.value.descuentoRestoActividades <= 0 || abono.value.descuentoRestoActividades > 100
+
+  errores.value.descuentoActividadesExteriores = 
+    abono.value.descuentoActividadesExteriores <= 0 || abono.value.descuentoActividadesExteriores > 100
+
+	for (const key in errores.value) {
+		if (errores.value[key]) valido = false
+	}
+
+	return valido
 }
 
 const crearAbono = async () => {

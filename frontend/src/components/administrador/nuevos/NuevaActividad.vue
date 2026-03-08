@@ -2,7 +2,7 @@
  <div class="min-vh-100" style="background: linear-gradient(135deg, #fff4e0, #e0f7ff);">
     <main class="container py-5" style="max-width: 1120px;">
       <h1 class="text-center fw-bold mb-5 text-primary">
-        {{ t.newFacility }}
+        {{ t.newActivity }}
       </h1>
 
       <div class="card shadow-lg border-0 rounded-4 p-4"
@@ -49,16 +49,6 @@
             <label class="form-label fw-semibold">{{ t.academicYear }}</label>
             <input type="number" class="form-control form-control-lg" :class="{ 'is-invalid': errores.año }"
               v-model.number="actividad.año" />
-          </div>
-
-          <!-- ESTADO -->
-          <div class="col-md-3">
-            <label class="form-label fw-semibold">{{ t.status }}</label>
-            <select class="form-select form-select-lg" :class="{ 'is-invalid': errores.estado }"
-              v-model="actividad.estado">
-              <option disabled value="">--</option>
-              <option v-for="e in tiposStore.estados" :key="e[0]" :value="e[0]">{{ e[1] }}</option>
-            </select>
           </div>
 
           <!-- DESCRIPCIÓN -->
@@ -122,7 +112,7 @@
               :class="{ 'is-invalid': errores.deporte }">
               <option disabled value="">{{ t.selectOption }}</option>
 
-              <option v-for="d in deportes" :key="d.id" :value="d.id">
+              <option v-for="d in deportes" :key="d.id" :value="d.titulo">
                 {{ d.titulo }}
               </option>
 
@@ -492,7 +482,6 @@ const errores = ref({
   tipoActividad: false,
   tipoReserva: false,
   terreno: false,
-  estado: false,
   instalacion: false,
   monitor: false,
   deporte: false,
@@ -551,7 +540,6 @@ function validarFormulario() {
   errores.value.tipoActividad = actividad.value.tipoActividad === ""
   errores.value.tipoReserva = actividad.value.tipoReserva === ""
   errores.value.terreno = actividad.value.terreno === ""
-  errores.value.estado = actividad.value.estado === ""
   errores.value.periodo = actividad.value.periodo === ""
   errores.value.instalacion = actividad.value.instalacion === null
   errores.value.monitor = actividad.value.monitor === null
@@ -572,6 +560,11 @@ const crearActividad = async () => {
   mensaje.value = ""
   if (!validarFormulario()) {
     mensaje.value = t.value.emptyFields
+    return
+  }
+
+  if (sesiones.value.length == 0) {
+    mensaje.value = t.value.noSessionWarning
     return
   }
 

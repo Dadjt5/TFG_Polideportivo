@@ -10,6 +10,25 @@ export default {
   login: "Login",
   logout: "Logout",
 
+  /* Otros */
+  sportsSubscriptionDetail: "Sports subscription details",
+  summerSubscriptionDetail: "Summer subscription details",
+  deleteDiscount: "Delete discount",
+  bonusDetail: "Bonus details",
+  modifyBonus: "Edit bonus",
+  deleteBonus: "Delete bonus",
+  deleteChannel: "Delete channel",
+
+  /* Mensajes */
+  missing: "Missing or incorrect fields",
+  duplicatedDNI: "There is already a user with that ID number.",
+  duplicatedEmail: "There is already a user with that email.",
+  unexpectedError: "Something has gone wrong, try again later",
+  registerSuccess: "Registration completed",
+  configurationSuccess: "Information successfully modified",
+  cantBooking: "This activity cannot be reserved",
+  noSessionWarning: "The activity has no sessions",
+
   /* Perfil */
   role: "Role",
   identity: "Identification",
@@ -135,11 +154,6 @@ export default {
   phoneNumber: "Phone number",
   name: "Name",
   surnames: "Surnames",
-  missing: "Missing or incorrect fields",
-  duplicatedDNI: "There is already a user with that ID number.",
-  duplicatedEmail: "There is already a user with that email.",
-  unexpectedError: "Something has gone wrong, try again later",
-  registerSuccess: "Registration completed",
   UAMmember: "UAM member",
 
   /* Detalle Actividad */
@@ -220,7 +234,7 @@ export default {
   otherActivitiesDiscount: "Discount for other activities",
   outdoorDiscount: "Discount for outdoor activities",
   singlePaymentUAM: "Single payment for UAM members",
-  familyPrice: "Final price",
+  familyPrice: "Family price",
 
   unlimitedPool: 'Unlimited access to the swimming pool',
   unlimitedGym: 'Unlimited access to the gym',

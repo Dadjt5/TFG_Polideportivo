@@ -103,7 +103,7 @@
                   class="position-absolute end-0 me-3 border-0 bg-transparent d-flex align-items-center justify-content-center"
                   style="height: 100%; top: 0;" @click="togglePassword">
                   <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"
-                    style="font-size: 1.2rem; color: #6c757d;"></i>
+                   style="font-size: 1.2rem; color: #0072ff;"></i>
                 </button>
               </div>
             </div>
@@ -117,8 +117,8 @@
                 <button type="button"
                   class="position-absolute end-0 me-3 border-0 bg-transparent d-flex align-items-center justify-content-center"
                   style="height: 100%; top: 0;" @click="toggleConfirmPassword">
-                  <i :class="showConfirmPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"
-                    style="font-size: 1.2rem; color: #6c757d;"></i>
+                  <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"
+                   style="font-size: 1.2rem; color: #0072ff;"></i>
                 </button>
               </div>
             </div>
@@ -130,19 +130,19 @@
           </p>
 
           <!-- Mensaje del identificador único -->
-        <div v-if="showIdentifier" class="text-center mt-3">
-          <p class="fw-bold text-primary mb-2">
+        <div v-if="showIdentifier" class="text-center mt-4">
+          <p class="fw-bold text-primary mb-2 fs-4">
             ¡{{ t.usuarioFinalIdentifier }}: <span class="text-success">{{ userIdentifier }}</span>!
           </p>
 
-          <!-- Botón para ir a login -->
-          <button class="btn btn-primary btn-sm" @click="gestionUsuarios">
-            {{ t.login }}
+          <!-- Botón para continuar -->
+          <button class="btn btn-outline-secondary btn-lg px-5" @click="gestionUsuarios">
+            {{ t.continue }}
           </button>
         </div>
 
           <!-- BOTONES -->
-          <div class="d-flex justify-content-center gap-4 mt-4">
+          <div v-else class="d-flex justify-content-center gap-4 mt-4">
             <button class="btn btn-primary btn-lg px-5" @click="nuevoUsuario">
               {{ t.newUserNoQues }}
             </button>

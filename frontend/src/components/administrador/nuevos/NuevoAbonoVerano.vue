@@ -12,22 +12,22 @@
 
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.name }}</label>
-            <input class="form-control form-control-lg" v-model="abono.nombre" />
+            <input class="form-control form-control-lg" v-model="abono.nombre" :class="{ 'is-invalid': errores.nombre }" />
           </div>
 
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.priceTDA }}</label>
-            <input type="number" step="0.01" class="form-control form-control-lg" v-model.number="abono.precioTDA" />
+            <input type="number" step="0.01" class="form-control form-control-lg" v-model.number="abono.precioTDA" :class="{ 'is-invalid': errores.precioTDA }" />
           </div>
 
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.priceUAM }}</label>
-            <input type="number" step="0.01" class="form-control form-control-lg" v-model.number="abono.precioUAM" />
+            <input type="number" step="0.01" class="form-control form-control-lg" v-model.number="abono.precioUAM" :class="{ 'is-invalid': errores.precioUAM }"/>
           </div>
 
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.priceOthers }}</label>
-            <input type="number" step="0.01" class="form-control form-control-lg" v-model.number="abono.precioOtros" />
+            <input type="number" step="0.01" class="form-control form-control-lg" v-model.number="abono.precioOtros" :class="{ 'is-invalid': errores.precioOtros }"/>
           </div>
 
         </div>
@@ -69,12 +69,25 @@ const abono = ref({
 })
 
 const errores = ref({
-  nombre: false
+  nombre: false,
+  precioTDA: false,
+  precioUAM: false,
+  precioOtros: false,
 })
 
 function validar() {
+  let valido = true
+
   errores.value.nombre = abono.value.nombre.trim() === ""
-  return !errores.value.nombre
+  errores.value.precioTDA = abono.value.precioTDA <= 0
+  errores.value.precioUAM = abono.value.precioUAM <= 0
+  errores.value.precioOtros = abono.value.precioOtros <= 0
+
+	for (const key in errores.value) {
+		if (errores.value[key]) valido = false
+	}
+
+	return valido
 }
 
 const crear = async () => {

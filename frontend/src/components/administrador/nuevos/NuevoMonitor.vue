@@ -85,19 +85,19 @@
         </p>
 
         <!-- Mensaje del identificador único -->
-        <div v-if="showIdentifier" class="text-center mt-3">
-          <p class="fw-bold text-primary mb-2">
+        <div v-if="showIdentifier" class="text-center mt-4">
+          <p class="fw-bold text-primary mb-2 fs-4">
             ¡{{ t.monitorIdentifier }}: <span class="text-success">{{ userIdentifier }}</span>!
           </p>
 
-          <!-- Botón para ir al login -->
-          <button class="btn btn-primary btn-sm shadow-sm" @click="gestionUsuarios">
-            {{ t.login }}
+          <!-- Botón para continuar -->
+          <button class="btn btn-outline-secondary btn-lg px-5" @click="gestionUsuarios">
+            {{ t.continue }}
           </button>
         </div>
 
         <!-- BOTONES -->
-        <div class="d-flex justify-content-center gap-3 mt-5">
+        <div v-else class="d-flex justify-content-center gap-3 mt-5">
           <button
             class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm"
             @click="crearMonitor"

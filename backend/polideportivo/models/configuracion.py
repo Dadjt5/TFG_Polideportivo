@@ -41,7 +41,6 @@ class Configuracion(models.Model):
     def editar(self, data):
         try:
             for campo, valor in data.items():
-                print(campo, valor)
                 if hasattr(self, campo):
                     setattr(self, campo, valor)
             self.save()

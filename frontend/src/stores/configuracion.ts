@@ -96,8 +96,10 @@ export const useConfiguracionStore = defineStore("configuracion", {
 				this.guardarEnLocalStorage();
 
 				this.modificado = true;
+				return true;
 			} catch (e) {
 				console.log("Error al editar la configuración", e);
+				return false;
 			}
 		},
 

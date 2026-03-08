@@ -129,7 +129,7 @@
         </div>
 
         <!-- Botones -->
-        <div class="d-flex justify-content-between mt-4">
+        <div v-if="!showIdentifier" class="d-flex justify-content-between mt-4">
           <button class="btn btn-outline-primary" :disabled="step === 1" @click="step--">{{ t.back }}</button>
           <button class="btn btn-primary" v-if="step < 3" @click="siguiente()">{{ t.next }}</button>
           <button class="btn btn-success" v-else @click="handleFinish">{{ t.finish }}</button>
@@ -141,13 +141,13 @@
         </p>
 
         <!-- Mensaje del identificador único -->
-        <div v-if="showIdentifier" class="text-center mt-3">
-          <p class="fw-bold text-primary mb-2">
+        <div v-if="showIdentifier" class="text-center mt-4">
+          <p class="fw-bold text-primary mb-2 fs-4">
             ¡{{ t.yourIdentifier }}: <span class="text-success">{{ userIdentifier }}</span>!
           </p>
 
           <!-- Botón para ir al login -->
-          <button class="btn btn-primary btn-sm" @click="login">
+          <button class="btn btn-outline-secondary btn-lg px-5" @click="login">
             {{ t.login }}
           </button>
         </div>

@@ -464,7 +464,6 @@ onMounted(async () => {
   try {
     const data = await getInstalacionDetalle(id)
 
-    // Separar agendas y fechas especiales
     agenda.value = data.agenda.filter((a: any) => a.dia && !a.fecha)
     fechasEspeciales.value = data.agenda.filter((a: any) => a.fecha)
 

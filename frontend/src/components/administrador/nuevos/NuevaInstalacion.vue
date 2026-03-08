@@ -102,7 +102,7 @@
           <!-- TARIFA -->
           <div class="col-md-6">
             <label class="form-label fw-semibold">{{ t.tariff }}</label>
-            <select class="form-select form-select-lg" v-model="instalacion.tarifa">
+            <select class="form-select form-select-lg" v-model="instalacion.tarifa" :class="{ 'is-invalid': errores.tarifa }">
               <option value="">--</option>
               <option v-for="t in tarifas" :key="t.id" :value="t.id">
                 {{ t.titulo }}
@@ -256,10 +256,11 @@ const errores = ref({
   aforoMaximo: false,
   porcentajeTDA: false,
   pabellon: false,
+  tarifa: false,
   tipoInstalacion: false
 })
 
-const diasSemana = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+const diasSemana = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"];
 const agenda = ref(diasSemana.map(d => ({
   dia: d,
   apertura: "08:00",
@@ -273,16 +274,9 @@ const tempAbierto = ref(false);
 const tempApertura = ref("08:00");
 const tempCierre = ref("22:00");
 
-const openAgenda = ref(false);
-const openEspeciales = ref(false);
-
 const pabellones = ref<any[]>([])
 const tarifas = ref<any[]>([])
 
-
-function handleAgendaChange(index: number, field: "apertura" | "cierre", value: string) {
-  agenda.value[index][field] = value;
-}
 
 function handleAddFechaEspecial() {
   if (!tempFecha.value) return;
@@ -311,7 +305,8 @@ function validarFormulario() {
   errores.value.porcentajeTDA =
     instalacion.value.porcentajeTDA < 0 ||
     instalacion.value.porcentajeTDA > 100
-  errores.value.pabellon = instalacion.value.pabellon === ""
+  errores.value.pabellon = instalacion.value.pabellon === null
+  errores.value.tarifa = instalacion.value.tarifa === null
   errores.value.tipoInstalacion = instalacion.value.tipoInstalacion === ""
 
   for (const k in errores.value) {

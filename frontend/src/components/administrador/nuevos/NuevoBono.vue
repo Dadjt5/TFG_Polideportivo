@@ -25,15 +25,27 @@
           </div>
 
           <div class="col-md-3">
+            <label class="form-label fw-semibold">{{ t.priceSubscripcion }}</label>
+            <input type="number" step="0.01" class="form-control form-control-lg"
+                   v-model.number="bono.precioAbono" :class="{ 'is-invalid': errores.precioAbono }"/>
+          </div>
+
+          <div class="col-md-3">
+            <label class="form-label fw-semibold">{{ t.priceTDA }}</label>
+            <input type="number" step="0.01" class="form-control form-control-lg"
+                   v-model.number="bono.precioOtros" :class="{ 'is-invalid': errores.precioTDA }"/>
+          </div>
+
+          <div class="col-md-3">
             <label class="form-label fw-semibold">{{ t.priceUAM }}</label>
             <input type="number" step="0.01" class="form-control form-control-lg"
-                   v-model.number="bono.precioUAM" />
+                   v-model.number="bono.precioUAM" :class="{ 'is-invalid': errores.precioUAM }"/>
           </div>
 
           <div class="col-md-3">
             <label class="form-label fw-semibold">{{ t.priceOthers }}</label>
             <input type="number" step="0.01" class="form-control form-control-lg"
-                   v-model.number="bono.precioOtros" />
+                   v-model.number="bono.precioOtros" :class="{ 'is-invalid': errores.precioOtros }"/>
           </div>
 
           <div class="col-md-4">
@@ -97,15 +109,29 @@ const instalaciones = ref<any[]>([])
 const errores = ref({
   usos: false,
   validez: false,
+  precioTDA: false,
+  precioUAM: false,
+  precioAbono: false,
+  precioOtros: false,
   instalacion: false
 })
 
 function validar() {
+  let valido = true
+
   errores.value.usos = bono.value.usos <= 0
   errores.value.validez = bono.value.validez <= 0
+  errores.value.precioTDA = bono.value.precioTDA <= 0
+  errores.value.precioUAM = bono.value.precioUAM <= 0
+  errores.value.precioAbono = bono.value.precioAbono <= 0
+  errores.value.precioOtros = bono.value.precioOtros <= 0
   errores.value.instalacion = bono.value.instalacion == null
 
-  return !errores.value.usos
+  for (const key in errores.value) {
+		if (errores.value[key]) valido = false
+	}
+
+	return valido
 }
 
 const cargarDatos = async () => {

@@ -1,34 +1,29 @@
 <template>
-  <div class="min-vh-100 bg-light pb-5">
-    <main class="container py-5" style="max-width: 1100px">
-      <div class="d-flex justify-content-between align-items-center mb-4">
+  <div class="min-vh-100 pt-4" style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
+    <main class="container-fluid px-5 py-4" style="max-width: 1600px;">
+
+      <!-- CABECERA -->
+      <div class="d-flex justify-content-between align-items-center mb-4 mt-3">
         <button class="btn btn-secondary rounded-pill" @click="volver">
           ← {{ t.return }}
         </button>
 
-        <h1 class="fw-semibold mb-0">{{ t.userDetail }}</h1>
+        <h1 class="fw-semibold text-primary mb-2" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.2);">
+          {{ usuario.nombre }}
+        </h1>
 
         <div style="width: 100px"></div>
       </div>
 
       <div class="card shadow-sm rounded-4">
-        <div class="card-body p-4 p-md-5">
+        <div class="card shadow-lg rounded-4 p-4"
+            style="background-color: rgba(255,255,255,0.75); backdrop-filter: blur(10px);">
 
-          <!-- USUARIO -->
-          <div class="d-flex flex-column flex-md-row align-items-center gap-4 mb-4">
-            <div
-              class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center"
-              style="width:96px;height:96px"
-            >
-              <i class="bi bi-person-fill text-primary fs-1"></i>
-            </div>
+            <h4 class="mb-3 d-flex align-items-center">
+              <i class="bi bi-currency-euro text-primary me-2"></i>
+              {{ t.userDetail }}
+            </h4>
 
-            <div class="flex-fill text-center text-md-start">
-              <h3 class="fw-semibold mb-1">
-                {{ usuario.nombre }} {{ usuario.apellidos }}
-              </h3>
-            </div>
-          </div>
 
           <!-- DATOS PERSONALES -->
           <div class="row g-3">
@@ -239,44 +234,25 @@
           </div>
 
           <!-- ACCIONES -->
-          <div class="d-flex justify-content-center gap-4 mt-5">
+      <div class="d-flex justify-content-center gap-3 mt-5">
+        <button v-if="!isEditing" class="btn btn-primary btn-lg rounded-pill" @click="activarEdicion">
+          <i class="bi bi-pencil me-2"></i> {{ t.modifyUser }}
+        </button>
 
-            <button
-              v-if="!isEditing"
-              class="btn btn-primary btn-lg rounded-pill"
-              @click="activarEdicion"
-            >
-              <i class="bi bi-pencil me-2"></i>
-              {{ t.modifyUser }}
-            </button>
+        <template v-else>
+          <button class="btn btn-success btn-lg rounded-pill" @click="guardarCambios">
+            <i class="bi bi-check-lg me-2"></i> {{ t.saveChanges }}
+          </button>
+          <button class="btn btn-secondary btn-lg rounded-pill" @click="cancelarEdicion">
+            {{ t.cancel }}
+          </button>
+        </template>
 
-            <template v-else>
-              <button
-                class="btn btn-success btn-lg rounded-pill"
-                @click="guardarCambios"
-              >
-                <i class="bi bi-check-lg me-2"></i>
-                {{ t.saveChanges }}
-              </button>
+        <button v-if="!isEditing" class="btn btn-danger btn-lg rounded-pill" @click="eliminar">
+          <i class="bi bi-trash me-2"></i> {{ t.deleteUser }}
+        </button>
 
-              <button
-                class="btn btn-secondary btn-lg rounded-pill"
-                @click="cancelarEdicion"
-              >
-                {{ t.cancel }}
-              </button>
-            </template>
-
-            <button
-              v-if="!isEditing"
-              class="btn btn-danger btn-lg rounded-pill"
-              @click="eliminar"
-            >
-              <i class="bi bi-trash me-2"></i>
-              {{ t.deleteUser }}
-            </button>
-
-          </div>
+      </div>
         </div>
       </div>
     </main>

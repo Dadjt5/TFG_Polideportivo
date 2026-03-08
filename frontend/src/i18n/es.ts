@@ -10,6 +10,25 @@ export default {
   login: "Acceder",
   logout: "Cerrar sesión",
 
+  /* Otros */
+  sportsSubscriptionDetail: "Detalles del abono deportivo",
+  summerSubscriptionDetail: "Detalles del abono de verano",
+  deleteDiscount: "Eliminar descuento",
+  bonusDetail: "Detalles del bono",
+  modifyBonus: "Editar bono",
+  deleteBonus: "Eliminar bono",
+  deleteChannel: "Eliminar canal",
+
+  /* Mensajes */
+  missing: "Hay campos vacios o erroneos",
+  duplicatedDNI: "Ya existe un usuario con ese DNI.",
+  duplicatedEmail: "Ya existe un usuario con ese correo electrónico",
+  unexpectedError: "Ha ocurrido un error, pruebe mas tarde",
+  registerSuccess: "Registro completado",
+  configurationSuccess: "Información modificada correctamente",
+  cantBooking: "Esta actividad no puede ser reservada",
+  noSessionWarning: "La actividad no tiene sesiones",
+
   /* Perfil */
   role: "Rol",
   identity: "Identificación",
@@ -135,11 +154,6 @@ export default {
   phoneNumber: "Teléfono",
   name: "Nombre",
   surnames: "Apellidos",
-  missing: "Hay campos vacios o erroneos",
-  duplicatedDNI: "Ya existe un usuario con ese DNI.",
-  duplicatedEmail: "Ya existe un usuario con ese correo electrónico",
-  unexpectedError: "Ha ocurrido un error, pruebe mas tarde",
-  registerSuccess: "Registro completado",
   UAMmember: "Miembro de la UAM",
 
   /* Detalle Actividad */
@@ -220,7 +234,7 @@ export default {
   otherActivitiesDiscount: "Descuento para el resto de actividades",
   outdoorDiscount: "Descuento para actividades externas",
   singlePaymentUAM: "Pago único miembros UAM",
-  familyPrice: "Precio finales",
+  familyPrice: "Precio familiar",
 
   unlimitedPool: "Acceso ilimitado a la piscina",
   unlimitedGym: "Acceso ilimitado a la sala de musculación",
@@ -382,7 +396,7 @@ export default {
   createMonitor: "Crear monitor",
 
   /* Nuevo administrador */
-  newAdminTitle: "Nuevo Adminitrador",
+  newAdminTitle: "Nuevo administrador",
   createAdmin: "Crear administrador",
   rootAdmin: "Administrador raíz",
   spacesAdmin: "Administrador de espacios",

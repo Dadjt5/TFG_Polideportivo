@@ -129,9 +129,14 @@
         </div>
       </div>
 
+      <div class="text-center mt-4"
+        v-if="usuarioFinalStore.isLogged && actividad.tipoReserva !== 'ONLINE' && actividad.tipoReserva !== 'AMBAS'">
+        <p>{{ t.cantBooking }}</p>
+      </div>
+
       <!-- Reserva y Volver -->
       <div class="d-flex justify-content-center mt-5">
-        <button v-if="usuarioFinalStore.isLogged" class="btn btn-gradient btn-lg px-5 me-4" @click="reservar">
+        <button v-if="usuarioFinalStore.isLogged && (actividad.tipoReserva === 'ONLINE' || actividad.tipoReserva === 'AMBAS')" class="btn btn-gradient btn-lg px-5 me-4" @click="reservar">
           {{ t.booking }}
         </button>
 

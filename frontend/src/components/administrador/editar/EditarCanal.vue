@@ -186,6 +186,15 @@ function cancelarEdicion() {
   editando.value = false
 }
 
+const eliminar = async () => {
+  try {
+    await eliminarCanal(canal.value.id)
+    router.push({ name: 'foro' });
+  } catch (e) {
+    console.error("Error al eliminar el canal", e);
+  }
+}
+
 function camposModificados() {
   const data: any = {}
 

@@ -1,9 +1,17 @@
 <template>
-  <div class="min-vh-100 bg-light pb-5">
-    <main class="container py-5" style="max-width: 1100px;">
-      <h1 class="text-center fw-bold mb-5 display-6">
-        {{ t.modifyActivity }}
-      </h1>
+  <div class="min-vh-100 pt-4" style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
+    <main class="container-fluid px-5 py-4" style="max-width: 1600px;">
+
+       <!-- CABECERA -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <button class="btn btn-secondary rounded-pill" @click="volver">
+          ← {{ t.return }}
+        </button>
+
+        <h1 class="fw-semibold mb-0">{{ actividad.nombre }}</h1>
+
+        <div style="width: 100px"></div>
+      </div>
 
       <div class="card border-0 shadow-lg rounded-4 p-4">
 
@@ -344,14 +352,14 @@
           <p v-if="mensaje" class="text-danger">{{ mensaje }}</p>
         </div>
 
-        <!-- ACCIONES -->
+      <!-- ACCIONES -->
       <div class="d-flex justify-content-center gap-4 mt-5">
         <button
           v-if="!editando"
           class="btn btn-primary btn-lg rounded-pill px-4"
           @click="activarEdicion"
         >
-          {{ t.modifyFacility }}
+          {{ t.modifyActivity }}
         </button>
 
         <template v-else>
@@ -375,7 +383,7 @@
           class="btn btn-outline-danger btn-lg rounded-pill px-4"
           @click="eliminar"
         >
-          {{ t.deleteFacility }}
+          {{ t.deleteActivity }}
         </button>
       </div>
 
@@ -389,7 +397,7 @@ import { ref, onMounted, inject, type Ref, computed } from "vue"
 import { useRouter } from "vue-router"
 
 import { getInstalacionesSimples, getMonitoresSimples, getTarifasActividadComun, getTarifasFisioterapia, getTarifasGrupoReducido, getDeportes } from "@/services/listadoService"
-import { getActividadDetalle, modificarActividad } from "@/services/detalleService"
+import { eliminarActividad, getActividadDetalle, modificarActividad } from "@/services/detalleService"
 import { useTiposStore } from "@/stores/tipos"
 
 import type { Language } from "@/useI18N"
@@ -471,6 +479,15 @@ function agregarSesion() {
   if (!crearSesion.value.dia || !crearSesion.value.horaInicio || !crearSesion.value.horaFin) return
   sesiones.value.push({ ...crearSesion.value })
   crearSesion.value = { id: -1, dia: "", horaInicio: "", horaFin: "" }
+}
+
+const eliminar = async () => {
+  try {
+    await eliminarActividad(actividad.value.id)
+    router.push({ name: 'gestion-espacios' });
+  } catch (e) {
+    console.error("Error al eliminar la actividad", e);
+  }
 }
 
 function volver() { router.back() }

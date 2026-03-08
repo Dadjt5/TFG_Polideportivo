@@ -717,14 +717,12 @@ class RegistroAdministradorView(APIView):
         )
 
         if respuesta["error"]:
-            sta = status.HTTP_400_BAD_REQUEST
-        else:
-            sta = status.HTTP_201_CREATED
+            return Response({"mensaje": respuesta["respuesta"]}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(
-            {"respuesta": respuesta["respuesta"]},
-            status=sta
-        )
+        serializer = AdministradorSerializer(respuesta["respuesta"])
+        admin = serializer.data
+
+        return Response(admin)
 
 
 # Crear nuevas notificaciones
@@ -1090,42 +1088,65 @@ class NuevaInstalacionView(APIView):
 
     @transaction.atomic
     def post(self, request):
-        try:
-            # Datos de la instalacion
-            instalacion_data = request.data.get("instalacion", {})
 
-            pabellon_id = instalacion_data.pop("pabellon", None)
-            tarifa_id = instalacion_data.pop("tarifa", None)
+        instalacion_data = request.data.get("instalacion", {})
 
-            pabellon = get_object_or_404(Pabellon, id=pabellon_id)
-            tarifa = get_object_or_404(TarifaInstalacion, id=tarifa_id)
+        pabellon_id = instalacion_data.pop("pabellon", None)
+        tarifa_id = instalacion_data.pop("tarifa", None)
 
-            instalacion = Instalacion.objects.create(**instalacion_data, pabellon=pabellon, tarifa=tarifa)
+        if not pabellon_id or not tarifa_id:
+            return Response(
+                {"respuesta": "Faltan datos obligatorios"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
-            # Crear y manejar la agenda y fechas especiales
-            agenda = request.data.get('agenda', [])
-            fechasEspeciales = request.data.get('fechasEspeciales', [])
+        pabellon = get_object_or_404(Pabellon, id=pabellon_id)
+        tarifa = get_object_or_404(TarifaInstalacion, id=tarifa_id)
 
-            for fecha in agenda:
-                res = instalacion.controlarCambioHorario(fecha["dia"], fecha.get("apertura"), fecha.get("cierre"))
-                if not res:
-                    return Response({"respuesta": "Error, el cambio no esta permitido debido a que hay sesiones en esas horas"}, status=status.HTTP_400_BAD_REQUEST)
+        instalacion = Instalacion.objects.create(
+            **instalacion_data,
+            pabellon=pabellon,
+            tarifa=tarifa
+        )
 
-                res = instalacion.nuevoHorario(fecha["dia"], fecha.get("apertura"), fecha.get("cierre"), fecha.get("abierto", True))
-                if not res:
-                    return Response({"respuesta": "Error al actualizar la agenda de los dias de la semana"}, status=status.HTTP_400_BAD_REQUEST)
+        agenda = request.data.get('agenda', [])
+        fechasEspeciales = request.data.get('fechasEspeciales', [])
 
-            for fecha in fechasEspeciales:
-                instalacion.nuevoHorarioEspecial(fecha["fecha"], fecha.get("apertura"), fecha.get("cierre"), fecha.get("abierto", True))
+        for fecha in agenda:
+            res = instalacion.controlarCambioHorario(
+                fecha["dia"],
+                fecha.get("apertura"),
+                fecha.get("cierre")
+            )
 
-                if not res:
-                    return Response({"respuesta": "Error al actualizar la agenda de los dias especiales"}, status=status.HTTP_400_BAD_REQUEST)
+            if not res:
+                raise Exception("El cambio de horario no está permitido")
 
-            return Response({"respuesta": "Exito al asignar la agenda a la instalacion"}, status=status.HTTP_200_OK)
+            res = instalacion.nuevoHorario(
+                fecha["dia"],
+                fecha.get("apertura"),
+                fecha.get("cierre"),
+                fecha.get("abierto", True)
+            )
 
-        except Exception as e:
-            return Response({"respuesta": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            if not res:
+                raise Exception("Error al actualizar la agenda")
 
+        for fecha in fechasEspeciales:
+            res = instalacion.nuevoHorarioEspecial(
+                fecha["fecha"],
+                fecha.get("apertura"),
+                fecha.get("cierre"),
+                fecha.get("abierto", True)
+            )
+
+            if not res:
+                raise Exception("Error al actualizar fechas especiales")
+
+        return Response(
+            {"respuesta": "Instalación creada correctamente"},
+            status=status.HTTP_201_CREATED
+        )
 
 
 class EditarInstalacionView(APIView):
@@ -1146,7 +1167,7 @@ class EditarInstalacionView(APIView):
             tarifa = get_object_or_404(TarifaInstalacion, id=tarifa_id)
 
             # Manejar la agenda y fechas especiales
-            agenda = request.data.get('agenda', [])
+            agenda = request.data.get('agendas', [])
             fechasEspeciales = request.data.get('fechasEspeciales', [])
 
             # AGENDA SEMANAL
@@ -1188,11 +1209,6 @@ class EditarInstalacionView(APIView):
                             {"respuesta": f"Error creando horario para {dia}"},
                             status=status.HTTP_400_BAD_REQUEST
                         )
-
-            # Eliminar los que ya no vienen
-            for dia, agenda in agendas_existentes.items():
-                if dia not in dias_recibidos:
-                    agenda.delete()
 
             # FECHAS ESPECIALES
             especiales_existentes = {
@@ -1250,53 +1266,64 @@ class NuevaActividadView(APIView):
 
     @transaction.atomic
     def post(self, request):
-        try:
-            # Datos de la actividad
-            actividad_data = request.data.get("actividad", {})
-            
-            tarifa_id = actividad_data.pop("tarifa", None)
-            instalacion_id = actividad_data.pop("instalacion", None)
-            monitor_id = actividad_data.pop("monitor", None)
-            
-            tarifa = get_object_or_404(TarifaActividad, id=tarifa_id)
-            instalacion = get_object_or_404(Instalacion, id=instalacion_id)
-            monitor = get_object_or_404(Monitor, id=monitor_id)
 
-            actividad = Actividad.objects.create(**actividad_data, tarifa=tarifa, instalacion=instalacion, monitor=monitor)
-            ListaEspera.objects.create(actividad=actividad)
+        actividad_data = request.data.get("actividad", {})
 
-            # Sesiones de la actividad
-            sesiones = request.data.get("sesiones", [])
+        tarifa_id = actividad_data.pop("tarifa", None)
+        instalacion_id = actividad_data.pop("instalacion", None)
+        monitor_id = actividad_data.pop("monitor", None)
 
-            for sesion in sesiones:
-                dia = sesion.get('dia')
-                hora_inicio = sesion.get('horaInicio')
-                hora_fin = sesion.get('horaFin')
+        tarifa = get_object_or_404(TarifaActividad, id=tarifa_id)
+        instalacion = get_object_or_404(Instalacion, id=instalacion_id)
+        monitor = get_object_or_404(Monitor, id=monitor_id)
 
-                respuesta = instalacion.controlarHorarioActividad(dia, hora_inicio, hora_fin)
-                if not respuesta:
-                    return Response({"respuesta": "Una o más sesiones no se pueden realizar en esta instalación en el horario elegido"}, status=status.HTTP_400_BAD_REQUEST)
+        sesiones = request.data.get("sesiones", [])
 
-                respuesta = actividad.nuevaSesion(dia, hora_inicio, hora_fin)
+        # Validar horarios primero
+        for sesion in sesiones:
+            dia = sesion.get('dia')
+            hora_inicio = sesion.get('horaInicio')
+            hora_fin = sesion.get('horaFin')
 
-                if not respuesta:
-                    return Response({"respuesta": "No se ha podido crear ninguna sesión"}, status=status.HTTP_400_BAD_REQUEST)
+            if not instalacion.controlarHorarioActividad(dia, hora_inicio, hora_fin):
+                return Response(
+                    {"respuesta": "Una o más sesiones no se pueden realizar en esta instalación"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
-            # Deporte de la actividad
-            nombre = request.data.get("deportes")
-            nombre = nombre.strip()
-            titulo = nombre.lower().replace(" ", "_")
+        # Crear actividad
+        actividad = Actividad.objects.create(
+            **actividad_data,
+            tarifa=tarifa,
+            instalacion=instalacion,
+            monitor=monitor
+        )
 
-            deporte, _ = Deporte.objects.get_or_create(titulo=titulo)
-            actividad.deportes = deporte
-            actividad.save()
-            
-            Notificacion.notificarNuevaActividad(actividad)
+        ListaEspera.objects.create(actividad=actividad)
 
-            return Response({"respuesta": "Deporte asignado correctamente"}, status=status.HTTP_200_OK)
+        # Crear sesiones
+        for sesion in sesiones:
+            actividad.nuevaSesion(
+                sesion.get('dia'),
+                sesion.get('horaInicio'),
+                sesion.get('horaFin')
+            )
 
-        except Exception as e:
-            return Response({"respuesta": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        # Deporte
+        nombre = request.data.get("deportes", "").strip()
+        titulo = nombre.lower().replace(" ", "_")
+
+        deporte, _ = Deporte.objects.get_or_create(titulo=titulo)
+
+        actividad.deportes = deporte
+        actividad.save()
+
+        Notificacion.notificarNuevaActividad(actividad)
+
+        return Response({
+            "respuesta": "Actividad creada correctamente",
+            "actividad_id": actividad.id
+        }, status=status.HTTP_201_CREATED)
 
 
 class EditarActividadView(APIView):
@@ -1574,7 +1601,7 @@ class ObtenerConfiguracionView(APIView):
         configuracion = Configuracion.objects.first()
 
         resultado = configuracion.editar(request.data)
-        
+    
         if resultado:
             return Response({"respuesta": "Resultados cambiados correctamente"}, status=status.HTTP_200_OK)
         

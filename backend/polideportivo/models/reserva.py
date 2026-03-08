@@ -7,7 +7,7 @@ from .constantes import EstadoReserva
 from .descuento import Descuento
 from .lista_espera import ListaEspera, EntradaListaEspera
 from .notificacion import Notificacion
-from .constantes import TipoActividad
+from .constantes import FormaReserva
 
 
 class Reserva(models.Model):
@@ -102,6 +102,9 @@ class ReservaActividad(Reserva):
     
     @classmethod
     def nuevaReserva(cls, usuario, actividad):
+        if actividad.tipoReserva == FormaReserva.PRESENCIAL or actividad.tipoReserva == FormaReserva.NINGUNA:
+            return None
+
         with transaction.atomic():
             actividad.refresh_from_db()
 

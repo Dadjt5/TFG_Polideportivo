@@ -140,7 +140,7 @@ function validarFormulario() {
   errores.value.titulo = tarifa.value.titulo === ''
 
   for (const key in errores.value) {
-    errores.value[key] = tarifa.value[key] < 0
+    errores.value[key] = tarifa.value[key] <= 0
     if (errores.value[key]) valido = false
   }
 
