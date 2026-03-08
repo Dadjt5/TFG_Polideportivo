@@ -1,6 +1,6 @@
 <template>
-  <div class="min-vh-100 bg-light">
-    <main class="container py-4">
+  <div class="min-vh-100 pt-4" style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
+    <main class="container-fluid px-5 py-4" style="max-width: 1600px;">
 
       <!-- CABECERA -->
       <div class="d-flex justify-content-between align-items-center mb-4">
@@ -20,7 +20,8 @@
 
         <!-- DETALLES CANAL -->
         <div class="col-lg-8 mx-auto">
-          <div class="bg-white rounded-3 shadow-sm p-4">
+          <div class="card shadow-lg rounded-4 p-4"
+            style="background-color: rgba(255,255,255,0.75); backdrop-filter: blur(10px);">
 
             <h4 class="mb-4 d-flex align-items-center gap-2">
               <i class="bi bi-chat-dots-fill text-primary"></i>
@@ -106,33 +107,24 @@
       </div>
 
       <!-- ACCIONES -->
-      <div class="d-flex justify-content-center gap-4 mt-5">
-
-        <button
-          v-if="!editando"
-          class="btn btn-primary btn-lg rounded-pill"
-          @click="activarEdicion"
-        >
-          <i class="bi bi-pencil me-2"></i>
-          {{ t.modifyChannel }}
+      <div class="d-flex justify-content-center gap-3 mt-5">
+        <button v-if="!editando" class="btn btn-primary btn-lg rounded-pill" @click="activarEdicion">
+          <i class="bi bi-pencil me-2"></i> {{ t.modifyChannel }}
         </button>
 
         <template v-else>
-          <button
-            class="btn btn-success btn-lg rounded-pill"
-            @click="guardarCambios"
-          >
-            <i class="bi bi-check-lg me-2"></i>
-            {{ t.saveChanges }}
+          <button class="btn btn-success btn-lg rounded-pill" @click="guardarCambios">
+            <i class="bi bi-check-lg me-2"></i> {{ t.saveChanges }}
           </button>
-
-          <button
-            class="btn btn-secondary btn-lg rounded-pill"
-            @click="cancelarEdicion"
-          >
+          <button class="btn btn-secondary btn-lg rounded-pill" @click="cancelarEdicion">
             {{ t.cancel }}
           </button>
         </template>
+
+        <button v-if="!editando" class="btn btn-danger btn-lg rounded-pill" @click="eliminar">
+          <i class="bi bi-trash me-2"></i> {{ t.deleteChannel }}
+        </button>
+
       </div>
 
     </main>

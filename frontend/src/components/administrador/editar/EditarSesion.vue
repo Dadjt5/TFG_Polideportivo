@@ -1,56 +1,67 @@
 <template>
-  <div class="min-vh-100 bg-light">
-    <main class="container py-4">
+  <div class="min-vh-100 pt-4" style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
+    <main class="container-fluid px-5 py-4" style="max-width: 1600px;">
 
-      <!-- TÍTULO -->
-      <div class="d-flex justify-content-between align-items-center mb-4">
+      <!-- CABECERA -->
+      <div class="d-flex justify-content-between align-items-center mb-4 mt-3">
+
         <button class="btn btn-secondary rounded-pill" @click="volver">
           ← {{ t.return }}
         </button>
 
-        <h1 class="fw-semibold mb-0">
-          {{ sesion.actividad.nombre }}
-        </h1>
+        <div class="text-center">
+          <h1 class="fw-semibold text-primary mb-1"
+          style="text-shadow: 1px 1px 3px rgba(0,0,0,0.2);">
 
-        <!-- BADGE HORARIO -->
-        <span class="badge bg-primary fs-6" v-if="!editando">
-          {{ sesion.dia }} · {{ sesion.horaInicio }} - {{ sesion.horaFin }}
-        </span>
+            {{ sesion.actividad.nombre }}
 
-        <div v-else class="d-flex gap-2 align-items-center">
-          <input
-            type="text"
-            class="form-control form-control-sm text-center"
-            v-model="sesion.dia"
-            style="width: 110px"
-						:class="{ 'is-invalid': errores.dia }"
-          />
+          </h1>
 
-          <input
-            type="time"
-            class="form-control form-control-sm"
-            v-model="sesion.horaInicio"
-						:class="{ 'is-invalid': errores.horaInicio }"
-          />
+          <!-- HORARIO -->
+          <span class="badge bg-primary fs-6" v-if="!editando">
+            {{ sesion.dia }} · {{ sesion.horaInicio }} - {{ sesion.horaFin }}
+          </span>
 
-          <span>—</span>
+          <div v-else class="d-flex gap-2 justify-content-center align-items-center mt-2">
 
-          <input
-            type="time"
-            class="form-control form-control-sm"
-            v-model="sesion.horaFin"
-						:class="{ 'is-invalid': errores.horaFin }"
-          />
+            <input
+              type="text"
+              class="form-control form-control-sm text-center"
+              style="width:120px"
+              v-model="sesion.dia"
+              :class="{ 'is-invalid': errores.dia }"
+            />
+
+            <input
+              type="time"
+              class="form-control form-control-sm"
+              v-model="sesion.horaInicio"
+              :class="{ 'is-invalid': errores.horaInicio }"
+            />
+
+            <span>—</span>
+
+            <input
+              type="time"
+              class="form-control form-control-sm"
+              v-model="sesion.horaFin"
+              :class="{ 'is-invalid': errores.horaFin }"
+            />
+
+          </div>
+
         </div>
 
-        <div style="width: 100px"></div>
+        <div style="width:100px"></div>
+
       </div>
 
       <div class="row g-4">
 
         <!-- DETALLES ACTIVIDAD -->
         <div class="col-lg-6">
-          <div class="bg-white rounded-3 shadow-sm p-4 h-100">
+          <div class="card shadow-lg rounded-4 p-4 h-100"
+          style="background-color: rgba(255,255,255,0.75); backdrop-filter: blur(10px);">
 
             <h4 class="mb-3 d-flex align-items-center gap-2">
               <i class="bi bi-info-circle-fill text-primary"></i>
@@ -58,6 +69,7 @@
             </h4>
 
             <div class="row g-3">
+
               <div class="col-6">
                 <span class="fw-medium">{{ t.period }}:</span>
                 {{ sesion.actividad.periodo }}
@@ -70,26 +82,31 @@
 
               <div class="col-6">
                 <span class="fw-medium">{{ t.facility }}:</span>
+
                 <span
                   class="text-primary fw-medium"
-                  style="cursor: pointer"
+                  style="cursor:pointer"
                   @click="facilityDetail(sesion.actividad.instalacion.id)"
                 >
                   {{ sesion.actividad.instalacion.nombre }}
                 </span>
+
               </div>
 
               <div class="col-6">
                 <span class="fw-medium">{{ t.level }}:</span>
                 {{ sesion.actividad.nivel }}
               </div>
+
             </div>
           </div>
         </div>
 
+
         <!-- PARTICIPANTES -->
         <div class="col-lg-6">
-          <div class="bg-white rounded-3 shadow-sm p-4 h-100">
+          <div class="card shadow-lg rounded-4 p-4 h-100"
+          style="background-color: rgba(255,255,255,0.75); backdrop-filter: blur(10px);">
 
             <h4 class="mb-3 d-flex align-items-center gap-2">
               <i class="bi bi-person-check-fill text-primary"></i>
@@ -106,10 +123,12 @@
 
           </div>
         </div>
+
       </div>
 
+
       <!-- ACCIONES -->
-      <div class="d-flex justify-content-center gap-4 mt-5">
+      <div class="d-flex justify-content-center gap-3 mt-5">
 
         <button
           v-if="!editando"
@@ -121,6 +140,7 @@
         </button>
 
         <template v-else>
+
           <button
             class="btn btn-success btn-lg rounded-pill"
             @click="guardarCambios"
@@ -135,6 +155,7 @@
           >
             {{ t.cancel }}
           </button>
+
         </template>
 
         <button
@@ -151,8 +172,6 @@
     </main>
   </div>
 </template>
-
-
 
 <script setup lang="ts">
 import { ref, onMounted, inject, type Ref } from "vue";

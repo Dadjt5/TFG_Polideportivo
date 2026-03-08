@@ -1,63 +1,16 @@
 <template>
-  <div class="min-vh-100 bg-light">
-    <main class="container-fluid mt-2 px-5 py-4">
+  <div class="min-vh-100 pt-4" style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
+    <main class="container-fluid px-5 py-4" style="max-width: 1600px;">
 
       <!-- CABECERA -->
       <div class="d-flex justify-content-between align-items-center mb-4">
-        <button class="btn btn-outline-secondary rounded-pill" @click="volver">
+        <button class="btn btn-secondary rounded-pill" @click="volver">
           ← {{ t.return }}
         </button>
 
-        <h1 class="fw-semibold mb-0 text-center flex-grow-1">
-          <span v-if="!editando">{{ instalacion.nombre }}</span>
-          <input
-            v-else
-            v-model="instalacion.nombre"
-            class="form-control text-center fw-semibold"
-            :class="{ 'is-invalid': errores.nombre }"
-          />
-        </h1>
+        <h1 class="fw-semibold mb-0">{{ instalacion.nombre }}</h1>
 
-        <div style="width: 120px"></div>
-      </div>
-
-      <!-- TARJETAS RESUMEN -->
-      <div class="row g-3 mb-4">
-
-        <div class="col-md-3">
-          <div class="card shadow-sm rounded-4 border-0 p-3 text-center">
-            <div class="fs-4 fw-bold">{{ instalacion.aforoMaximo }}</div>
-            <div class="text-muted small">{{ t.capacity }}</div>
-          </div>
-        </div>
-
-        <div class="col-md-3">
-          <div class="card shadow-sm rounded-4 border-0 p-3 text-center">
-            <div class="fs-4 fw-bold">
-              {{ instalacion.luz ? t.yes : 'No' }}
-            </div>
-            <div class="text-muted small">{{ t.light }}</div>
-          </div>
-        </div>
-
-        <div class="col-md-3">
-          <div class="card shadow-sm rounded-4 border-0 p-3 text-center">
-            <div class="fs-4 fw-bold">
-              {{ instalacion.porcentajeTDA }}%
-            </div>
-            <div class="text-muted small">TDA</div>
-          </div>
-        </div>
-
-        <div class="col-md-3">
-          <div class="card shadow-sm rounded-4 border-0 p-3 text-center">
-            <div class="fw-semibold">
-              {{ instalacion.tipoInstalacion }}
-            </div>
-            <div class="text-muted small">{{ t.facilityType }}</div>
-          </div>
-        </div>
-
+        <div style="width: 100px"></div>
       </div>
 
       <!-- TABS -->
@@ -90,6 +43,13 @@
         <div class="tab-pane fade show active" id="info">
           <div class="card border-0 shadow-sm rounded-4 p-4">
             <div class="row g-4">
+
+              <div class="col-md-6">
+              <label class="fw-medium">{{ t.name }}</label>
+              <input v-if="editando" class="form-control" v-model="instalacion.nombre"
+                :class="{ 'is-invalid': errores.nombre }" />
+              <p v-else>{{ instalacion.nombre }}</p>
+              </div>
 
               <div class="col-md-6">
                 <label class="fw-medium">{{ t.capacity }}</label>

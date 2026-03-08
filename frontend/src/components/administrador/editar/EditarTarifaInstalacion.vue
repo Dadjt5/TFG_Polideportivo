@@ -1,23 +1,21 @@
 <template>
-  <div class="min-vh-100 bg-light">
-    <main class="container py-5" style="max-width: 900px;">
+  <div class="min-vh-100 pt-4" style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
+    <main class="container-fluid px-5 py-4" style="max-width: 1600px;">
 
       <!-- CABECERA -->
-      <div class="d-flex justify-content-between align-items-center mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-4 mt-3">
         <button class="btn btn-secondary rounded-pill" @click="volver">
           ← {{ t.return }}
         </button>
 
-        <h1 class="fw-bold text-center mb-4 display-5">
-          <span v-if="!editando">{{ tarifa.titulo }}</span>
-          <input
-            v-else
-            v-model="tarifa.titulo"
-            class="form-control form-control-lg text-center fw-semibold"
-            :class="{ 'is-invalid': errores.titulo }"
-            :placeholder="tarifa.titulo"
-          />
+        <h1 class="fw-semibold text-primary mb-2" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.2);">
+          {{ tarifa.titulo }}
         </h1>
+
+        <div style="width: 100px"></div>
+      </div>
+
+      <div class="row g-4">
 
         <div style="width: 100px"></div>
       </div>
@@ -26,7 +24,9 @@
 
         <!-- INFORMACIÓN DE TARIFAS -->
         <div class="col-12">
-          <div class="bg-white rounded-4 shadow p-5 h-100">
+          <div class="card shadow-lg rounded-4 p-4"
+            style="background-color: rgba(255,255,255,0.75); backdrop-filter: blur(10px);">
+
             <h4 class="mb-3 d-flex align-items-center">
               <i class="bi bi-cash-stack text-primary me-2"></i>
               {{ t.tariffDetail }}
@@ -34,64 +34,43 @@
 
             <div class="row g-3">
 
+              <!-- Titulo -->
+              <div class="col-12 col-sm-6">
+                <span v-if="!editando">{{ tarifa.titulo }}</span>
+                <input v-else v-model="tarifa.titulo" class="form-control form-control-lg text-center fw-semibold"
+                  :class="{ 'is-invalid': errores.titulo }" :placeholder="tarifa.titulo" />
+              </div>
+
               <!-- PRECIO ABONADO -->
               <div class="col-12 col-sm-6">
                 <span class="fw-medium">{{ t.priceSubscripcion }}:</span>
                 <p v-if="!editando" class="fs-5 fw-semibold">{{ tarifa.precioAbonado }} €</p>
-                <input
-                  v-else
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  class="form-control form-control-lg"
-                  v-model.number="tarifa.precioAbonado"
-                  :class="{ 'is-invalid': errores.precioAbonado }"
-                />
+                <input v-else type="number" min="0" step="0.01" class="form-control form-control-lg"
+                  v-model.number="tarifa.precioAbonado" :class="{ 'is-invalid': errores.precioAbonado }" />
               </div>
 
               <!-- PRECIO UAM -->
               <div class="col-12 col-sm-6">
                 <span class="fw-medium">{{ t.priceUAM }}:</span>
                 <p v-if="!editando" class="fs-5 fw-semibold">{{ tarifa.precioUAM }} €</p>
-                <input
-                  v-else
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  class="form-control form-control-lg"
-                  v-model.number="tarifa.precioUAM"
-                  :class="{ 'is-invalid': errores.precioUAM }"
-                />
+                <input v-else type="number" min="0" step="0.01" class="form-control form-control-lg"
+                  v-model.number="tarifa.precioUAM" :class="{ 'is-invalid': errores.precioUAM }" />
               </div>
 
               <!-- PRECIO TDA -->
               <div class="col-12 col-sm-6">
                 <span class="fw-medium">{{ t.priceTDA }}:</span>
                 <p v-if="!editando" class="fs-5 fw-semibold">{{ tarifa.precioTDA }} €</p>
-                <input
-                  v-else
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  class="form-control form-control-lg"
-                  v-model.number="tarifa.precioTDA"
-                  :class="{ 'is-invalid': errores.precioTDA }"
-                />
+                <input v-else type="number" min="0" step="0.01" class="form-control form-control-lg"
+                  v-model.number="tarifa.precioTDA" :class="{ 'is-invalid': errores.precioTDA }" />
               </div>
 
               <!-- PRECIO OTROS -->
               <div class="col-12 col-sm-6">
                 <span class="fw-medium">{{ t.priceOthers }}:</span>
                 <p v-if="!editando" class="fs-5 fw-semibold">{{ tarifa.precioOtros }} €</p>
-                <input
-                  v-else
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  class="form-control form-control-lg"
-                  v-model.number="tarifa.precioOtros"
-                  :class="{ 'is-invalid': errores.precioOtros }"
-                />
+                <input v-else type="number" min="0" step="0.01" class="form-control form-control-lg"
+                  v-model.number="tarifa.precioOtros" :class="{ 'is-invalid': errores.precioOtros }" />
               </div>
 
             </div>
@@ -100,41 +79,24 @@
       </div>
 
       <!-- ACCIONES -->
-      <div class="d-flex justify-content-center gap-4 mt-5">
-        <button
-          v-if="!editando"
-          class="btn btn-primary btn-lg rounded-pill"
-          @click="activarEdicion"
-        >
-          <i class="bi bi-pencil me-2"></i>
-          {{ t.modifyTariff }}
+      <div class="d-flex justify-content-center gap-3 mt-5">
+        <button v-if="!editando" class="btn btn-primary btn-lg rounded-pill" @click="activarEdicion">
+          <i class="bi bi-pencil me-2"></i> {{ t.modifyTariff }}
         </button>
 
         <template v-else>
-          <button
-            class="btn btn-success btn-lg rounded-pill"
-            @click="guardarCambios"
-          >
-            <i class="bi bi-check-lg me-2"></i>
-            {{ t.saveChanges }}
+          <button class="btn btn-success btn-lg rounded-pill" @click="guardarCambios">
+            <i class="bi bi-check-lg me-2"></i> {{ t.saveChanges }}
           </button>
-
-          <button
-            class="btn btn-secondary btn-lg rounded-pill"
-            @click="cancelarEdicion"
-          >
+          <button class="btn btn-secondary btn-lg rounded-pill" @click="cancelarEdicion">
             {{ t.cancel }}
           </button>
         </template>
 
-        <button
-          v-if="!editando"
-          class="btn btn-danger btn-lg rounded-pill"
-          @click="eliminar"
-        >
-          <i class="bi bi-trash me-2"></i>
-          {{ t.deleteTariff }}
+        <button v-if="!editando" class="btn btn-danger btn-lg rounded-pill" @click="eliminar">
+          <i class="bi bi-trash me-2"></i> {{ t.deleteTariff }}
         </button>
+
       </div>
     </main>
   </div>

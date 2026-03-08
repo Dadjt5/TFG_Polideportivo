@@ -1,34 +1,19 @@
 <template>
-  <div class="min-vh-100 bg-light pb-5">
-    <main class="container py-5" style="max-width: 900px">
+  <div class="min-vh-100 pt-4" style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
+    <main class="container-fluid px-5 py-4" style="max-width: 1600px;">
 
       <div class="d-flex justify-content-between align-items-center mb-4">
         <button class="btn btn-secondary rounded-pill" @click="volver">
           ← {{ t.return }}
         </button>
 
-        <h1 class="fw-semibold mb-0">{{ t.adminDetail }}</h1>
+        <h1 class="fw-semibold mb-0">{{ admin.nombre }}</h1>
 
         <div style="width: 100px"></div>
       </div>
 
-      <div class="card shadow-sm rounded-4">
+      <div class="card border-0 shadow-lg rounded-4">
         <div class="card-body p-4 p-md-5">
-
-          <!-- ADMIN -->
-          <div class="d-flex flex-column flex-md-row align-items-center gap-4 mb-4">
-            <div class="rounded-circle bg-danger bg-opacity-10 d-flex align-items-center justify-content-center"
-              style="width:96px;height:96px">
-              <i class="bi bi-shield-lock-fill text-danger fs-1"></i>
-            </div>
-
-            <div class="flex-fill text-center text-md-start">
-              <h3 class="fw-semibold mb-1">
-                {{ admin.nombre }}
-              </h3>
-              <p class="text-muted mb-0">{{ admin.rol }}</p>
-            </div>
-          </div>
 
           <!-- DATOS -->
           <div class="row g-3">
