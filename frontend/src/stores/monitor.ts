@@ -16,6 +16,7 @@ export interface Notificacion {
   fijado: boolean;
   fecha: string;
   hora: string;
+  debeMarcar: boolean;
   actividad: {
     id: number;
     nombre: string;

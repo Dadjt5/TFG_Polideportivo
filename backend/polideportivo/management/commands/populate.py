@@ -52,8 +52,7 @@ class Command(BaseCommand):
         if not Configuracion.objects.exists():
             Configuracion.objects.create(
                 max_deportes_por_usuario=5,
-                dias_minimo_reserva_actividad=1,
-                dias_maximo_reserva_actividad=7,
+                dias_minimo_alquiler=0,
                 dias_maximo_alquiler=7,
                 dias_minimo_cancelacion=1,
                 horas_alquiler_consecutivas=2,

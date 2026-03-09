@@ -6,11 +6,9 @@ export const useConfiguracionStore = defineStore("configuracion", {
 	state: () => ({
 		id: 0,
 		max_deportes_por_usuario: 0,
-		dias_minimo_reserva_actividad: 0,
-		dias_maximo_reserva_actividad: 0,
+		dias_minimo_alquiler: 0,
 		dias_maximo_alquiler: 0,
 		dias_minimo_cancelacion: 0,
-		horas_previas_notificacion: 0,
 		horas_alquiler_consecutivas: 0,
 		porcentaje_maximo: 0,
 		titulo_cambios_cancelaciones: '',
@@ -35,10 +33,8 @@ export const useConfiguracionStore = defineStore("configuracion", {
 
 				this.id = data.id;
 				this.max_deportes_por_usuario = data.max_deportes_por_usuario;
-				this.dias_minimo_reserva_actividad = data.dias_minimo_reserva_actividad;
-				this.dias_maximo_reserva_actividad = data.dias_maximo_reserva_actividad;
+				this.dias_minimo_alquiler = data.dias_minimo_alquiler;
 				this.dias_minimo_cancelacion = data.dias_minimo_cancelacion;
-				this.horas_previas_notificacion = data.horas_previas_notificacion;
 				this.porcentaje_maximo = data.porcentaje_maximo;
 				this.dias_maximo_alquiler = data.dias_maximo_alquiler;
 				this.horas_alquiler_consecutivas = data.horas_alquiler_consecutivas;
@@ -69,10 +65,8 @@ export const useConfiguracionStore = defineStore("configuracion", {
 			try {
 				const payload = {
 					max_deportes_por_usuario: this.max_deportes_por_usuario,
-					dias_minimo_reserva_actividad: this.dias_minimo_reserva_actividad,
-					dias_maximo_reserva_actividad: this.dias_maximo_reserva_actividad,
+					dias_minimo_alquiler: this.dias_minimo_alquiler,
 					dias_minimo_cancelacion: this.dias_minimo_cancelacion,
-					horas_previas_notificacion: this.horas_previas_notificacion,
 					porcentaje_maximo: this.porcentaje_maximo,
 					dias_maximo_alquiler: this.dias_maximo_alquiler,
 					horas_alquiler_consecutivas: this.horas_alquiler_consecutivas,
@@ -107,10 +101,8 @@ export const useConfiguracionStore = defineStore("configuracion", {
 			localStorage.setItem("configuracion", JSON.stringify({
 				id: this.id,
 				max_deportes_por_usuario: this.max_deportes_por_usuario,
-				dias_minimo_reserva_actividad: this.dias_minimo_reserva_actividad,
-				dias_maximo_reserva_actividad: this.dias_maximo_reserva_actividad,
+				dias_minimo_alquiler: this.dias_minimo_alquiler,
 				dias_minimo_cancelacion: this.dias_minimo_cancelacion,
-				horas_previas_notificacion: this.horas_previas_notificacion,
 				porcentaje_maximo: this.porcentaje_maximo,
 				dias_maximo_alquiler: this.dias_maximo_alquiler,
 				horas_alquiler_consecutivas: this.horas_alquiler_consecutivas,

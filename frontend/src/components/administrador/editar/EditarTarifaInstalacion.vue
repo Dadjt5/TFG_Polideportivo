@@ -141,11 +141,12 @@ const tarifaOriginal = ref<any>(null);
 
 function validarFormulario() {
   let valido = true;
+  
   errores.value.titulo = tarifa.value.titulo === '';
-  errores.value.precioAbonado = tarifa.value.precioAbonado < 0;
-  errores.value.precioUAM = tarifa.value.precioUAM < 0;
-  errores.value.precioTDA = tarifa.value.precioTDA < 0;
-  errores.value.precioOtros = tarifa.value.precioOtros < 0;
+  errores.value.precioAbonado = tarifa.value.precioAbonado <= 0;
+  errores.value.precioUAM = tarifa.value.precioUAM <= 0;
+  errores.value.precioTDA = tarifa.value.precioTDA <= 0;
+  errores.value.precioOtros = tarifa.value.precioOtros <= 0;
 
   for (const key in errores.value) {
     if (errores.value[key]) valido = false;

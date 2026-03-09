@@ -18,6 +18,7 @@ class Notificacion(models.Model):
     hora = models.TimeField(default=timezone.now)
     leido = models.BooleanField(default=False)
     fijado = models.BooleanField(default=False)
+    debeMarcar = models.BooleanField(default=False)
 
     actividad = models.ForeignKey('Actividad', on_delete=models.RESTRICT, blank=True, null=True)
     instalacion = models.ForeignKey('Instalacion', on_delete=models.RESTRICT, blank=True, null=True)
@@ -100,6 +101,35 @@ class Notificacion(models.Model):
                 usuario=usuario.user,
                 actividad=actividad
             )
+
+    @classmethod
+    def notificarNuevoMaterial(cls, actividad):
+        configuracion = Configuracion.objects.all().first()
+        
+        usuarios = UsuarioFinal.objects.filter(reserva__actividad=actividad).distinct()
+
+        for usuario in usuarios:
+            cls.objects.create(
+                titulo=configuracion.titulo_material_especial,
+                descripcion=configuracion.texto_material_especial,
+                usuario=usuario.user,
+                actividad=actividad
+            )
+
+
+    @classmethod
+    def notificarCambioCancelacion(cls):
+        configuracion = Configuracion.objects.all().first()
+        
+        usuarios = UsuarioFinal.objects.all()
+
+        for usuario in usuarios:
+            cls.objects.create(
+                titulo=configuracion.texto_cambios_cancelaciones,
+                descripcion=configuracion.texto_cambios_cancelaciones,
+                usuario=usuario.user
+            )
+
         
     @classmethod
     def notificarSalidaListaDeEspera(cls, usuario, actividad):
@@ -109,5 +139,6 @@ class Notificacion(models.Model):
             titulo=configuracion.titulo_salida_lista_espera,
             descripcion=configuracion.texto_salida_lista_espera,
             usuario=usuario.user,
-            actividad=actividad
+            actividad=actividad,
+            debeMarcar=True
         )

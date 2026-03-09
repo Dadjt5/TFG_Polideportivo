@@ -1,149 +1,157 @@
 <template>
-	<div class="min-vh-100 pt-4" style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
-		<main class="container-fluid px-5 py-4" style="max-width: 1600px;">
+  <div class="min-vh-100 pt-4" style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
+    <main class="container-fluid px-5 py-4" style="max-width: 1600px;">
 
-			<!-- CABECERA -->
-			<div class="d-flex justify-content-between align-items-center mb-4 mt-3">
-				<button class="btn btn-secondary rounded-pill" @click="volver">
-					← {{ t.return }}
-				</button>
+      <!-- CABECERA -->
+      <div class="d-flex justify-content-between align-items-center mb-4 mt-3">
+        <button class="btn btn-secondary rounded-pill" @click="volver">
+          ← {{ t.return }}
+        </button>
 
-				<h1 class="fw-semibold text-primary mb-2" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.2);">
-					<p v-if="bono.nombreInstalacion">
-						<strong>{{ t.facility }}:</strong> {{ bono.nombreInstalacion }}
-					</p>
-					<p v-else>
-						<strong>{{ t.sport }}:</strong> {{ bono.nombreDeporte }}
-					</p>
-				</h1>
+        <h1 class="fw-semibold text-primary mb-2" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.2);">
+          <p v-if="bono.nombreInstalacion">
+            <strong>{{ t.facility }}:</strong> {{ bono.nombreInstalacion }}
+          </p>
+          <p v-else>
+            <strong>{{ t.sport }}:</strong> {{ bono.nombreDeporte }}
+          </p>
+        </h1>
 
-				<div style="width: 100px"></div>
-			</div>
+        <div style="width: 100px"></div>
+      </div>
 
-			<div class="row g-4">
+      <div class="row g-4">
 
-				<!-- INFORMACIÓN GENERAL -->
-				<div class="col-lg-6">
-					<div class="card shadow-lg rounded-4 p-4"
-						style="background-color: rgba(255,255,255,0.75); backdrop-filter: blur(10px);">
+        <!-- INFORMACIÓN GENERAL -->
+        <div class="col-lg-6">
+          <div class="card shadow-lg rounded-4 p-4"
+               style="background-color: rgba(255,255,255,0.75); backdrop-filter: blur(10px);">
 
-						<h4 class="mb-3 d-flex align-items-center">
-							<i class="bi bi-currency-euro text-primary me-2"></i>
-							{{ t.bonusDetail }}
-						</h4>
+            <h4 class="mb-3 d-flex align-items-center">
+              <i class="bi bi-currency-euro text-primary me-2"></i>
+              {{ t.bonusDetail }}
+            </h4>
 
-						<div class="row g-3">
+            <div class="row g-3">
 
-							<!-- USOS -->
-							<div class="col-6">
-								<span class="fw-medium">{{ t.uses }}:</span>
-								<p v-if="!editando">{{ bono.usos }}</p>
-								<input v-else type="number" min="1" class="form-control" v-model.number="bono.usos" />
-							</div>
+              <!-- USOS -->
+              <div class="col-6">
+                <span class="fw-medium">{{ t.uses }}:</span>
+                <p v-if="!editando">{{ bono.usos }}</p>
+                <input v-else type="number" min="1" class="form-control"
+                       v-model.number="bono.usos"
+                       :class="{ 'is-invalid': errores.usos }" />
+              </div>
 
-							<!-- VALIDEZ -->
-							<div class="col-6">
-								<span class="fw-medium">{{ t.validity }}:</span>
-								<p v-if="!editando">{{ bono.validez }}</p>
-								<input v-else type="number" min="1" class="form-control"
-									v-model.number="bono.validez" />
-							</div>
+              <!-- VALIDEZ -->
+              <div class="col-6">
+                <span class="fw-medium">{{ t.validity }}:</span>
+                <p v-if="!editando">{{ bono.validez }}</p>
+                <input v-else type="number" min="1" class="form-control"
+                       v-model.number="bono.validez"
+                       :class="{ 'is-invalid': errores.validez }" />
+              </div>
 
-						</div>
+            </div>
 
-					</div>
-				</div>
+          </div>
+        </div>
 
-				<!-- PRECIOS -->
-				<div class="col-lg-6">
-					<div class="bg-white rounded-3 shadow-sm p-4 h-100">
+        <!-- PRECIOS -->
+        <div class="col-lg-6">
+          <div class="bg-white rounded-3 shadow-sm p-4 h-100">
 
-						<h4 class="mb-3">
-							<i class="bi bi-cash-coin text-success me-2"></i>
-							{{ t.prices }}
-						</h4>
+            <h4 class="mb-3">
+              <i class="bi bi-cash-coin text-success me-2"></i>
+              {{ t.prices }}
+            </h4>
 
-						<div class="row g-3">
+            <div class="row g-3">
 
-							<div class="col-6">
-								<span class="fw-medium">{{ t.priceTDA }}:</span>
-								<p v-if="!editando">{{ bono.precioTDA }} €</p>
-								<input v-else type="number" step="0.01" min="0" class="form-control"
-									v-model.number="bono.precioTDA" />
-							</div>
+              <div class="col-6">
+                <span class="fw-medium">{{ t.priceTDA }}:</span>
+                <p v-if="!editando">{{ bono.precioTDA }} €</p>
+                <input v-else type="number" step="0.01" min="0" class="form-control"
+                       v-model.number="bono.precioTDA"
+                       :class="{ 'is-invalid': errores.precioTDA }" />
+              </div>
 
-							<div class="col-6">
-								<span class="fw-medium">{{ t.priceUAM }}:</span>
-								<p v-if="!editando">{{ bono.precioUAM }} €</p>
-								<input v-else type="number" step="0.01" min="0" class="form-control"
-									v-model.number="bono.precioUAM" />
-							</div>
+              <div class="col-6">
+                <span class="fw-medium">{{ t.priceUAM }}:</span>
+                <p v-if="!editando">{{ bono.precioUAM }} €</p>
+                <input v-else type="number" step="0.01" min="0" class="form-control"
+                       v-model.number="bono.precioUAM"
+                       :class="{ 'is-invalid': errores.precioUAM }" />
+              </div>
 
-							<div class="col-6">
-								<span class="fw-medium">{{ t.priceSubscripcion }}:</span>
-								<p v-if="!editando">{{ bono.precioAbono }} €</p>
-								<input v-else type="number" step="0.01" min="0" class="form-control"
-									v-model.number="bono.precioAbono" />
-							</div>
+              <div class="col-6">
+                <span class="fw-medium">{{ t.priceSubscripcion }}:</span>
+                <p v-if="!editando">{{ bono.precioAbono }} €</p>
+                <input v-else type="number" step="0.01" min="0" class="form-control"
+                       v-model.number="bono.precioAbono"
+                       :class="{ 'is-invalid': errores.precioAbono }" />
+              </div>
 
-							<div class="col-6">
-								<span class="fw-medium">{{ t.priceOthers }}:</span>
-								<p v-if="!editando">{{ bono.precioOtros }} €</p>
-								<input v-else type="number" step="0.01" min="0" class="form-control"
-									v-model.number="bono.precioOtros" />
-							</div>
+              <div class="col-6">
+                <span class="fw-medium">{{ t.priceOthers }}:</span>
+                <p v-if="!editando">{{ bono.precioOtros }} €</p>
+                <input v-else type="number" step="0.01" min="0" class="form-control"
+                       v-model.number="bono.precioOtros"
+                       :class="{ 'is-invalid': errores.precioOtros }" />
+              </div>
 
-						</div>
+            </div>
 
-					</div>
-				</div>
+          </div>
+        </div>
 
-				<!-- RELACIONES -->
-				<div class="col-12">
-					<div class="bg-white rounded-3 shadow-sm p-4">
-						<div class="row g-3">
+        <!-- RELACIONES -->
+        <div class="col-12">
+          <div class="bg-white rounded-3 shadow-sm p-4">
+            <div class="row g-3">
 
-							<!-- INSTALACIÓN -->
-							<div class="col-md-6">
-								<span class="fw-medium">{{ t.facility }}:</span>
-								<p v-if="!editando">
-									{{ bono.nombreInstalacion || "—" }}
-								</p>
+              <!-- INSTALACIÓN -->
+              <div class="col-md-6">
+                <span class="fw-medium">{{ t.facility }}:</span>
+                <p v-if="!editando">{{ bono.nombreInstalacion || "—" }}</p>
 
-								<select v-else class="form-select" v-model="bono.instalacion">
-									<option v-for="i in instalaciones" :key="i.id" :value="i.id">
-										{{ i.nombre }}
-									</option>
-								</select>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
+                <select v-else class="form-select"
+                        v-model="bono.instalacion"
+                        :class="{ 'is-invalid': errores.instalacion }">
+                  <option v-for="i in instalaciones" :key="i.id" :value="i.id">
+                    {{ i.nombre }}
+                  </option>
+                </select>
+              </div>
 
-			<!-- ACCIONES -->
-			<div class="d-flex justify-content-center gap-3 mt-5">
-				<button v-if="!editando" class="btn btn-primary btn-lg rounded-pill" @click="activarEdicion">
-					<i class="bi bi-pencil me-2"></i> {{ t.modifyBonus }}
-				</button>
+            </div>
+          </div>
+        </div>
+      </div>
 
-				<template v-else>
-					<button class="btn btn-success btn-lg rounded-pill" @click="guardarCambios">
-						<i class="bi bi-check-lg me-2"></i> {{ t.saveChanges }}
-					</button>
-					<button class="btn btn-secondary btn-lg rounded-pill" @click="cancelarEdicion">
-						{{ t.cancel }}
-					</button>
-				</template>
+      <!-- ACCIONES -->
+      <div class="d-flex justify-content-center gap-3 mt-5">
+        <button v-if="!editando" class="btn btn-primary btn-lg rounded-pill" @click="activarEdicion">
+          <i class="bi bi-pencil me-2"></i> {{ t.modifyBonus }}
+        </button>
 
-				<button v-if="!editando" class="btn btn-danger btn-lg rounded-pill" @click="eliminar">
-					<i class="bi bi-trash me-2"></i> {{ t.deleteBonus }}
-				</button>
+        <template v-else>
+          <button class="btn btn-success btn-lg rounded-pill" @click="guardarCambios">
+            <i class="bi bi-check-lg me-2"></i> {{ t.saveChanges }}
+          </button>
+          <button class="btn btn-secondary btn-lg rounded-pill" @click="cancelarEdicion">
+            {{ t.cancel }}
+          </button>
+        </template>
 
-			</div>
+        <button v-if="!editando" class="btn btn-danger btn-lg rounded-pill" @click="eliminar">
+          <i class="bi bi-trash me-2"></i> {{ t.deleteBonus }}
+        </button>
 
-		</main>
-	</div>
+      </div>
+
+    </main>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -151,11 +159,11 @@ import { ref, inject, onMounted, type Ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 import {
-	getBonoDetalle,
-	modificarBono,
-	eliminarBono,
+  getBonoDetalle,
+  modificarBono,
+  eliminarBono,
 } from '@/services/abonoBonoService'
-import { getInstalacionesSimples, getDeportes } from '@/services/listadoService';
+import { getInstalacionesSimples } from '@/services/listadoService';
 
 import type { Language } from "@/useI18N";
 import { useI18n } from "@/useI18N";
@@ -171,47 +179,77 @@ const bonoOriginal = ref<any>(null);
 
 const instalaciones = ref<any[]>([]);
 
+const errores = ref({
+  usos: false,
+  validez: false,
+  precioTDA: false,
+  precioUAM: false,
+  precioAbono: false,
+  precioOtros: false,
+  instalacion: false
+})
+
 function activarEdicion() {
-	bonoOriginal.value = JSON.parse(JSON.stringify(bono.value));
-	editando.value = true;
+  bonoOriginal.value = JSON.parse(JSON.stringify(bono.value));
+  editando.value = true;
 }
 
 function cancelarEdicion() {
-	bono.value = JSON.parse(JSON.stringify(bonoOriginal.value));
-	editando.value = false;
+  bono.value = JSON.parse(JSON.stringify(bonoOriginal.value));
+  editando.value = false;
 }
 
 function camposModificados() {
-	const data: any = {};
-	for (const key in bono.value) {
-		if (bono.value[key] !== bonoOriginal.value[key]) {
-			data[key] = bono.value[key];
-		}
-	}
-	return data;
+  const data: any = {};
+  for (const key in bono.value) {
+    if (bono.value[key] !== bonoOriginal.value[key]) {
+      data[key] = bono.value[key];
+    }
+  }
+  return data;
+}
+
+function validar() {
+  let valido = true
+
+  errores.value.usos = bono.value.usos <= 0
+  errores.value.validez = bono.value.validez <= 0
+  errores.value.precioTDA = bono.value.precioTDA <= 0
+  errores.value.precioUAM = bono.value.precioUAM <= 0
+  errores.value.precioAbono = bono.value.precioAbono <= 0
+  errores.value.precioOtros = bono.value.precioOtros <= 0
+  errores.value.instalacion = !bono.value.instalacion
+
+  for (const key in errores.value) {
+    if (errores.value[key]) valido = false
+  }
+
+  return valido
 }
 
 const guardarCambios = async () => {
-	const data = camposModificados();
-	if (Object.keys(data).length > 0) {
-		await modificarBono(bono.value.id, data);
-		bonoOriginal.value = JSON.parse(JSON.stringify(bono.value));
-		editando.value = false;
-	}
+  if (!validar()) return
+
+  const data = camposModificados();
+  if (Object.keys(data).length > 0) {
+    await modificarBono(bono.value.id, data);
+    bonoOriginal.value = JSON.parse(JSON.stringify(bono.value));
+    editando.value = false;
+  }
 };
 
 const eliminar = async () => {
-	await eliminarBono(bono.value.id);
-	router.back();
+  await eliminarBono(bono.value.id);
+  router.back();
 };
 
 const volver = () => router.back();
 
 onMounted(async () => {
-	const id = parseInt(props.id);
-	bono.value = await getBonoDetalle(id);
-	bonoOriginal.value = JSON.parse(JSON.stringify(bono.value));
+  const id = parseInt(props.id);
+  bono.value = await getBonoDetalle(id);
+  bonoOriginal.value = JSON.parse(JSON.stringify(bono.value));
 
-	instalaciones.value = await getInstalacionesSimples();
+  instalaciones.value = await getInstalacionesSimples();
 });
 </script>

@@ -1,25 +1,31 @@
 <template>
-  <div class="min-vh-100 bg-light d-flex align-items-center justify-content-center">
-    <div class="card shadow-lg p-4" style="width: 500px;">
+  <div class="min-vh-100 d-flex align-items-center justify-content-center"
+       style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
+
+    <div class="card rounded-4 shadow-lg p-5 card-hover"
+         style="width: 500px; background-color: rgba(255,255,255,0.85); backdrop-filter: blur(8px);">
 
       <!-- Título -->
-      <h3 class="text-center mb-4">{{ t.paymentTitle }}</h3>
+      <h3 class="text-center text-primary mb-4 fw-bold" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.1);">
+        {{ t.paymentTitle }}
+      </h3>
 
       <!-- Resumen pago -->
-      <div class="mb-3">
-        <h5>{{ t.reservationSummary }}</h5>
+      <div class="mb-4">
+        <h5 class="fw-semibold">{{ t.reservationSummary }}</h5>
 
-        <!-- Nombre del recurso: puede ser actividad, instalación, abono, bono o TDA -->
-        <p class="mb-1">
-          {{ resumen.nombre }}
-        </p>
+        <!-- Nombre del recurso -->
+        <p class="mb-1">{{ resumen.nombre }}</p>
 
         <!-- Descuento aplicado -->
-        <p class="mb-1">
-          <strong>{{ t.discount }}:</strong> {{ resumen.pago.descuentoAplicado }} %
+        <p class="mb-1" v-if="resumen.pago.descuentoAplicado > 0">
+          <strong>{{ t.discount }}:</strong>
+          <span class="text-success fw-semibold">
+            {{ resumen.pago.descuentoAplicado }} %
+          </span>
         </p>
 
-        <!-- Precio final a pagar -->
+        <!-- Precio final -->
         <p class="mb-1">
           <strong>{{ t.price }}: </strong>
           <span class="text-success fw-bold">
@@ -28,36 +34,35 @@
         </p>
       </div>
 
-      <hr />
+      <hr class="my-3"/>
 
       <!-- Tiempo restante -->
-<div class="mb-3">
-  <div 
-    class="alert"
-    :class="tiempoRestante <= 60 ? 'alert-danger' : 'alert-warning'"
-  >
-    ⏳ Tiempo restante para completar el pago:
-    <strong>
-      {{ minutos }}:{{ segundos }}
-    </strong>
-  </div>
-</div>
+      <div class="mb-3">
+        <div class="alert d-flex align-items-center justify-content-center fw-semibold"
+             :class="tiempoRestante <= 60 ? 'alert-danger' : 'alert-warning'">
+          <i class="bi bi-hourglass-split me-2"></i>
+          {{ t.timeRemaining }}:
+          <strong class="ms-1">{{ minutos }}:{{ segundos }}</strong>
+        </div>
+      </div>
 
       <!-- Formulario Stripe -->
       <form @submit.prevent="pagar">
 
         <div class="mb-3">
-          <label class="form-label">{{ t.cardInfo }}</label>
-          <div id="payment-element"></div>
+          <label class="form-label fw-semibold">{{ t.cardInfo }}</label>
+          <div id="payment-element" class="rounded-2 p-2"
+               style="background-color: rgba(255,255,255,0.95); border: 1px solid #dee2e6;"></div>
         </div>
 
         <!-- Error -->
-        <div v-if="error" class="alert alert-danger">
+        <div v-if="error" class="alert alert-danger rounded-2">
           {{ error }}
         </div>
 
         <!-- Botón pagar -->
-        <button type="submit" class="btn btn-primary w-100 mt-3" :disabled="loading">
+        <button type="submit" class="btn btn-primary w-100 mt-3 rounded-3"
+                :disabled="loading">
           <span v-if="loading" class="spinner-border spinner-border-sm me-2"></span>
           {{ loading 
             ? `${t.processing}...` 
@@ -70,7 +75,6 @@
     </div>
   </div>
 </template>
-
 
 <script setup lang="ts">
 import { computed, onMounted, type Ref, ref, inject } from "vue"

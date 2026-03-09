@@ -13,7 +13,7 @@ from .constantes import FormaReserva
 class Reserva(models.Model):
     """Modelo para representar una reserva"""
 
-    usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.RESTRICT)
+    usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.RESTRICT, related_name="reserva")
     descuentos = models.ManyToManyField('Descuento', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -101,11 +101,11 @@ class ReservaActividad(Reserva):
         return cls.objects.count()
     
     @classmethod
-    def nuevaReserva(cls, usuario, actividad):
+    def nuevaReserva(cls, usuario, actividad, lista=False):
         if actividad.tipoReserva == FormaReserva.PRESENCIAL or actividad.tipoReserva == FormaReserva.NINGUNA:
             return None
         
-        if cls.objects.filter(actividad=actividad, usuarioFinal=usuario).exists():
+        if cls.objects.filter(actividad=actividad, usuarioFinal=usuario, estado=EstadoReserva.CONFIRMADA).exists():
             return None
 
         with transaction.atomic():
@@ -117,9 +117,9 @@ class ReservaActividad(Reserva):
                 return None
 
             # Lista de espera
-            if actividad.plazasReservadas >= actividad.plazasMaximas:
-                lista = ListaEspera.objects.filter(actividad=actividad).first()
-                EntradaListaEspera.objects.create(usuarioFinal=usuario, listaEspera=lista)
+            if actividad.plazasReservadas >= actividad.plazasMaximas and not lista:
+                lista_espera = ListaEspera.objects.filter(actividad=actividad).first()
+                EntradaListaEspera.objects.create(usuarioFinal=usuario, listaEspera=lista_espera)
 
             reservasPrevias = cls.objects.filter(usuarioFinal=usuario, actividad=actividad, estado=EstadoReserva.PENDIENTE)
 

@@ -55,3 +55,9 @@ export const getReservasRealizadas = async () => {
   const response = await api.get("api/v1/reservas/");
   return response.data;
 };
+
+/* Función para responder a una solicitud de salida de la lista de espera */
+export const responderListaEspera = async (id: number, aceptar: boolean) => {
+  const response = await api.post(`api/v1/notificaciones/${id}/responder/`, {"aceptar": aceptar});
+  return response.data;
+}

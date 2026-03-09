@@ -183,11 +183,12 @@ const tarifaOriginal = ref<any>(null)
 function validarFormulario() {
   let valido = true
 
-  errores.value.numeroHoras = tarifa.value.numeroHoras < 0
+  errores.value.titulo = tarifa.value.titulo === ''
+  errores.value.numeroHoras = tarifa.value.numeroHoras <= 0
   errores.value.numeroPersonas = tarifa.value.numeroPersonas <= 0
-  errores.value.precio = tarifa.value.precio < 0
-  errores.value.precioCuatrimestre = tarifa.value.precioCuatrimestre < 0
-  errores.value.precioMensual = tarifa.value.precioMensual < 0
+  errores.value.precio = tarifa.value.precio <= 0
+  errores.value.precioCuatrimestre = tarifa.value.precioCuatrimestre <= 0
+  errores.value.precioMensual = tarifa.value.precioMensual <= 0
 
   for (const key in errores.value) {
     if (errores.value[key]) valido = false

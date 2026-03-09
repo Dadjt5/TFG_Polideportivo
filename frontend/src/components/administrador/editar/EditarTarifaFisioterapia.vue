@@ -204,14 +204,14 @@ const errores = ref<any>({})
 
 function validarFormulario() {
   let valido = true
-  for (const key in tarifa.value) {
-    if (typeof tarifa.value[key] === 'number' && tarifa.value[key] < 0) {
-      errores.value[key] = true
-      valido = false
-    } else {
-      errores.value[key] = false
-    }
+
+  errores.value.titulo = tarifa.value.titulo === ''
+
+  for (const key in errores.value) {
+    errores.value[key] = tarifa.value[key] <= 0
+    if (errores.value[key]) valido = false
   }
+
   return valido
 }
 

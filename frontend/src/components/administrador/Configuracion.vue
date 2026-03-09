@@ -35,24 +35,13 @@
             </div>
           </div>
 
-          <!-- DIAS MINIMO RESERVA -->
+          <!-- DIAS MINIMO ALQUILER -->
           <div class="col-md-4">
             <div class="card h-100 shadow-lg rounded-4"
                  style="background-color: rgba(180,220,255,0.6); backdrop-filter: blur(10px);">
               <div class="card-body">
-                <h5 class="card-title">{{ t.minDaysActivityReservation }}</h5>
-                <input type="number" class="form-control" v-model.number="configuracionStore.dias_minimo_reserva_actividad" />
-              </div>
-            </div>
-          </div>
-
-          <!-- DIAS MAXIMO RESERVA -->
-          <div class="col-md-4">
-            <div class="card h-100 shadow-lg rounded-4"
-                 style="background-color: rgba(180,220,255,0.6); backdrop-filter: blur(10px);">
-              <div class="card-body">
-                <h5 class="card-title">{{ t.maxDaysActivityReservation }}</h5>
-                <input type="number" class="form-control" v-model.number="configuracionStore.dias_maximo_reserva_actividad" />
+                <h5 class="card-title">{{ t.minDaysFacilityReservation }}</h5>
+                <input type="number" class="form-control" v-model.number="configuracionStore.dias_minimo_alquiler" />
               </div>
             </div>
           </div>
@@ -86,17 +75,6 @@
               <div class="card-body">
                 <h5 class="card-title">{{ t.minCancellationDays }}</h5>
                 <input type="number" class="form-control" v-model.number="configuracionStore.dias_minimo_cancelacion" />
-              </div>
-            </div>
-          </div>
-
-          <!-- HORAS PREVIAS NOTIFICACION -->
-          <div class="col-md-4">
-            <div class="card h-100 shadow-lg rounded-4"
-                 style="background-color: rgba(180,220,255,0.6); backdrop-filter: blur(10px);">
-              <div class="card-body">
-                <h5 class="card-title">{{ t.previousNotificationHours }}</h5>
-                <input type="number" class="form-control" v-model.number="configuracionStore.horas_previas_notificacion" />
               </div>
             </div>
           </div>

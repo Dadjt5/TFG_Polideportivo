@@ -1,83 +1,63 @@
 <template>
-  <div class="container py-4">
+  <div class="min-vh-100" style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
+    <div class="container py-4">
 
-    <!-- TÍTULO -->
-    <div class="text-center mb-4">
-      <h2 class="fw-bold">{{ t.activityBookingTitle }}</h2>
-      <p class="text-muted">
-        {{ t.activityBookingSubtitle }}
-      </p>
-    </div>
+      <!-- Cabecera -->
+      <div class="text-center mb-4">
+        <h2 class="fw-bold text-primary mb-1" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.15);">
+          {{ t.activityBookingTitle }}
+        </h2>
+        <p class="text-muted">{{ t.activityBookingSubtitle }}</p>
+      </div>
 
-    <div class="card shadow-sm">
-      <div class="card-body">
-
+      <!-- Card principal -->
+      <div class="rounded-3 shadow-sm p-4 card-hover" style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(8px);">
         <h5 class="fw-bold mb-3">{{ reserva.tarifa.nombre }}</h5>
 
+        <!-- Horarios -->
         <ul class="list-group list-group-flush mb-4">
-
-          <li v-if="reserva.tarifa.horario.length != 0" v-for="(h, index) in reserva.tarifa.horario" :key="index"
-            class="list-group-item d-flex justify-content-between align-items-center">
-            <!-- Días -->
+          <li v-if="reserva.tarifa.horario.length" v-for="(h, index) in reserva.tarifa.horario" :key="index"
+              class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2">
             <span class="fw-semibold">
-              <i class="bi bi-calendar-event me-2 text-muted"></i>
-              {{ h.dia }}
+              <i class="bi bi-calendar-event me-2 text-muted"></i>{{ h.dia }}
             </span>
-
-            <!-- Horario -->
-            <span class="badge bg-primary-subtle text-primary fw-semibold px-3 py-2">
-              <i class="bi bi-clock me-1"></i>
-              {{ h.horaInicio }} – {{ h.horaFin }}
+            <span class="badge bg-primary-subtle text-primary fw-semibold px-3 py-2 rounded-pill">
+              <i class="bi bi-clock me-1"></i>{{ h.horaInicio }} – {{ h.horaFin }}
             </span>
           </li>
-
-          <span v-else>
-            <p class="fs-5">{{ t.noSession }}</p>
-          </span>
+          <li v-else class="list-group-item border-0 px-0 py-2 text-muted fs-5">{{ t.noSession }}</li>
         </ul>
 
-        <!-- TARIFAS -->
+        <!-- Tarifas -->
         <h6 class="fw-bold mb-2">{{ t.tariff }}</h6>
 
+        <!-- Tipo OTROS -->
         <table v-if="reserva.tarifa.tipo === 'OTROS'" class="table table-sm mb-4">
           <tbody>
             <tr :class="{ 'table-primary': usuarioFinalStore.isUAM }">
               <td>UAM</td>
-              <td class="text-end">
-                {{ reserva.tarifa.datos.precioUAM }} € / {{ reserva.tarifa.datos.numeroHorasSemana }} {{ t.weekHours }}
-              </td>
+              <td class="text-end">{{ reserva.tarifa.datos.precioUAM }} € / {{ reserva.tarifa.datos.numeroHorasSemana }} {{ t.weekHours }}</td>
             </tr>
-
             <tr :class="{ 'table-primary': !usuarioFinalStore.isUAM }">
               <td>{{ t.other }}</td>
-              <td class="text-end">
-                {{ reserva.tarifa.datos.precioOtros }} € / {{ reserva.tarifa.datos.numeroHorasSemana }} {{ t.weekHours }}
-              </td>
+              <td class="text-end">{{ reserva.tarifa.datos.precioOtros }} € / {{ reserva.tarifa.datos.numeroHorasSemana }} {{ t.weekHours }}</td>
             </tr>
           </tbody>
         </table>
 
+        <!-- Tipo GRUPOS_REDUCIDOS -->
         <table v-else-if="reserva.tarifa.tipo === 'GRUPOS_REDUCIDOS'" class="table table-sm mb-4 align-middle">
           <tbody>
-
             <tr>
-              <td>
-                <i class="bi bi-people me-2"></i>
-                {{ t.people }}
-              </td>
-
+              <td><i class="bi bi-people me-2"></i>{{ t.people }}</td>
               <td class="text-end" style="max-width: 120px">
                 <input type="number" class="form-control form-control-sm text-end"
-                  v-model.number="reserva.seleccion.personas" :min="1" :max="reserva.tarifa.datos.numeroPersonas" />
+                       v-model.number="reserva.seleccion.personas"
+                       :min="1" :max="reserva.tarifa.datos.numeroPersonas" />
               </td>
             </tr>
-
             <tr>
-              <td>
-                <i class="bi bi-credit-card me-2"></i>
-                {{ t.paymentMethod }}
-              </td>
-
+              <td><i class="bi bi-credit-card me-2"></i>{{ t.paymentMethod }}</td>
               <td class="text-end">
                 <select class="form-select form-select-sm text-end" v-model="reserva.seleccion.modalidad">
                   <option value="mensual">{{ t.monthly }}</option>
@@ -86,59 +66,20 @@
                 </select>
               </td>
             </tr>
-
-            <tr>
-              <td colspan="2">
-                <hr class="my-2">
-              </td>
-            </tr>
-
-            <tr>
-              <td>{{ t.hours }}</td>
-              <td class="text-end">
-                {{ reserva.tarifa.datos.numeroHoras }}
-              </td>
-            </tr>
-
-            <tr>
-              <td>{{ t.people }}</td>
-              <td class="text-end">
-                {{ reserva.tarifa.datos.numeroPersonas }}
-              </td>
-            </tr>
-
-            <tr>
-              <td>{{ t.monthly }}</td>
-              <td class="text-end">
-                {{ reserva.tarifa.datos.precioMensual }} €
-              </td>
-            </tr>
-
-            <tr>
-              <td>{{ t.quarterly }}</td>
-              <td class="text-end">
-                {{ reserva.tarifa.datos.precioCuatrimestre }} €
-              </td>
-            </tr>
-
-            <tr class="table-light fw-bold">
-              <td>{{ t.fullPayment }}</td>
-              <td class="text-end">
-                {{ reserva.tarifa.datos.precio }} €
-              </td>
-            </tr>
-
+            <tr><td colspan="2"><hr class="my-2"></td></tr>
+            <tr><td>{{ t.hours }}</td><td class="text-end">{{ reserva.tarifa.datos.numeroHoras }}</td></tr>
+            <tr><td>{{ t.people }}</td><td class="text-end">{{ reserva.tarifa.datos.numeroPersonas }}</td></tr>
+            <tr><td>{{ t.monthly }}</td><td class="text-end">{{ reserva.tarifa.datos.precioMensual }} €</td></tr>
+            <tr><td>{{ t.quarterly }}</td><td class="text-end">{{ reserva.tarifa.datos.precioCuatrimestre }} €</td></tr>
+            <tr class="table-light fw-bold"><td>{{ t.fullPayment }}</td><td class="text-end">{{ reserva.tarifa.datos.precio }} €</td></tr>
           </tbody>
         </table>
 
-
+        <!-- Tipo FISIOTERAPIA -->
         <table v-else-if="reserva.tarifa.tipo === 'FISIOTERAPIA'" class="table table-sm mb-4">
           <tbody>
             <tr>
-              <td>
-                {{ t.sessionType }}
-              </td>
-
+              <td>{{ t.sessionType }}</td>
               <td class="text-end">
                 <select class="form-select form-select-sm text-end" v-model="reserva.seleccion.tipoSesion">
                   <option value="consulta">{{ t.initialConsultation }}</option>
@@ -147,37 +88,21 @@
                 </select>
               </td>
             </tr>
-
             <tr :class="{ 'table-primary': usuarioFinalStore.hasTda }">
-              <td>TDA</td>
-              <td class="text-end">
-                {{ precioFisioTDA }} €
-              </td>
+              <td>TDA</td><td class="text-end">{{ precioFisioTDA }} €</td>
             </tr>
-
             <tr :class="{ 'table-primary': usuarioFinalStore.isUAM }">
-              <td>UAM</td>
-              <td class="text-end">
-                {{ precioFisioUAM }} €
-              </td>
+              <td>UAM</td><td class="text-end">{{ precioFisioUAM }} €</td>
             </tr>
-
             <tr :class="{ 'table-primary': !usuarioFinalStore.isUAM && !usuarioFinalStore.hasTda }">
-              <td>{{ t.other }}</td>
-              <td class="text-end">
-                {{ precioFisioOtros }} €
-              </td>
+              <td>{{ t.other }}</td><td class="text-end">{{ precioFisioOtros }} €</td>
             </tr>
           </tbody>
         </table>
 
-        <!-- DESCUENTOS -->
-        <div v-if="reserva.descuento.aplicados.length" class="alert alert-success py-2">
-          <div class="fw-bold mb-1">
-            {{ t.discount }}:
-            {{ reserva.descuento.porcentaje_total }}%
-          </div>
-
+        <!-- Descuentos -->
+        <div v-if="reserva.descuento.aplicados.length" class="alert alert-success py-2 rounded-3">
+          <div class="fw-bold mb-1">{{ t.discount }}: {{ reserva.descuento.porcentaje_total }}%</div>
           <ul class="mb-0 ps-3">
             <li v-for="descuento in reserva.descuento.aplicados" :key="descuento.id">
               {{ descuento.nombre }} ({{ descuento.porcentaje }}%)
@@ -185,31 +110,24 @@
           </ul>
         </div>
 
-        <!-- TOTAL -->
+        <!-- Total -->
         <div class="border-top pt-3 mt-3">
-          <div class="d-flex justify-content-between fs-5">
-            <span class="fw-bold">{{ t.price }}</span>
-            <span class="fw-bold">
-              {{ total }} €
-            </span>
+          <div class="d-flex justify-content-between fs-5 fw-bold">
+            <span>{{ t.price }}</span>
+            <span>{{ total }} €</span>
           </div>
         </div>
 
+        <!-- Botones -->
         <div class="d-flex justify-content-end gap-2 mt-4">
-          <button class="btn btn-outline-secondary" @click="cancelar">
-            {{ t.cancel }}
-          </button>
-          <button class="btn btn-primary" @click="continuarPago">
-            {{ t.payContinue }}
-          </button>
+          <button class="btn btn-outline-secondary" @click="cancelar">{{ t.cancel }}</button>
+          <button class="btn btn-primary" @click="continuarPago">{{ t.payContinue }}</button>
         </div>
 
       </div>
     </div>
-
   </div>
 </template>
-
 
 <script setup lang="ts">
 import { computed, inject, type Ref, ref, onMounted } from 'vue'

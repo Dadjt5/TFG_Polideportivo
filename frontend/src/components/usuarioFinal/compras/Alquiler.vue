@@ -1,14 +1,14 @@
 <template>
   <div class="container py-4">
+
+    <!-- TÍTULO -->
     <div class="text-center mb-4">
       <h2 class="fw-bold">{{ t.facilityReservationTitle }}</h2>
-      <p class="text-muted">
-        {{ t.facilityReservationRule }}
-      </p>
+      <p class="text-muted">{{ t.facilityReservationRule }}</p>
     </div>
 
     <!-- INFO INSTALACIÓN -->
-    <div class="card shadow-sm mb-4">
+    <div class="card shadow-sm rounded-4 mb-4" style="backdrop-filter: blur(6px); background: rgba(255,255,255,0.85);">
       <div class="card-body">
         <h5 class="fw-bold mb-2 fs-3">{{ reserva.tarifa.nombre }}</h5>
         <p v-if="reserva.tarifa.abierto" class="mb-0 fs-4 text-primary">
@@ -20,8 +20,8 @@
       </div>
     </div>
 
-    <!-- HORARIOS -->
-    <div class="card shadow-sm">
+    <!-- HORARIOS Y TARIFAS -->
+    <div class="card shadow-sm rounded-4" style="backdrop-filter: blur(6px); background: rgba(255,255,255,0.85);">
       <div class="card-body">
 
         <!-- TARIFAS -->
@@ -29,7 +29,10 @@
 
         <div class="mb-3">
           <label class="form-label">{{ t.selectedDate }}</label>
-          <input type="date" class="form-control" v-model="reserva.seleccion.fecha" :min="hoy" :max="maxFechaStr" />
+          <input type="date" class="form-control"
+                 v-model="reserva.seleccion.fecha"
+                 :min="minFecha"
+                 :max="maxFechaStr" />
         </div>
 
         <h6 class="fw-bold">{{ t.prices }}</h6>
@@ -56,11 +59,7 @@
 
         <!-- DESCUENTOS -->
         <div v-if="reserva.descuento.aplicados.length" class="alert alert-success py-2">
-          <div class="fw-bold mb-1">
-            {{ t.discount }}:
-            {{ reserva.descuento.porcentaje_total }}%
-          </div>
-
+          <div class="fw-bold mb-1">{{ t.discount }}: {{ reserva.descuento.porcentaje_total }}%</div>
           <ul class="mb-0 ps-3">
             <li v-for="descuento in reserva.descuento.aplicados" :key="descuento.id">
               {{ descuento.nombre }} ({{ descuento.porcentaje }}%)
@@ -69,42 +68,40 @@
         </div>
 
         <!-- TOTAL -->
-        <div class="pt-3 mt-3">
+        <div class="pt-3 mt-3 border-top">
           <div class="d-flex justify-content-between fs-5">
             <span class="fw-bold">{{ t.price }}</span>
-            <span class="fw-bold">
-              {{ total }} €
-            </span>
+            <span class="fw-bold text-primary">{{ total }} €</span>
           </div>
         </div>
 
+        <!-- HORARIOS -->
         <h5 class="fw-bold mt-3 mb-3">{{ t.timetable }}</h5>
 
         <div v-if="mensaje" class="text-center mt-5 fs-5">
           <p class="text-danger">{{ mensaje }}</p>
         </div>
-
         <div v-else class="d-flex flex-wrap gap-2">
-          <button v-for="hora in reserva.tarifa.reservas" :key="hora.horaInicio" class="btn" :class="claseHora(hora)" :disabled="estaBloqueada(hora)"
-            @click="toggleHora(hora)">
+          <button v-for="hora in reserva.tarifa.reservas" :key="hora.horaInicio" 
+                  class="btn btn-outline-primary" 
+                  :class="claseHora(hora)" 
+                  :disabled="estaBloqueada(hora)"
+                  @click="toggleHora(hora)">
             {{ hora.horaInicio }} - {{ hora.horaFin }}
           </button>
         </div>
 
         <!-- LEYENDA -->
-        <div class="mt-4">
-          <span class="badge bg-success me-2">{{ t.free }}</span>
-          <span class="badge bg-primary me-2">{{ t.selected }}</span>
-          <span class="badge bg-danger me-2">{{ t.reserved }}</span>
+        <div class="mt-4 d-flex flex-wrap gap-2">
+          <span class="badge bg-success">{{ t.free }}</span>
+          <span class="badge bg-primary">{{ t.selected }}</span>
+          <span class="badge bg-danger">{{ t.reserved }}</span>
           <span class="badge bg-warning text-dark">{{ t.activity }}</span>
         </div>
 
         <!-- ACCIONES -->
         <div class="d-flex justify-content-end mt-4 gap-2">
-          <button class="btn btn-outline-secondary" @click="cancelar">
-            {{ t.cancel }}
-          </button>
-
+          <button class="btn btn-outline-secondary" @click="cancelar">{{ t.cancel }}</button>
           <button class="btn btn-primary" :disabled="horasSeleccionadas.length === 0" @click="continuarPago">
             {{ t.continue }}
           </button>
@@ -116,28 +113,22 @@
   </div>
 </template>
 
-
 <script setup lang="ts">
 import { computed, watch, onMounted, inject, type Ref, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { alquilar, getTarifaDescuentoInstalacion } from '@/services/reservaPagoService';
-
 import { useUserStore } from '@/stores/usuarioFinal'
 import { useConfiguracionStore } from '@/stores/configuracion';
-
-/* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
 import type { Language } from "@/useI18N";
 import { useI18n } from "@/useI18N";
 
-const props = defineProps<{
-  id: string
-}>();
+const props = defineProps<{ id: string }>();
 
 const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);
-
 const router = useRouter();
+
 const usuarioFinalStore = useUserStore();
 const configuracionStore = useConfiguracionStore();
 
@@ -181,60 +172,73 @@ const reserva = ref({
 const mensaje = ref("")
 const horasSeleccionadas = ref<string[]>([])
 
+// Mínimo y máximo de fecha
+const minFecha = computed(() => {
+  const fecha = new Date()
+  fecha.setDate(fecha.getDate() + (configuracionStore.dias_minimo_alquiler || 0))
+  return fecha.toISOString().slice(0,10)
+})
+
+const maxFecha = new Date()
+maxFecha.setDate(maxFecha.getDate() + (configuracionStore.dias_maximo_alquiler || 7))
+const maxFechaStr = maxFecha.toISOString().slice(0,10)
+
+// Funciones para horas
 const estaBloqueada = (hora: any) => {
   if (esAlquilerUsuario(hora)) return true
-  return hora.estado !== "LIBRE"
+  if (hora.estado !== "LIBRE") return true
+
+  const hoy = new Date()
+  const fechaSeleccionada = new Date(reserva.value.seleccion.fecha)
+  const esHoy = hoy.toISOString().slice(0,10) === fechaSeleccionada.toISOString().slice(0,10)
+
+  if (esHoy) {
+    const [h, m] = hora.horaInicio.split(":").map(Number)
+    const horaReserva = new Date()
+    horaReserva.setHours(h, m, 0, 0)
+    if (horaReserva <= hoy) return true
+  }
+
+  return false
 }
 
 const esAlquilerUsuario = (hora: any) => {
   const fechaSeleccionada = reserva.value.seleccion.fecha
-
   return reserva.value.tarifa.alquileres.some(a => {
     if (a.fecha !== fechaSeleccionada) return false
-
     return hora.horaInicio >= a.horaInicio && hora.horaInicio < a.horaFin
   })
 }
 
 const claseHora = (hora: any) => {
   if (esAlquilerUsuario(hora)) return "btn-danger"
-
   if (hora.estado === "ACTIVIDAD") return "btn-warning"
   if (hora.estado === "LIBRE") {
-    return horasSeleccionadas.value.includes(hora.horaInicio)
-      ? "btn-primary"
-      : "btn-success"
+    return horasSeleccionadas.value.includes(hora.horaInicio) ? "btn-primary" : "btn-success"
   }
-
   return "btn-secondary"
 }
 
-const hoy = new Date().toISOString().slice(0,10)
-
-const maxFecha = new Date()
-maxFecha.setDate(maxFecha.getDate() + 7)
-const maxFechaStr = maxFecha.toISOString().slice(0,10)
-
 const toggleHora = (intervalo: any) => {
-  const hoy = new Date()
-  hoy.setHours(0,0,0,0)
+  if (estaBloqueada(intervalo)) return
 
   const fechaSeleccionada = new Date(reserva.value.seleccion.fecha)
   fechaSeleccionada.setHours(0,0,0,0)
 
-  const maxFecha = new Date()
-  maxFecha.setDate(maxFecha.getDate() + configuracionStore.dias_maximo_alquiler)
-  maxFecha.setHours(0,0,0,0)
+  const fechaMin = new Date()
+  fechaMin.setDate(fechaMin.getDate() + (configuracionStore.dias_minimo_alquiler || 0))
+  fechaMin.setHours(0,0,0,0)
 
-  if (fechaSeleccionada < hoy || fechaSeleccionada > maxFecha) return
+  const fechaMax = new Date()
+  fechaMax.setDate(fechaMax.getDate() + (configuracionStore.dias_maximo_alquiler || 7))
+  fechaMax.setHours(0,0,0,0)
 
+  if (fechaSeleccionada < fechaMin || fechaSeleccionada > fechaMax) return
   if (intervalo.estado !== 'LIBRE') return
 
   const key = intervalo.horaInicio
-
   if (horasSeleccionadas.value.includes(key)) {
-    horasSeleccionadas.value =
-      horasSeleccionadas.value.filter(h => h !== key)
+    horasSeleccionadas.value = horasSeleccionadas.value.filter(h => h !== key)
     return
   }
 
@@ -246,7 +250,6 @@ const toggleHora = (intervalo: any) => {
   }
 
   const horas = reserva.value.tarifa.reservas.map(r => r.horaInicio)
-
   const indexActual = horas.indexOf(key)
   const indexSeleccionada = horas.indexOf(horasSeleccionadas.value[0])
 
@@ -283,7 +286,6 @@ const continuarPago = async () => {
 
   try {
     const response = await alquilar(reserva.value.tarifa.idInstalacion, { complementos })
-
     const idPago = response.idPago
 
     router.push({
@@ -305,10 +307,11 @@ watch(
   async (nuevaFecha) => {
     if (!nuevaFecha) return;
     mensaje.value = ""
+    horasSeleccionadas.value = []
+
     try {
       const id = parseInt(props.id);
       const data = await getTarifaDescuentoInstalacion(id, reserva.value.seleccion.fecha)
-
       reserva.value.tarifa = data.tarifa
       reserva.value.descuento = data.descuento
     } catch (e: any) {
@@ -318,13 +321,10 @@ watch(
   }
 );
 
-
 onMounted(async () => {
   const id = parseInt(props.id);
-
   try {
     const data = await getTarifaDescuentoInstalacion(id, reserva.value.seleccion.fecha)
-
     reserva.value.tarifa = data.tarifa
     reserva.value.descuento = data.descuento
   } catch(e: any) {

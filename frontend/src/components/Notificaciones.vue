@@ -23,18 +23,16 @@
 
       <!-- Lista de notificaciones -->
       <div class="d-flex flex-column gap-3">
-        <div v-for="notif in activeStore.sortedNotifications" :key="notif.id"
-             class="card rounded-4 shadow-sm"
-             :class="notif.leido ? 'bg-white' : 'bg-primary bg-opacity-10'"
-             style="backdrop-filter: blur(6px);">
+        <div v-for="notif in activeStore.sortedNotifications" :key="notif.id" class="card rounded-4 shadow-sm"
+          :class="notif.leido ? 'bg-white' : 'bg-primary bg-opacity-10'" style="backdrop-filter: blur(6px);">
           <div class="card-body py-3 px-4">
 
             <div class="d-flex justify-content-between align-items-start">
 
               <!-- Contenido de la notificación -->
               <div class="d-flex gap-3 w-100">
-                <div v-if="!notif.leido" class="rounded-circle bg-primary mt-1" 
-                     style="width: 10px; height: 10px;"></div>
+                <div v-if="!notif.leido" class="rounded-circle bg-primary mt-1" style="width: 10px; height: 10px;">
+                </div>
 
                 <div>
                   <h6 class="fw-semibold mb-1 text-primary">
@@ -51,7 +49,7 @@
                       {{ t.activity }}
                     </small>
                     <span class="fw-medium text-primary" style="cursor: pointer;"
-                          @click="activityDetail(notif.actividad.id)">
+                      @click="activityDetail(notif.actividad.id)">
                       {{ notif.actividad.nombre }}
                     </span>
                   </div>
@@ -62,7 +60,7 @@
                       {{ t.facility }}
                     </small>
                     <span class="fw-medium text-primary" style="cursor: pointer;"
-                          @click="facilityDetail(notif.instalacion.id)">
+                      @click="facilityDetail(notif.instalacion.id)">
                       {{ notif.instalacion.nombre }}
                     </span>
                   </div>
@@ -73,9 +71,18 @@
                       {{ t.pavilion }}
                     </small>
                     <span class="fw-medium text-primary" style="cursor: pointer;"
-                          @click="pavilionDetail(notif.pabellon.id)">
+                      @click="pavilionDetail(notif.pabellon.id)">
                       {{ notif.pabellon.nombre }}
                     </span>
+                  </div>
+
+                  <div v-if="notif.debeMarcar" class="mt-2 d-flex gap-2">
+                    <button class="btn btn-success btn-sm" @click="responderNotif(notif, true)">
+                      {{ t.accept }}
+                    </button>
+                    <button class="btn btn-danger btn-sm" @click="responderNotif(notif, false)">
+                      {{ t.reject }}
+                    </button>
                   </div>
 
                   <small class="text-muted">
@@ -87,19 +94,18 @@
               <!-- Botones de acción -->
               <div class="d-flex gap-1 ms-3">
                 <button class="btn btn-sm btn-light rounded-circle" @click="togglePin(notif.id)"
-                        :title="notif.fijado ? t.unpin : t.pin">
+                  :title="notif.fijado ? t.unpin : t.pin">
                   <i v-if="notif.fijado" class="bi bi-pin text-primary fs-4"></i>
                   <i v-else class="bi bi-pin-fill text-primary fs-4"></i>
                 </button>
 
                 <button class="btn btn-sm btn-light rounded-circle" @click="markRead(notif.id)"
-                        :title="notif.leido ? t.markUnread : t.markRead">
+                  :title="notif.leido ? t.markUnread : t.markRead">
                   <i v-if="notif.leido" class="bi bi-envelope-open text-primary fs-4"></i>
                   <i v-else class="bi bi-envelope text-primary fs-4"></i>
                 </button>
 
-                <button class="btn btn-sm btn-light rounded-circle" @click="deleteNotif(notif.id)"
-                        :title="t.delete">
+                <button class="btn btn-sm btn-light rounded-circle" @click="deleteNotif(notif.id)" :title="t.delete">
                   <i class="bi bi-trash fs-4 text-danger"></i>
                 </button>
               </div>
@@ -127,6 +133,7 @@ import type { Language } from "@/useI18N";
 import { useI18n } from "@/useI18N";
 
 import { useAuthStore } from "@/stores/auth";
+import { responderListaEspera } from "@/services/usuarioFinalService";
 
 const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);
@@ -142,7 +149,6 @@ const markRead = (id: number) => activeStore.value.cambiarLeido(id);
 const togglePin = (id: number) => activeStore.value.cambiarFijado(id);
 const deleteNotif = (id: number) => activeStore.value.deleteNotificacion(id);
 
-
 const activeStore = computed(() => {
   if (userStore.isUsuarioFinal) {
     return usuarioFinalStore;
@@ -154,6 +160,19 @@ const activeStore = computed(() => {
 
   return administradorStore;
 });
+
+const responderNotif = async (notif: any, aceptar: boolean) => {
+  try {
+    await responderListaEspera(notif.id, aceptar);
+    activeStore.value.deleteNotificacion(notif.id);
+
+    if(aceptar){
+      router.push({ name: 'reservar-actividad', params: { id: notif.actividad.id } });
+    }
+  } catch (e) {
+    console.error("Error al responder notificación: ", e)
+  }
+}
 
 const activityDetail = (id: number) => {
   router.push({

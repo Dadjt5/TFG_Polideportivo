@@ -26,19 +26,19 @@
             </h4>
 
             <!-- nombre -->
-              <div class="col-6">
-                <span class="fw-medium">{{ t.name }}:</span>
-                <p v-if="!editando">{{ abono.nombre }}</p>
-                <input v-else type="text"
-                  class="form-control"
-                  v-model.number="abono.nombre"
-                />
-              </div>
+            <div class="col-6 mb-3">
+              <span class="fw-medium">{{ t.name }}:</span>
+              <p v-if="!editando">{{ abono.nombre }}</p>
+              <input v-else type="text" class="form-control"
+                v-model="abono.nombre"
+                :class="{ 'is-invalid': errores.nombre }"
+              />
+            </div>
 
             <div class="row g-3">
 
               <!-- PRECIO TDA -->
-              <div class="col-12">
+              <div class="col-12 mb-3">
                 <span class="fw-medium">{{ t.priceTDA }}:</span>
                 <p v-if="!editando">{{ abono.precioTDA }} €</p>
                 <input
@@ -48,11 +48,12 @@
                   min="0"
                   class="form-control"
                   v-model.number="abono.precioTDA"
+                  :class="{ 'is-invalid': errores.precioTDA }"
                 />
               </div>
 
               <!-- PRECIO UAM -->
-              <div class="col-12">
+              <div class="col-12 mb-3">
                 <span class="fw-medium">{{ t.priceUAM }}:</span>
                 <p v-if="!editando">{{ abono.precioUAM }} €</p>
                 <input
@@ -62,11 +63,12 @@
                   min="0"
                   class="form-control"
                   v-model.number="abono.precioUAM"
+                  :class="{ 'is-invalid': errores.precioUAM }"
                 />
               </div>
 
               <!-- PRECIO OTROS -->
-              <div class="col-12">
+              <div class="col-12 mb-3">
                 <span class="fw-medium">{{ t.priceOthers }}:</span>
                 <p v-if="!editando">{{ abono.precioOtros }} €</p>
                 <input
@@ -76,6 +78,7 @@
                   min="0"
                   class="form-control"
                   v-model.number="abono.precioOtros"
+                  :class="{ 'is-invalid': errores.precioOtros }"
                 />
               </div>
 
@@ -129,13 +132,16 @@ const t = useI18n(language);
 const router = useRouter();
 
 const editando = ref(false);
-
 const abono = ref<any>({});
 const abonoOriginal = ref<any>(null);
 
+// ERRORES
 const errores = ref({
-  nombre: false
-});
+  nombre: false,
+  precioTDA: false,
+  precioUAM: false,
+  precioOtros: false
+})
 
 function activarEdicion() {
   abonoOriginal.value = JSON.parse(JSON.stringify(abono.value));
@@ -157,7 +163,25 @@ function camposModificados() {
   return data;
 }
 
+// VALIDACIÓN
+function validar() {
+  let valido = true;
+
+  errores.value.nombre = !abono.value.nombre || abono.value.nombre.trim() === '';
+  errores.value.precioTDA = abono.value.precioTDA <= 0;
+  errores.value.precioUAM = abono.value.precioUAM <= 0;
+  errores.value.precioOtros = abono.value.precioOtros <= 0;
+
+  for (const key in errores.value) {
+    if (errores.value[key]) valido = false;
+  }
+
+  return valido;
+}
+
 const guardarCambios = async () => {
+  if (!validar()) return;
+
   const data = camposModificados();
   if (Object.keys(data).length > 0) {
     await modificarAbonoVerano(abono.value.id, data);

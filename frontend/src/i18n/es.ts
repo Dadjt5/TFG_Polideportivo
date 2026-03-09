@@ -18,6 +18,8 @@ export default {
   modifyBonus: "Editar bono",
   deleteBonus: "Eliminar bono",
   deleteChannel: "Eliminar canal",
+  accept: "Aceptar",
+  reject: "Rechazar",
 
   /* Mensajes */
   missing: "Hay campos vacios o erroneos",
@@ -29,6 +31,8 @@ export default {
   cantBooking: "Esta actividad no puede ser reservada",
   noSessionWarning: "La actividad no tiene sesiones",
   wrongTimetable: "La hora de inicio no puede ser mas tarde que la de fin",
+  cannotCancel: "La reserva de la actividad no se puede cancelar en este momento",
+  timeRemaining: "Tiempo restante para completar el pago",
 
   /* Perfil */
   role: "Rol",
@@ -512,7 +516,7 @@ export default {
   textPaymentProblems: "Problemas de pago",
   textAbsences: "Ausencias acumuladas",
   textWaitingListExit: "Salida lista de espera",
-  minDaysActivityReservation: "Cantidad mínima de días para reservar la actividad",
+  minDaysFacilityReservation: "Días mínimos para alquilar",
   maxDaysActivityReservation: "Cantidad máxima de días para reservar la actividad",
   minCancellationDays: "Cantidad de días mínima para cancelar la reserva",
   previousNotificationHours: "Horas previas para enviar una notificación",

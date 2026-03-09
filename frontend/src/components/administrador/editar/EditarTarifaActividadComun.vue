@@ -147,9 +147,9 @@ function validarFormulario() {
   let valido = true
 
   errores.value.titulo = tarifa.value.titulo === ''
-  errores.value.precioUAM = tarifa.value.precioUAM < 0
-  errores.value.precioOtros = tarifa.value.precioOtros < 0
-  errores.value.numeroHorasSemana = tarifa.value.numeroHorasSemana < 0
+  errores.value.precioUAM = tarifa.value.precioUAM <= 0
+  errores.value.precioOtros = tarifa.value.precioOtros <= 0
+  errores.value.numeroHorasSemana = tarifa.value.numeroHorasSemana <= 0
 
   for (const key in errores.value) {
     if (errores.value[key]) valido = false

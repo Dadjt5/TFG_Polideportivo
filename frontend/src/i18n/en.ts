@@ -18,6 +18,8 @@ export default {
   modifyBonus: "Edit bonus",
   deleteBonus: "Delete bonus",
   deleteChannel: "Delete channel",
+  accept: "Accept",
+  reject: "Reject",
 
   /* Mensajes */
   missing: "Missing or incorrect fields",
@@ -29,6 +31,8 @@ export default {
   cantBooking: "This activity cannot be reserved",
   noSessionWarning: "The activity has no sessions",
   wrongTimetable: "The start hour cannot be later than the end hour",
+  cannotCancel: "The activity reservation cannot be canceled yet",
+  timeRemaining: "Time remaining to complete payment",
 
   /* Perfil */
   role: "Role",
@@ -513,7 +517,7 @@ export default {
   textPaymentProblems: "Payment issues",
   textAbsences: "Accumulated absences",
   textWaitingListExit: "Waitlist exit",
-  minDaysActivityReservation: "Minimum number of days to book the activity",
+  minDaysFacilityReservation: "Minimum number of days to book the facility",
   maxDaysActivityReservation: "Maximum number of days to book the activity",
   minCancellationDays: "Minimum number of days required to cancel a reservation",
   previousNotificationHours: "Hours in advance to send a notification",

@@ -75,14 +75,16 @@ class Pago(models.Model):
             coste = objeto.calcular_precio()
 
             if usuario.tieneAbono:
-                if usuario.abono.abonoDeportivo:
+                compraAbono = usuario.abono.filter(abonoVerano=None).first()
+
+                if compraAbono and compraAbono.abonoDeportivo:
                     if usuario.actividadesRealizadas == 0:
-                        porcentaje += usuario.abono.abonoDeportivo.descuentoPrimeraActividad
+                        porcentaje += compraAbono.abonoDeportivo.descuentoPrimeraActividad
                     else:
-                        porcentaje += usuario.abono.abonoDeportivo.descuentoRestoActividades
+                        porcentaje += compraAbono.abonoDeportivo.descuentoRestoActividades
                     
                     if objeto.actividad.exterior:
-                        porcentaje += usuario.abono.abonoDeportivo.descuentoActividadesExteriores
+                        porcentaje += compraAbono.abonoDeportivo.descuentoActividadesExteriores
 
         else:
             coste = objeto.calcular_precio()

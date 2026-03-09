@@ -7,11 +7,9 @@ class Configuracion(models.Model):
     """Modelo para representar la configuracion interna de la aplicacion"""
     
     max_deportes_por_usuario = models.PositiveIntegerField(default=5)
-    dias_minimo_reserva_actividad = models.PositiveIntegerField(default=1)
-    dias_maximo_reserva_actividad = models.PositiveIntegerField(default=7)
+    dias_minimo_alquiler = models.PositiveIntegerField(default=0)
     dias_maximo_alquiler = models.PositiveIntegerField(default=7)
     dias_minimo_cancelacion = models.PositiveIntegerField(default=1)
-    horas_previas_notificacion = models.PositiveIntegerField(default=1)
     horas_alquiler_consecutivas = models.PositiveIntegerField(default=2)
     porcentaje_maximo = models.PositiveIntegerField(default=100, validators=[MinValueValidator(0), MaxValueValidator(100)])
 
@@ -40,10 +38,18 @@ class Configuracion(models.Model):
     
     def editar(self, data):
         try:
+            valor_original_cancelacion = self.dias_minimo_cancelacion
+
             for campo, valor in data.items():
                 if hasattr(self, campo):
                     setattr(self, campo, valor)
+
             self.save()
+
+            if 'dias_minimo_cancelacion' in data and data['dias_minimo_cancelacion'] != valor_original_cancelacion:
+                from .notificacion import Notificacion
+                Notificacion.notificarCambioCancelacion(valor_original_cancelacion, data['dias_minimo_cancelacion'])
+
             return True
         except Exception as e:
             print("Error al editar configuración:", e)
