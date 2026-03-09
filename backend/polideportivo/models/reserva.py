@@ -104,6 +104,9 @@ class ReservaActividad(Reserva):
     def nuevaReserva(cls, usuario, actividad):
         if actividad.tipoReserva == FormaReserva.PRESENCIAL or actividad.tipoReserva == FormaReserva.NINGUNA:
             return None
+        
+        if cls.objects.filter(actividad=actividad, usuarioFinal=usuario).exists():
+            return None
 
         with transaction.atomic():
             actividad.refresh_from_db()

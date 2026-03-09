@@ -266,11 +266,11 @@ const guardarDeporte = async () => {
 
   if (modoEdicion.value && deporteEditandoId.value !== null) {
     await modificarDeporte(deporteEditandoId.value, {
-      titulo: nombreDeporte.value
+      titulo: nombreDeporte.value.toLowerCase()
     })
   } else {
     await nuevoDeporte({
-      titulo: nombreDeporte.value
+      titulo: nombreDeporte.value.toLowerCase()
     })
   }
 

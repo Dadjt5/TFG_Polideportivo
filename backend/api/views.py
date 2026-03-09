@@ -1185,8 +1185,8 @@ class EditarInstalacionView(APIView):
                 dia = item["dia"].lower()
                 dias_recibidos.add(dia)
 
-                apertura = item.get("apertura")
-                cierre = item.get("cierre")
+                apertura = item.get("horaApertura")
+                cierre = item.get("horaCierre")
                 abierto = item.get("abierto", True)
 
                 agenda_existente = agendas_existentes.get(dia)
@@ -1225,8 +1225,8 @@ class EditarInstalacionView(APIView):
                 fecha = item["fecha"]
                 fechas_recibidas.add(str(fecha))
 
-                apertura = item.get("apertura")
-                cierre = item.get("cierre")
+                apertura = item.get("horaApertura")
+                cierre = item.get("horaCierre")
                 abierto = item.get("abierto", True)
 
                 especial_existente = especiales_existentes.get(str(fecha))

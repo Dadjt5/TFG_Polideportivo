@@ -36,13 +36,9 @@
 
           <!-- FAMILIAR -->
           <div class="form-check mb-3">
-            <input class="form-check-input"
-                   type="checkbox"
-                   id="familiar"
-                   v-model="seleccion.familiar">
+            <input class="form-check-input" type="checkbox" id="familiar" v-model="seleccion.familiar">
 
-            <label class="form-check-label"
-                   for="familiar">
+            <label class="form-check-label" for="familiar">
               {{ t.family }}
             </label>
           </div>
@@ -51,39 +47,33 @@
           <div class="table-responsive mb-4">
             <table class="table table-sm">
               <tbody>
-                <tr>
+                <tr
+                  :class="{ 'table-primary fw-bold': !seleccion.familiar && usuarioStore.isUAM && seleccion.forma === 'MENSUAL' && abono.precioTotalMensual === total }">
                   <td>{{ t.monthlyPriceUAM }}</td>
-                  <td class="text-end">
-                    {{ abono.precioTotalMensual }} €
-                  </td>
+                  <td class="text-end">{{ abono.precioTotalMensual }} €</td>
                 </tr>
 
-                <tr>
+                <tr
+                  :class="{ 'table-primary fw-bold': !seleccion.familiar && !usuarioStore.isUAM && seleccion.forma === 'MENSUAL' && abono.precioTotalMensualOtros === total }">
                   <td>{{ t.monthlyPriceOthers }}</td>
-                  <td class="text-end">
-                    {{ abono.precioTotalMensualOtros }} €
-                  </td>
+                  <td class="text-end">{{ abono.precioTotalMensualOtros }} €</td>
                 </tr>
 
-                <tr>
+                <tr
+                  :class="{ 'table-primary fw-bold': !seleccion.familiar && usuarioStore.isUAM && seleccion.forma === 'TOTAL' && abono.precioPagoUnicoUAM === total }">
                   <td>{{ t.totalPriceUAM }}</td>
-                  <td class="text-end">
-                    {{ abono.precioPagoUnicoUAM }} €
-                  </td>
+                  <td class="text-end">{{ abono.precioPagoUnicoUAM }} €</td>
                 </tr>
 
-                <tr>
+                <tr
+                  :class="{ 'table-primary fw-bold': !seleccion.familiar && !usuarioStore.isUAM && seleccion.forma === 'TOTAL' && abono.precioPagoUnicoOtros === total }">
                   <td>{{ t.totalPriceOthers }}</td>
-                  <td class="text-end">
-                    {{ abono.precioPagoUnicoOtros }} €
-                  </td>
+                  <td class="text-end">{{ abono.precioPagoUnicoOtros }} €</td>
                 </tr>
 
-                <tr>
+                <tr :class="{ 'table-primary fw-bold': seleccion.familiar && abono.precioFamiliar === total }">
                   <td>{{ t.family }}</td>
-                  <td class="text-end">
-                    {{ abono.precioFamiliar }} €
-                  </td>
+                  <td class="text-end">{{ abono.precioFamiliar }} €</td>
                 </tr>
               </tbody>
             </table>
@@ -135,13 +125,11 @@
 
         <!-- BOTONES -->
         <div class="d-flex justify-content-end gap-2 mt-4">
-          <button class="btn btn-outline-secondary"
-                  @click="cancelar">
+          <button class="btn btn-outline-secondary" @click="cancelar">
             {{ t.cancel }}
           </button>
 
-          <button class="btn btn-primary"
-                  @click="continuarPago">
+          <button class="btn btn-primary" @click="continuarPago">
             {{ t.payContinue }}
           </button>
         </div>
@@ -241,7 +229,7 @@ function cancelar() {
 onMounted(async () => {
   let data
 
-  if(esDeportivo.value) {
+  if (esDeportivo.value) {
     data = await getAbonoDeportivoDetalle(id)
   } else {
     data = await getAbonoVeranoDetalle(id)

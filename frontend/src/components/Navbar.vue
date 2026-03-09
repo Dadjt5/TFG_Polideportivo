@@ -43,7 +43,7 @@
 
           <li class="nav-item fs-5">
             <router-link to="/foro"
-              v-if="userStore.isUsuarioFinal || userStore.isAdminEspacios || userStore.isAdminRaiz"
+              v-if="userStore.isUsuarioFinal || userStore.isAdminUsuarios || userStore.isAdminRaiz"
               class="nav-link text-white" @click="menuOpen = false">
               {{ t.forum }}
             </router-link>

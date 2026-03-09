@@ -267,7 +267,7 @@ class HorarioSerializer(serializers.ModelSerializer):
 class PabellonSimpleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Pabellon
-        fields = ('id', 'nombre')
+        fields = ('id', 'nombre', 'direccion')
 
 
 class PabellonSerializer(serializers.ModelSerializer):
@@ -286,6 +286,7 @@ class InstalacionSimpleSerializer(serializers.ModelSerializer):
 
 class InstalacionSerializer(serializers.ModelSerializer):
     agenda = AgendaSerializer(many=True, read_only=True)
+    pabellon = PabellonSimpleSerializer(read_only=True)
     imagenURL = serializers.SerializerMethodField()
 
     class Meta:
@@ -354,6 +355,7 @@ class ActividadSimpleSerializer(serializers.ModelSerializer):
 
 class ActividadSerializer(serializers.ModelSerializer):
     sesiones = SesionSerializer(many=True, read_only=True)
+    instalacion = InstalacionSimpleSerializer(read_only=True)
     horasSemanales = serializers.SerializerMethodField()
     dias = serializers.SerializerMethodField()
     nombreDeporte = serializers.SerializerMethodField()

@@ -84,8 +84,12 @@
                 <p><i class="bi bi-tools text-warning me-1"></i><span class="fw-medium">{{ t.material }}:</span> {{ actividad.material }}</p>
               </div>
 
-              <div class="col-12 col-sm-4" v-if="actividad.monitor">
-                <p><i class="bi bi-person-badge text-info me-1"></i><span class="fw-medium">{{ t.monitorName }}:</span> {{ actividad.monitor.nombre || "-" }}</p>
+              <div class="col-12 col-sm-4">
+                <p><i class="bi bi-person-badge text-info me-1"></i><span class="fw-medium">{{ t.monitorName }}:</span> {{ actividad.nombreMonitor || "-" }}</p>
+              </div>
+
+              <div class="col-12 col-sm-4">
+                <p><i class="bi bi-activity text-info me-1"></i><span class="fw-medium">{{ t.sport }}:</span> {{ actividad.nombreDeporte || "-" }}</p>
               </div>
             </div>
           </div>
@@ -136,7 +140,7 @@
 
       <!-- Reserva y Volver -->
       <div class="d-flex justify-content-center mt-5">
-        <button v-if="usuarioFinalStore.isLogged && (actividad.tipoReserva === 'ONLINE' || actividad.tipoReserva === 'AMBAS')" class="btn btn-gradient btn-lg px-5 me-4" @click="reservar">
+        <button v-if="usuarioFinalStore.isLogged && (actividad.tipoReserva === 'ONLINE' || actividad.tipoReserva === 'AMBAS')" class="btn btn-success btn-lg px-5 me-4" @click="reservar">
           {{ t.booking }}
         </button>
 
@@ -192,17 +196,13 @@ const actividad = ref({
   periodo: "",
   estado: "",
   dias: "",
+  nombreMonitor: "",
+  nombreDeporte: "",
   horasSemanales: "",
   instalacion: {
-    id: -1,
+    id: 0,
     nombre: ""
   } as Generic,
-
-  monitor: {
-    id: -1,
-    nombre: ""
-  } as Generic,
-
   sesiones: [] as any[]
 });
 
@@ -231,39 +231,6 @@ const volver = () => {
 onMounted(async () => {
   const id = parseInt(props.id);
   actividad.value = await getActividadDetalle(id);
+  console.log(actividad)
 });
 </script>
-
-<style scoped>
-.card-hover {
-  transition: all 0.3s ease;
-}
-.card-hover:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-}
-
-.img-hover {
-  transition: transform 0.3s ease;
-}
-.img-hover:hover {
-  transform: scale(1.05);
-}
-
-.session-hover {
-  transition: all 0.2s ease;
-}
-.session-hover:hover {
-  transform: translateY(-2px);
-  background-color: rgba(255,255,255,0.95);
-}
-
-.btn-gradient {
-  background: linear-gradient(135deg, #56ab2f, #a8e063);
-  border: none;
-  color: white;
-}
-.btn-gradient:hover {
-  filter: brightness(1.1);
-}
-</style>

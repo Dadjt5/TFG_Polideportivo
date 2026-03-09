@@ -34,18 +34,14 @@ class Pago(models.Model):
         return f'Pago {self.concepto}, de coste {self.coste} en estado {self.estadoPago}'
     
     def confirmarPago(self):
-        if not self.objeto.confirmarCompra():
-            return False
-
-        self.estado = EstadoPago.PAGADO
+        self.objeto.confirmarCompra()
+        self.estadoPago = EstadoPago.PAGADO
         self.save()
         return True
     
     def cancelarPago(self):
-        if not self.objeto.cancelarCompra():
-            return False
-
-        self.estado = EstadoPago.CANCELADO
+        self.objeto.cancelarCompra()
+        self.estadoPago = EstadoPago.CANCELADO
         self.save()
         return True
 

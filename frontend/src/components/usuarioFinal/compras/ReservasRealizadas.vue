@@ -41,7 +41,7 @@
 
               <!-- BOTONES -->
               <div class="mt-3 text-end">
-                <button class="btn btn-outline-danger btn-sm" :disabled="reserva.estado !== 'ACTIVO'"
+                <button class="btn btn-outline-danger btn-sm"
                   @click="cancelarReserva(reserva)">
                   <i class="bi bi-x-circle me-1"></i>{{ t.cancel }}
                 </button>

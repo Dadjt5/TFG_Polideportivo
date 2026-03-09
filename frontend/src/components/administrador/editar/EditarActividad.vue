@@ -2,7 +2,7 @@
   <div class="min-vh-100 pt-4" style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
     <main class="container-fluid px-5 py-4" style="max-width: 1600px;">
 
-       <!-- CABECERA -->
+      <!-- CABECERA -->
       <div class="d-flex justify-content-between align-items-center mb-4">
         <button class="btn btn-secondary rounded-pill" @click="volver">
           ← {{ t.return }}
@@ -46,20 +46,8 @@
         <div v-if="tab === 1" class="row g-4">
           <div class="col-md-6">
             <label class="form-label fw-semibold">{{ t.name }}</label>
-            <input type="text" class="form-control form-control-lg" v-model="actividad.nombre" :class="{ 'is-invalid': errores.nombre }" />
-          </div>
-
-          <div class="col-md-3">
-            <label class="form-label fw-semibold">{{ t.academicYear }}</label>
-            <input type="number" class="form-control form-control-lg" v-model.number="actividad.año" :class="{ 'is-invalid': errores.año }" />
-          </div>
-
-          <div class="col-md-3">
-            <label class="form-label fw-semibold">{{ t.status }}</label>
-            <select class="form-select form-select-lg" v-model="actividad.estado" :class="{ 'is-invalid': errores.estado }">
-              <option disabled value="">--</option>
-              <option v-for="e in tiposStore.estados" :key="e[0]" :value="e[0]">{{ e[1] }}</option>
-            </select>
+            <input type="text" class="form-control form-control-lg" v-model="actividad.nombre"
+              :class="{ 'is-invalid': errores.nombre }" />
           </div>
 
           <div class="col-md-12">
@@ -69,27 +57,32 @@
 
           <div class="col-md-12">
             <label class="form-label fw-semibold">{{ t.images }}</label>
-            <input type="text" class="form-control form-control-lg" v-model="actividad.imagenURL" placeholder="https://@." />
+            <input type="text" class="form-control form-control-lg" v-model="actividad.imagenURL"
+              placeholder="https://@." />
           </div>
 
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.maxPlaces }}</label>
-            <input type="number" class="form-control form-control-lg" v-model.number="actividad.plazasMaximas" :class="{ 'is-invalid': errores.plazasMaximas }" />
+            <input type="number" class="form-control form-control-lg" v-model.number="actividad.plazasMaximas"
+              :class="{ 'is-invalid': errores.plazasMaximas }" />
           </div>
 
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.reservedPlaces }}</label>
-            <input type="number" class="form-control form-control-lg" v-model.number="actividad.plazasReservadas" :class="{ 'is-invalid': errores.plazasReservadas }" />
+            <input type="number" class="form-control form-control-lg" v-model.number="actividad.plazasReservadas"
+              :class="{ 'is-invalid': errores.plazasReservadas }" />
           </div>
 
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.minimumAge }}</label>
-            <input type="number" class="form-control form-control-lg" v-model.number="actividad.edadMinima" :class="{ 'is-invalid': errores.edadMinima }" />
+            <input type="number" class="form-control form-control-lg" v-model.number="actividad.edadMinima"
+              :class="{ 'is-invalid': errores.edadMinima }" />
           </div>
 
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.credits }}</label>
-            <input type="number" class="form-control form-control-lg" v-model.number="actividad.numeroCreditos" :class="{ 'is-invalid': errores.numeroCreditos }" />
+            <input type="number" class="form-control form-control-lg" v-model.number="actividad.numeroCreditos"
+              :class="{ 'is-invalid': errores.numeroCreditos }" />
           </div>
 
           <div class="col-md-4">
@@ -125,21 +118,24 @@
 
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.reserveType }}</label>
-            <select class="form-select form-select-lg" v-model="actividad.tipoReserva" :class="{ 'is-invalid': errores.tipoReserva }">
+            <select class="form-select form-select-lg" v-model="actividad.tipoReserva"
+              :class="{ 'is-invalid': errores.tipoReserva }">
               <option v-for="r in tiposStore.tiposReserva" :key="r[0]" :value="r[0]">{{ r[1] }}</option>
             </select>
           </div>
 
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.terrainType }}</label>
-            <select class="form-select form-select-lg" v-model="actividad.terreno" :class="{ 'is-invalid': errores.terreno }">
+            <select class="form-select form-select-lg" v-model="actividad.terreno"
+              :class="{ 'is-invalid': errores.terreno }">
               <option v-for="t in tiposStore.terrenos" :key="t[0]" :value="t[0]">{{ t[1] }}</option>
             </select>
           </div>
 
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.period }}</label>
-            <select class="form-select form-select-lg" v-model="actividad.periodo" :class="{ 'is-invalid': errores.periodo }">
+            <select class="form-select form-select-lg" v-model="actividad.periodo"
+              :class="{ 'is-invalid': errores.periodo }">
               <option v-for="t in tiposStore.periodos" :key="t[0]" :value="t[0]">{{ t[1] }}</option>
             </select>
           </div>
@@ -156,7 +152,8 @@
         <div v-if="tab === 2">
           <div class="mb-4">
             <label class="form-label fw-semibold">{{ t.facility }}</label>
-            <select class="form-select form-select-lg" v-model="actividad.instalacion" :class="{ 'is-invalid': errores.instalacion }">
+            <select class="form-select form-select-lg" v-model="actividad.instalacion"
+              :class="{ 'is-invalid': errores.instalacion }">
               <option :value="null">--</option>
               <option v-for="i in instalaciones" :key="i.id" :value="i.id">{{ i.nombre }}</option>
             </select>
@@ -198,7 +195,8 @@
         <div v-if="tab === 3">
           <div class="mb-4">
             <label class="form-label fw-semibold">{{ t.monitor }}</label>
-            <select class="form-select form-select-lg" v-model="actividad.monitor" :class="{ 'is-invalid': errores.monitor }">
+            <select class="form-select form-select-lg" v-model="actividad.monitor"
+              :class="{ 'is-invalid': errores.monitor }">
               <option :value="null">--</option>
               <option v-for="m in monitores" :key="m.id" :value="m.id">{{ m.nombre }}</option>
             </select>
@@ -210,7 +208,8 @@
 
           <div>
             <label class="form-label fw-semibold">{{ t.tariff }}</label>
-            <select class="form-select form-select-lg" v-model="actividad.tarifa" :class="{ 'is-invalid': errores.tarifa }">
+            <select class="form-select form-select-lg" v-model="actividad.tarifa"
+              :class="{ 'is-invalid': errores.tarifa }">
               <option :value="null">--</option>
               <option v-for="t in tarifas" :key="t.id" :value="t.id">{{ t.titulo }}</option>
             </select>
@@ -315,12 +314,16 @@
 
         <!-- TAB 4: SESIONES -->
         <div v-if="tab === 4">
-          <div class="row g-3 align-items-end mb-4">
+
+          <!-- CREAR SESIÓN -->
+          <div v-if="editando" class="row g-3 align-items-end mb-4">
             <div class="col-md-4">
               <label class="form-label fw-semibold">{{ t.day }}</label>
               <select class="form-select" v-model="crearSesion.dia">
                 <option value="">--</option>
-                <option v-for="d in tiposStore.dias" :key="d[0]" :value="d[0]">{{ d[1] }}</option>
+                <option v-for="d in tiposStore.dias" :key="d[0]" :value="d[0]">
+                  {{ d[1] }}
+                </option>
               </select>
             </div>
 
@@ -335,16 +338,65 @@
             </div>
 
             <div class="col-md-2">
-              <button type="button" class="btn btn-primary w-100" @click="agregarSesion">{{ t.newSession }}</button>
+              <button class="btn btn-primary w-100" @click="agregarSesion">
+                {{ t.newSession }}
+              </button>
             </div>
           </div>
 
+          <!-- LISTA SESIONES -->
           <div v-if="sesiones.length" class="bg-light rounded-4 p-3">
-            <div v-for="(s, index) in sesiones" :key="index" class="d-flex justify-content-between align-items-center mb-2">
-              <span>{{ s.dia }} | {{ s.horaInicio }} - {{ s.horaFin }}</span>
-              <button type="button" class="btn btn-sm btn-danger" @click="sesiones.splice(index, 1)">X</button>
+
+            <div v-for="(s, index) in sesiones" :key="s.id ?? index" class="row g-2 align-items-center mb-2">
+
+              <!-- DIA -->
+              <div class="col-md-4">
+                <template v-if="editando">
+                  <select class="form-select" v-model="s.dia">
+                    <option v-for="d in tiposStore.dias" :key="d[0]" :value="d[0]">
+                      {{ d[1] }}
+                    </option>
+                  </select>
+                </template>
+
+                <template v-else>
+                  {{tiposStore.dias.find(d => d[0] === s.dia)?.[1]}}
+                </template>
+              </div>
+
+              <!-- HORA INICIO -->
+              <div class="col-md-3">
+                <template v-if="editando">
+                  <input type="time" class="form-control" v-model="s.horaInicio">
+                </template>
+
+                <template v-else>
+                  {{ s.horaInicio }}
+                </template>
+              </div>
+
+              <!-- HORA FIN -->
+              <div class="col-md-3">
+                <template v-if="editando">
+                  <input type="time" class="form-control" v-model="s.horaFin">
+                </template>
+
+                <template v-else>
+                  {{ s.horaFin }}
+                </template>
+              </div>
+
+              <!-- BORRAR -->
+              <div class="col-md-2 text-end">
+                <button v-if="editando" class="btn btn-sm btn-danger" @click="sesiones.splice(index, 1)">
+                  X
+                </button>
+              </div>
+
             </div>
+
           </div>
+
         </div>
 
         <!-- MENSAJE -->
@@ -352,40 +404,26 @@
           <p v-if="mensaje" class="text-danger">{{ mensaje }}</p>
         </div>
 
-      <!-- ACCIONES -->
-      <div class="d-flex justify-content-center gap-4 mt-5">
-        <button
-          v-if="!editando"
-          class="btn btn-primary btn-lg rounded-pill px-4"
-          @click="activarEdicion"
-        >
-          {{ t.modifyActivity }}
-        </button>
-
-        <template v-else>
-          <button
-            class="btn btn-success btn-lg rounded-pill px-4"
-            @click="guardarCambios"
-          >
-            {{ t.saveChanges }}
+        <!-- ACCIONES -->
+        <div class="d-flex justify-content-center gap-4 mt-5">
+          <button v-if="!editando" class="btn btn-primary btn-lg rounded-pill px-4" @click="activarEdicion">
+            {{ t.modifyActivity }}
           </button>
 
-          <button
-            class="btn btn-secondary btn-lg rounded-pill px-4"
-            @click="cancelarEdicion"
-          >
-            {{ t.cancel }}
-          </button>
-        </template>
+          <template v-else>
+            <button class="btn btn-success btn-lg rounded-pill px-4" @click="guardarCambios">
+              {{ t.saveChanges }}
+            </button>
 
-        <button
-          v-if="!editando"
-          class="btn btn-outline-danger btn-lg rounded-pill px-4"
-          @click="eliminar"
-        >
-          {{ t.deleteActivity }}
-        </button>
-      </div>
+            <button class="btn btn-secondary btn-lg rounded-pill px-4" @click="cancelarEdicion">
+              {{ t.cancel }}
+            </button>
+          </template>
+
+          <button v-if="!editando" class="btn btn-outline-danger btn-lg rounded-pill px-4" @click="eliminar">
+            {{ t.deleteActivity }}
+          </button>
+        </div>
 
       </div>
     </main>
@@ -445,7 +483,7 @@ const editando = ref(false)
 const errores = ref<any>({
   nombre: false, plazasMaximas: false, plazasReservadas: false, edadMinima: false,
   año: false, numeroCreditos: false, tipoActividad: false, tipoReserva: false,
-  terreno: false, estado: false, instalacion: false, monitor: false, deporte: false,
+  terreno: false, instalacion: false, monitor: false, deporte: false,
   tarifa: false, periodo: false
 })
 
@@ -465,12 +503,14 @@ const tarifas = ref<any[]>([])
 const deportes = ref<any[]>([])
 
 function activarEdicion() {
+  mensaje.value = ""
   actividadOriginal.value = JSON.parse(JSON.stringify(actividad.value))
   Object.keys(errores.value).forEach(k => errores.value[k] = false)
   editando.value = true
 }
 
 function cancelarEdicion() {
+  mensaje.value = ""
   actividadOriginal.value = JSON.parse(JSON.stringify(actividad.value))
   editando.value = false
 }
@@ -503,7 +543,6 @@ function validarFormulario() {
   errores.value.tipoActividad = actividad.value.tipoActividad === ""
   errores.value.tipoReserva = actividad.value.tipoReserva === ""
   errores.value.terreno = actividad.value.terreno === ""
-  errores.value.estado = actividad.value.estado === ""
   errores.value.periodo = actividad.value.periodo === ""
   errores.value.instalacion = actividad.value.instalacion === null
   errores.value.monitor = actividad.value.monitor === null
@@ -513,12 +552,37 @@ function validarFormulario() {
   return ok
 }
 
+function horasValidas() {
+  for (const s of sesiones.value) {
+    if (s.horaInicio >= s.horaFin) {
+      return false
+    }
+  }
+  return true
+}
+
+function limpiarHora(h: string) {
+  return h ? h.slice(0,5) : h
+}
+
 async function guardarCambios() {
   mensaje.value = ""
   if (!validarFormulario()) {
     mensaje.value = t.value.emptyFields
     return
   }
+
+  if (!horasValidas()) {
+    mensaje.value = t.value.wrongTimetable
+    return
+  }
+
+  // limpiar segundos para que no interfieran
+  sesiones.value = sesiones.value.map(s => ({
+    ...s,
+    horaInicio: limpiarHora(s.horaInicio),
+    horaFin: limpiarHora(s.horaFin)
+  }))
 
   try {
     await modificarActividad(

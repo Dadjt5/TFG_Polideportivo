@@ -44,13 +44,6 @@
               v-model="actividad.nombre" />
           </div>
 
-          <!-- AÑO -->
-          <div class="col-md-3">
-            <label class="form-label fw-semibold">{{ t.academicYear }}</label>
-            <input type="number" class="form-control form-control-lg" :class="{ 'is-invalid': errores.año }"
-              v-model.number="actividad.año" />
-          </div>
-
           <!-- DESCRIPCIÓN -->
           <div class="col-md-12">
             <label class="form-label fw-semibold">{{ t.description }}</label>

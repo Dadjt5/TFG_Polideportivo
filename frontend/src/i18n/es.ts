@@ -28,6 +28,7 @@ export default {
   configurationSuccess: "Información modificada correctamente",
   cantBooking: "Esta actividad no puede ser reservada",
   noSessionWarning: "La actividad no tiene sesiones",
+  wrongTimetable: "La hora de inicio no puede ser mas tarde que la de fin",
 
   /* Perfil */
   role: "Rol",

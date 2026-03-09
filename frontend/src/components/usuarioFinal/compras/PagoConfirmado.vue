@@ -84,7 +84,7 @@
 import { ref, onMounted, inject, type Ref } from "vue"
 import { useRouter } from "vue-router"
 
-import { getPago } from "@/services/reservaPagoService";
+import { confirmarPago, getPago } from "@/services/reservaPagoService";
 
 import type { Language } from "@/useI18N"
 import { useI18n } from "@/useI18N"
@@ -98,18 +98,11 @@ const router = useRouter()
 
 const pago = ref()
 
-const irReservas = () => {
-  router.push("/reservas-realizadas")
-}
-
-const irHome = () => {
-  router.push("/")
-}
-
 onMounted(async () => {
   const id = parseInt(props.id)
 
   try {
+    await confirmarPago(id)
     pago.value = await getPago(id)
   } catch(e) {
     console.log("Error al obtener el pago", e)

@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from datetime import time
+from datetime import time, datetime
+from django.db.models import Q
 
 from .agenda import Agenda
 from .actividad import Sesion
@@ -85,6 +86,7 @@ class Instalacion(models.Model):
             h, m = map(int, hora_fin.split(":"))
             hora_fin = time(h, m)
 
+
         agenda = self.agenda.filter(dia__iexact=dia).first()
         if not agenda or not agenda.abierto:
             return False
@@ -94,7 +96,7 @@ class Instalacion(models.Model):
 
         conflictos = Sesion.objects.filter(
             actividad__instalacion=self,
-            dia=dia,
+            dia__iexact=dia,
             horaInicio__lt=hora_fin,
             horaFin__gt=hora_inicio
         )
@@ -106,18 +108,19 @@ class Instalacion(models.Model):
             return False
 
         return True
+    
+    def controlarCambioHorario(self, dia, horaInicio, horaFin, abierto):
+        if not abierto:
+            return not self.actividad.filter(sesiones__dia__iexact=dia).exists()
 
-    def controlarCambioHorario(self, dia, horaInicio, horaFin):
-        conflictos = self.actividad.filter(
-            sesiones__dia=dia,
-            sesiones__horaInicio__lt=horaFin,
-            sesiones__horaFin__gt=horaInicio
+        conflictos = Sesion.objects.filter(
+            actividad__instalacion=self,
+            dia__iexact=dia
+        ).filter(
+            Q(horaInicio__lt=horaInicio) | Q(horaFin__gt=horaFin)
         )
 
-        if conflictos.exists():
-            return False
-        
-        return True
+        return not conflictos.exists()
 
     def controlarAlquiler(self, dia, horaInicio, horaFin):
         agenda = self.agenda.filter(fecha=dia).first()

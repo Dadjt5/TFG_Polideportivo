@@ -2,10 +2,9 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 import math
 from django.utils import timezone
-from django.core.exceptions import ValidationError
 from datetime import time
-from django.db import transaction
 from django.http import Http404
+from datetime import time, datetime, timedelta
 
 from .constantes import TipoActividad, FormaReserva, Terreno, Estado, Periodo, Dia
 
@@ -240,7 +239,7 @@ class Sesion(models.Model):
 
     actividad = models.ForeignKey(Actividad, on_delete=models.RESTRICT, related_name="sesiones")
     horaInicio = models.TimeField()
-    horaFin = models.TimeField() 
+    horaFin = models.TimeField()
     numeroHoras = models.FloatField(default=0.0)
 
     dia = models.CharField(default=Dia.SABADO, choices=Dia.choices)
@@ -250,10 +249,10 @@ class Sesion(models.Model):
             models.Case(
                 models.When(dia='lunes', then=0),
                 models.When(dia='martes', then=1),
-                models.When(dia='miércoles', then=2),
+                models.When(dia='miercoles', then=2),
                 models.When(dia='jueves', then=3),
                 models.When(dia='viernes', then=4),
-                models.When(dia='sábado', then=5),
+                models.When(dia='sabado', then=5),
                 models.When(dia='domingo', then=6),
                 output_field=models.IntegerField(),
             )
@@ -274,11 +273,23 @@ class Sesion(models.Model):
             return False
         
     def save(self, *args, **kwargs):
-        t1 = self.horaInicio.hour*3600 + self.horaInicio.minute*60 + self.horaInicio.second
-        t2 = self.horaFin.hour*3600 + self.horaFin.minute*60 + self.horaFin.second
-        horas = (t2-t1)/3600
-        self.numeroHoras = horas
-        
+        if isinstance(self.horaInicio, str):
+            h, m = map(int, self.horaInicio.split(":"))
+            self.horaInicio = time(h, m)
+
+        if isinstance(self.horaFin, str):
+            h, m = map(int, self.horaFin.split(":"))
+            self.horaFin = time(h, m)
+
+        if self.horaInicio and self.horaFin:
+            inicio = datetime.combine(datetime.today(), self.horaInicio)
+            fin = datetime.combine(datetime.today(), self.horaFin)
+
+            if fin <= inicio:
+                raise ValueError("horaFin debe ser mayor que horaInicio")
+
+            self.numeroHoras = (fin - inicio).total_seconds() / 3600
+
         super().save(*args, **kwargs)
 
     @classmethod

@@ -41,7 +41,13 @@
               </div>
 
               <div class="col-12 col-sm-6" v-if="instalacion.pabellon">
-                <p><i class="bi bi-building text-secondary me-1"></i><span class="fw-medium">{{ t.pavilion }}:</span> {{ instalacion.pabellon.nombre }}</p>
+                <p>
+                  <i class="bi bi-building text-primary me-1"></i>
+                  <span class="fw-medium">{{ t.pavilion }}: </span>
+                  <span class="text-primary fw-medium" style="cursor: pointer;" @click="pavilionDetail(instalacion.pabellon.id)">
+                    {{ instalacion.pabellon.nombre }}
+                  </span>
+                </p>
               </div>
 
               <div class="col-12 col-sm-6" v-if="instalacion.pabellon">
@@ -84,7 +90,7 @@
 
       <!-- Reserva y Volver -->
       <div class="d-flex justify-content-center mt-5">
-        <button v-if="usuarioFinalStore.isLogged" class="btn btn-gradient btn-lg px-5 me-4" @click="reservar">
+        <button v-if="usuarioFinalStore.isLogged" class="btn btn-success btn-lg px-5 me-4" @click="reservar">
           {{ t.booking }}
         </button>
 
@@ -134,6 +140,14 @@ const cambiarFavorito = () => {
   usuarioFinalStore.marcarInstalacionFavorita(instalacion.value.id)
 }
 
+const pavilionDetail = (id: number) => {
+  router.push({
+    name: 'detalle-pabellon',
+    params: { id }
+  });
+}
+
+
 const reservar = () => {
   router.push({
     name: 'reservar-instalacion',
@@ -155,29 +169,3 @@ onMounted(async () => {
   }
 });
 </script>
-
-<style scoped>
-.card-hover {
-  transition: all 0.3s ease;
-}
-.card-hover:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-}
-
-.img-hover {
-  transition: transform 0.3s ease;
-}
-.img-hover:hover {
-  transform: scale(1.05);
-}
-
-.btn-gradient {
-  background: linear-gradient(135deg, #56ab2f, #a8e063);
-  border: none;
-  color: white;
-}
-.btn-gradient:hover {
-  filter: brightness(1.1);
-}
-</style>

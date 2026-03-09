@@ -169,30 +169,3 @@ onMounted(async () => {
 	}
 });
 </script>
-
-<style scoped>
-.card-hover {
-  transition: all 0.3s ease;
-}
-.card-hover:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-}
-
-.participant-hover {
-  transition: all 0.2s ease;
-}
-.participant-hover:hover {
-  transform: translateY(-2px);
-  background-color: rgba(255,255,255,0.95);
-}
-
-.btn-gradient-success {
-  background: linear-gradient(135deg, #56ab2f, #a8e063);
-  border: none;
-  color: white;
-}
-.btn-gradient-success:hover {
-  filter: brightness(1.1);
-}
-</style>

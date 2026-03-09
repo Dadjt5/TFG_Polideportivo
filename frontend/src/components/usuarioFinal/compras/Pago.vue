@@ -150,17 +150,12 @@ const pagar = async () => {
     confirmParams: {
       return_url: `${window.location.origin}/pago/finalizado/${props.id}`
     },
-    redirect: "if_required"
   })
 
   if (stripeError) {
     error.value = stripeError.message
     loading.value = false
-  } else {
-    await confirmarPago(parseInt(props.id))
-    router.push({ name: 'pago-finalizado', params: { id: props.id } })
-  }
-}
+  }}
 
 onMounted(async () => {
   try {

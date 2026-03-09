@@ -74,16 +74,6 @@
 
       <!-- Botones -->
       <div class="d-flex justify-content-center gap-4 mt-5">
-        <button v-if="authStore.role === 'administrador'" class="btn btn-gradient-danger btn-lg px-4" @click="activarEdicion">
-          <i class="bi bi-pencil me-1"></i>
-          {{ t.modifyPavilion }}
-        </button>
-
-        <button v-if="authStore.role === 'administrador'" class="btn btn-gradient-danger btn-lg px-4" @click="eliminar">
-          <i class="bi bi-trash me-1"></i>
-          {{ t.delete }}
-        </button>
-
         <button class="btn btn-secondary btn-lg px-5" @click="volver">
           {{ t.return }}
         </button>
@@ -208,38 +198,3 @@ onMounted(async () => {
 	}
 });
 </script>
-
-<style scoped>
-.card-hover {
-  transition: all 0.3s ease;
-}
-.card-hover:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-}
-
-.img-hover {
-  transition: transform 0.3s ease;
-}
-.img-hover:hover {
-  transform: scale(1.05);
-}
-
-.btn-gradient-success {
-  background: linear-gradient(135deg, #56ab2f, #a8e063);
-  border: none;
-  color: white;
-}
-.btn-gradient-success:hover {
-  filter: brightness(1.1);
-}
-
-.btn-gradient-danger {
-  background: linear-gradient(135deg, #e53935, #ff6f61);
-  border: none;
-  color: white;
-}
-.btn-gradient-danger:hover {
-  filter: brightness(1.1);
-}
-</style>

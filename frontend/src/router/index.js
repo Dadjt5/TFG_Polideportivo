@@ -37,6 +37,7 @@ import ReservaActividad from '@/components/usuarioFinal/compras/ReservaActividad
 import Alquiler from '@/components/usuarioFinal/compras/Alquiler.vue'
 import ReservasRealizadas from '@/components/usuarioFinal/compras/ReservasRealizadas.vue'
 import Pago from '@/components/usuarioFinal/compras/Pago.vue'
+import PagoConfirmado from '@/components/usuarioFinal/compras/PagoConfirmado.vue'
 import ConfigurarAbono from '@/components/usuarioFinal/compras/ConfigurarAbono.vue'
 
 
@@ -140,7 +141,7 @@ const routes = [
   { path: '/instalacion/:id/reservar', component: Alquiler, name: 'reservar-instalacion', props: true, meta: { requiresAuth: true, allowedRoles: ['usuario_final'] } },
 
   { path: '/pago/:tipo/:id', component: Pago, props: true, name: 'pasarela-pago', meta: { requiresAuth: true, allowedRoles: ['usuario_final'] }},
-  { path: '/pago/finalizado/:id', component: Pago, props: true, name: 'pago-finalizado', meta: { requiresAuth: true, allowedRoles: ['usuario_final'] }},
+  { path: '/pago/finalizado/:id', component: PagoConfirmado, props: true, name: 'pago-finalizado', meta: { requiresAuth: true, allowedRoles: ['usuario_final'] }},
 
   /* Detalle */
   { path: '/pabellones/:id', component: DetallePabellon, name: 'detalle-pabellon', props: true, meta: { public: true } },
