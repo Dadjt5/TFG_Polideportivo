@@ -84,6 +84,16 @@
                 <p v-else>{{ instalacion.tipoInstalacion }}</p>
               </div>
 
+              <!-- NÚMERO DE CALLES -->
+              <div class="col-md-6" v-if="instalacion.tipoInstalacion === 'PISCINA'">
+                <label class="fw-medium">{{ t.poolStreets }}</label>
+
+                <input v-if="editando" type="number" min="1" class="form-control"
+                  v-model.number="instalacion.numeroCalles" />
+
+                <p v-else>{{ instalacion.numeroCalles }}</p>
+              </div>
+
             </div>
           </div>
         </div>
@@ -264,7 +274,7 @@
 </template>
 
 <script setup lang="ts">
-import { inject, ref, onMounted, type Ref } from 'vue';
+import { inject, ref, onMounted, type Ref, watch } from 'vue';
 import { useRouter } from "vue-router";
 
 /* Importamos la comunicacion para recuperar la informacion de instalaciones del backend */
@@ -299,6 +309,7 @@ const instalacion = ref({
   porcentajeTDA: 0,
   pabellon: { id: -1, nombre: "", direccion: "" },
   tipoInstalacion: "",
+  numeroCalles: 0,
   agenda: [] as any[],
 });
 
@@ -308,7 +319,8 @@ const errores = ref({
   porcentajeTDA: false,
   horaApertura: false,
   horaCierre: false,
-  tipoInstalacion: false
+  tipoInstalacion: false,
+  numeroCalles: false
 })
 
 const instalacionOriginal = ref<any>(null);
@@ -320,6 +332,9 @@ function validarFormulario() {
   errores.value.aforoMaximo = instalacion.value.aforoMaximo <= 0
   errores.value.porcentajeTDA = instalacion.value.porcentajeTDA <= 0
   errores.value.tipoInstalacion = instalacion.value.tipoInstalacion === ''
+  errores.value.numeroCalles =
+    instalacion.value.numeroCalles <= 0 &&
+    instalacion.value.tipoInstalacion === "PISCINA"
 
   for (const key in errores.value) {
     if (errores.value[key]) {
@@ -377,6 +392,15 @@ const eliminar = async () => {
 const volver = () => {
   router.back();
 };
+
+watch(
+  () => instalacion.value.tipoInstalacion,
+  (tipo) => {
+    if (tipo !== "PISCINA") {
+      instalacion.value.numeroCalles = 0
+    }
+  }
+)
 
 onMounted(async () => {
   const id = parseInt(props.id);

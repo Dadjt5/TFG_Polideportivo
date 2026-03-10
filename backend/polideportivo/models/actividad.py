@@ -6,6 +6,7 @@ from datetime import time
 from django.http import Http404
 from datetime import time, datetime, timedelta
 
+from .notificacion import Notificacion
 from .constantes import TipoActividad, FormaReserva, Terreno, Estado, Periodo, Dia
 
 
@@ -158,7 +159,7 @@ class Actividad(models.Model):
         
         return horario
     
-    def nuevaSesion(self, dia, horaInicio, horaFin):
+    def nuevaSesion(self, dia, horaInicio, horaFin, calle=None):
         if isinstance(horaInicio, str):
             h, m = map(int, horaInicio.split(":"))
             horaInicio = time(h, m)
@@ -166,7 +167,7 @@ class Actividad(models.Model):
             h, m = map(int, horaFin.split(":"))
             horaFin = time(h, m)
 
-        sesion = Sesion.objects.create(dia=dia, horaInicio=horaInicio, horaFin=horaFin, actividad=self, numeroHoras=0.0)
+        sesion = Sesion.objects.create(dia=dia, horaInicio=horaInicio, horaFin=horaFin, actividad=self, calle=calle, numeroHoras=0.0)
         return sesion
     
     def modificarInformacion(self, actividad_data, tarifa, instalacion, monitor):
@@ -197,6 +198,9 @@ class Actividad(models.Model):
         for campo in campos_simples:
             if campo in actividad_data:
                 setattr(self, campo, actividad_data[campo])
+                
+                if campo == "material":
+                    Notificacion.notificarNuevoMaterial(actividad=self)
 
         self.plazasMaximas = nuevas_plazas_max
         self.plazasReservadas = nuevas_plazas_res
@@ -242,6 +246,8 @@ class Sesion(models.Model):
     horaFin = models.TimeField()
     numeroHoras = models.FloatField(default=0.0)
 
+    calle = models.ForeignKey('Calle', null=True, blank=True, on_delete=models.SET_NULL)
+
     dia = models.CharField(default=Dia.SABADO, choices=Dia.choices)
     
     class Meta:
@@ -268,6 +274,9 @@ class Sesion(models.Model):
             if asistencia.presente != falta:
                 asistencia.presente = falta
                 asistencia.save(update_fields=["presente"])
+            
+            if Asistencia.objects.filter(usuarioFinal=usuarioFinal, sesion=self, presente=False).count() > 10:
+                Notificacion.notificarAusencias(usuario=usuarioFinal, actividad=self.actividad)
             return True
         except:
             return False

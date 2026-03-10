@@ -20,6 +20,8 @@ export default {
   deleteChannel: "Delete channel",
   accept: "Accept",
   reject: "Reject",
+  poolStreet: "Pool street",
+  poolStreets: "Pool streets",
 
   /* Mensajes */
   missing: "Missing or incorrect fields",

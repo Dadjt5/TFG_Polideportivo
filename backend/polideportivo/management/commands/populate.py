@@ -63,7 +63,7 @@ class Command(BaseCommand):
                 titulo_salida_lista_espera="Salida de la lista de espera",
                 titulo_ausencias="Aviso por falta de asistencia",
                 titulo_material_especial="Nuevo material especial necesario",
-                texto_cambios_cancelaciones="Las cancelaciones deben realizarse con antelación suficiente.",
+                texto_cambios_cancelaciones="Los tiempos mínimos de las cancelaciones han cambiado.",
                 texto_avisos_actividades="Hay una nueva actividad que podría interesarle.",
                 texto_problemas_pago="Si tiene problemas con el pago contacte con administración.",
                 texto_salida_lista_espera="Ha salido de la lista de espera.",

@@ -20,6 +20,8 @@ export default {
   deleteChannel: "Eliminar canal",
   accept: "Aceptar",
   reject: "Rechazar",
+  poolStreet: "Calle de la piscina",
+  poolStreets: "Calles de la piscina",
 
   /* Mensajes */
   missing: "Hay campos vacios o erroneos",

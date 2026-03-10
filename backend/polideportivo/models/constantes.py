@@ -8,7 +8,7 @@ class TipoInstalacion(models.TextChoices):
 
     Tipos de instalaciones:
     - PISTA_PADEL, PISTA_TENIS, PISTA_BALONCESTO, CAMPO_FUTBOL_7, CAMPO_FUTBOL_11, CAMPO_RUGBY, PISTA_SQUASH, RECTA_ATLETISMO, PISTA_VOLEY_PLAYA,
-    PISTA_POLIDEPORTIVA, SALA_MULTIUSOS, SALA_MUSCULACION.
+    PISTA_POLIDEPORTIVA, SALA_MULTIUSOS, SALA_MUSCULACION, PISCINA.
     """
 
     PISTA_PADEL = 'PISTA_PADEL', 'Pista de pádel'
@@ -22,6 +22,7 @@ class TipoInstalacion(models.TextChoices):
     PISTA_POLIDEPORTIVA = 'PISTA_POLIDEPORTIVA', 'Pista polideportiva'
     SALA_MULTIUSOS = 'SALA_MULTIUSOS', 'Sala multiusos'
     SALA_MUSCULACION = 'SALA_MUSCULACION', 'Sala de musculación'
+    PISCINA = 'PISCINA', 'Piscina'
 
 
 class TipoActividad(models.TextChoices):

@@ -32,6 +32,7 @@ class Instalacion(models.Model):
     aforoMaximo = models.PositiveIntegerField(default=50)
     luz = models.BooleanField(default=False)
     porcentajeTDA = models.FloatField(default=0.0)
+    numeroCalles = models.PositiveIntegerField(default=0)
 
     pabellon = models.ForeignKey(Pabellon, on_delete=models.RESTRICT)
     tarifa = models.ForeignKey('TarifaInstalacion', on_delete=models.PROTECT, blank=True, null=True)
@@ -40,6 +41,13 @@ class Instalacion(models.Model):
 
     def __str__(self):
         return f'{self.nombre}, ubicado en el {self.pabellon}'
+    
+    def crear_calles(self):
+        if self.tipoInstalacion != TipoInstalacion.PISCINA:
+            return
+
+        for i in range(1, self.numeroCalles + 1):
+            Calle.objects.create(instalacion=self, numero=i)
     
     def obtener_precios(self):
         return {
@@ -78,16 +86,31 @@ class Instalacion(models.Model):
         self.save()
         return True
 
-    def controlarHorarioActividad(self, dia, hora_inicio, hora_fin, sesion_id=None):
+    def sincronizarCalles(self, numero_calles):
+        if self.tipoInstalacion != TipoInstalacion.PISCINA:
+            self.calles.all().delete()
+            return
+
+        actuales = self.calles.count()
+
+        if numero_calles > actuales:
+            for i in range(actuales + 1, numero_calles + 1):
+                Calle.objects.create(instalacion=self, numero=i)
+
+        elif numero_calles < actuales:
+            self.calles.filter(numero__gt=numero_calles).delete()
+
+    def controlarHorarioActividad(self, dia, hora_inicio, hora_fin, sesion_id=None, calle=None):
         if isinstance(hora_inicio, str):
             h, m = map(int, hora_inicio.split(":"))
             hora_inicio = time(h, m)
+
         if isinstance(hora_fin, str):
             h, m = map(int, hora_fin.split(":"))
             hora_fin = time(h, m)
 
-
         agenda = self.agenda.filter(dia__iexact=dia).first()
+
         if not agenda or not agenda.abierto:
             return False
 
@@ -101,9 +124,12 @@ class Instalacion(models.Model):
             horaFin__gt=hora_inicio
         )
 
+        if self.tipoInstalacion == TipoInstalacion.PISCINA:
+            conflictos = conflictos.filter(calle=calle)
+
         if sesion_id and sesion_id != -1:
             conflictos = conflictos.exclude(id=sesion_id)
-        
+
         if conflictos.exists():
             return False
 
@@ -122,8 +148,9 @@ class Instalacion(models.Model):
 
         return not conflictos.exists()
 
-    def controlarAlquiler(self, dia, horaInicio, horaFin):
+    def controlarAlquiler(self, dia, horaInicio, horaFin, calle=None):
         agenda = self.agenda.filter(fecha=dia).first()
+
         if not agenda:
             dia_semana = dia.strftime("%A").upper()
 
@@ -138,9 +165,13 @@ class Instalacion(models.Model):
             }
 
             dia_modelo = mapa_dias[dia_semana]
-            agenda = Agenda.objects.filter(dia__iexact=dia_modelo).first()
 
-        if agenda.estaOcupado(horaInicio, horaFin):
+            agenda = Agenda.objects.filter(instalacion=self, dia__iexact=dia_modelo).first()
+
+        if not agenda:
+            return False
+
+        if agenda.estaOcupado(horaInicio, horaFin, calle):
             return False
 
         return True
@@ -215,24 +246,42 @@ class Instalacion(models.Model):
 
         return None, None
 
-    def get_reservas(self, fecha):
-        if not fecha:
-            return []
 
+    def get_reservas(self, fecha):
         agenda = Agenda.objects.filter(instalacion=self, fecha=fecha, abierto=True).first()
 
         if not agenda:
             return []
 
-        reservas = []
-        for mapa in agenda.mapa_reservas.all():
-            reservas.append({
-                "horaInicio": mapa.horaInicio.strftime("%H:%M"),
-                "horaFin": mapa.horaFin.strftime("%H:%M"),
-                "estado": mapa.estado
-            })
+        if self.tipoInstalacion != TipoInstalacion.PISCINA:
+            reservas = []
+            for mapa in agenda.mapa_reservas.filter(calle__isnull=True):
+                reservas.append({
+                    "horaInicio": mapa.horaInicio.strftime("%H:%M"),
+                    "horaFin": mapa.horaFin.strftime("%H:%M"),
+                    "estado": mapa.estado
+                })
 
-        return reservas
+            return reservas
+        else:
+            calles = []
+            for calle in self.calles.all():
+                reservas = []
+
+                mapas = agenda.mapa_reservas.filter(calle=calle)
+                for mapa in mapas:
+                    reservas.append({
+                        "horaInicio": mapa.horaInicio.strftime("%H:%M"),
+                        "horaFin": mapa.horaFin.strftime("%H:%M"),
+                        "estado": mapa.estado
+                    })
+
+                calles.append({
+                    "calle": calle.numero,
+                    "reservas": reservas
+                })
+
+            return calles
 
     @classmethod
     def contar(cls):
@@ -255,3 +304,12 @@ class Instalacion(models.Model):
             res = res.filter(agenda__horaCierre__gte=horaFin)
 
         return res.distinct()
+
+
+class Calle(models.Model):
+    numero = models.PositiveIntegerField()
+      
+    instalacion = models.ForeignKey('Instalacion', on_delete=models.CASCADE, related_name="calles")
+
+    def __str__(self):
+        return f"Calle {self.numero} - {self.instalacion.nombre}"

@@ -35,6 +35,7 @@ router.register(r'horarios', views.HorarioViewSet, basename="horario")
 
 router.register(r'instalaciones', views.InstalacionViewSet, basename="instalacion")
 router.register(r'pabellones', views.PabellonViewSet, basename="pabellon")
+router.register(r'calles', views.CalleViewSet, basename="calle")
 
 router.register(r'listasEspera', views.ListaEsperaViewSet, basename="lista-espera")
 router.register(r'entradasListaEspera', views.EntradaListaEsperaViewSet, basename="entrada-lista")

@@ -10,7 +10,7 @@ from polideportivo.models import (
     TarifaInstalacion, TDA, UsuarioFinal, AbonoDeportivo, AbonoVerano, Pabellon, 
     ReservaActividad, Alquiler, Administrador, CompraBono, CompraAbono, Sesion,
     Mensaje, MapaReservas, GrupoReducido, ActividadComun, Fisioterapia, TipoInstalacion,
-    Feedback
+    Feedback, Calle
 )
 
 
@@ -301,7 +301,8 @@ class InstalacionSerializer(serializers.ModelSerializer):
             "porcentajeTDA",
             "pabellon",
             "agenda",
-            "tarifa"
+            "tarifa",
+            "numeroCalles"
         )
     
     def get_imagenURL(self, obj):
@@ -316,6 +317,11 @@ class InstalacionSerializer(serializers.ModelSerializer):
             pass
 
         return [obj.imagenURL]
+    
+class CalleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Calle
+        fields = '__all__'
 
 # --------------------
 # Actividades

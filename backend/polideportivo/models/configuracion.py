@@ -35,7 +35,7 @@ class Configuracion(models.Model):
 
     def __str__(self):
         return "Configuración global de la aplicación"
-    
+
     def editar(self, data):
         try:
             valor_original_cancelacion = self.dias_minimo_cancelacion

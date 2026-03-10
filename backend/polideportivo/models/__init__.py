@@ -9,7 +9,7 @@ from .descuento import Descuento
 from .favorito import Favorito
 from .foro import (Foro, Canal, UsuarioCanal, Mensaje)
 from .horario import Horario
-from .instalacion import (Instalacion, Pabellon)
+from .instalacion import (Instalacion, Pabellon, Calle)
 from .lista_espera import (ListaEspera, EntradaListaEspera)
 from .monitor import Monitor
 from .notificacion import Notificacion

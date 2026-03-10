@@ -51,6 +51,14 @@
             </select>
           </div>
 
+          <!-- NÚMERO DE CALLES (solo piscina) -->
+          <div class="col-md-4" v-if="instalacion.tipoInstalacion === 'PISCINA'">
+            <label class="form-label fw-semibold">{{ t.poolStreets }}</label>
+
+            <input type="number" min="1" class="form-control form-control-lg"
+              :class="{ 'is-invalid': errores.numeroCalles }" v-model.number="instalacion.numeroCalles" />
+          </div>
+
           <!-- AFORO -->
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.maxCapacity }}</label>
@@ -102,7 +110,8 @@
           <!-- TARIFA -->
           <div class="col-md-6">
             <label class="form-label fw-semibold">{{ t.tariff }}</label>
-            <select class="form-select form-select-lg" v-model="instalacion.tarifa" :class="{ 'is-invalid': errores.tarifa }">
+            <select class="form-select form-select-lg" v-model="instalacion.tarifa"
+              :class="{ 'is-invalid': errores.tarifa }">
               <option value="">--</option>
               <option v-for="t in tarifas" :key="t.id" :value="t.id">
                 {{ t.titulo }}
@@ -218,7 +227,7 @@
 
 
 <script setup lang="ts">
-import { ref, inject, type Ref, onMounted, computed } from "vue"
+import { ref, inject, type Ref, onMounted, watch } from "vue"
 import { useRouter } from "vue-router"
 
 import { nuevaInstalacion } from "@/services/crearRecursosService"
@@ -247,7 +256,8 @@ const instalacion = ref({
   porcentajeTDA: 0,
   tarifa: null,
   pabellon: null,
-  tipoInstalacion: ""
+  tipoInstalacion: "",
+  numeroCalles: 0
 })
 
 const errores = ref({
@@ -257,7 +267,8 @@ const errores = ref({
   porcentajeTDA: false,
   pabellon: false,
   tarifa: false,
-  tipoInstalacion: false
+  tipoInstalacion: false,
+  numeroCalles: false
 })
 
 const diasSemana = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"];
@@ -308,6 +319,9 @@ function validarFormulario() {
   errores.value.pabellon = instalacion.value.pabellon === null
   errores.value.tarifa = instalacion.value.tarifa === null
   errores.value.tipoInstalacion = instalacion.value.tipoInstalacion === ""
+  errores.value.numeroCalles =
+    instalacion.value.numeroCalles <= 0 &&
+    instalacion.value.tipoInstalacion === "PISCINA"
 
   for (const k in errores.value) {
     if (errores.value[k]) valido = false
@@ -338,6 +352,15 @@ const crearInstalacion = async () => {
 }
 
 const volver = () => router.back()
+
+watch(
+  () => instalacion.value.tipoInstalacion,
+  (tipo) => {
+    if (tipo !== "PISCINA") {
+      instalacion.value.numeroCalles = 0
+    }
+  }
+)
 
 onMounted(async () => {
   pabellones.value = await getPabellonesSimples()

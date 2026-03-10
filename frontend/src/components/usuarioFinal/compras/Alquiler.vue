@@ -29,10 +29,20 @@
 
         <div class="mb-3">
           <label class="form-label">{{ t.selectedDate }}</label>
-          <input type="date" class="form-control"
-                 v-model="reserva.seleccion.fecha"
-                 :min="minFecha"
-                 :max="maxFechaStr" />
+          <input type="date" class="form-control" v-model="reserva.seleccion.fecha" :min="minFecha"
+            :max="maxFechaStr" />
+        </div>
+
+        <div v-if="reserva.tarifa.numeroCalles > 0" class="mb-3">
+          <label class="form-label">{{ t.poolStreet }}</label>
+
+          <select class="form-select" v-model="reserva.seleccion.calle">
+            <option v-for="calle in reserva.tarifa.calles" :key="calle.numero" :value="calle.numero">
+
+              {{ t.poolStreet }} {{ calle.numero }}
+
+            </option>
+          </select>
         </div>
 
         <h6 class="fw-bold">{{ t.prices }}</h6>
@@ -82,11 +92,8 @@
           <p class="text-danger">{{ mensaje }}</p>
         </div>
         <div v-else class="d-flex flex-wrap gap-2">
-          <button v-for="hora in reserva.tarifa.reservas" :key="hora.horaInicio" 
-                  class="btn btn-outline-primary" 
-                  :class="claseHora(hora)" 
-                  :disabled="estaBloqueada(hora)"
-                  @click="toggleHora(hora)">
+          <button v-for="hora in reservasActuales" :key="hora.horaInicio" class="btn btn-outline-primary"
+            :class="claseHora(hora)" :disabled="estaBloqueada(hora)" @click="toggleHora(hora)">
             {{ hora.horaInicio }} - {{ hora.horaFin }}
           </button>
         </div>
@@ -141,6 +148,7 @@ const reserva = ref({
     horaApertura: '',
     horaCierre: '',
     abierto: true,
+    numeroCalles: 0,
     datos: {} as any,
     reservas: [] as {
       horaInicio: string,
@@ -155,9 +163,11 @@ const reserva = ref({
       nombre: string,
       numeroHoras: number
     }[]
+    calles: [] as {}
   },
   seleccion: {
     fecha: new Date().toISOString().slice(0, 10),
+    calle: 1
   },
   descuento: {
     porcentaje_total: 0,
@@ -172,16 +182,30 @@ const reserva = ref({
 const mensaje = ref("")
 const horasSeleccionadas = ref<string[]>([])
 
+// Se debe revisar si es una piscina o no, si lo es se deben mostrar las reservas por calle
+const reservasActuales = computed(() => {
+
+  if(reserva.value.tarifa.numeroCalles === 0)
+    return reserva.value.tarifa.reservas
+
+  const calle = reserva.value.tarifa.calles.find(
+    c => c.numero === reserva.value.seleccion.calle
+  )
+
+  return calle ? calle.reservas : []
+
+})
+
 // Mínimo y máximo de fecha
 const minFecha = computed(() => {
   const fecha = new Date()
   fecha.setDate(fecha.getDate() + (configuracionStore.dias_minimo_alquiler || 0))
-  return fecha.toISOString().slice(0,10)
+  return fecha.toISOString().slice(0, 10)
 })
 
 const maxFecha = new Date()
 maxFecha.setDate(maxFecha.getDate() + (configuracionStore.dias_maximo_alquiler || 7))
-const maxFechaStr = maxFecha.toISOString().slice(0,10)
+const maxFechaStr = maxFecha.toISOString().slice(0, 10)
 
 // Funciones para horas
 const estaBloqueada = (hora: any) => {
@@ -190,7 +214,7 @@ const estaBloqueada = (hora: any) => {
 
   const hoy = new Date()
   const fechaSeleccionada = new Date(reserva.value.seleccion.fecha)
-  const esHoy = hoy.toISOString().slice(0,10) === fechaSeleccionada.toISOString().slice(0,10)
+  const esHoy = hoy.toISOString().slice(0, 10) === fechaSeleccionada.toISOString().slice(0, 10)
 
   if (esHoy) {
     const [h, m] = hora.horaInicio.split(":").map(Number)
@@ -223,15 +247,15 @@ const toggleHora = (intervalo: any) => {
   if (estaBloqueada(intervalo)) return
 
   const fechaSeleccionada = new Date(reserva.value.seleccion.fecha)
-  fechaSeleccionada.setHours(0,0,0,0)
+  fechaSeleccionada.setHours(0, 0, 0, 0)
 
   const fechaMin = new Date()
   fechaMin.setDate(fechaMin.getDate() + (configuracionStore.dias_minimo_alquiler || 0))
-  fechaMin.setHours(0,0,0,0)
+  fechaMin.setHours(0, 0, 0, 0)
 
   const fechaMax = new Date()
   fechaMax.setDate(fechaMax.getDate() + (configuracionStore.dias_maximo_alquiler || 7))
-  fechaMax.setHours(0,0,0,0)
+  fechaMax.setHours(0, 0, 0, 0)
 
   if (fechaSeleccionada < fechaMin || fechaSeleccionada > fechaMax) return
   if (intervalo.estado !== 'LIBRE') return
@@ -263,13 +287,13 @@ const total = computed(() => {
   let base = reserva.value.tarifa.datos.precioOtros
   otroCaso.value = true
 
-  if(usuarioFinalStore.hasAbono) {
+  if (usuarioFinalStore.hasAbono) {
     base = reserva.value.tarifa.datos.precioAbonado
     otroCaso.value = false
-  } else if(usuarioFinalStore.isUAM) {
+  } else if (usuarioFinalStore.isUAM) {
     base = reserva.value.tarifa.datos.precioUAM
     otroCaso.value = false
-  } else if(usuarioFinalStore.hasTda) {
+  } else if (usuarioFinalStore.hasTda) {
     base = reserva.value.tarifa.datos.precioTDA
     otroCaso.value = false
   }
@@ -281,7 +305,8 @@ const total = computed(() => {
 const continuarPago = async () => {
   const complementos = {
     fecha: reserva.value.seleccion.fecha,
-    horas: horasSeleccionadas.value
+    horas: horasSeleccionadas.value,
+    calle: reserva.value.seleccion.calle
   }
 
   try {
@@ -292,7 +317,7 @@ const continuarPago = async () => {
       name: 'pasarela-pago',
       params: { tipo: "alquiler_instalacion", id: idPago }
     })
-  } catch(e: any) {
+  } catch (e: any) {
     mensaje.value = e.response?.data?.respuesta
     console.error("Error al reservar:", e);
   }
@@ -321,13 +346,20 @@ watch(
   }
 );
 
+watch(
+  () => reserva.value.seleccion.calle,
+  () => {
+    horasSeleccionadas.value = []
+  }
+);
+
 onMounted(async () => {
   const id = parseInt(props.id);
   try {
     const data = await getTarifaDescuentoInstalacion(id, reserva.value.seleccion.fecha)
     reserva.value.tarifa = data.tarifa
     reserva.value.descuento = data.descuento
-  } catch(e: any) {
+  } catch (e: any) {
     mensaje.value = e.response?.data?.respuesta
     console.error("Error al actualizar la fecha:", e);
   }

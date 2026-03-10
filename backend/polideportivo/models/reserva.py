@@ -7,7 +7,7 @@ from .constantes import EstadoReserva
 from .descuento import Descuento
 from .lista_espera import ListaEspera, EntradaListaEspera
 from .notificacion import Notificacion
-from .constantes import FormaReserva
+from .constantes import FormaReserva, TipoInstalacion
 
 
 class Reserva(models.Model):
@@ -143,17 +143,25 @@ class ReservaActividad(Reserva):
 
 class Alquiler(Reserva):
     """Modelo para representar un alquiler en una instalacion"""
-
     fecha = models.DateField(default=timezone.now)
     horaInicio = models.TimeField()
     horaFin = models.TimeField()
     numeroHoras = models.FloatField(default=0.0)
 
     instalacion = models.ForeignKey('Instalacion', on_delete=models.CASCADE)
+    calle = models.ForeignKey('Calle', on_delete=models.SET_NULL, null=True, blank=True)
+    
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["instalacion", "fecha", "horaInicio", "calle"],
+                name="unique_reserva_instalacion_calle"
+            )
+        ]
 
     def __str__(self):
         return f'Alquiler de {self.instalacion}, en {self.fecha} de {self.horaInicio} a {self.horaFin}'
-    
+
     def calcular_precio(self):
         """Calcula el precio final de la reserva usando la instalacion"""
         return self.instalacion._calcular_precio_base(usuario=self.usuarioFinal)
@@ -171,16 +179,27 @@ class Alquiler(Reserva):
         return cls.objects.count()
     
     @classmethod
-    def nuevaReserva(cls, usuario, instalacion, fecha, horaInicio, horaFin):
+    def nuevaReserva(cls, usuario, instalacion, fecha, horaInicio, horaFin, calle=None):
         with transaction.atomic():
             instalacion.refresh_from_db()
 
             descuentos = Descuento.obtener_descuentos(instalacion=instalacion)
             
-            if cls.objects.filter(fecha=fecha, horaInicio=horaInicio, estado=EstadoReserva.CONFIRMADA).exists() or cls.objects.filter(fecha=fecha, horaFin=horaFin, estado=EstadoReserva.CONFIRMADA).exists():
+            conflictos = cls.objects.filter(
+                instalacion=instalacion,
+                fecha=fecha,
+                estado=EstadoReserva.CONFIRMADA,
+                horaInicio__lt=horaFin,
+                horaFin__gt=horaInicio
+            )
+
+            if instalacion.tipoInstalacion == TipoInstalacion.PISCINA:
+                conflictos = conflictos.filter(calle=calle)
+
+            if conflictos.exists():
                 return None
 
-            if not instalacion.controlarAlquiler(fecha, horaInicio, horaFin):
+            if not instalacion.controlarAlquiler(fecha, horaInicio, horaFin, calle):
                 return None
 
             reservasPrevias = cls.objects.filter(usuarioFinal=usuario, instalacion=instalacion, estado=EstadoReserva.PENDIENTE)
@@ -191,6 +210,7 @@ class Alquiler(Reserva):
             reserva = cls.objects.create(
                 usuarioFinal=usuario,
                 instalacion=instalacion,
+                calle=calle,
                 fecha=fecha,
                 horaInicio=horaInicio,
                 horaFin=horaFin,

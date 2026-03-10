@@ -125,12 +125,23 @@ class Notificacion(models.Model):
 
         for usuario in usuarios:
             cls.objects.create(
-                titulo=configuracion.texto_cambios_cancelaciones,
+                titulo=configuracion.titulo_cambios_cancelaciones,
                 descripcion=configuracion.texto_cambios_cancelaciones,
                 usuario=usuario.user
             )
-
+    
+    @classmethod
+    def notificarAusencias(cls, usuario, actividad):
+        configuracion = Configuracion.objects.all().first()
         
+        cls.objects.create(
+            titulo=configuracion.titulo_ausencias,
+            descripcion=configuracion.texto_ausencias,
+            usuario=usuario.user,
+            actividad=actividad
+        )
+
+
     @classmethod
     def notificarSalidaListaDeEspera(cls, usuario, actividad):
         configuracion = Configuracion.objects.all().first()

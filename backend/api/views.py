@@ -39,7 +39,7 @@ from .serializers import (
     FisioterapiaSerializer, TarifaInstalacionSimpleSerializer, TarifaTDASimpleSerializer,
     ActividadComunSimpleSerializer, GrupoReducidoSimpleSerializer, FisioterapiaSimpleSerializer,
     CanalSerializer, CanalAdministradorSerializer, ReservaActividadSimpleSerializer,
-    AlquilerSimpleSerializer, FeedbackSerializer
+    AlquilerSimpleSerializer, FeedbackSerializer, CalleSerializer
 )
 
 from polideportivo.models import (
@@ -50,7 +50,7 @@ from polideportivo.models import (
     ReservaActividad, Alquiler, Administrador, User, CompraBono, CompraAbono,
     Mensaje, Sesion, MapaReservas, TipoActividad, TipoInstalacion, FormaReserva,
     Terreno, Estado, Dia, ActividadComun, GrupoReducido, Fisioterapia, EstadoPago,
-    EstadoReserva, Periodo, Feedback
+    EstadoReserva, Periodo, Feedback, Calle
 )
 
 
@@ -291,6 +291,12 @@ class HorarioViewSet(viewsets.ModelViewSet):
 # ----------------
 # Instalaciones
 # ----------------
+
+class CalleViewSet(viewsets.ModelViewSet):
+    queryset = Calle.objects.all()
+    serializer_class = CalleSerializer
+    permission_classes = [AllowAny]
+
 
 class InstalacionViewSet(viewsets.ModelViewSet):
     queryset = Instalacion.objects.all()
@@ -1093,6 +1099,7 @@ class NuevaInstalacionView(APIView):
 
         pabellon_id = instalacion_data.pop("pabellon", None)
         tarifa_id = instalacion_data.pop("tarifa", None)
+        numero_calles = instalacion_data.pop("numeroCalles", 0)
 
         if not pabellon_id or not tarifa_id:
             return Response(
@@ -1108,6 +1115,9 @@ class NuevaInstalacionView(APIView):
             pabellon=pabellon,
             tarifa=tarifa
         )
+        
+        if instalacion.tipoInstalacion == TipoInstalacion.PISCINA:
+            instalacion.sincronizarCalles(numero_calles)
 
         agenda = request.data.get('agenda', [])
         fechasEspeciales = request.data.get('fechasEspeciales', [])
@@ -1161,7 +1171,8 @@ class EditarInstalacionView(APIView):
             instalacion_data = request.data.get("instalacion", {})
 
             pabellon_id = instalacion_data.pop("pabellon", None)            
-            tarifa_id = instalacion_data.pop("tarifa", None)            
+            tarifa_id = instalacion_data.pop("tarifa", None)
+            numero_calles = instalacion_data.pop("numeroCalles", None)
 
             pabellon = get_object_or_404(Pabellon, id=pabellon_id)
             tarifa = get_object_or_404(TarifaInstalacion, id=tarifa_id)
@@ -1255,6 +1266,9 @@ class EditarInstalacionView(APIView):
                     agenda.delete()
 
             instalacion.modificarInformacion(instalacion_data, pabellon, tarifa)
+            if numero_calles is not None:
+                instalacion.sincronizarCalles(numero_calles)
+            
             return Response({"respuesta": "Exito al asignar la agenda a la instalacion"}, status=status.HTTP_200_OK)
 
         except Exception as e:
@@ -1284,8 +1298,16 @@ class NuevaActividadView(APIView):
             dia = sesion.get('dia')
             hora_inicio = sesion.get('horaInicio')
             hora_fin = sesion.get('horaFin')
+            calle_num = sesion.get('calle')
 
-            if not instalacion.controlarHorarioActividad(dia, hora_inicio, hora_fin):
+            calle = None
+            if instalacion.tipoInstalacion == TipoInstalacion.PISCINA:
+                calle = instalacion.calles.filter(numero=calle_num).first()
+
+                if not calle:
+                    return Response({"respuesta": "Calle no válida"}, status=status.HTTP_400_BAD_REQUEST)
+
+            if not instalacion.controlarHorarioActividad(dia, hora_inicio, hora_fin, calle=calle):
                 return Response(
                     {"respuesta": "Una o más sesiones no se pueden realizar en esta instalación"},
                     status=status.HTTP_400_BAD_REQUEST
@@ -1306,7 +1328,8 @@ class NuevaActividadView(APIView):
             actividad.nuevaSesion(
                 sesion.get('dia'),
                 sesion.get('horaInicio'),
-                sesion.get('horaFin')
+                sesion.get('horaFin'),
+                calle
             )
 
         # Deporte
@@ -1354,13 +1377,13 @@ class EditarActividadView(APIView):
                 hora_inicio = sesion_data.get('horaInicio')
                 hora_fin = sesion_data.get('horaFin')
                 sesion_id = sesion_data.get('id')
+                calle_num = sesion_data.get('calle')
+                
+                calle = None
+                if instalacion.tipoInstalacion == TipoInstalacion.PISCINA:
+                    calle = instalacion.calles.filter(numero=calle_num).first()
 
-                respuesta = instalacion.controlarHorarioActividad(
-                    dia,
-                    hora_inicio,
-                    hora_fin,
-                    sesion_id
-                )
+                respuesta = instalacion.controlarHorarioActividad(dia, hora_inicio, hora_fin, sesion_id, calle)
 
                 if not respuesta:
                     return Response(
@@ -1379,6 +1402,7 @@ class EditarActividadView(APIView):
                         sesion_existente.dia = dia
                         sesion_existente.horaInicio = hora_inicio
                         sesion_existente.horaFin = hora_fin
+                        sesion_existente.calle = calle
                         sesion_existente.save()
 
                         ids_recibidos.append(sesion_existente.id)
@@ -1474,8 +1498,24 @@ class TarifaInstalacionView(APIView):
             dia = Agenda.objects.filter(dia__iexact=dia_modelo).first()
 
         if dia:
-            reservas_serializer = MapaReservasSerializer(dia.mapa_reservas.all(), many=True)
-            reservas = reservas_serializer.data
+            if instalacion.tipoInstalacion == TipoInstalacion.PISCINA:
+                calles = []
+
+                for calle in instalacion.calles.all():
+                    mapas = dia.mapa_reservas.filter(calle=calle)
+                    reservas_serializer = MapaReservasSerializer(mapas, many=True)
+
+                    calles.append({"numero": calle.numero, "reservas": reservas_serializer.data})
+
+            else:
+                reservas_serializer = MapaReservasSerializer(
+                    dia.mapa_reservas.filter(calle__isnull=True),
+                    many=True
+                )
+
+                calles = None
+                reservas = reservas_serializer.data
+            
             alquileres_serializer = AlquilerSimpleSerializer(Alquiler.objects.filter(fecha=fecha), many=True)
             alquileres = alquileres_serializer.data
             horaApertura = dia.horaApertura
@@ -1483,6 +1523,7 @@ class TarifaInstalacionView(APIView):
             abierto = dia.abierto
         else:
             reservas = []
+            calles = []
             alquileres = []
             horaApertura = ""
             horaCierre = ""
@@ -1496,8 +1537,10 @@ class TarifaInstalacionView(APIView):
                 "horaCierre": horaCierre,
                 "abierto": abierto,
                 "datos": precios,
-                "reservas": reservas,
-                "alquileres": alquileres
+                "reservas": reservas if instalacion.tipoInstalacion != TipoInstalacion.PISCINA else [],
+                "calles": calles if instalacion.tipoInstalacion == TipoInstalacion.PISCINA else [],
+                "alquileres": alquileres,
+                "numeroCalles": instalacion.numeroCalles
             },
             "descuento": {
                 "porcentaje_total": 0,
@@ -1638,6 +1681,16 @@ class ReservaInstalacionView(APIView):
         fecha_str = complementos.get("fecha")
         fecha = datetime.strptime(fecha_str, "%Y-%m-%d").date()
         horas = complementos.get("horas")
+        calle = complementos.get("calle")
+
+        calle_obj = None
+        if instalacion.tipoInstalacion == TipoInstalacion.PISCINA:
+            if not calle:
+                return Response({"respuesta": "Debe seleccionar una calle"}, status=status.HTTP_400_BAD_REQUEST)
+
+            calle_obj = instalacion.calles.filter(numero=calle).first()
+            if not calle_obj:
+                return Response({"respuesta": "Calle inválida"}, status=status.HTTP_400_BAD_REQUEST)
 
         if not horas or len(horas) == 0:
             return Response({"respuesta": "Debe seleccionar horas"}, status=status.HTTP_400_BAD_REQUEST)
@@ -1664,7 +1717,7 @@ class ReservaInstalacionView(APIView):
         if fecha == timezone.localdate() and hora_inicio <= timezone.localtime().time():
             return Response({"respuesta": "No se puede reservar en horas anteriores a la actual"}, status=status.HTTP_400_BAD_REQUEST)
 
-        res = Alquiler.nuevaReserva(request.user.usuario_final, instalacion, fecha, hora_inicio, hora_fin)
+        res = Alquiler.nuevaReserva(request.user.usuario_final, instalacion, fecha, hora_inicio, hora_fin, calle_obj)
         if not res:
             return Response({"respuesta": "Error al alquilar, la instalacion esta ocupada"}, status=status.HTTP_400_BAD_REQUEST)
 

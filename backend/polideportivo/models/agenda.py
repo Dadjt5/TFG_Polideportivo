@@ -4,7 +4,7 @@ from datetime import time
 from datetime import datetime, timedelta
 from django.core.exceptions import ValidationError
 
-from .constantes import TipoReserva, Dia
+from .constantes import TipoReserva, Dia, TipoInstalacion
 
 
 class Agenda(models.Model):
@@ -27,7 +27,7 @@ class Agenda(models.Model):
             return f'Agenda para {self.dia} de {self.instalacion.nombre}'
         return f'Agenda para {self.fecha} de {self.instalacion.nombre}'
     
-    def estaOcupado(self, horaInicio, horaFin, minutos=60):
+    def estaOcupado(self, horaInicio, horaFin, calle=None, minutos=60):
         if not self.abierto:
             return True
 
@@ -36,8 +36,17 @@ class Agenda(models.Model):
 
         while inicio < fin:
             siguiente = inicio + timedelta(minutes=minutos)
-            
-            mapa = self.mapa_reservas.select_for_update().filter(horaInicio=inicio.time(), horaFin=siguiente.time()).first()
+
+            query = self.mapa_reservas.select_for_update().filter(
+                horaInicio=inicio.time(),
+                horaFin=siguiente.time()
+            )
+
+            if calle:
+                query = query.filter(calle=calle)
+
+            mapa = query.first()
+
             if not mapa or mapa.estado != TipoReserva.LIBRE:
                 return True
 
@@ -49,19 +58,40 @@ class Agenda(models.Model):
         if not self.abierto:
             return
 
-        inicio = datetime.combine(datetime.today(), self.horaApertura)
+        inicio_base = datetime.combine(datetime.today(), self.horaApertura)
         fin = datetime.combine(datetime.today(), self.horaCierre)
 
-        while inicio < fin:
-            siguiente = inicio + timedelta(minutes=minutos)
+        instalacion = self.instalacion
+        if instalacion.tipoInstalacion != TipoInstalacion.PISCINA:
+            inicio = inicio_base
 
-            mapa, created = MapaReservas.objects.get_or_create(
-                agenda=self,
-                horaInicio=inicio.time(),
-                horaFin=siguiente.time(),
-            )
+            while inicio < fin:
+                siguiente = inicio + timedelta(minutes=minutos)
 
-            inicio = siguiente
+                MapaReservas.objects.get_or_create(
+                    agenda=self,
+                    calle=None,
+                    horaInicio=inicio.time(),
+                    horaFin=siguiente.time(),
+                )
+
+                inicio = siguiente
+
+        else:
+            for calle in instalacion.calles.all():
+                inicio = inicio_base
+
+                while inicio < fin:
+                    siguiente = inicio + timedelta(minutes=minutos)
+
+                    MapaReservas.objects.get_or_create(
+                        agenda=self,
+                        calle=calle,
+                        horaInicio=inicio.time(),
+                        horaFin=siguiente.time(),
+                    )
+
+                    inicio = siguiente
 
 
 class MapaReservas(models.Model):
@@ -72,6 +102,7 @@ class MapaReservas(models.Model):
     estado = models.CharField(max_length=40, default=TipoReserva.LIBRE, choices=TipoReserva.choices)
 
     agenda = models.ForeignKey(Agenda, on_delete=models.CASCADE, related_name="mapa_reservas")
+    calle = models.ForeignKey('Calle', on_delete=models.CASCADE, null=True, blank=True, related_name="mapas")
 
     class Meta:
         ordering = ['horaInicio']
