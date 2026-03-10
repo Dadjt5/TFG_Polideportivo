@@ -101,6 +101,7 @@ AUTHENTICATION_BACKENDS = [
 CORS_ORIGIN_WHITELIST = os.getenv('CORS_ORIGIN_WHITELIST', '').split(',')
 CORS_ALLOW_CREDENTIALS = True
 
+
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Polideportivo API',
     'DESCRIPTION': 'API para el Polideportivo',
@@ -190,6 +191,8 @@ AUTH_USER_MODEL = 'polideportivo.User'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 STATIC_URL = 'static/'
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
 
 LOGIN_REDIRECT_URL = '/'
 

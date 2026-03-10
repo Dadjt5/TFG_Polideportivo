@@ -1,13 +1,13 @@
 <template>
   <div class="min-vh-100" style="background: linear-gradient(135deg, #e0f7ff, #ffffff);">
     <div class="container py-5" style="max-width: 1120px">
-       <h1 class="text-center fw-bold mb-5 text-primary">
+      <h1 class="text-center fw-bold mb-5 text-primary">
         {{ t.newUserNoQues }}
       </h1>
-      
+
 
       <div class="card shadow-lg border-0 rounded-4 p-4"
-           style="background-color: rgba(180,220,255,0.6); backdrop-filter: blur(10px);">
+        style="background-color: rgba(180,220,255,0.6); backdrop-filter: blur(10px);">
         <div class="card-body p-4 p-md-5">
 
           <!-- DATOS PERSONALES -->
@@ -103,7 +103,7 @@
                   class="position-absolute end-0 me-3 border-0 bg-transparent d-flex align-items-center justify-content-center"
                   style="height: 100%; top: 0;" @click="togglePassword">
                   <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"
-                   style="font-size: 1.2rem; color: #0072ff;"></i>
+                    style="font-size: 1.2rem; color: #0072ff;"></i>
                 </button>
               </div>
             </div>
@@ -118,7 +118,7 @@
                   class="position-absolute end-0 me-3 border-0 bg-transparent d-flex align-items-center justify-content-center"
                   style="height: 100%; top: 0;" @click="toggleConfirmPassword">
                   <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"
-                   style="font-size: 1.2rem; color: #0072ff;"></i>
+                    style="font-size: 1.2rem; color: #0072ff;"></i>
                 </button>
               </div>
             </div>
@@ -130,16 +130,16 @@
           </p>
 
           <!-- Mensaje del identificador único -->
-        <div v-if="showIdentifier" class="text-center mt-4">
-          <p class="fw-bold text-primary mb-2 fs-4">
-            ¡{{ t.usuarioFinalIdentifier }}: <span class="text-success">{{ userIdentifier }}</span>!
-          </p>
+          <div v-if="showIdentifier" class="text-center mt-4">
+            <p class="fw-bold text-primary mb-2 fs-4">
+              ¡{{ t.usuarioFinalIdentifier }}: <span class="text-success">{{ userIdentifier }}</span>!
+            </p>
 
-          <!-- Botón para continuar -->
-          <button class="btn btn-outline-secondary btn-lg px-5" @click="gestionUsuarios">
-            {{ t.continue }}
-          </button>
-        </div>
+            <!-- Botón para continuar -->
+            <button class="btn btn-outline-secondary btn-lg px-5" @click="gestionUsuarios">
+              {{ t.continue }}
+            </button>
+          </div>
 
           <!-- BOTONES -->
           <div v-else class="d-flex justify-content-center gap-4 mt-4">
@@ -190,8 +190,6 @@ const usuarioFinal = ref({
   municipio: '',
   localidad: '',
   codigoPostal: '',
-  pagoFraccionado: false,
-  cuentaBancaria: '',
   password: '',
   confirmPassword: '',
 });
@@ -208,8 +206,6 @@ const errores = ref({
   municipio: false,
   localidad: false,
   codigoPostal: false,
-  pagoFraccionado: false,
-  cuentaBancaria: false,
   password: false,
   confirmPassword: false,
 });
@@ -253,9 +249,6 @@ function validarFormulario() {
   errores.value.email =
     usuarioFinal.value.email === '' ||
     !emailRegex.test(usuarioFinal.value.email)
-  errores.value.cuentaBancaria =
-    usuarioFinal.value.cuentaBancaria !== '' &&
-    usuarioFinal.value.cuentaBancaria.length < 20
   errores.value.password = usuarioFinal.value.password === ''
   errores.value.confirmPassword = usuarioFinal.value.password !== usuarioFinal.value.confirmPassword
 

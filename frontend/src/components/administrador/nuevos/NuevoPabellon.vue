@@ -6,53 +6,40 @@
       </h1>
 
       <div class="card shadow-lg border-0 rounded-4 p-4"
-           style="background-color: rgba(180,220,255,0.6); backdrop-filter: blur(10px);">
+        style="background-color: rgba(180,220,255,0.6); backdrop-filter: blur(10px);">
 
         <div class="row g-4">
 
           <!-- NOMBRE -->
           <div class="col-md-6">
             <label class="form-label fw-semibold">{{ t.name }}</label>
-            <input
-              type="text"
-              class="form-control form-control-lg"
-              :class="{ 'is-invalid': errores.nombre }"
-              v-model="pabellon.nombre"
-            />
+            <input type="text" class="form-control form-control-lg" :class="{ 'is-invalid': errores.nombre }"
+              v-model="pabellon.nombre" />
           </div>
 
           <!-- DIRECCIÓN -->
           <div class="col-md-6">
             <label class="form-label fw-semibold">{{ t.address }}</label>
-            <input
-              type="text"
-              class="form-control form-control-lg"
-              :class="{ 'is-invalid': errores.direccion }"
-              v-model="pabellon.direccion"
-            />
+            <input type="text" class="form-control form-control-lg" :class="{ 'is-invalid': errores.direccion }"
+              v-model="pabellon.direccion" />
           </div>
 
           <!-- IMAGEN -->
           <div class="col-md-12">
             <label class="form-label fw-semibold">{{ t.images }}</label>
-            <input
-              type="text"
-              class="form-control form-control-lg"
-              :class="{ 'is-invalid': errores.imagenURL }"
-              v-model="pabellon.imagenURL"
-              placeholder="https://..."
-            />
+
+            <input type="file" class="form-control form-control-lg"
+              accept="image/*" @change="onFileChange" />
+
+            <!-- preview -->
+            <img v-if="preview" :src="preview" class="mt-3 rounded" style="max-width:250px" />
           </div>
 
           <!-- DESCRIPCIÓN -->
           <div class="col-md-12">
             <label class="form-label fw-semibold">{{ t.description }}</label>
-            <textarea
-              class="form-control form-control-lg"
-              rows="4"
-              :class="{ 'is-invalid': errores.descripcion }"
-              v-model="pabellon.descripcion"
-            ></textarea>
+            <textarea class="form-control form-control-lg" rows="4" :class="{ 'is-invalid': errores.descripcion }"
+              v-model="pabellon.descripcion"></textarea>
           </div>
         </div>
 
@@ -62,17 +49,11 @@
 
         <!-- BOTONES -->
         <div class="d-flex justify-content-center gap-3 mt-5">
-          <button
-            class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm"
-            @click="crearPabellon"
-          >
+          <button class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm" @click="crearPabellon">
             {{ t.newPavilion }}
           </button>
 
-          <button
-            class="btn btn-outline-secondary btn-lg px-5 rounded-pill shadow-sm"
-            @click="volver"
-          >
+          <button class="btn btn-outline-secondary btn-lg px-5 rounded-pill shadow-sm" @click="volver">
             {{ t.return }}
           </button>
         </div>
@@ -99,25 +80,24 @@ const router = useRouter()
 const pabellon = ref({
   nombre: "",
   descripcion: "",
-  imagenURL: "",
   direccion: ""
 })
 
 const errores = ref({
   nombre: false,
   descripcion: false,
-  imagenURL: false,
   direccion: false
 })
 
 const mensaje = ref("")
+const imagen = ref<File | null>(null)
+const preview = ref<string | null>(null)
 
 function validarFormulario() {
   let valido = true
 
   errores.value.nombre = pabellon.value.nombre === ""
   errores.value.descripcion = pabellon.value.descripcion === ""
-  errores.value.imagenURL = pabellon.value.imagenURL === ""
   errores.value.direccion = pabellon.value.direccion === ""
 
   for (const key in errores.value) {
@@ -131,11 +111,29 @@ function validarFormulario() {
 
 const volver = () => router.back();
 
+function onFileChange(e: Event) {
+  const input = e.target as HTMLInputElement
+  if (!input.files || input.files.length === 0) return
+
+  imagen.value = input.files[0]
+  preview.value = URL.createObjectURL(imagen.value)
+}
+
 const crearPabellon = async () => {
   if (!validarFormulario()) return
 
+  const formData = new FormData()
+
+  formData.append("nombre", pabellon.value.nombre)
+  formData.append("descripcion", pabellon.value.descripcion)
+  formData.append("direccion", pabellon.value.direccion)
+
+  if (imagen.value) {
+    formData.append("imagenURL", imagen.value)
+  }
+
   try {
-    await nuevoPabellon(pabellon.value);
+    await nuevoPabellon(formData)
     router.back();
   } catch (e) {
     console.log("Error al crear el pabellon", e);

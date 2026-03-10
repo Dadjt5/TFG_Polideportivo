@@ -71,19 +71,15 @@
 
         <!-- IMÁGENES -->
         <div class="col-lg-6 d-flex flex-column gap-4">
-          <div class="rounded-3 shadow-sm p-4 card-hover"
-               v-if="instalacion.imagenURL"
-               style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(8px);">
+          <div class="card shadow-lg rounded-4 p-4"
+            style="background-color: rgba(255,255,255,0.75); backdrop-filter: blur(10px);">
+
             <h4 class="mb-3 d-flex align-items-center gap-2">
               <i class="bi bi-images text-primary"></i>
               {{ t.images }}
             </h4>
 
-            <div class="row g-2">
-              <div class="col-6" v-for="(img, i) in instalacion.imagenURL" :key="i">
-                <img :src="img" class="img-fluid rounded shadow-sm img-hover" alt="Instalacion" />
-              </div>
-            </div>
+            <img :src="instalacion.imagenURL" class="img-fluid rounded mb-3 img-hover" />
           </div>
         </div>
       </div>
@@ -126,7 +122,7 @@ const usuarioFinalStore = useUserStore();
 const instalacion = ref({
   id: 0,
   nombre: "",
-  imagenURL: [] as string[],
+  imagenURL: "",
   aforoMaximo: 50,
   luz: false,
   porcentajeTDA: 0,

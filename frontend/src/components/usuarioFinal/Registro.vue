@@ -116,16 +116,6 @@
               </button>
             </div>
           </div>
-
-          <h4 class="mt-4 mb-3 text-primary">{{ t.payment }}</h4>
-          <div class="form-check mb-2">
-            <input type="checkbox" class="form-check-input" id="pagoFraccionado" v-model="formData.pagoFraccionado">
-            <label class="form-check-label text-primary" for="pagoFraccionado">{{ t.account }}</label>
-          </div>
-          <div v-if="formData.pagoFraccionado">
-            <input type="text" class="form-control" :class="{ 'is-invalid': errores.cuentaBancaria }"
-              :placeholder=t.account v-model="formData.cuentaBancaria">
-          </div>
         </div>
 
         <!-- Botones -->
@@ -194,8 +184,6 @@ const formData = reactive({
   codigoPostal: '',
   password: '',
   confirmPassword: '',
-  pagoFraccionado: false,
-  cuentaBancaria: '',
 })
 
 const errores = ref({
@@ -212,8 +200,6 @@ const errores = ref({
   codigoPostal: false,
   password: false,
   confirmPassword: false,
-  pagoFraccionado: false,
-  cuentaBancaria: false,
 });
 
 const step = ref(1)
@@ -345,13 +331,6 @@ const handleFinish = async () => {
     continuar.value = false
   } else {
     errores.value.confirmPassword = false
-  }
-
-  if (formData.cuentaBancaria == '' || formData.pagoFraccionado) {
-    errores.value.cuentaBancaria = true
-    continuar.value = false
-  } else {
-    errores.value.cuentaBancaria = false
   }
 
   try {

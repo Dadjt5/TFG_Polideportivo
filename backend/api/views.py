@@ -1,5 +1,6 @@
 from rest_framework import viewsets
 from rest_framework.views import APIView
+import json
 from rest_framework.response import Response
 import re
 from rest_framework.permissions import (
@@ -65,11 +66,11 @@ class FeedbackViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action == "list":
-            return [IsSuperUser]
+            return [IsSuperUser()]
         elif self.action == "create":
-            return [IsAuthenticated]
+            return []
         else:
-            return [IsSuperUser]
+            return [IsSuperUser()]
 
     def get_queryset(self):
         if self.request.user.is_superuser:
@@ -1095,7 +1096,9 @@ class NuevaInstalacionView(APIView):
     @transaction.atomic
     def post(self, request):
 
-        instalacion_data = request.data.get("instalacion", {})
+        instalacion_json = request.POST.get("instalacion", "{}")
+        instalacion_data = json.loads(instalacion_json)
+        imagen = request.FILES.get("imagenURL")
 
         pabellon_id = instalacion_data.pop("pabellon", None)
         tarifa_id = instalacion_data.pop("tarifa", None)
@@ -1113,20 +1116,25 @@ class NuevaInstalacionView(APIView):
         instalacion = Instalacion.objects.create(
             **instalacion_data,
             pabellon=pabellon,
-            tarifa=tarifa
+            tarifa=tarifa,
+            imagenURL=imagen
         )
         
         if instalacion.tipoInstalacion == TipoInstalacion.PISCINA:
             instalacion.sincronizarCalles(numero_calles)
 
-        agenda = request.data.get('agenda', [])
-        fechasEspeciales = request.data.get('fechasEspeciales', [])
+        agenda_json = request.POST.get("agenda", "[]")
+        fechasEspeciales_json = request.POST.get("fechasEspeciales", "[]")
+
+        agenda = json.loads(agenda_json)
+        fechasEspeciales = json.loads(fechasEspeciales_json)
 
         for fecha in agenda:
             res = instalacion.controlarCambioHorario(
                 fecha["dia"],
                 fecha.get("apertura"),
-                fecha.get("cierre")
+                fecha.get("cierre"),
+                fecha.get("abierto", True)
             )
 
             if not res:
@@ -1168,7 +1176,9 @@ class EditarInstalacionView(APIView):
             instalacion = get_object_or_404(Instalacion, id=instalacion_id)
 
             # Datos de la instalacion
-            instalacion_data = request.data.get("instalacion", {})
+            instalacion_json = request.POST.get("instalacion", "{}")
+            instalacion_data = json.loads(instalacion_json)
+            imagen = request.FILES.get("imagenURL")
 
             pabellon_id = instalacion_data.pop("pabellon", None)            
             tarifa_id = instalacion_data.pop("tarifa", None)
@@ -1178,8 +1188,11 @@ class EditarInstalacionView(APIView):
             tarifa = get_object_or_404(TarifaInstalacion, id=tarifa_id)
 
             # Manejar la agenda y fechas especiales
-            agenda = request.data.get('agendas', [])
-            fechasEspeciales = request.data.get('fechasEspeciales', [])
+            agenda_json = request.POST.get("agenda", "[]")
+            fechasEspeciales_json = request.POST.get("fechasEspeciales", "[]")
+
+            agenda = json.loads(agenda_json)
+            fechasEspeciales = json.loads(fechasEspeciales_json)
 
             # AGENDA SEMANAL
             agendas_existentes = {
@@ -1265,7 +1278,7 @@ class EditarInstalacionView(APIView):
                 if fecha not in fechas_recibidas:
                     agenda.delete()
 
-            instalacion.modificarInformacion(instalacion_data, pabellon, tarifa)
+            instalacion.modificarInformacion(instalacion_data, pabellon, tarifa, imagen)
             if numero_calles is not None:
                 instalacion.sincronizarCalles(numero_calles)
             
@@ -1281,7 +1294,9 @@ class NuevaActividadView(APIView):
     @transaction.atomic
     def post(self, request):
 
-        actividad_data = request.data.get("actividad", {})
+        actividad_json = request.POST.get("actividad", "{}")
+        actividad_data = json.loads(actividad_json)
+        imagen = request.FILES.get("imagenURL")
 
         tarifa_id = actividad_data.pop("tarifa", None)
         instalacion_id = actividad_data.pop("instalacion", None)
@@ -1290,8 +1305,9 @@ class NuevaActividadView(APIView):
         tarifa = get_object_or_404(TarifaActividad, id=tarifa_id)
         instalacion = get_object_or_404(Instalacion, id=instalacion_id)
         monitor = get_object_or_404(Monitor, id=monitor_id)
-
-        sesiones = request.data.get("sesiones", [])
+        
+        sesiones_json = request.POST.get("sesiones", "[]")
+        sesiones = json.loads(sesiones_json)
 
         # Validar horarios primero
         for sesion in sesiones:
@@ -1318,7 +1334,8 @@ class NuevaActividadView(APIView):
             **actividad_data,
             tarifa=tarifa,
             instalacion=instalacion,
-            monitor=monitor
+            monitor=monitor,
+            imagenURL=imagen
         )
 
         ListaEspera.objects.create(actividad=actividad)
@@ -1333,7 +1350,9 @@ class NuevaActividadView(APIView):
             )
 
         # Deporte
-        nombre = request.data.get("deportes", "").strip()
+        nombre_json = request.POST.get("deportes", "[]")
+        nombre = json.loads(nombre_json).strip()
+
         titulo = nombre.lower().replace(" ", "_")
 
         deporte, _ = Deporte.objects.get_or_create(titulo=titulo)
@@ -1357,7 +1376,9 @@ class EditarActividadView(APIView):
         try:
             actividad = get_object_or_404(Actividad, id=actividad_id)
 
-            actividad_data = request.data.get("actividad", {})
+            actividad_json = request.POST.get("actividad", "{}")
+            actividad_data = json.loads(actividad_json)
+            imagen = request.FILES.get("imagenURL")
 
             tarifa_id = actividad_data.pop("tarifa", None)
             instalacion_id = actividad_data.pop("instalacion", None)
@@ -1367,7 +1388,8 @@ class EditarActividadView(APIView):
             instalacion = get_object_or_404(Instalacion, id=instalacion_id)
             monitor = get_object_or_404(Monitor, id=monitor_id)
             
-            sesiones_recibidas = request.data.get("sesiones", [])
+            sesiones_json = request.POST.get("sesiones", "[]")
+            sesiones_recibidas = json.loads(sesiones_json)
 
             sesiones_bd = actividad.sesiones.all()
             ids_recibidos = []
@@ -1412,7 +1434,9 @@ class EditarActividadView(APIView):
                     sesion.delete()
 
             # Nombre del deporte
-            nombre = request.data.get("deportes")
+            nombre_json = request.POST.get("deportes", "[]")
+            nombre = json.loads(nombre_json)
+
             nombre = nombre.strip()
             titulo = nombre.lower().replace(" ", "_")
 
@@ -1420,7 +1444,7 @@ class EditarActividadView(APIView):
             if actividad.deportes != deporte:
                 actividad.deportes = deporte
 
-            actividad.modificarInformacion(actividad_data, tarifa, instalacion, monitor)
+            actividad.modificarInformacion(actividad_data, tarifa, instalacion, monitor, imagen)
 
             return Response({"respuesta": "Deporte asignado correctamente"}, status=status.HTTP_200_OK)
 

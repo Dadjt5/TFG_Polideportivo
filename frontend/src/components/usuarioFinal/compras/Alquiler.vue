@@ -38,9 +38,7 @@
 
           <select class="form-select" v-model="reserva.seleccion.calle">
             <option v-for="calle in reserva.tarifa.calles" :key="calle.numero" :value="calle.numero">
-
               {{ t.poolStreet }} {{ calle.numero }}
-
             </option>
           </select>
         </div>
@@ -141,6 +139,17 @@ const configuracionStore = useConfiguracionStore();
 
 const otroCaso = ref(false)
 
+type ReservaMapa = {
+  horaInicio: string;
+  horaFin: string;
+  estado: 'LIBRE' | 'USUARIO' | 'ACTIVIDAD';
+};
+
+type CalleMapa = {
+  numero: number;
+  reservas: ReservaMapa[];
+};
+
 const reserva = ref({
   tarifa: {
     idInstalacion: 0,
@@ -162,8 +171,8 @@ const reserva = ref({
       horaInicio: string,
       nombre: string,
       numeroHoras: number
-    }[]
-    calles: [] as {}
+    }[],
+    calles: [] as CalleMapa[]
   },
   seleccion: {
     fecha: new Date().toISOString().slice(0, 10),
@@ -359,6 +368,7 @@ onMounted(async () => {
     const data = await getTarifaDescuentoInstalacion(id, reserva.value.seleccion.fecha)
     reserva.value.tarifa = data.tarifa
     reserva.value.descuento = data.descuento
+    reserva.value.tarifa.calles = data.calles;
   } catch (e: any) {
     mensaje.value = e.response?.data?.respuesta
     console.error("Error al actualizar la fecha:", e);

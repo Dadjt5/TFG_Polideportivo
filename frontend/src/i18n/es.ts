@@ -35,6 +35,8 @@ export default {
   wrongTimetable: "La hora de inicio no puede ser mas tarde que la de fin",
   cannotCancel: "La reserva de la actividad no se puede cancelar en este momento",
   timeRemaining: "Tiempo restante para completar el pago",
+  selectLane: "Debe seleccionar un canal",
+  cannotChangeType: "No se puede cambiar a ese tipo de instalación",
 
   /* Perfil */
   role: "Rol",

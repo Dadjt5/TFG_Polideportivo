@@ -35,6 +35,8 @@ export default {
   wrongTimetable: "The start hour cannot be later than the end hour",
   cannotCancel: "The activity reservation cannot be canceled yet",
   timeRemaining: "Time remaining to complete payment",
+  selectLane: "You must select a pool lane",
+  cannotChangeType: "You cannot change to this facility type",
 
   /* Perfil */
   role: "Role",

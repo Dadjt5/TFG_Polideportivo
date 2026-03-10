@@ -7,8 +7,10 @@ export const getActividadDetalle = async (id: number) => {
 };
 
 /* Función para editar los campos indicados de una actividad */
-export const modificarActividad = async (id: number, actividad: any, sesiones: any, deportes: any): Promise<any> => {
-  const response = await api.post(`api/v1/actividades/${id}/editar/`, {"actividad": actividad, "sesiones": sesiones, "deportes": deportes})
+export const modificarActividad = async (id: number, payload: FormData): Promise<any> => {
+  const response = await api.post(`/api/v1/actividades/${id}/editar/`, payload, {
+    headers: { "Content-Type": "multipart/form-data" }
+  })
   return response.data
 }
 
@@ -36,9 +38,11 @@ export const getInstalacionDetalle = async (id: number) => {
   return response.data;
 };
 
-/* Función para editar los campos indicados de una instalacion */
-export const modificarInstalacion = async (id: number, instalacion: any, agendas: any, fechasEspeciales: any): Promise<any> => {
-  const response = await api.post(`api/v1/instalaciones/${id}/editar/`, {"instalacion": instalacion, "agendas": agendas, "fechasEspeciales": fechasEspeciales})
+/* Función para editar instalación usando FormData */
+export const modificarInstalacion = async (id: number, payload: FormData): Promise<any> => {
+  const response = await api.post(`/api/v1/instalaciones/${id}/editar/`, payload, {
+    headers: { "Content-Type": "multipart/form-data" }
+  })
   return response.data
 }
 
@@ -55,10 +59,12 @@ export const getPabellonDetalle = async (id: number) => {
 };
 
 /* Función para editar los campos indicados de un pabellón */
-export const modificarPabellon = async (id: number, data: any) => {
-  const response = await api.patch(`api/v1/pabellones/${id}/`, data);
-  return response.data;
-};
+export const modificarPabellon = async (id: number, payload: FormData): Promise<any> => {
+  const response = await api.patch(`/api/v1/pabellones/${id}/`, payload, {
+    headers: { "Content-Type": "multipart/form-data" }
+  })
+  return response.data
+}
 
 /* Función para eliminar un pabellón */
 export const eliminarPabellon = async (id: number) => {

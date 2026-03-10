@@ -17,7 +17,6 @@ class UsuarioFinal(Usuario):
     municipio = models.CharField(max_length=64, default="")
     localidad = models.CharField(max_length=64, default="")
     codigoPostal = models.CharField(max_length=64, default="")
-    cuentaBancaria = models.CharField(max_length=64, default="", blank=True)
     actividadesRealizadas = models.PositiveIntegerField(default=0)
     esUAM = models.BooleanField(default=False)
     tieneAbono = models.BooleanField(default=False)
@@ -28,7 +27,7 @@ class UsuarioFinal(Usuario):
 
     sexo = models.CharField(default=Sexo.NINGUNO, choices=Sexo.choices)
     rol = models.CharField(default=Rol.EXTERNO, choices=Rol.choices)
-    
+
     def save(self, *args, **kwargs):
         if self.rol == Rol.EXTERNO:
             self.esUAM = False
@@ -81,7 +80,7 @@ class UsuarioFinal(Usuario):
     @classmethod
     def registrar_usuario(cls, *, nombre, apellidos, sexo, fechaNacimiento,
                           dni, telefono, email, provincia, municipio,
-                          localidad, codigoPostal, password, cuentaBancaria=None):
+                          localidad, codigoPostal, password):
 
         from .foro import Canal
 
@@ -117,8 +116,7 @@ class UsuarioFinal(Usuario):
                 provincia=provincia,
                 municipio=municipio,
                 localidad=localidad,
-                codigoPostal=codigoPostal,
-                cuentaBancaria=cuentaBancaria
+                codigoPostal=codigoPostal
             )
 
             for canal in Canal.objects.all():

@@ -1,5 +1,5 @@
 <template>
- <div class="min-vh-100" style="background: linear-gradient(135deg, #fff4e0, #e0f7ff);">
+  <div class="min-vh-100" style="background: linear-gradient(135deg, #fff4e0, #e0f7ff);">
     <main class="container py-5" style="max-width: 1120px;">
       <h1 class="text-center fw-bold mb-5 text-primary">
         {{ t.newActivity }}
@@ -53,8 +53,12 @@
           <!-- IMAGEN -->
           <div class="col-md-12">
             <label class="form-label fw-semibold">{{ t.images }}</label>
-            <input type="text" class="form-control form-control-lg" v-model="actividad.imagenURL"
-              placeholder="https://@." />
+
+            <input type="file" class="form-control form-control-lg"
+              accept="image/*" @change="onFileChange" />
+
+            <!-- preview -->
+            <img v-if="preview" :src="preview" class="mt-3 rounded" style="max-width:250px" />
           </div>
 
           <!-- PLAZAS -->
@@ -180,6 +184,16 @@
             </select>
           </div>
 
+          <div class="col-md-4" v-if="callesDisponibles.length > 0">
+            <label class="form-label fw-semibold">{{ t.poolStreets }}</label>
+            <select class="form-select" v-model="calleSeleccionada">
+              <option value="" disabled>--</option>
+              <option v-for="c in callesDisponibles" :key="c.id" :value="c.numero">
+                {{t.poolStreet}} {{ c.numero }}
+              </option>
+            </select>
+          </div>
+
           <!-- HORARIO -->
           <div v-if="instalacionSeleccionada?.agenda?.length" class="card border-0 shadow-sm rounded-4 p-4 bg-light">
             <h5 class="fw-bold mb-3">
@@ -252,7 +266,7 @@
 
             <transition name="fade">
               <div v-if="tarifaSeleccionada" class="mt-4 p-4 bg-white rounded-4 shadow-sm border">
-                <h5 class="mb-3 text-primary">{{ t.priceSubscripcion }}</h5>
+                <h5 class="mb-3 text-primary">{{ t.tariff }}</h5>
 
                 <div v-if="actividad.tipoActividad === 'OTROS'" class="row g-3">
                   <div class="col-md-6">
@@ -446,7 +460,6 @@ const tab = ref(1)
 const actividad = ref({
   nombre: "",
   descripcion: "",
-  imagenURL: "",
   edadMinima: 18,
   plazasMaximas: 50,
   plazasReservadas: 0,
@@ -488,8 +501,12 @@ const monitores = ref<any[]>([])
 const tarifas = ref<any[]>([])
 const deportes = ref<any[]>([])
 
+const imagen = ref<File | null>(null)
+const preview = ref<string | null>(null)
 const deporteSeleccionado = ref("")
 const nuevoDeporteNombre = ref("")
+const callesDisponibles = ref<any[]>([])
+const calleSeleccionada = ref<number | null>(null)
 
 const sesiones = ref<any[]>([])
 const crearSesion = ref({
@@ -510,13 +527,30 @@ const instalacionSeleccionada = computed(() =>
   instalaciones.value.find(i => i.id === actividad.value.instalacion)
 )
 
+function onFileChange(e: Event) {
+  const input = e.target as HTMLInputElement
+  if (!input.files || input.files.length === 0) return
+
+  imagen.value = input.files[0]
+  preview.value = URL.createObjectURL(imagen.value)
+}
+
 function agregarSesion() {
   if (!crearSesion.value.dia ||
-    !crearSesion.value.horaInicio ||
-    !crearSesion.value.horaFin) return
+      !crearSesion.value.horaInicio ||
+      !crearSesion.value.horaFin ||
+      (callesDisponibles.value.length > 0 && !calleSeleccionada.value)) {
+    mensaje.value = t.value.selectLane
+    return
+  }
 
-  sesiones.value.push({ ...crearSesion.value })
+  sesiones.value.push({
+    ...crearSesion.value,
+    calle: calleSeleccionada.value || null
+  })
+
   crearSesion.value = { dia: "", horaInicio: "", horaFin: "" }
+  calleSeleccionada.value = null
 }
 
 function validarFormulario() {
@@ -556,19 +590,29 @@ const crearActividad = async () => {
     return
   }
 
-  if (sesiones.value.length == 0) {
+  if (sesiones.value.length === 0) {
     mensaje.value = t.value.noSessionWarning
     return
   }
 
-  try {
-    await nuevaActividad(
-      actividad.value,
-      sesiones.value,
-      deporteSeleccionado.value === "nuevo" ? nuevoDeporteNombre.value : deporteSeleccionado.value
-    )
+  const formData = new FormData()
 
-    router.push({ name: 'gestion-actividades' })
+  formData.append("actividad", JSON.stringify(actividad.value))
+  formData.append("sesiones", JSON.stringify(sesiones.value))
+
+  const deporteFinal =
+    deporteSeleccionado.value === "nuevo"
+      ? nuevoDeporteNombre.value
+      : deporteSeleccionado.value
+  formData.append("deportes", JSON.stringify(deporteFinal))
+
+  if (imagen.value) {
+    formData.append("imagenURL", imagen.value)
+  }
+
+  try {
+    await nuevaActividad(formData)
+    router.push({ name: "gestion-actividades" })
   } catch (e: any) {
     mensaje.value = e.response?.data?.respuesta
     console.log("Error al crear la actividad", e)
@@ -595,6 +639,17 @@ watch(
     }
   }
 )
+
+watch(instalacionSeleccionada, (nuevaInstalacion) => {
+  if (!nuevaInstalacion || !nuevaInstalacion.calles?.length) {
+    callesDisponibles.value = []
+    calleSeleccionada.value = null
+    return
+  }
+
+  callesDisponibles.value = nuevaInstalacion.calles
+  calleSeleccionada.value = null
+})
 
 onMounted(async () => {
   instalaciones.value = await getInstalacionesSimples()

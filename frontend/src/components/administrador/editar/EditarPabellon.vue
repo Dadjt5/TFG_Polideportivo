@@ -57,7 +57,7 @@
         <!-- IMAGEN -->
         <div class="col-lg-6">
           <div class="card shadow-lg rounded-4 p-4"
-            style="background-color: rgba(255,255,255,0.75); backdrop-filter: blur(10px);" v-if="pabellon.imagenURL">
+            style="background-color: rgba(255,255,255,0.75); backdrop-filter: blur(10px);">
 
             <h4 class="mb-3 d-flex align-items-center gap-2">
               <i class="bi bi-images text-primary"></i>
@@ -66,8 +66,8 @@
 
             <img :src="pabellon.imagenURL" class="img-fluid rounded mb-3 img-hover" />
 
-            <input v-if="editando" v-model="pabellon.imagenURL" class="form-control form-control-lg"
-              placeholder="URL imagen" />
+            <input v-if="editando" type="file" class="form-control form-control-lg" @change="onFileChange" />
+            <img v-if="preview" :src="preview" class="img-fluid rounded mb-3" />
           </div>
         </div>
 
@@ -115,6 +115,8 @@ const t = useI18n(language);
 const router = useRouter();
 
 const editando = ref(false)
+const imagen = ref<File | null>(null)
+const preview = ref<string | null>(null)
 
 const pabellon = ref({
   id: 0,
@@ -145,6 +147,8 @@ function activarEdicion() {
 
 function cancelarEdicion() {
   pabellon.value = JSON.parse(JSON.stringify(pabellonOriginal.value))
+  preview.value = null
+  imagen.value = null
   editando.value = false
 }
 
@@ -160,19 +164,34 @@ function camposModificados() {
   if (pabellonOriginal.value.direccion !== pabellon.value.direccion) {
     data.direccion = pabellon.value.direccion
   }
-  if (pabellonOriginal.value.imagenURL !== pabellon.value.imagenURL) {
-    data.imagenURL = pabellon.value.imagenURL
-  }
-
+ 
   return data
+}
+
+function onFileChange(e: Event) {
+  const input = e.target as HTMLInputElement
+  if (!input.files || input.files.length === 0) return
+  imagen.value = input.files[0]
+  preview.value = URL.createObjectURL(imagen.value)
 }
 
 const guardarCambios = async () => {
   if (!validarFormulario()) return
+
   const data = camposModificados()
-  if (Object.keys(data).length > 0) {
+  const formData = new FormData()
+
+  Object.entries(data).forEach(([key, value]) => {
+    formData.append(key, String(value))
+  })
+
+  if (imagen.value) {
+    formData.append("imagenURL", imagen.value)
+  }
+
+  if (formData.has("nombre") || formData.has("descripcion") || formData.has("direccion") || imagen.value) {
     try {
-      await modificarPabellon(pabellon.value.id, data)
+      await modificarPabellon(pabellon.value.id, formData)
       editando.value = false
     } catch (e) {
       console.error("Error al modificar el pabellon", e)

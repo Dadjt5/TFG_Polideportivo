@@ -81,7 +81,7 @@ class UsuarioFinalSerializer(serializers.ModelSerializer):
             "municipio",
             "localidad",
             "codigoPostal",
-            "cuentaBancaria",
+            "tarjeta",
             "actividadesRealizadas",
             "deportesFavoritos",
             "deportes_ids",
@@ -264,6 +264,11 @@ class HorarioSerializer(serializers.ModelSerializer):
 # Instalaciones
 # --------------------
 
+class CalleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Calle
+        fields = '__all__'
+
 class PabellonSimpleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Pabellon
@@ -278,16 +283,17 @@ class PabellonSerializer(serializers.ModelSerializer):
 
 class InstalacionSimpleSerializer(serializers.ModelSerializer):
     agenda = AgendaSerializer(many=True, read_only=True)
+    calles = CalleSerializer(many=True, read_only=True)
 
     class Meta:
         model = Instalacion
-        fields = ("id", "nombre", "agenda")
+        fields = ("id", "nombre", "agenda", "calles", "numeroCalles", "tipoInstalacion")
 
 
 class InstalacionSerializer(serializers.ModelSerializer):
     agenda = AgendaSerializer(many=True, read_only=True)
+    calles = CalleSerializer(many=True, read_only=True)
     pabellon = PabellonSimpleSerializer(read_only=True)
-    imagenURL = serializers.SerializerMethodField()
 
     class Meta:
         model = Instalacion
@@ -302,26 +308,9 @@ class InstalacionSerializer(serializers.ModelSerializer):
             "pabellon",
             "agenda",
             "tarifa",
-            "numeroCalles"
+            "numeroCalles",
+            "calles"
         )
-    
-    def get_imagenURL(self, obj):
-        if not obj.imagenURL:
-            return []
-
-        try:
-            data = json.loads(obj.imagenURL)
-            if isinstance(data, list):
-                return data
-        except Exception:
-            pass
-
-        return [obj.imagenURL]
-    
-class CalleSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Calle
-        fields = '__all__'
 
 # --------------------
 # Actividades
@@ -361,19 +350,18 @@ class ActividadSimpleSerializer(serializers.ModelSerializer):
 
 class ActividadSerializer(serializers.ModelSerializer):
     sesiones = SesionSerializer(many=True, read_only=True)
-    instalacion = InstalacionSimpleSerializer(read_only=True)
+
     horasSemanales = serializers.SerializerMethodField()
     dias = serializers.SerializerMethodField()
     nombreDeporte = serializers.SerializerMethodField()
     nombreMonitor = serializers.SerializerMethodField()
-    imagenURL = serializers.SerializerMethodField()
 
     class Meta:
         model = Actividad
-    
         fields = (
             "id",
             "nombre",
+            "descripcion",
             "tipoActividad",
             "imagenURL",
             "plazasMaximas",
@@ -395,33 +383,21 @@ class ActividadSerializer(serializers.ModelSerializer):
             "monitor",
             "sesiones",
             "nombreDeporte",
-            "nombreMonitor"
+            "nombreMonitor",
         )
 
     def get_horasSemanales(self, obj):
         return obj.calcularHorasSemanales()
-    
+
     def get_nombreDeporte(self, obj):
-        return obj.deportes.titulo
-    
+        return obj.deportes.titulo if obj.deportes else None
+
     def get_nombreMonitor(self, obj):
-        return obj.monitor.nombre
+        return obj.monitor.nombre if obj.monitor else None
 
     def get_dias(self, obj):
-        return ",".join(sesion.dia for sesion in obj.sesiones.all())
+        return [sesion.dia for sesion in obj.sesiones.all()]
 
-    def get_imagenURL(self, obj):
-        if not obj.imagenURL:
-            return []
-
-        try:
-            data = json.loads(obj.imagenURL)
-            if isinstance(data, list):
-                return data
-        except Exception:
-            pass
-
-        return [obj.imagenURL]
 
 class AsistenciaSerializer(serializers.ModelSerializer):
     nombreUsuario = serializers.SerializerMethodField()

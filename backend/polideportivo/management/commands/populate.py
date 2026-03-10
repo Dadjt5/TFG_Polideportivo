@@ -2,7 +2,7 @@ import os
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
 from django.db import transaction
-from polideportivo.models import Administrador, RolAdministrador, Configuracion, Foro
+from polideportivo.models import Administrador, RolAdministrador, Configuracion, Foro, Canal
 
 User = get_user_model()
 
@@ -85,3 +85,29 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS("Foro general creado"))
         else:
             self.stdout.write(self.style.WARNING("El foro ya existe"))
+            
+        # Canal de sugerencias
+        if not Canal.objects.filter(titulo="Buzón de sugerencias").exists():
+            Canal.objects.create(
+                titulo = "Buzón de sugerencias",
+                tema = "Buzón",
+                numeroParticipantes = 0,
+                secreto=True
+            )
+
+            self.stdout.write(self.style.SUCCESS("Buzón de sugerencias creado"))
+        else:
+            self.stdout.write(self.style.WARNING("El buzón de sugerencias ya existe"))
+            
+        # Buzón de nuevas actividades
+        if not Canal.objects.filter(titulo="Nuevas actividades").exists():
+            Canal.objects.create(
+                titulo = "Nuevas actividades",
+                tema = "Proponer nuevas actividades",
+                numeroParticipantes = 0,
+                secreto=True
+            )
+
+            self.stdout.write(self.style.SUCCESS("Canal para proponer nuevas actividades creado"))
+        else:
+            self.stdout.write(self.style.WARNING("El canal de nuevas actividades ya existe"))

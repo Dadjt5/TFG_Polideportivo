@@ -99,19 +99,15 @@
         <div class="col-lg-6 d-flex flex-column gap-4">
 
           <!-- IMÁGENES -->
-          <div class="rounded-3 shadow-sm p-4 card-hover"
-               v-if="actividad.imagenURL"
-               style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(8px);">
+          <div class="card shadow-lg rounded-4 p-4"
+            style="background-color: rgba(255,255,255,0.75); backdrop-filter: blur(10px);">
+
             <h4 class="mb-3 d-flex align-items-center gap-2">
               <i class="bi bi-images text-primary"></i>
               {{ t.images }}
             </h4>
 
-            <div class="row g-2">
-              <div class="col-6" v-for="(img, i) in actividad.imagenURL" :key="i">
-                <img :src="img" class="img-fluid rounded shadow-sm img-hover" alt="Actividad" />
-              </div>
-            </div>
+            <img :src="actividad.imagenURL" class="img-fluid rounded mb-3 img-hover" />
           </div>
 
           <!-- SESIONES -->
@@ -182,7 +178,7 @@ const actividad = ref({
   id: 0,
   nombre: "",
   tipoActividad: "",
-  imagenURL: [] as string[],
+  imagenURL: "",
   plazasMaximas: 0,
   plazasReservadas: 0,
   edadMinima: 0,

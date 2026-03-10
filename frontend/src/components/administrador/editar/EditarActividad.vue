@@ -7,9 +7,7 @@
         <button class="btn btn-secondary rounded-pill" @click="volver">
           ← {{ t.return }}
         </button>
-
         <h1 class="fw-semibold mb-0">{{ actividad.nombre }}</h1>
-
         <div style="width: 100px"></div>
       </div>
 
@@ -22,27 +20,29 @@
               {{ t.data }}
             </button>
           </li>
-
           <li class="nav-item">
             <button type="button" class="nav-link" :class="{ active: tab === 2 }" @click="tab = 2">
+              {{ t.images }}
+            </button>
+          </li>
+          <li class="nav-item">
+            <button type="button" class="nav-link" :class="{ active: tab === 3 }" @click="tab = 3">
               {{ t.facility }}
             </button>
           </li>
-
           <li class="nav-item">
-            <button type="button" class="nav-link" :class="{ active: tab === 3 }" @click="tab = 3">
+            <button type="button" class="nav-link" :class="{ active: tab === 4 }" @click="tab = 4">
               {{ t.monitorTariff }}
             </button>
           </li>
-
           <li class="nav-item">
-            <button type="button" class="nav-link" :class="{ active: tab === 4 }" @click="tab = 4">
+            <button type="button" class="nav-link" :class="{ active: tab === 5 }" @click="tab = 5">
               {{ t.sessions }}
             </button>
           </li>
         </ul>
 
-        <!-- TAB 1: DATOS -->
+        <!-- TAB 1: DATOS GENERALES -->
         <div v-if="tab === 1" class="row g-4">
           <div class="col-md-6">
             <label class="form-label fw-semibold">{{ t.name }}</label>
@@ -53,12 +53,6 @@
           <div class="col-md-12">
             <label class="form-label fw-semibold">{{ t.description }}</label>
             <textarea rows="3" class="form-control form-control-lg" v-model="actividad.descripcion"></textarea>
-          </div>
-
-          <div class="col-md-12">
-            <label class="form-label fw-semibold">{{ t.images }}</label>
-            <input type="text" class="form-control form-control-lg" v-model="actividad.imagenURL"
-              placeholder="https://@." />
           </div>
 
           <div class="col-md-4">
@@ -98,20 +92,15 @@
           <!-- DEPORTE -->
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.sport }}</label>
-
             <select class="form-select form-select-lg" v-model="actividad.nombreDeporte"
               :class="{ 'is-invalid': errores.deporte }">
               <option disabled value="">{{ t.selectOption }}</option>
-
-              <option v-for="d in deportes" :key="d.id" :value="d.id">
-                {{ d.titulo }}
-              </option>
-
+              <option v-for="d in deportes" :key="d.id" :value="d.id">{{ d.titulo }}</option>
               <option value="nuevo">+ {{ t.newSport }}</option>
             </select>
           </div>
 
-          <div v-if="actividad.nombreDeporte === 'nuevo'" class="mt-3">
+          <div v-if="actividad.nombreDeporte === 'nuevo'" class="mt-3 col-md-6">
             <input type="text" class="form-control form-control-lg" v-model="actividad.nombreDeporte"
               :placeholder=t.title />
           </div>
@@ -148,14 +137,41 @@
           </div>
         </div>
 
-        <!-- TAB 2: INSTALACION -->
-        <div v-if="tab === 2">
+        <!-- TAB 2: IMAGEN -->
+        <div v-if="tab === 2" class="d-flex justify-content-center">
+          <div class="card shadow rounded-4 p-3 text-center"
+            style="background-color: rgba(255,255,255,0.75); backdrop-filter: blur(8px); max-width: 500px; width: 100%;">
+
+            <h5 class="mb-3 d-flex justify-content-center align-items-center gap-2">
+              <i class="bi bi-images text-primary"></i> {{ t.images }}
+            </h5>
+
+            <img :src="actividad.imagenURL" class="img-fluid rounded mb-3 img-hover" v-if="actividad.imagenURL"
+              style="max-height: 300px; object-fit: cover;" />
+
+            <input v-if="editando" type="file" class="form-control form-control-lg mt-2" @change="onFileChange" />
+            <img v-if="preview" :src="preview" class="img-fluid rounded mt-3"
+              style="max-height: 300px; object-fit: cover;" />
+          </div>
+        </div>
+        <!-- TAB 3: INSTALACION -->
+        <div v-if="tab === 3">
           <div class="mb-4">
             <label class="form-label fw-semibold">{{ t.facility }}</label>
             <select class="form-select form-select-lg" v-model="actividad.instalacion"
               :class="{ 'is-invalid': errores.instalacion }">
               <option :value="null">--</option>
-              <option v-for="i in instalaciones" :key="i.id" :value="i.id">{{ i.nombre }}</option>
+              <option v-for="i in instalacionesFiltradas" :key="i.id" :value="i.id">{{ i.nombre }}</option>
+            </select>
+          </div>
+
+          <div class="col-md-4" v-if="callesDisponibles.length > 0">
+            <label class="form-label fw-semibold">{{ t.poolStreets }}</label>
+            <select class="form-select" v-model="calleSeleccionada">
+              <option value="" disabled>--</option>
+              <option v-for="c in callesDisponibles" :key="c.id" :value="c.numero">
+                {{ t.poolStreet }} {{ c.numero }}
+              </option>
             </select>
           </div>
 
@@ -191,8 +207,8 @@
           </div>
         </div>
 
-        <!-- TAB 3: MONITOR Y TARIFA -->
-        <div v-if="tab === 3">
+        <!-- TAB 4: MONITOR Y TARIFA -->
+        <div v-if="tab === 4">
           <div class="mb-4">
             <label class="form-label fw-semibold">{{ t.monitor }}</label>
             <select class="form-select form-select-lg" v-model="actividad.monitor"
@@ -216,7 +232,7 @@
 
             <transition name="fade">
               <div v-if="tarifaSeleccionada" class="mt-4 p-4 bg-white rounded-4 shadow-sm border">
-                <h5 class="mb-3 text-primary">{{ t.priceSubscripcion }}</h5>
+                <h5 class="mb-3 text-primary">{{ t.tariff }}</h5>
 
                 <div v-if="actividad.tipoActividad === 'OTROS'" class="row g-3">
                   <div class="col-md-6">
@@ -312,9 +328,8 @@
           </div>
         </div>
 
-        <!-- TAB 4: SESIONES -->
-        <div v-if="tab === 4">
-
+        <!-- TAB 5: SESIONES -->
+        <div v-if="tab === 5">
           <!-- CREAR SESIÓN -->
           <div v-if="editando" class="row g-3 align-items-end mb-4">
             <div class="col-md-4">
@@ -346,57 +361,38 @@
 
           <!-- LISTA SESIONES -->
           <div v-if="sesiones.length" class="bg-light rounded-4 p-3">
-
             <div v-for="(s, index) in sesiones" :key="s.id ?? index" class="row g-2 align-items-center mb-2">
-
-              <!-- DIA -->
               <div class="col-md-4">
                 <template v-if="editando">
                   <select class="form-select" v-model="s.dia">
-                    <option v-for="d in tiposStore.dias" :key="d[0]" :value="d[0]">
-                      {{ d[1] }}
-                    </option>
+                    <option v-for="d in tiposStore.dias" :key="d[0]" :value="d[0]">{{ d[1] }}</option>
                   </select>
                 </template>
-
                 <template v-else>
                   {{tiposStore.dias.find(d => d[0] === s.dia)?.[1]}}
                 </template>
               </div>
-
-              <!-- HORA INICIO -->
               <div class="col-md-3">
                 <template v-if="editando">
                   <input type="time" class="form-control" v-model="s.horaInicio">
                 </template>
-
                 <template v-else>
                   {{ s.horaInicio }}
                 </template>
               </div>
-
-              <!-- HORA FIN -->
               <div class="col-md-3">
                 <template v-if="editando">
                   <input type="time" class="form-control" v-model="s.horaFin">
                 </template>
-
                 <template v-else>
                   {{ s.horaFin }}
                 </template>
               </div>
-
-              <!-- BORRAR -->
               <div class="col-md-2 text-end">
-                <button v-if="editando" class="btn btn-sm btn-danger" @click="sesiones.splice(index, 1)">
-                  X
-                </button>
+                <button v-if="editando" class="btn btn-sm btn-danger" @click="sesiones.splice(index, 1)">X</button>
               </div>
-
             </div>
-
           </div>
-
         </div>
 
         <!-- MENSAJE -->
@@ -414,7 +410,6 @@
             <button class="btn btn-success btn-lg rounded-pill px-4" @click="guardarCambios">
               {{ t.saveChanges }}
             </button>
-
             <button class="btn btn-secondary btn-lg rounded-pill px-4" @click="cancelarEdicion">
               {{ t.cancel }}
             </button>
@@ -429,6 +424,7 @@
     </main>
   </div>
 </template>
+
 
 <script setup lang="ts">
 import { ref, onMounted, inject, type Ref, computed } from "vue"
@@ -474,11 +470,15 @@ const actividad = ref<any>({
   nombreDeporte: ""
 })
 
+const imagen = ref<File | null>(null)
+const preview = ref<string | null>(null)
 const actividadOriginal = ref<any>(null);
 const sesiones = ref<any[]>([])
 const crearSesion = ref({ id: -1, dia: "", horaInicio: "", horaFin: "" })
 const mensaje = ref("")
 const editando = ref(false)
+const callesDisponibles = ref<any[]>([])
+const calleSeleccionada = ref<number | null>(null)
 
 const errores = ref<any>({
   nombre: false, plazasMaximas: false, plazasReservadas: false, edadMinima: false,
@@ -502,6 +502,17 @@ const monitores = ref<any[]>([])
 const tarifas = ref<any[]>([])
 const deportes = ref<any[]>([])
 
+const instalacionesFiltradas = computed(() => {
+  if (!actividad.value.instalacion) return instalaciones.value
+  const instalacionActual = instalaciones.value.find(i => i.id === actividad.value.instalacion)
+  if (!instalacionActual) return instalaciones.value
+  if (instalacionActual.tipoInstalacion === "PISCINA") {
+    return instalaciones.value.filter(i => i.tipoInstalacion === "PISCINA")
+  } else {
+    return instalaciones.value.filter(i => i.tipoInstalacion !== "PISCINA")
+  }
+})
+
 function activarEdicion() {
   mensaje.value = ""
   actividadOriginal.value = JSON.parse(JSON.stringify(actividad.value))
@@ -512,13 +523,27 @@ function activarEdicion() {
 function cancelarEdicion() {
   mensaje.value = ""
   actividadOriginal.value = JSON.parse(JSON.stringify(actividad.value))
+  preview.value = null
+  imagen.value = null
   editando.value = false
 }
 
 function agregarSesion() {
-  if (!crearSesion.value.dia || !crearSesion.value.horaInicio || !crearSesion.value.horaFin) return
-  sesiones.value.push({ ...crearSesion.value })
+  if (!crearSesion.value.dia ||
+    !crearSesion.value.horaInicio ||
+    !crearSesion.value.horaFin ||
+    (callesDisponibles.value.length > 0 && !calleSeleccionada.value)) {
+    mensaje.value = t.value.selectLane
+    return
+  }
+
+  sesiones.value.push({
+    ...crearSesion.value,
+    calle: calleSeleccionada.value || null
+  })
+
   crearSesion.value = { id: -1, dia: "", horaInicio: "", horaFin: "" }
+  calleSeleccionada.value = null
 }
 
 const eliminar = async () => {
@@ -562,7 +587,34 @@ function horasValidas() {
 }
 
 function limpiarHora(h: string) {
-  return h ? h.slice(0,5) : h
+  return h ? h.slice(0, 5) : h
+}
+
+function validarTipoInstalacion() {
+  const inst = instalaciones.value.find(i => i.id === actividad.value.instalacion)
+  if (!inst) return false
+
+  const instOriginal = instalaciones.value.find(i => i.id === actividadOriginal.value.instalacion)
+  if (!instOriginal) return false
+
+  // Si el tipo es piscina no puede ser otro y viceversa
+  if (inst.tipoInstalacion == "PISCINA" && instOriginal.tipoInstalacion != "PISCINA") {
+    return false;
+  }
+
+  if (inst.tipoInstalacion != "PISCINA" && instOriginal.tipoInstalacion == "PISCINA") {
+    return false
+  }
+
+  return true
+}
+
+function onFileChange(e: Event) {
+  const input = e.target as HTMLInputElement
+  if (!input.files || input.files.length === 0) return
+
+  imagen.value = input.files[0]
+  preview.value = URL.createObjectURL(imagen.value)
 }
 
 async function guardarCambios() {
@@ -572,25 +624,34 @@ async function guardarCambios() {
     return
   }
 
+  if (!validarTipoInstalacion()) {
+    mensaje.value = t.value.cannotChangeType
+    return
+  }
+
   if (!horasValidas()) {
     mensaje.value = t.value.wrongTimetable
     return
   }
 
-  // limpiar segundos para que no interfieran
   sesiones.value = sesiones.value.map(s => ({
     ...s,
     horaInicio: limpiarHora(s.horaInicio),
     horaFin: limpiarHora(s.horaFin)
   }))
 
+  const formData = new FormData()
+
+  formData.append("actividad", JSON.stringify(actividad.value))
+  formData.append("sesiones", JSON.stringify(sesiones.value))
+  formData.append("deportes", JSON.stringify(actividad.value.nombreDeporte))
+
+  if (imagen.value) {
+    formData.append("imagenURL", imagen.value)
+  }
+
   try {
-    await modificarActividad(
-      parseInt(props.id),
-      actividad.value,
-      sesiones.value,
-      actividad.value.nombreDeporte,
-    )
+    await modificarActividad(parseInt(props.id), formData)
     router.back()
   } catch (e: any) {
     mensaje.value = e.response?.data?.respuesta
@@ -610,6 +671,7 @@ onMounted(async () => {
     monitores.value = await getMonitoresSimples()
     deportes.value = await getDeportes()
 
+    console.log(data)
     if (actividad.value.tipoActividad === "OTROS") {
       tarifas.value = await getTarifasActividadComun()
     } else if (actividad.value.tipoActividad === "GRUPOS_REDUCIDOS") {

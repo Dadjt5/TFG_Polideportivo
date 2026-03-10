@@ -13,7 +13,7 @@ from .constantes import FormaReserva, TipoInstalacion
 class Reserva(models.Model):
     """Modelo para representar una reserva"""
 
-    usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.RESTRICT, related_name="reserva")
+    usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.RESTRICT, related_name="+")
     descuentos = models.ManyToManyField('Descuento', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -39,6 +39,7 @@ class ReservaActividad(Reserva):
     tipoPago = models.CharField(default="total")
     tipoSesion = models.CharField(default="consulta")
 
+    usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.RESTRICT, related_name="reservas_actividad")
     actividad = models.ForeignKey('Actividad', on_delete=models.CASCADE)
 
     def __str__(self):
@@ -148,6 +149,7 @@ class Alquiler(Reserva):
     horaFin = models.TimeField()
     numeroHoras = models.FloatField(default=0.0)
 
+    usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.RESTRICT, related_name="alquileres")
     instalacion = models.ForeignKey('Instalacion', on_delete=models.CASCADE)
     calle = models.ForeignKey('Calle', on_delete=models.SET_NULL, null=True, blank=True)
     

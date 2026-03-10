@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from datetime import time, datetime
+from datetime import time, datetime, timedelta
 from django.db.models import Q
 
 from .agenda import Agenda
@@ -13,7 +13,7 @@ class Pabellon(models.Model):
 
     nombre = models.CharField(max_length=256, blank=True)
     descripcion = models.CharField(max_length=1024, blank=True)
-    imagenURL = models.CharField(max_length=2048, blank=True)
+    imagenURL = models.ImageField(upload_to="pabellones/", blank=True, null=True)
     direccion = models.CharField(max_length=256, blank=True)
 
     def __str__(self):
@@ -28,7 +28,7 @@ class Instalacion(models.Model):
     """Modelo para representar una instalacion"""
 
     nombre = models.CharField(max_length=256, blank=True)
-    imagenURL = models.CharField(max_length=2048, blank=True)
+    imagenURL = models.ImageField(upload_to="instalaciones/", blank=True, null=True)
     aforoMaximo = models.PositiveIntegerField(default=50)
     luz = models.BooleanField(default=False)
     porcentajeTDA = models.FloatField(default=0.0)
@@ -68,7 +68,7 @@ class Instalacion(models.Model):
 
         return precio
 
-    def modificarInformacion(self, instlacion_data, pabellon, tarifa):
+    def modificarInformacion(self, instlacion_data, pabellon, tarifa, imagen):
         campos_simples = [
             "nombre",
             "aforoMaximo",
@@ -82,8 +82,40 @@ class Instalacion(models.Model):
 
         self.tarifa = tarifa
         self.pabellon = pabellon
+        self.imagenURL = imagen
 
         self.save()
+        return True
+    
+    def sincronizarMapaReservas(self, agenda, minutos=60):
+        if not agenda.abierto:
+            agenda.mapa_reservas.all().delete()
+            return True
+
+        inicio = datetime.combine(datetime.today(), agenda.horaApertura)
+        fin = datetime.combine(datetime.today(), agenda.horaCierre)
+        slots_necesarios = []
+        while inicio < fin:
+            siguiente = inicio + timedelta(minutes=minutos)
+            slots_necesarios.append((inicio.time(), siguiente.time()))
+            inicio = siguiente
+
+        slots_existentes = agenda.mapa_reservas.all()
+
+        for reserva in slots_existentes:
+            if reserva.horaInicio < agenda.horaApertura or reserva.horaFin > agenda.horaCierre:
+                reserva.delete()
+
+        if self.tipoInstalacion != TipoInstalacion.PISCINA:
+            for inicio, fin in slots_necesarios:
+                if not slots_existentes.filter(horaInicio=inicio, horaFin=fin, calle__isnull=True).exists():
+                    agenda.mapa_reservas.create(horaInicio=inicio, horaFin=fin)
+        else:
+            for calle in self.calles.all():
+                for inicio, fin in slots_necesarios:
+                    if not slots_existentes.filter(horaInicio=inicio, horaFin=fin, calle=calle).exists():
+                        agenda.mapa_reservas.create(horaInicio=inicio, horaFin=fin, calle=calle)
+
         return True
 
     def sincronizarCalles(self, numero_calles):
@@ -214,7 +246,7 @@ class Instalacion(models.Model):
                 abierto=True
             )
 
-        agenda.generarMapa()
+        self.sincronizarMapaReservas(agenda, minutos=60)
         return True
 
     def nuevoHorarioEspecial(self, fecha, horaApertura, horaCierre, abierto):
@@ -234,7 +266,7 @@ class Instalacion(models.Model):
             return False
 
         agenda = Agenda.objects.create(instalacion=self, fecha=fecha, horaApertura=horaApertura, horaCierre=horaCierre)
-        agenda.generarMapa()
+        self.sincronizarMapaReservas(agenda, minutos=60)
 
         return True
 
@@ -308,7 +340,7 @@ class Instalacion(models.Model):
 
 class Calle(models.Model):
     numero = models.PositiveIntegerField()
-      
+
     instalacion = models.ForeignKey('Instalacion', on_delete=models.CASCADE, related_name="calles")
 
     def __str__(self):

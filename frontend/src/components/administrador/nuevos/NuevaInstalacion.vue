@@ -86,8 +86,12 @@
           <!-- IMAGEN -->
           <div class="col-md-12">
             <label class="form-label fw-semibold">{{ t.images }}</label>
-            <input type="text" class="form-control form-control-lg" :class="{ 'is-invalid': errores.imagenURL }"
-              v-model="instalacion.imagenURL" placeholder="https://@." />
+
+            <input type="file" class="form-control form-control-lg"
+              accept="image/*" @change="onFileChange" />
+
+            <!-- preview -->
+            <img v-if="preview" :src="preview" class="mt-3 rounded" style="max-width:250px" />
           </div>
 
         </div>
@@ -250,7 +254,6 @@ const tab = ref(1)
 
 const instalacion = ref({
   nombre: "",
-  imagenURL: "",
   aforoMaximo: 50,
   luz: false,
   porcentajeTDA: 0,
@@ -262,7 +265,6 @@ const instalacion = ref({
 
 const errores = ref({
   nombre: false,
-  imagenURL: false,
   aforoMaximo: false,
   porcentajeTDA: false,
   pabellon: false,
@@ -285,6 +287,8 @@ const tempAbierto = ref(false);
 const tempApertura = ref("08:00");
 const tempCierre = ref("22:00");
 
+const imagen = ref<File | null>(null)
+const preview = ref<string | null>(null)
 const pabellones = ref<any[]>([])
 const tarifas = ref<any[]>([])
 
@@ -311,7 +315,6 @@ function validarFormulario() {
   let valido = true
 
   errores.value.nombre = instalacion.value.nombre === ""
-  errores.value.imagenURL = instalacion.value.imagenURL === ""
   errores.value.aforoMaximo = instalacion.value.aforoMaximo <= 0
   errores.value.porcentajeTDA =
     instalacion.value.porcentajeTDA < 0 ||
@@ -330,6 +333,14 @@ function validarFormulario() {
   return valido
 }
 
+function onFileChange(e: Event) {
+  const input = e.target as HTMLInputElement
+  if (!input.files || input.files.length === 0) return
+
+  imagen.value = input.files[0]
+  preview.value = URL.createObjectURL(imagen.value)
+}
+
 const crearInstalacion = async () => {
   mensaje.value = ""
   if (!validarFormulario()) {
@@ -337,13 +348,18 @@ const crearInstalacion = async () => {
     return
   }
 
-  try {
-    await nuevaInstalacion(
-      instalacion.value,
-      agenda.value,
-      fechasEspeciales.value
-    )
+  const formData = new FormData()
 
+  formData.append("instalacion", JSON.stringify(instalacion.value))
+  formData.append("agenda", JSON.stringify(agenda.value))
+  formData.append("fechasEspeciales", JSON.stringify(fechasEspeciales.value))
+
+  if (imagen.value) {
+    formData.append("imagenURL", imagen.value)
+  }
+
+  try {
+    await nuevaInstalacion(formData)
     router.push({ name: 'gestion-espacios' })
   } catch (e: any) {
     mensaje.value = e.response?.data?.respuesta

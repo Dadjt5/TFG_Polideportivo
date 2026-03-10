@@ -22,20 +22,32 @@ export const nuevoDescuento = async (payload: Payload): Promise<any> => {
 }
 
 /* Función para crear un nuevo pabellon */
-export const nuevoPabellon = async (payload: Payload): Promise<any> => {
-  const response = await api.post("api/v1/pabellones/", payload)
+export const nuevoPabellon = async (payload: FormData): Promise<any> => {
+  const response = await api.post("api/v1/pabellones/", payload, {
+    headers: {
+      "Content-Type": "multipart/form-data"
+    }
+  })
   return response.data
 }
 
 /* Función para crear una instalacion */
-export const nuevaInstalacion = async (instalacion: any, agenda: any, fechasEspeciales: any): Promise<any> => {
-  const response = await api.post("api/v1/instalaciones/crear/", {"instalacion": instalacion, "agenda": agenda, "fechasEspeciales": fechasEspeciales})
+export const nuevaInstalacion = async (payload: FormData): Promise<any> => {
+  const response = await api.post("/api/v1/instalaciones/crear/", payload, {
+    headers: {
+      "Content-Type": "multipart/form-data"
+    }
+  })
   return response.data
 }
 
 /* Función para crear una actividad */
-export const nuevaActividad = async (actividad: any, sesiones: any, deportes: any): Promise<any> => {
-  const response = await api.post("api/v1/actividades/crear/", {"actividad": actividad, "sesiones": sesiones, "deportes": deportes})
+export const nuevaActividad = async (payload: FormData): Promise<any> => {
+  const response = await api.post("/api/v1/actividades/crear/", payload, {
+    headers: {
+      "Content-Type": "multipart/form-data"
+    }
+  })
   return response.data
 }
 

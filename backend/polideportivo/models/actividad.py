@@ -15,7 +15,7 @@ class Actividad(models.Model):
 
     nombre = models.CharField(max_length=256, blank=True)
     descripcion = models.CharField(max_length=2048, blank=True)
-    imagenURL = models.CharField(max_length=2048, blank=True)
+    imagenURL = models.ImageField(upload_to="actividades/", blank=True, null=True)
     edadMinima = models.PositiveIntegerField(default=18)
     plazasMaximas = models.PositiveIntegerField(default=50)
     plazasReservadas = models.PositiveIntegerField(default=0)
@@ -170,7 +170,7 @@ class Actividad(models.Model):
         sesion = Sesion.objects.create(dia=dia, horaInicio=horaInicio, horaFin=horaFin, actividad=self, calle=calle, numeroHoras=0.0)
         return sesion
     
-    def modificarInformacion(self, actividad_data, tarifa, instalacion, monitor):
+    def modificarInformacion(self, actividad_data, tarifa, instalacion, monitor, imagen):
         campos_simples = [
             "nombre",
             "edadMinima",
@@ -208,6 +208,7 @@ class Actividad(models.Model):
         self.tarifa = tarifa
         self.instalacion = instalacion
         self.monitor = monitor
+        self.imagenURL = imagen
 
         self.save()
         return True
