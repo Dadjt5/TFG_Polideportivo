@@ -4,7 +4,7 @@
     <!-- TÍTULO -->
     <div class="text-center mb-4">
       <h2 class="fw-bold">{{ t.facilityReservationTitle }}</h2>
-      <p class="text-muted">{{ t.facilityReservationRule }}</p>
+      <p class="text-muted">{{ t.facilityReservationRule }}: {{ configuracionStore.horas_alquiler_consecutivas }}</p>
     </div>
 
     <!-- INFO INSTALACIÓN -->
@@ -48,19 +48,31 @@
           <tbody>
             <tr :class="{ 'table-primary': usuarioFinalStore.hasAbono }">
               <td>{{ t.subscription }}</td>
-              <td class="text-end">{{ reserva.tarifa.datos.precioAbonado }} €</td>
+              <td class="text-end">
+                {{ reserva.tarifa.datos.precioAbonado }} € × {{ horasSeleccionadas.length }}
+                = {{ (reserva.tarifa.datos.precioAbonado * horasSeleccionadas.length).toFixed(2) }} €
+              </td>
             </tr>
             <tr :class="{ 'table-primary': usuarioFinalStore.isUAM }">
               <td>UAM</td>
-              <td class="text-end">{{ reserva.tarifa.datos.precioUAM }} €</td>
+              <td class="text-end">
+                {{ reserva.tarifa.datos.precioUAM }} € × {{ horasSeleccionadas.length }}
+                = {{ (reserva.tarifa.datos.precioUAM * horasSeleccionadas.length).toFixed(2) }} €
+              </td>
             </tr>
             <tr :class="{ 'table-primary': usuarioFinalStore.hasTda }">
               <td>TDA</td>
-              <td class="text-end">{{ reserva.tarifa.datos.precioTDA }} €</td>
+              <td class="text-end">
+                {{ reserva.tarifa.datos.precioTDA }} € × {{ horasSeleccionadas.length }}
+                = {{ (reserva.tarifa.datos.precioTDA * horasSeleccionadas.length).toFixed(2) }} €
+              </td>
             </tr>
             <tr :class="{ 'table-primary': otroCaso }">
               <td>{{ t.other }}</td>
-              <td class="text-end">{{ reserva.tarifa.datos.precioOtros }} €</td>
+              <td class="text-end">
+                {{ reserva.tarifa.datos.precioOtros }} € × {{ horasSeleccionadas.length }}
+                = {{ (reserva.tarifa.datos.precioOtros * horasSeleccionadas.length).toFixed(2) }} €
+              </td>
             </tr>
           </tbody>
         </table>
@@ -194,7 +206,7 @@ const horasSeleccionadas = ref<string[]>([])
 // Se debe revisar si es una piscina o no, si lo es se deben mostrar las reservas por calle
 const reservasActuales = computed(() => {
 
-  if(reserva.value.tarifa.numeroCalles === 0)
+  if (reserva.value.tarifa.numeroCalles === 0)
     return reserva.value.tarifa.reservas
 
   const calle = reserva.value.tarifa.calles.find(
@@ -244,12 +256,14 @@ const esAlquilerUsuario = (hora: any) => {
 }
 
 const claseHora = (hora: any) => {
-  if (esAlquilerUsuario(hora)) return "btn-danger"
-  if (hora.estado === "ACTIVIDAD") return "btn-warning"
+  if (esAlquilerUsuario(hora)) return "bg-danger text-white"
+  if (hora.estado === "ACTIVIDAD") return "bg-warning text-dark"
   if (hora.estado === "LIBRE") {
-    return horasSeleccionadas.value.includes(hora.horaInicio) ? "btn-primary" : "btn-success"
+    return horasSeleccionadas.value.includes(hora.horaInicio)
+      ? "bg-primary text-white"
+      : "bg-success text-white"
   }
-  return "btn-secondary"
+  return "bg-secondary text-white"
 }
 
 const toggleHora = (intervalo: any) => {
@@ -259,11 +273,11 @@ const toggleHora = (intervalo: any) => {
   fechaSeleccionada.setHours(0, 0, 0, 0)
 
   const fechaMin = new Date()
-  fechaMin.setDate(fechaMin.getDate() + (configuracionStore.dias_minimo_alquiler || 0))
+  fechaMin.setDate(fechaMin.getDate() + (configuracionStore.dias_minimo_alquiler))
   fechaMin.setHours(0, 0, 0, 0)
 
   const fechaMax = new Date()
-  fechaMax.setDate(fechaMax.getDate() + (configuracionStore.dias_maximo_alquiler || 7))
+  fechaMax.setDate(fechaMax.getDate() + (configuracionStore.dias_maximo_alquiler))
   fechaMax.setHours(0, 0, 0, 0)
 
   if (fechaSeleccionada < fechaMin || fechaSeleccionada > fechaMax) return
@@ -307,6 +321,7 @@ const total = computed(() => {
     otroCaso.value = false
   }
 
+  base = base * horasSeleccionadas.value.length
   const descuento = (base * reserva.value.descuento.porcentaje_total) / 100
   return base - descuento
 })
@@ -366,9 +381,11 @@ onMounted(async () => {
   const id = parseInt(props.id);
   try {
     const data = await getTarifaDescuentoInstalacion(id, reserva.value.seleccion.fecha)
+    configuracionStore.obtenerConfiguracion()
     reserva.value.tarifa = data.tarifa
     reserva.value.descuento = data.descuento
     reserva.value.tarifa.calles = data.calles;
+    console.log(usuarioFinalStore)
   } catch (e: any) {
     mensaje.value = e.response?.data?.respuesta
     console.error("Error al actualizar la fecha:", e);

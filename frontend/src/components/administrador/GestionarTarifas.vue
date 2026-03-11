@@ -62,7 +62,7 @@
                   <h5 class="fw-semibold text-success">
                     <i class="bi bi-geo-alt me-2"></i>{{ t.TDATariff }}
                   </h5>
-                  <router-link to="/crear/tarifa/TDA" class="btn btn-primary rounded-pill shadow-sm">
+                  <router-link to="/crear/tarifa/TDA" v-if="tarifasTDA.length === 0" class="btn btn-primary rounded-pill shadow-sm">
                     <i class="bi bi-plus-lg me-1"></i> {{ t.newTariff }}
                   </router-link>
                 </div>

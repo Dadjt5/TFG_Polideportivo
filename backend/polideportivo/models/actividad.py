@@ -194,12 +194,12 @@ class Actividad(models.Model):
 
         if nuevas_plazas_max < self.plazasReservadas:
             return False
-        
+
         for campo in campos_simples:
             if campo in actividad_data:
                 setattr(self, campo, actividad_data[campo])
                 
-                if campo == "material":
+                if campo == "material" and actividad_data[campo] != self.material:
                     Notificacion.notificarNuevoMaterial(actividad=self)
 
         self.plazasMaximas = nuevas_plazas_max

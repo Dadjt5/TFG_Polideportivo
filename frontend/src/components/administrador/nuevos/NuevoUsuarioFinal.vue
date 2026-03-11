@@ -270,8 +270,9 @@ const nuevoUsuario = async () => {
     userIdentifier.value = data.codigo_usuario;
     showIdentifier.value = true;
     mensaje.value = data.mensaje;
-  } catch (e) {
-    console.log("Error al registrar el usuario final", e)
+  } catch (e: any) {
+    mensaje.value = e.response?.data?.respuesta
+    console.log("Error al crear el nuevo usuario", e);
   }
 };
 

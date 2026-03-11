@@ -88,6 +88,7 @@ urlpatterns = [
     path("abonos/", views.ObtenerAbonosView.as_view(), name="Obtener-abonos"),
     path("abonos/<int:abono_id>/comprar/", views.ComprarAbonoView.as_view(), name="comprar-abono"),
     path("bonos/<int:bono_id>/comprar/", views.ComprarBonoView.as_view(), name="comprar-bono"),
+    path("tda/comprar/", views.ComprarTDAView.as_view(), name="comprar-TDA"),
     path("foro/", views.ForoView.as_view(), name="Foro"),
     path("foros/<int:foro_id>/canal/", views.NuevoCanalView.as_view(), name="crear-canal"),
     path("canales/<int:canal_id>/mensajes/", views.MensajesCanalView.as_view(), name="mensajes-canal"),

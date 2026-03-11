@@ -30,6 +30,11 @@ export const validarTDA = async (payload: Record<string, any>) => {
   return response.data;
 };
 
+/* Función para comprar una TDA */
+export const comprarTarjetaDeportivaAnual = async () => {
+  const response = await api.post("api/v1/tda/comprar/");
+  return response.data;
+};
 
 /* Función para marcar actividades o instalaciones como favoritas */
 export const marcarFavoritos = async (payload: Record<string, any>) => {

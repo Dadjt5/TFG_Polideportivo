@@ -104,10 +104,6 @@ class MapaReservas(models.Model):
     agenda = models.ForeignKey(Agenda, on_delete=models.CASCADE, related_name="mapa_reservas")
     calle = models.ForeignKey('Calle', on_delete=models.CASCADE, null=True, blank=True, related_name="mapas")
 
-    class Meta:
-        ordering = ['horaInicio']
-        unique_together = ('agenda', 'horaInicio', 'horaFin')
-
     def clean(self):
         if self.horaInicio >= self.horaFin:
             raise ValidationError("La hora de inicio debe ser menor que la hora de fin")

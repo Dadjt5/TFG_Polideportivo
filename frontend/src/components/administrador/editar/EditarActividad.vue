@@ -46,68 +46,82 @@
         <div v-if="tab === 1" class="row g-4">
           <div class="col-md-6">
             <label class="form-label fw-semibold">{{ t.name }}</label>
-            <input type="text" class="form-control form-control-lg" v-model="actividad.nombre"
+            <input type="text" class="form-control form-control-lg"
+              v-model="actividad.nombre"
+              :disabled="!editando"
               :class="{ 'is-invalid': errores.nombre }" />
           </div>
 
           <div class="col-md-12">
             <label class="form-label fw-semibold">{{ t.description }}</label>
-            <textarea rows="3" class="form-control form-control-lg" v-model="actividad.descripcion"></textarea>
+            <textarea rows="3" class="form-control form-control-lg"
+              v-model="actividad.descripcion"
+              :disabled="!editando"></textarea>
           </div>
 
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.maxPlaces }}</label>
-            <input type="number" class="form-control form-control-lg" v-model.number="actividad.plazasMaximas"
+            <input type="number" class="form-control form-control-lg"
+              v-model.number="actividad.plazasMaximas"
+              :disabled="!editando"
               :class="{ 'is-invalid': errores.plazasMaximas }" />
           </div>
 
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.reservedPlaces }}</label>
-            <input type="number" class="form-control form-control-lg" v-model.number="actividad.plazasReservadas"
+            <input type="number" class="form-control form-control-lg"
+              v-model.number="actividad.plazasReservadas"
+              :disabled="!editando"
               :class="{ 'is-invalid': errores.plazasReservadas }" />
           </div>
 
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.minimumAge }}</label>
-            <input type="number" class="form-control form-control-lg" v-model.number="actividad.edadMinima"
+            <input type="number" class="form-control form-control-lg"
+              v-model.number="actividad.edadMinima"
+              :disabled="!editando"
               :class="{ 'is-invalid': errores.edadMinima }" />
           </div>
 
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.credits }}</label>
-            <input type="number" class="form-control form-control-lg" v-model.number="actividad.numeroCreditos"
+            <input type="number" class="form-control form-control-lg"
+              v-model.number="actividad.numeroCreditos"
+              :disabled="!editando"
               :class="{ 'is-invalid': errores.numeroCreditos }" />
           </div>
 
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.level }}</label>
-            <input type="text" class="form-control form-control-lg" v-model="actividad.nivel" />
+            <input type="text" class="form-control form-control-lg"
+              v-model="actividad.nivel"
+              :disabled="!editando" />
           </div>
 
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.material }}</label>
-            <input type="text" class="form-control form-control-lg" v-model="actividad.material" />
+            <input type="text" class="form-control form-control-lg"
+              v-model="actividad.material"
+              :disabled="!editando" />
           </div>
 
           <!-- DEPORTE -->
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.sport }}</label>
-            <select class="form-select form-select-lg" v-model="actividad.nombreDeporte"
+            <select class="form-select form-select-lg"
+              v-model="actividad.deportes"
+              :disabled="!editando"
               :class="{ 'is-invalid': errores.deporte }">
               <option disabled value="">{{ t.selectOption }}</option>
               <option v-for="d in deportes" :key="d.id" :value="d.id">{{ d.titulo }}</option>
-              <option value="nuevo">+ {{ t.newSport }}</option>
             </select>
-          </div>
-
-          <div v-if="actividad.nombreDeporte === 'nuevo'" class="mt-3 col-md-6">
-            <input type="text" class="form-control form-control-lg" v-model="actividad.nombreDeporte"
-              :placeholder=t.title />
           </div>
 
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.reserveType }}</label>
-            <select class="form-select form-select-lg" v-model="actividad.tipoReserva"
+            <select class="form-select form-select-lg"
+              v-model="actividad.tipoReserva"
+              :disabled="!editando"
               :class="{ 'is-invalid': errores.tipoReserva }">
               <option v-for="r in tiposStore.tiposReserva" :key="r[0]" :value="r[0]">{{ r[1] }}</option>
             </select>
@@ -115,7 +129,9 @@
 
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.terrainType }}</label>
-            <select class="form-select form-select-lg" v-model="actividad.terreno"
+            <select class="form-select form-select-lg"
+              v-model="actividad.terreno"
+              :disabled="!editando"
               :class="{ 'is-invalid': errores.terreno }">
               <option v-for="t in tiposStore.terrenos" :key="t[0]" :value="t[0]">{{ t[1] }}</option>
             </select>
@@ -123,7 +139,9 @@
 
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.period }}</label>
-            <select class="form-select form-select-lg" v-model="actividad.periodo"
+            <select class="form-select form-select-lg"
+              v-model="actividad.periodo"
+              :disabled="!editando"
               :class="{ 'is-invalid': errores.periodo }">
               <option v-for="t in tiposStore.periodos" :key="t[0]" :value="t[0]">{{ t[1] }}</option>
             </select>
@@ -131,7 +149,10 @@
 
           <div class="col-md-12">
             <div class="form-check form-switch mt-2">
-              <input class="form-check-input" type="checkbox" v-model="actividad.exterior" />
+              <input class="form-check-input"
+                type="checkbox"
+                v-model="actividad.exterior"
+                :disabled="!editando" />
               <label class="form-check-label fw-semibold">{{ t.outdoor }}</label>
             </div>
           </div>
@@ -146,19 +167,23 @@
               <i class="bi bi-images text-primary"></i> {{ t.images }}
             </h5>
 
-            <img :src="actividad.imagenURL" class="img-fluid rounded mb-3 img-hover" v-if="actividad.imagenURL"
+            <img :src="actividad.imagenURL" class="img-fluid rounded mb-3 img-hover" v-if="actividad.imagenURL && !preview"
               style="max-height: 300px; object-fit: cover;" />
 
             <input v-if="editando" type="file" class="form-control form-control-lg mt-2" @change="onFileChange" />
+
             <img v-if="preview" :src="preview" class="img-fluid rounded mt-3"
               style="max-height: 300px; object-fit: cover;" />
           </div>
         </div>
+
         <!-- TAB 3: INSTALACION -->
         <div v-if="tab === 3">
           <div class="mb-4">
             <label class="form-label fw-semibold">{{ t.facility }}</label>
-            <select class="form-select form-select-lg" v-model="actividad.instalacion"
+            <select class="form-select form-select-lg"
+              v-model="actividad.instalacion"
+              :disabled="!editando"
               :class="{ 'is-invalid': errores.instalacion }">
               <option :value="null">--</option>
               <option v-for="i in instalacionesFiltradas" :key="i.id" :value="i.id">{{ i.nombre }}</option>
@@ -167,7 +192,9 @@
 
           <div class="col-md-4" v-if="callesDisponibles.length > 0">
             <label class="form-label fw-semibold">{{ t.poolStreets }}</label>
-            <select class="form-select" v-model="calleSeleccionada">
+            <select class="form-select"
+              v-model="calleSeleccionada"
+              :disabled="!editando">
               <option value="" disabled>--</option>
               <option v-for="c in callesDisponibles" :key="c.id" :value="c.numero">
                 {{ t.poolStreet }} {{ c.numero }}
@@ -209,9 +236,12 @@
 
         <!-- TAB 4: MONITOR Y TARIFA -->
         <div v-if="tab === 4">
+
           <div class="mb-4">
             <label class="form-label fw-semibold">{{ t.monitor }}</label>
-            <select class="form-select form-select-lg" v-model="actividad.monitor"
+            <select class="form-select form-select-lg"
+              v-model="actividad.monitor"
+              :disabled="!editando"
               :class="{ 'is-invalid': errores.monitor }">
               <option :value="null">--</option>
               <option v-for="m in monitores" :key="m.id" :value="m.id">{{ m.nombre }}</option>
@@ -224,7 +254,9 @@
 
           <div>
             <label class="form-label fw-semibold">{{ t.tariff }}</label>
-            <select class="form-select form-select-lg" v-model="actividad.tarifa"
+            <select class="form-select form-select-lg"
+              v-model="actividad.tarifa"
+              :disabled="!editando"
               :class="{ 'is-invalid': errores.tarifa }">
               <option :value="null">--</option>
               <option v-for="t in tarifas" :key="t.id" :value="t.id">{{ t.titulo }}</option>
@@ -326,10 +358,12 @@
               </div>
             </transition>
           </div>
+
         </div>
 
         <!-- TAB 5: SESIONES -->
         <div v-if="tab === 5">
+
           <!-- CREAR SESIÓN -->
           <div v-if="editando" class="row g-3 align-items-end mb-4">
             <div class="col-md-4">
@@ -359,40 +393,6 @@
             </div>
           </div>
 
-          <!-- LISTA SESIONES -->
-          <div v-if="sesiones.length" class="bg-light rounded-4 p-3">
-            <div v-for="(s, index) in sesiones" :key="s.id ?? index" class="row g-2 align-items-center mb-2">
-              <div class="col-md-4">
-                <template v-if="editando">
-                  <select class="form-select" v-model="s.dia">
-                    <option v-for="d in tiposStore.dias" :key="d[0]" :value="d[0]">{{ d[1] }}</option>
-                  </select>
-                </template>
-                <template v-else>
-                  {{tiposStore.dias.find(d => d[0] === s.dia)?.[1]}}
-                </template>
-              </div>
-              <div class="col-md-3">
-                <template v-if="editando">
-                  <input type="time" class="form-control" v-model="s.horaInicio">
-                </template>
-                <template v-else>
-                  {{ s.horaInicio }}
-                </template>
-              </div>
-              <div class="col-md-3">
-                <template v-if="editando">
-                  <input type="time" class="form-control" v-model="s.horaFin">
-                </template>
-                <template v-else>
-                  {{ s.horaFin }}
-                </template>
-              </div>
-              <div class="col-md-2 text-end">
-                <button v-if="editando" class="btn btn-sm btn-danger" @click="sesiones.splice(index, 1)">X</button>
-              </div>
-            </div>
-          </div>
         </div>
 
         <!-- MENSAJE -->
@@ -402,7 +402,10 @@
 
         <!-- ACCIONES -->
         <div class="d-flex justify-content-center gap-4 mt-5">
-          <button v-if="!editando" class="btn btn-primary btn-lg rounded-pill px-4" @click="activarEdicion">
+
+          <button v-if="!editando"
+            class="btn btn-primary btn-lg rounded-pill px-4"
+            @click="activarEdicion">
             {{ t.modifyActivity }}
           </button>
 
@@ -415,9 +418,12 @@
             </button>
           </template>
 
-          <button v-if="!editando" class="btn btn-outline-danger btn-lg rounded-pill px-4" @click="eliminar">
+          <button v-if="!editando"
+            class="btn btn-outline-danger btn-lg rounded-pill px-4"
+            @click="eliminar">
             {{ t.deleteActivity }}
           </button>
+
         </div>
 
       </div>
@@ -467,7 +473,8 @@ const actividad = ref<any>({
   terreno: "",
   estado: "",
   periodo: "",
-  nombreDeporte: ""
+  nombreDeporte: "",
+  deportes: null,
 })
 
 const imagen = ref<File | null>(null)
@@ -586,6 +593,16 @@ function horasValidas() {
   return true
 }
 
+function horasEnPunto() {
+  for (const s of sesiones.value) {
+    const [hIni, mIni] = s.horaInicio.split(":").map(Number)
+    const [hFin, mFin] = s.horaFin.split(":").map(Number)
+
+    if (mIni !== 0 || mFin !== 0) return false
+  }
+  return true
+}
+
 function limpiarHora(h: string) {
   return h ? h.slice(0, 5) : h
 }
@@ -634,6 +651,11 @@ async function guardarCambios() {
     return
   }
 
+  if (!horasEnPunto()) {
+    mensaje.value = t.value.onTheHourWarning
+    return
+  }
+
   sesiones.value = sesiones.value.map(s => ({
     ...s,
     horaInicio: limpiarHora(s.horaInicio),
@@ -671,7 +693,6 @@ onMounted(async () => {
     monitores.value = await getMonitoresSimples()
     deportes.value = await getDeportes()
 
-    console.log(data)
     if (actividad.value.tipoActividad === "OTROS") {
       tarifas.value = await getTarifasActividadComun()
     } else if (actividad.value.tipoActividad === "GRUPOS_REDUCIDOS") {

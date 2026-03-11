@@ -68,17 +68,18 @@ class Instalacion(models.Model):
 
         return precio
 
-    def modificarInformacion(self, instlacion_data, pabellon, tarifa, imagen):
+    def modificarInformacion(self, instalacion_data, pabellon, tarifa, imagen):
         campos_simples = [
             "nombre",
             "aforoMaximo",
             "luz",
             "porcentajeTDA",
+            "numeroCalles"
         ]
 
         for campo in campos_simples:
-            if campo in instlacion_data:
-                setattr(self, campo, instlacion_data[campo])
+            if campo in instalacion_data:
+                setattr(self, campo, instalacion_data[campo])
 
         self.tarifa = tarifa
         self.pabellon = pabellon
@@ -131,6 +132,9 @@ class Instalacion(models.Model):
 
         elif numero_calles < actuales:
             self.calles.filter(numero__gt=numero_calles).delete()
+        
+        self.numeroCalles = numero_calles
+        self.save()
 
     def controlarHorarioActividad(self, dia, hora_inicio, hora_fin, sesion_id=None, calle=None):
         if isinstance(hora_inicio, str):

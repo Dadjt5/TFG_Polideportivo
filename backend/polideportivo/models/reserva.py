@@ -166,7 +166,7 @@ class Alquiler(Reserva):
 
     def calcular_precio(self):
         """Calcula el precio final de la reserva usando la instalacion"""
-        return self.instalacion._calcular_precio_base(usuario=self.usuarioFinal)
+        return self.instalacion._calcular_precio_base(usuario=self.usuarioFinal)*self.numeroHoras
 
     def confirmarCompra(self):
         self.estado = EstadoReserva.CONFIRMADA

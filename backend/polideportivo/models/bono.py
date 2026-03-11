@@ -1,7 +1,6 @@
-from django.db import models
+from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
 from dateutil.relativedelta import relativedelta
-from django.db import transaction
 from django.utils import timezone
 
 from .constantes import EstadoReserva
@@ -25,7 +24,7 @@ class Bono(models.Model):
 
 class CompraBono(models.Model):
     """Modelo para representar la compra de un bono"""
-    
+
     fecha = models.DateTimeField(default=timezone.now)
     vecesUsado = models.PositiveIntegerField(default=0)
     fechaExpiracion = models.DateTimeField(blank=True, null=True)

@@ -16,6 +16,7 @@
           />
 
           <button class="btn btn-primary w-100 mb-4" @click="vincularTarjeta">{{ t.linkButton }}</button>
+          <button class="btn btn-success w-100 mb-4" @click="comprarTDA">{{ t.buy }}</button>
 
           <p class="text-danger" v-if="error">{{ t.TDAerror }}</p>
         </div>
@@ -27,13 +28,14 @@
 
 <script setup lang="ts">
 import { type Ref, inject, ref } from "vue";
+import { useRouter } from 'vue-router'
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
 import type { Language } from "@/useI18N";
 import { useI18n } from "@/useI18N";
 
 /* Importamos la forma de tratar de validar la TDA desde el backend */
-import { validarTDA } from "@/services/usuarioFinalService";
+import { validarTDA, comprarTarjetaDeportivaAnual } from "@/services/usuarioFinalService";
 
 import { useUserStore } from "@/stores/usuarioFinal";
 
@@ -41,6 +43,7 @@ const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);
 
 const usuarioFinalStore = useUserStore();
+const router = useRouter();
 
 const codigo = ref('');
 const error = ref(false);
@@ -60,5 +63,16 @@ const vincularTarjeta = async () => {
     await usuarioFinalStore.fetchTDA();
   }
 };
+
+const comprarTDA = async () => {
+  const response = await comprarTarjetaDeportivaAnual()
+
+  const idPago = response.idPago
+
+  router.push({
+    name: 'pasarela-pago',
+    params: { tipo: "comprar_tda", id: idPago }
+  })
+}
 
 </script>

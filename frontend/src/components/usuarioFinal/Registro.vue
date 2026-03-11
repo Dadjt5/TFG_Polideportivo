@@ -43,13 +43,6 @@
               <input type="text" class="form-control" :class="{ 'is-invalid': errores.dni }" placeholder="DNI"
                 v-model="formData.dni">
             </div>
-
-            <div class="col-12">
-              <div class="form-check mb-2">
-                <input type="checkbox" class="form-check-input" id="esUAM" v-model="formData.esUAM">
-                <label class="form-check-label text-primary" for="esUAM">{{ t.UAMmember }}</label>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -175,7 +168,6 @@ const formData = reactive({
   fechaNacimiento: '',
   esMenor: false,
   dni: '',
-  esUAM: false,
   telefono: '',
   email: '',
   provincia: '',

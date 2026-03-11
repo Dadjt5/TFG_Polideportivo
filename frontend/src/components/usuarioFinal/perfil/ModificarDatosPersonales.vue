@@ -354,6 +354,7 @@ const guardarCambios = async () => {
 /* La variable usuario nos permite cambiar el usuario final unicamente en esta pantalla */
 onMounted(async () => {
   const data = usuarioFinalStore.usuarioFinal
+  configuracionStore.obtenerConfiguracion()
   if (data) {
     usuario.value = {
       ...usuario.value,

@@ -665,13 +665,12 @@ class RegistroView(APIView):
         localidad = request.data.get('localidad')
         codigoPostal = request.data.get('codigoPostal')
         password = request.data.get('password')
-        cuentaBancaria = request.data.get('cuentaBancaria')
 
         respuesta = UsuarioFinal.registrar_usuario(
             nombre=nombre, apellidos=apellidos, sexo=sexo, fechaNacimiento=fechaNacimiento,
             dni=dni, telefono=telefono, email=email, provincia=provincia,
             municipio=municipio, localidad=localidad, codigoPostal=codigoPostal,
-            password=password, cuentaBancaria=cuentaBancaria
+            password=password
         )
 
         if respuesta["error"]:
@@ -881,12 +880,50 @@ class ReservasView(APIView):
         actividades = ReservaActividad.objects.filter(usuarioFinal__user=user, estado=EstadoReserva.CONFIRMADA)
 
         for alquiler in alquileres:
-            serializer = AlquilerSerializer(alquiler)
-            reservas.append(serializer.data)
+            reservas.append({
+                "id": alquiler.id,
+                "tipo": "ALQUILER",
+                "estado": "ACTIVO",
+                "puede_cancelar": True,
+                "instalacion": {
+                    "id": alquiler.instalacion.id,
+                    "nombre": alquiler.instalacion.nombre,
+                    "tipo": getattr(alquiler.instalacion, "tipoInstalacion", None),
+                },
+                "actividad": None,
+                "fecha": str(alquiler.fecha) if hasattr(alquiler, "fecha") else None,
+                "horaInicio": alquiler.horaInicio,
+                "horaFin": alquiler.horaFin,
+                "tarifa": None,
+                "descuentos": [],
+            })
 
-        for reserva in actividades:
-            serializer = ReservaActividadSerializer(reserva)
-            reservas.append(serializer.data)
+        for reserva_act in actividades:
+            sesiones = reserva_act.actividad.sesiones.all()
+            reservas.append({
+                "id": reserva_act.id,
+                "tipo": "RESERVA",
+                "estado": reserva_act.estado,
+                "puede_cancelar": True,  # opcional, según lógica del frontend
+                "actividad": {
+                    "id": reserva_act.actividad.id,
+                    "nombre": reserva_act.actividad.nombre,
+                    "dias": [s.dia for s in sesiones],
+                    "horasSemanales": getattr(reserva_act.actividad, "calcularHorasSemanales", lambda: None)(),
+                },
+                "instalacion": None,
+                "fecha": str(reserva_act.actividad.periodo_inicio) if hasattr(reserva_act.actividad, "periodo_inicio") else None,
+                "horaInicio": None,
+                "horaFin": None,
+                "tarifa": {
+                    "id": getattr(reserva_act.tarifa, "id", None),
+                    "nombre": getattr(reserva_act.tarifa, "nombre", None)
+                },
+                "descuentos": [
+                    {"id": d.id, "nombre": d.nombre, "porcentaje": d.porcentaje} 
+                    for d in getattr(reserva_act, "descuentos", [])
+                ],
+            })
 
         return Response(reservas)
 
@@ -1178,9 +1215,12 @@ class EditarInstalacionView(APIView):
             # Datos de la instalacion
             instalacion_json = request.POST.get("instalacion", "{}")
             instalacion_data = json.loads(instalacion_json)
+
             imagen = request.FILES.get("imagenURL")
 
-            pabellon_id = instalacion_data.pop("pabellon", None)            
+            pabellon_id = instalacion_data.pop("pabellon", None)
+            if isinstance(pabellon_id, dict):
+                pabellon_id = pabellon_id.get("id")
             tarifa_id = instalacion_data.pop("tarifa", None)
             numero_calles = instalacion_data.pop("numeroCalles", None)
 
@@ -1540,7 +1580,7 @@ class TarifaInstalacionView(APIView):
                 calles = None
                 reservas = reservas_serializer.data
             
-            alquileres_serializer = AlquilerSimpleSerializer(Alquiler.objects.filter(fecha=fecha), many=True)
+            alquileres_serializer = AlquilerSimpleSerializer(Alquiler.objects.filter(fecha=fecha).exclude(estado=EstadoReserva.CANCELADO), many=True)
             alquileres = alquileres_serializer.data
             horaApertura = dia.horaApertura
             horaCierre = dia.horaCierre
@@ -1657,7 +1697,7 @@ class GestionTarifasView(APIView):
 
 # Obtener configuracion del sistema
 class ObtenerConfiguracionView(APIView):
-    permission_classes = [IsAdministradorRaiz]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         configuracion = Configuracion.objects.first()
@@ -1795,6 +1835,25 @@ class ComprarBonoView(APIView):
             return Response({"idPago": pago.id})
 
         return Response({"respuesta": "Error al comprar el bono"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+# Comprar una tda
+class ComprarTDAView(APIView):
+    permission_classes = [IsUsuarioFinal]
+    
+    def post(self, request, bono_id):
+        bono = get_object_or_404(Bono, id=bono_id)
+
+        compra = TDA.compraTDA(request.user.usuario_final)
+        if not compra:
+            return Response({"respuesta": "Error al comprar la TDA"}, status=status.HTTP_400_BAD_REQUEST)
+
+        pago = Pago.nuevoPago(f'Pago por nueva TDA', request.user.usuario_final, compra)
+
+        if compra and pago:
+            return Response({"idPago": pago.id})
+
+        return Response({"respuesta": "Error al comprar la TDA"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ResumenPagoView(APIView):

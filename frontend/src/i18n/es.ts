@@ -37,6 +37,7 @@ export default {
   timeRemaining: "Tiempo restante para completar el pago",
   selectLane: "Debe seleccionar un canal",
   cannotChangeType: "No se puede cambiar a ese tipo de instalación",
+  onTheHourWarning: "Las sesiones deben comenzar y acabar en horas en punto",
 
   /* Perfil */
   role: "Rol",
@@ -61,8 +62,8 @@ export default {
   newPassword: "Nueva contraseña",
   changePassword: "Cambiar contraseña",
   yourIdentifier: "Tu identificador único es",
-  monitorIdentifier: "El identificador del usuario final creado es",
-  usuarioFinalIdentifier: "El identificador del monitor creado es",
+  monitorIdentifier: "El identificador del monitor creado es",
+  usuarioFinalIdentifier: "El identificador del usuario final creado es",
   adminIdentifier: "El identificador del administrador creado es",
 
   /* Estadisticas de usuario final */
@@ -303,7 +304,7 @@ export default {
   selected: "Seleccionado",
   reserved: "Reservado",
   facilityReservationTitle: "Reserva de instalación",
-  facilityReservationRule: "Selecciona un máximo de 2 horas consecutivas.",
+  facilityReservationRule: "Horas consecutivas que puedes reservar",
   selectedDate: "Fecha seleccionada",
   noDays: "No hay horarios para esa fecha.",
 

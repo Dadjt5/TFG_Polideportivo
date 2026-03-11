@@ -23,7 +23,7 @@
           class="col-md-6 col-lg-4"
         >
           <div class="rounded-3 shadow-sm p-4 h-100 card-hover"
-               style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(8px);">
+               style="background-color: rgba(255,255,255,0.9); backdrop-filter: blur(8px);">
 
             <div class="d-flex flex-column justify-content-between h-100">
 
@@ -32,7 +32,6 @@
                 <h5 class="fw-semibold mb-2 d-flex align-items-center">
                   <i v-if="reserva.tipo === 'ALQUILER'" class="bi bi-building me-2 text-primary"></i>
                   <i v-else class="bi bi-activity me-2 text-success"></i>
-
                   {{ reserva.tipo === "ALQUILER"
                     ? reserva.instalacion?.nombre
                     : reserva.actividad?.nombre }}
@@ -40,21 +39,32 @@
 
                 <!-- ESTADO -->
                 <span
-                  class="badge rounded-pill"
-                  :class="
-                    reserva.estado === 'ACTIVO'
-                      ? 'bg-success-subtle text-success'
-                      : 'bg-secondary-subtle text-secondary'
-                  "
+                  class="badge rounded-pill mb-2"
+                  :class="reserva.tipo === 'ALQUILER' 
+                            ? (reserva.estado === 'ACTIVO' ? 'bg-primary-subtle text-primary' : 'bg-secondary-subtle text-secondary')
+                            : (reserva.estado === 'ACTIVO' ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary')"
                 >
                   {{ reserva.estado }}
                 </span>
 
-                <!-- DIAS ACTIVIDAD -->
-                <p v-if="reserva.actividad" class="mt-3 mb-0 text-muted small">
-                  <i class="bi bi-calendar-event me-1"></i>
-                  {{ reserva.actividad.dias.join(", ") }}
-                </p>
+                <!-- INFO DETALLADA -->
+                <div class="text-muted small mb-2">
+                  <template v-if="reserva.tipo === 'ALQUILER'">
+                    <p class="mb-1"><i class="bi bi-calendar-event me-1"></i>{{ t.date }}: {{ reserva.fecha }}</p>
+                    <p class="mb-1"><i class="bi bi-clock me-1"></i>{{ t.hours }}: {{ reserva.horaInicio }}-{{ reserva.horaFin }}</p>
+                    <p class="mb-1"><i class="bi bi-building me-1"></i>{{ t.facilityType }}: {{ reserva.instalacion?.tipo }}</p>
+                  </template>
+
+                  <template v-else>
+                    <p class="mb-1"><i class="bi bi-calendar-event me-1"></i>{{ t.days }}: {{ reserva.actividad.dias.join(", ") }}</p>
+                    <p class="mb-1"><i class="bi bi-clock me-1"></i>{{ t.weekHours }}: {{ reserva.actividad.horasSemanales }}</p>
+                    <p class="mb-1"><i class="bi bi-tag me-1"></i>{{ t.tariff }}: {{ reserva.tarifa?.nombre }}</p>
+                    <p v-if="reserva.descuentos?.length" class="mb-0">
+                      <i class="bi bi-percent me-1"></i>{{ t.discounts }}:
+                      <span v-for="d in reserva.descuentos" :key="d.id">{{ d.nombre }} ({{ d.porcentaje }}%)</span>
+                    </p>
+                  </template>
+                </div>
 
                 <!-- MENSAJE SI NO PUEDE CANCELAR -->
                 <p v-if="!puedeCancelar(reserva)" class="mt-2 small text-muted">
@@ -63,7 +73,7 @@
               </div>
 
               <!-- BOTON CANCELAR -->
-              <div class="mt-4 text-end">
+              <div class="mt-3 text-end">
                 <button
                   class="btn btn-danger btn-sm rounded-pill px-3"
                   :disabled="!puedeCancelar(reserva)"
@@ -101,15 +111,31 @@ type Reserva = {
   estado: string
   tipo: "ALQUILER" | "RESERVA"
   puede_cancelar?: boolean
+
   actividad?: {
     id: number
     nombre: string
     dias: string[]
+    horasSemanales?: number
   }
   instalacion?: {
     id: number
     nombre: string
+    tipo?: string
   }
+
+  fecha?: string
+  horaInicio?: string | number
+  horaFin?: string | number
+  tarifa?: {
+    id?: number
+    nombre?: string
+  }
+  descuentos?: {
+    id: number
+    nombre: string
+    porcentaje: number
+  }[]
 }
 
 const configuracionStore = useConfiguracionStore();

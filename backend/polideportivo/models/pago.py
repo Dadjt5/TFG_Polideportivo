@@ -6,6 +6,7 @@ from django.contrib.contenttypes.models import ContentType
 from .abono import CompraAbono
 from .bono import CompraBono
 from .reserva import ReservaActividad
+from .tda import TDA
 from .configuracion import Configuracion
 from .constantes import EstadoPago, TipoActividad
 
@@ -61,7 +62,7 @@ class Pago(models.Model):
     @classmethod
     def nuevoPago(cls, concepto, usuario, objeto, complementos=None):
         porcentaje = 0
-        if not isinstance(objeto, (CompraBono, CompraAbono)):
+        if not isinstance(objeto, (CompraBono, CompraAbono, TDA)):
             porcentaje = objeto.calcularDescuento()
 
         if isinstance(objeto, CompraAbono):

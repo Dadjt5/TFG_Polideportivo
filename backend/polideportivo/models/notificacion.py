@@ -61,10 +61,10 @@ class Notificacion(models.Model):
             usuarios = User.objects.filter(id__in=UsuarioFinal.objects.filter(asistencia__sesion__actividad_id=complemento).values_list('user_id', flat=True)).distinct()
 
         elif tipoUsuarios == "INSTALACION":
-            usuarios = User.objects.filter(id__in=UsuarioFinal.objects.filter(reservas__instalacion_id=complemento).values_list('user_id', flat=True)).distinct()
+            usuarios = User.objects.filter(id__in=UsuarioFinal.objects.filter(alquileres__instalacion_id=complemento).values_list('user_id', flat=True)).distinct()
 
         elif tipoUsuarios == "PABELLON":
-            usuarios = User.objects.filter(id__in=UsuarioFinal.objects.filter(reservas__instalacion__pabellon_id=complemento).values_list('user_id', flat=True)).distinct()
+            usuarios = User.objects.filter(id__in=UsuarioFinal.objects.filter(alquileres__instalacion__pabellon_id=complemento).values_list('user_id', flat=True)).distinct()
 
         else:
             usuarios = User.objects.none()
@@ -106,7 +106,7 @@ class Notificacion(models.Model):
     def notificarNuevoMaterial(cls, actividad):
         configuracion = Configuracion.objects.all().first()
         
-        usuarios = UsuarioFinal.objects.filter(reserva__actividad=actividad).distinct()
+        usuarios = UsuarioFinal.objects.filter(reservas_actividad__actividad=actividad).distinct()
 
         for usuario in usuarios:
             cls.objects.create(

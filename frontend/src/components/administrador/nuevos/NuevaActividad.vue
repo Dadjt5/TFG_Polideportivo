@@ -583,6 +583,25 @@ function validarFormulario() {
   return ok
 }
 
+function horasValidas() {
+  for (const s of sesiones.value) {
+    if (s.horaInicio >= s.horaFin) {
+      return false
+    }
+  }
+  return true
+}
+
+function horasEnPunto() {
+  for (const s of sesiones.value) {
+    const [hIni, mIni] = s.horaInicio.split(":").map(Number)
+    const [hFin, mFin] = s.horaFin.split(":").map(Number)
+
+    if (mIni !== 0 || mFin !== 0) return false
+  }
+  return true
+}
+
 const crearActividad = async () => {
   mensaje.value = ""
   if (!validarFormulario()) {
@@ -592,6 +611,16 @@ const crearActividad = async () => {
 
   if (sesiones.value.length === 0) {
     mensaje.value = t.value.noSessionWarning
+    return
+  }
+
+  if (!horasValidas()) {
+    mensaje.value = t.value.wrongTimetable
+    return
+  }
+
+  if (!horasEnPunto()) {
+    mensaje.value = t.value.onTheHourWarning
     return
   }
 

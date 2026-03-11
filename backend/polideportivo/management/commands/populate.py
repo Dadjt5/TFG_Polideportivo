@@ -22,6 +22,8 @@ class Command(BaseCommand):
                 password=password
             )
             self.stdout.write(self.style.SUCCESS("Superusuario técnico creado"))
+        else:
+            self.stdout.write(self.style.WARNING("Superusuario ya existe"))
 
         # Usuario admin raiz
         username = os.environ.get("DJANGO_ADMIN_USERNAME")
@@ -47,7 +49,9 @@ class Command(BaseCommand):
                 )
 
             self.stdout.write(self.style.SUCCESS("Administrador RAIZ creado"))
-        
+        else:
+            self.stdout.write(self.style.WARNING("Administrador raiz ya existe"))
+
         # Configuracion del sistema
         if not Configuracion.objects.exists():
             Configuracion.objects.create(
@@ -77,7 +81,7 @@ class Command(BaseCommand):
         
         # Foro unico del sistema
         if not Foro.objects.exists():
-            Foro.objects.create(
+            foro = Foro.objects.create(
                 titulo = "Foro",
                 numeroParticipantes = 0
             )
@@ -92,7 +96,9 @@ class Command(BaseCommand):
                 titulo = "Buzón de sugerencias",
                 tema = "Buzón",
                 numeroParticipantes = 0,
-                secreto=True
+                secreto=True,
+                foro=foro
+
             )
 
             self.stdout.write(self.style.SUCCESS("Buzón de sugerencias creado"))
@@ -105,7 +111,8 @@ class Command(BaseCommand):
                 titulo = "Nuevas actividades",
                 tema = "Proponer nuevas actividades",
                 numeroParticipantes = 0,
-                secreto=True
+                secreto=True,
+                foro=foro
             )
 
             self.stdout.write(self.style.SUCCESS("Canal para proponer nuevas actividades creado"))

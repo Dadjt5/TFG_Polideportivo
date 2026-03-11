@@ -37,6 +37,7 @@ export default {
   timeRemaining: "Time remaining to complete payment",
   selectLane: "You must select a pool lane",
   cannotChangeType: "You cannot change to this facility type",
+  onTheHourWarning: "Sessions must begin and end on the hour",
 
   /* Perfil */
   role: "Role",
@@ -61,8 +62,8 @@ export default {
   newPassword: "New password",
   changePassword: "Change password",
   yourIdentifier: "Your unique identifier is",
-  monitorIdentifier: "The end user identifier created is",
-  usuarioFinalIdentifier: "The monitor identifier created is",
+  monitorIdentifier: "The monitor identifier created is",
+  usuarioFinalIdentifier: "The end user identifier created is",
   adminIdentifier: "The administrator identifier created is",
 
   /* Estadisticas de usuario final */
@@ -303,7 +304,7 @@ export default {
   selected: "Selected",
   reserved: "Reserved",
   facilityReservationTitle: "Installation reservation",
-  facilityReservationRule: "Select a maximum of 2 consecutive hours.",
+  facilityReservationRule: "Consecutive hours you can select",
   selectedDate: "Selected date",
   noDays: "There is no schedule for that date.",
 
