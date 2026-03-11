@@ -1,14 +1,14 @@
 <template>
-  <div class="min-vh-100 bg-light">
+  <div class="min-vh-100" style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
     <main class="container-fluid mt-2 px-5 py-4">
 
       <!-- CABECERA -->
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold m-0">{{ t.myStadistics }}</h2>
+      <div class="d-flex justify-content-center align-items-center mb-4 mt-3">
+        <h2 class="fw-bold m-0 text-primary">{{ t.myStadistics }}</h2>
       </div>
 
       <!-- KPIs -->
-      <div class="row g-4 mb-4">
+      <div class="row g-4 mb-4 mt-3">
 
         <div class="col-md-4 col-xl-2" v-for="kpi in kpis" :key="kpi.title">
           <div class="card shadow-sm border-0 rounded-4 h-100">

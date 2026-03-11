@@ -39,6 +39,7 @@ export interface TDA {
   id: number;
   fechaInicio: string;
   fechaExpiracion: string;
+  estado: string;
 }
 
 export const useUserStore = defineStore("user", {
@@ -58,9 +59,10 @@ export const useUserStore = defineStore("user", {
     isLogged: (state) => !!state.usuarioFinal,
     hasTda: (s) => {
       if (!s.tda) return false;
+      if (s.tda.estado != "CONFIRMADA") return false;
       const hoy = new Date();
       const fechaExpiracion = new Date(s.tda.fechaExpiracion);
-      return hoy <= fechaExpiracion;s
+      return hoy <= fechaExpiracion;
     },
     isUAM: (s) => {
       return s.usuarioFinal.esUAM

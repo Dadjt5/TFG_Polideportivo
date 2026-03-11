@@ -1,5 +1,5 @@
 <template>
-  <div class="min-vh-100 bg-light">
+  <div class="min-vh-100" style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
     <TDAActiva v-if="usuarioFinalStore.hasTda" />
     <TDAVacia v-else />
   </div>

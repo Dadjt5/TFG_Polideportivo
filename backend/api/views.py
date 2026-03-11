@@ -1841,9 +1841,7 @@ class ComprarBonoView(APIView):
 class ComprarTDAView(APIView):
     permission_classes = [IsUsuarioFinal]
     
-    def post(self, request, bono_id):
-        bono = get_object_or_404(Bono, id=bono_id)
-
+    def post(self, request):
         compra = TDA.compraTDA(request.user.usuario_final)
         if not compra:
             return Response({"respuesta": "Error al comprar la TDA"}, status=status.HTTP_400_BAD_REQUEST)
@@ -1919,6 +1917,22 @@ class ResumenPagoView(APIView):
                 "id": compra.id,
                 "estado": compra.estado,
                 "nombre": f'Bono para {compra.bono.instalacion.nombre}',
+                "pago": {
+                    "concepto": pago.concepto,
+                    "coste": pago.coste,
+                    "costeFinal": pago.costeFinal,
+                    "descuentoAplicado": pago.descuentoAplicado,
+                    "fecha": pago.fecha,
+                    "estadoPago": pago.estadoPago
+                }
+            })
+        
+        elif tipo == "comprar_tda":
+            compra = objeto  # objeto es una TDA
+            return Response({
+                "id": compra.id,
+                "estado": compra.estado,
+                "nombre": f'TDA',
                 "pago": {
                     "concepto": pago.concepto,
                     "coste": pago.coste,

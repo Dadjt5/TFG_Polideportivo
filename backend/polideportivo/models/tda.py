@@ -13,7 +13,7 @@ class TDA(models.Model):
     """Modelo para representar una actividad"""
 
     fechaInicio = models.DateField(auto_now_add=True)
-    fechaExpiracion = models.DateField()
+    fechaExpiracion = models.DateField(blank=True, null=True)
     _codigo_secreto_hash = models.CharField(max_length=128, blank=True)
     codigo_secreto = models.CharField(max_length=128, blank=True)
 

@@ -1,12 +1,12 @@
 <template>
-  <div class="min-vh-100 bg-light py-4">
-    <main class="container">
-      <h2 class="mb-4 text-center fw-bold">{{ t.personalDataTitle }}</h2>
+  <div class="min-vh-100" style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
+    <main class="container py-4 mb-3">
+      <h2 class="mb-4 mt-3 text-center fw-bold text-primary">{{ t.personalDataTitle }}</h2>
 
       <!-- Información no editable -->
-      <div class="card shadow-sm mb-4">
+      <div class="card mb-5 mt-4 rounded-4" style="background-color: rgba(255,255,255,0.9); backdrop-filter: blur(10px);">
         <div class="card-body">
-          <h5 class="fw-semibold mb-3">{{ t.inmutableData }}</h5>
+          <h5 class="fw-semibold mb-3 text-primary">{{ t.inmutableData }}</h5>
 
           <div class="row g-3">
             <div class="col-md-4">
@@ -38,9 +38,9 @@
       </div>
 
       <!-- Información editable -->
-      <div class="card shadow-sm mb-4">
+      <div class="card mb-5 rounded-4" style="background-color: rgba(255,255,255,0.9); backdrop-filter: blur(10px);">
         <div class="card-body">
-          <h5 class="fw-semibold mb-3">{{ t.editableData }}</h5>
+          <h5 class="fw-semibold mb-3 text-primary">{{ t.editableData }}</h5>
 
           <div class="row g-3">
             <div class="col-md-4">
@@ -112,19 +112,12 @@
               </div>
             </div>
           </div>
-
-          <!-- CUENTA -->
-          <div class="mb-4 mt-4">
-            <h5 class="fw-semibold mb-3">{{ t.account }}</h5>
-            <input type="text" class="form-control" :class="{ 'is-invalid': errores.cuentaBancaria }"
-              v-model="usuario.cuentaBancaria">
-          </div>
         </div>
       </div>
 
       <!-- Deportes favoritos -->
       <div class="container py-4 mb-4">
-        <h2 class="mb-4">{{ t.favoriteSports }}</h2>
+        <h2 class="mb-4 text-primary">{{ t.favoriteSports }}</h2>
 
         <div class="row">
           <div class="col-md-5">
@@ -212,7 +205,6 @@ const usuario = ref({
   municipio: '',
   localidad: '',
   codigoPostal: '',
-  cuentaBancaria: '',
   sexo: '',
   password: '',
   confirmPassword: '',
@@ -226,7 +218,6 @@ const errores = ref({
   municipio: false,
   localidad: false,
   codigoPostal: false,
-  cuentaBancaria: false,
   password: false,
 })
 
@@ -271,10 +262,6 @@ function validarFormulario() {
   errores.value.localidad = usuario.value.localidad === ''
   errores.value.codigoPostal = usuario.value.codigoPostal === ''
 
-  errores.value.cuentaBancaria =
-    usuario.value.cuentaBancaria !== '' &&
-    usuario.value.cuentaBancaria.length < 20
-
   errores.value.password =
     usuario.value.password === '' ||
     usuario.value.password === usuario.value.confirmPassword
@@ -314,10 +301,6 @@ function camposModificados() {
 
   if (usuarioFinalStore.usuarioFinal.codigoPostal != usuario.value.codigoPostal) {
     data["codigoPostal"] = usuario.value.codigoPostal
-  }
-
-  if (usuarioFinalStore.usuarioFinal.cuentaBancaria != usuario.value.cuentaBancaria) {
-    data["cuentaBancaria"] = usuario.value.cuentaBancaria
   }
 
   if (usuario.value.password) {
