@@ -266,12 +266,59 @@
           </button>
         </template>
 
-        <button v-if="!editando" class="btn btn-outline-danger btn-lg rounded-pill px-5 bg-white" @click="eliminar">
+        <button v-if="!editando" class="btn btn-outline-danger btn-lg rounded-pill px-5 bg-white" @click="abrirConfirmacion">
           {{ t.deleteFacility }}
         </button>
       </div>
-
     </main>
+
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4">
+
+          <div class="modal-header">
+            <h5 class="modal-title">{{ t.confirmDelete }}</h5>
+          </div>
+
+          <div class="modal-body text-center">
+            <p>{{ t.confirmDeleteFacility }}</p>
+          </div>
+
+          <div class="modal-footer justify-content-center">
+            <button class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">
+              {{ t.cancel }}
+            </button>
+
+            <button class="btn btn-danger rounded-pill" @click="confirmarEliminar">
+              {{ t.deleteUser }}
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="successDeleteModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 text-center">
+
+          <div class="modal-body py-5">
+
+            <i class="bi bi-check-circle-fill text-success fs-1 mb-3"></i>
+
+            <h4 class="fw-semibold">
+              {{ mensaje }}
+            </h4>
+
+            <button class="btn btn-primary rounded-pill mt-4" @click="finalizar" data-bs-dismiss="modal">
+              {{ t.continue }}
+            </button>
+
+          </div>
+
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -279,6 +326,7 @@
 <script setup lang="ts">
 import { inject, ref, onMounted, type Ref, watch } from 'vue';
 import { useRouter } from "vue-router";
+import { Modal } from 'bootstrap'
 
 /* Importamos la comunicacion para recuperar la informacion de instalaciones del backend */
 import { getInstalacionDetalle, modificarInstalacion, eliminarInstalacion } from "@/services/detalleService";
@@ -428,12 +476,37 @@ async function guardarCambios() {
   }
 }
 
-const eliminar = async () => {
+let confirmModal: Modal
+let successModal: Modal
+
+const eliminado = ref(false)
+
+function abrirConfirmacion() {
+  confirmModal.show()
+}
+
+async function confirmarEliminar() {
   try {
     await eliminarInstalacion(instalacion.value.id)
-    router.push({ name: 'gestion-espacios' });
+
+    confirmModal.hide()
+    successModal.show()
+
+    mensaje.value = t.value.facilityDeleted
+    eliminado.value = true
   } catch (e) {
+    mensaje.value = t.value.noDeleted
+    eliminado.value = false
     console.error("Error al eliminar la instalacion", e);
+  }
+}
+
+const finalizar = async () => {
+  if (eliminado.value) {
+    router.push({ name: 'gestion-espacios' });
+  } else {
+    successModal.hide()
+    eliminado.value = false
   }
 }
 
@@ -444,6 +517,7 @@ const volver = () => {
 watch(
   () => instalacion.value.tipoInstalacion,
   (tipo) => {
+    mensaje.value = ""
     if (tipo !== "PISCINA") {
       instalacion.value.numeroCalles = 0
     }
@@ -452,6 +526,9 @@ watch(
 
 onMounted(async () => {
   const id = parseInt(props.id);
+
+  confirmModal = new Modal(document.getElementById('confirmDeleteModal')!)
+  successModal = new Modal(document.getElementById('successDeleteModal')!)
 
   try {
     const data = await getInstalacionDetalle(id)
@@ -468,6 +545,7 @@ onMounted(async () => {
 
     instalacionOriginal.value = JSON.parse(JSON.stringify(instalacion.value))
   } catch (e) {
+    mensaje.value = t.value.unexpectedError
     console.log("Error al obtener la informacion de la instalacion", e);
   }
 });

@@ -14,7 +14,7 @@ export const modificarMonitor = async (id: number, data: any) => {
 
 /* Función para eliminar un monitor */
 export const eliminarMonitor = async (id: number) => {
-  const response = await api.patch(`api/v1/monitores/${id}/`);
+  const response = await api.delete(`api/v1/monitores/${id}/`);
   return response.data;
 };
 

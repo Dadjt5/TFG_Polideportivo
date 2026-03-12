@@ -9,6 +9,7 @@ from rest_framework.permissions import (
 )
 from rest_framework import status
 import stripe
+from rest_framework.exceptions import PermissionDenied
 from django.utils.dateparse import parse_date
 from datetime import date
 from django.db import transaction
@@ -51,7 +52,7 @@ from polideportivo.models import (
     ReservaActividad, Alquiler, Administrador, User, CompraBono, CompraAbono,
     Mensaje, Sesion, MapaReservas, TipoActividad, TipoInstalacion, FormaReserva,
     Terreno, Estado, Dia, ActividadComun, GrupoReducido, Fisioterapia, EstadoPago,
-    EstadoReserva, Periodo, Feedback, Calle
+    EstadoReserva, Periodo, Feedback, Calle, RolAdministrador
 )
 
 
@@ -529,6 +530,38 @@ class AdministradorViewSet(viewsets.ModelViewSet):
     queryset = Administrador.objects.all()
     serializer_class = AdministradorSerializer
     permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        admin = self.request.user.administrador
+        rol = serializer.validated_data.get("rol")
+
+        if admin.rol != RolAdministrador.RAIZ and rol == RolAdministrador.RAIZ:
+            raise PermissionDenied("No puedes crear administradores raíz")
+
+        serializer.save()
+
+    def perform_update(self, serializer):
+        admin = self.request.user.administrador
+        adminNuevo = self.get_object()
+
+        nuevoRol = serializer.validated_data.get("rol", adminNuevo.rol)
+
+        if admin.rol != RolAdministrador.RAIZ and adminNuevo.rol == RolAdministrador.RAIZ:
+            raise PermissionDenied("No se puede modificar al administrador raíz")
+
+        if admin.rol != RolAdministrador.RAIZ and nuevoRol == RolAdministrador.RAIZ:
+            raise PermissionDenied("No puedes convertir a nadie en administrador raíz")
+
+        serializer.save()
+    
+    def destroy(self, request, *args, **kwargs):
+        admin = request.user.administrador
+        adminObjetivo = self.get_object()
+
+        if admin.rol != RolAdministrador.RAIZ and adminObjetivo.rol == RolAdministrador.RAIZ:
+            raise PermissionDenied("No se puede eliminar al administrador raíz")
+
+        return super().destroy(request, *args, **kwargs)
 
 
 # ----------------

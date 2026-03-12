@@ -106,6 +106,11 @@
         </div>
       </div>
 
+      <!-- MENSAJE -->
+      <p v-if="mensaje" class="text-center text-danger mt-4">
+        {{ mensaje }}
+      </p>
+
       <!-- ACCIONES -->
       <div class="d-flex justify-content-center gap-3 mt-5">
         <button v-if="!editando" class="btn btn-primary btn-lg rounded-pill" @click="activarEdicion">
@@ -121,19 +126,66 @@
           </button>
         </template>
 
-        <button v-if="!editando" class="btn btn-danger btn-lg rounded-pill" @click="eliminar">
+        <button v-if="!editando" class="btn btn-danger btn-lg rounded-pill" @click="abrirConfirmacion">
           <i class="bi bi-trash me-2"></i> {{ t.deleteChannel }}
         </button>
-
       </div>
-
     </main>
+
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4">
+
+          <div class="modal-header">
+            <h5 class="modal-title">{{ t.confirmDelete }}</h5>
+          </div>
+
+          <div class="modal-body text-center">
+            <p>{{ t.confirmDeleteChannel }}</p>
+          </div>
+
+          <div class="modal-footer justify-content-center">
+            <button class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">
+              {{ t.cancel }}
+            </button>
+
+            <button class="btn btn-danger rounded-pill" @click="confirmarEliminar">
+              {{ t.deleteUser }}
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="successDeleteModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 text-center">
+
+          <div class="modal-body py-5">
+
+            <i class="bi bi-check-circle-fill text-success fs-1 mb-3"></i>
+
+            <h4 class="fw-semibold">
+              {{ mensaje }}
+            </h4>
+
+            <button class="btn btn-primary rounded-pill mt-4" @click="finalizar" data-bs-dismiss="modal">
+              {{ t.continue }}
+            </button>
+
+          </div>
+
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, inject, type Ref } from "vue";
 import { useRouter } from "vue-router";
+import { Modal } from 'bootstrap'
 
 import { getCanalAdministrador, editarCanal, eliminarCanal } from "@/services/foroService"
 
@@ -146,6 +198,7 @@ const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);
 
 const router = useRouter();
+const mensaje = ref("");
 
 const editando = ref(false)
 
@@ -172,6 +225,7 @@ function validarFormulario() {
 }
 
 function activarEdicion() {
+  mensaje.value = ""
   canalOriginal.value = JSON.parse(JSON.stringify(canal.value))
 
   errores.value.titulo = false
@@ -181,17 +235,43 @@ function activarEdicion() {
 }
 
 function cancelarEdicion() {
+  mensaje.value = ""
   canal.value = JSON.parse(JSON.stringify(canalOriginal.value))
 
   editando.value = false
 }
 
-const eliminar = async () => {
+let confirmModal: Modal
+let successModal: Modal
+
+const eliminado = ref(false)
+
+function abrirConfirmacion() {
+  confirmModal.show()
+}
+
+async function confirmarEliminar() {
   try {
     await eliminarCanal(canal.value.id)
-    router.push({ name: 'foro' });
+
+    confirmModal.hide()
+    successModal.show()
+
+    mensaje.value = t.value.channelDeleted
+    eliminado.value = true
   } catch (e) {
+    mensaje.value = t.value.noDeleted
+    eliminado.value = false
     console.error("Error al eliminar el canal", e);
+  }
+}
+
+const finalizar = async () => {
+  if (eliminado.value) {
+    router.push({ name: 'foro' });
+  } else {
+    successModal.hide()
+    eliminado.value = false
   }
 }
 
@@ -218,6 +298,7 @@ function camposModificados() {
 }
 
 const guardarCambios = async () => {
+  mensaje.value = ""
   try {
     if (!validarFormulario()) return
 
@@ -236,11 +317,15 @@ const guardarCambios = async () => {
 const volver = () => router.back();
 
 onMounted(async () => {
+  confirmModal = new Modal(document.getElementById('confirmDeleteModal')!)
+  successModal = new Modal(document.getElementById('successDeleteModal')!)
+
   try {
     canal.value = await getCanalAdministrador(Number(props.idCanal))
     canalOriginal.value = JSON.parse(JSON.stringify(canal.value))
   } catch(e) {
-    console.log("Error al obtener la informacion del canal", e);
+    mensaje.value = t.value.unexpectedError
+    console.error("Error al obtener la informacion del canal", e);
   }
 });
 </script>

@@ -116,14 +116,16 @@ import { type Ref, inject, ref } from "vue"
 import { useRouter } from "vue-router"
 
 import { registrarAdministrador } from "@/services/loginService"
+import { useAuthStore } from "@/stores/auth"
 
 import type { Language } from "@/useI18N"
 import { useI18n } from "@/useI18N"
 
-const language = inject<Ref<Language>>("language")!
-const t = useI18n(language)
+const language = inject<Ref<Language>>("language")!;
+const t = useI18n(language);
 
-const router = useRouter()
+const router = useRouter();
+const authStore = useAuthStore();
 
 const userIdentifier = ref("");
 const showIdentifier = ref(false);
@@ -183,8 +185,25 @@ function validarFormulario() {
   return valido
 }
 
+function comprobarPermisos() {
+  if (!authStore.isAdminRaiz && administrador.value.rol == "RAIZ") {
+    return false
+  }
+
+  return true
+}
+
 const crearAdministrador = async () => {
-  if(!validarFormulario()) return
+  mensaje.value = ""
+  if (!validarFormulario()) {
+    mensaje.value = t.value.missing
+    return
+  }
+
+  if (!comprobarPermisos()) {
+    mensaje.value = t.value.noPermissions
+    return
+  }
 
   try {
     const data = await registrarAdministrador(administrador.value)

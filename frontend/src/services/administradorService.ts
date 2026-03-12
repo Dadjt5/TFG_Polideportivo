@@ -14,7 +14,7 @@ export const modificarAdministrador = async (id: number, data: any) => {
 
 /* Función para eliminar un administrador */
 export const eliminarAdministrador = async (id: number) => {
-  const response = await api.patch(`api/v1/administradores/${id}/`)
+  const response = await api.delete(`api/v1/administradores/${id}/`)
   return response.data
 };
 

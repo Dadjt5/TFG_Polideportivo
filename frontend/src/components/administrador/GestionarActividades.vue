@@ -131,7 +131,7 @@
 
                   <button
                     class="btn btn-sm btn-outline-danger rounded-pill"
-                    @click="borrarDeporte(d.id)"
+                    @click="abrirConfirmacion(d.id)"
                   >
                     <i class="bi bi-trash"></i>
                   </button>
@@ -188,12 +188,61 @@
       </div>
     </div>
 
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4">
+
+          <div class="modal-header">
+            <h5 class="modal-title">{{ t.confirmDelete }}</h5>
+          </div>
+
+          <div class="modal-body text-center">
+            <p>{{ t.confirmDeleteSport }}</p>
+          </div>
+
+          <div class="modal-footer justify-content-center">
+            <button class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">
+              {{ t.cancel }}
+            </button>
+
+            <button class="btn btn-danger rounded-pill" @click="confirmarEliminar">
+              {{ t.deleteUser }}
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="successDeleteModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 text-center">
+
+          <div class="modal-body py-5">
+
+            <i class="bi bi-check-circle-fill text-success fs-1 mb-3"></i>
+
+            <h4 class="fw-semibold">
+              {{ mensaje }}
+            </h4>
+
+            <button class="btn btn-primary rounded-pill mt-4" @click="finalizar" data-bs-dismiss="modal">
+              {{ t.continue }}
+            </button>
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref, computed, inject, type Ref } from "vue"
 import { useRouter } from "vue-router"
+import { Modal } from 'bootstrap'
 
 import { getActividadesSimples, getDeportes } from "@/services/listadoService"
 import { modificarDeporte, eliminarDeporte } from "@/services/detalleService"
@@ -278,23 +327,52 @@ const guardarDeporte = async () => {
   cerrarModal()
 }
 
-const borrarDeporte = async (id: number) => {
+let confirmModal: Modal
+let successModal: Modal
+const id_deporte = ref(0)
+
+const eliminado = ref(false)
+
+function abrirConfirmacion(id: number) {
+  confirmModal.show()
+  id_deporte.value = id
+}
+
+async function confirmarEliminar() {
   try {
-    mensaje.value = ""
-    await eliminarDeporte(id)
-    deportes.value = await getDeportes()
-  } catch(e: any) {
-    mensaje.value = e.response?.data?.respuesta
-    console.log("Error al eliminar el deporte", e)    
+    await eliminarDeporte(id_deporte.value)
+
+    confirmModal.hide()
+    successModal.show()
+
+    mensaje.value = t.value.sportDeleted
+    eliminado.value = true
+  } catch (e) {
+    mensaje.value = t.value.noDeleted
+    eliminado.value = false
+    console.error("Error al eliminar el deporte", e);
   }
 }
 
+const finalizar = async () => {
+  if (eliminado.value) {
+    deportes.value = await getDeportes()
+  } else {
+    successModal.hide()
+    eliminado.value = false
+  }
+}
+
+
 onMounted(async () => {
+  confirmModal = new Modal(document.getElementById('confirmDeleteModal')!)
+  successModal = new Modal(document.getElementById('successDeleteModal')!)
+
   try {
     actividades.value = await getActividadesSimples()
     deportes.value = await getDeportes()
   } catch (e: any) {
-    mensaje.value = e.response?.data?.respuesta
+    mensaje.value = t.value.unexpectedError
     console.log("Error al cargar las actividades y/o los deportes", e)
   }
 })

@@ -5,8 +5,11 @@ from django.db import models
 
 from .constantes import RolAdministrador
 
+def generar_codigo():
+    return uuid.uuid4().hex[:8]
+
 class User(AbstractUser):
-    codigo_usuario = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    codigo_usuario = models.CharField(max_length=8, unique=True, default=generar_codigo, editable=False)
 
     @property
     def is_usuario_final(self):

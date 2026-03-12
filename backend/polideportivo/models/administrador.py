@@ -67,3 +67,8 @@ class Administrador(models.Model):
             "respuesta": admin,
             "error": False
         }
+
+    def delete(self, *args, **kwargs):
+        user = self.user
+        super().delete(*args, **kwargs)
+        user.delete()

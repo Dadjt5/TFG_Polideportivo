@@ -63,11 +63,11 @@
 
           <!-- Login / logout -->
           <li class="nav-item fs-5">
-            <a v-if="userStore.user" href="#" class="nav-link text-white" @click.prevent="logout" @click="menuOpen = false">
+            <a v-if="userStore.user" href="#" class="nav-link text-white fs-4" @click.prevent="logout" @click="menuOpen = false">
               {{ t.logout }}
             </a>
 
-            <router-link v-else to="/login" class="nav-link text-white" @click="menuOpen = false">
+            <router-link v-else to="/login" class="nav-link text-white fs-4" @click="menuOpen = false">
               {{ t.login }}
             </router-link>
           </li>

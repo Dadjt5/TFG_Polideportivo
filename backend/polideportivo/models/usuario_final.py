@@ -86,7 +86,7 @@ class UsuarioFinal(Usuario):
 
         User = get_user_model()
 
-        if User.objects.filter(username=dni).exists():
+        if dni and User.objects.filter(username=dni).exists():
             return {
                 "respuesta": "Ya existe un usuario con ese DNI",
                 "error": True
@@ -99,9 +99,14 @@ class UsuarioFinal(Usuario):
             }
 
         with transaction.atomic():
+            codigo = User.generar_codigo()
+    
+            username = dni if dni else codigo
+
             auth_user = User.objects.create_user(
-                username=dni,
+                username=username,
                 email=email,
+                codigo_usuario=codigo,
                 password=password
             )
 
@@ -126,3 +131,8 @@ class UsuarioFinal(Usuario):
             "respuesta": usuarioFinal,
             "error": False
         }
+
+    def delete(self, *args, **kwargs):
+        user = self.user
+        super().delete(*args, **kwargs)
+        user.delete()

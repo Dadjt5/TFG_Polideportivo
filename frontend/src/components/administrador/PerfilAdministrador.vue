@@ -21,7 +21,7 @@
 
               <p class="text-dark mb-1">
                 <i class="bi bi-person-badge me-2"></i>
-                {{ t.rootAdmin }}
+                {{ administradorStore.administrador.rol }}
               </p>
               <p class="text-secondary mb-0">
                 {{ t.loginCode }}: {{ administradorStore.administrador.codigo_usuario }}

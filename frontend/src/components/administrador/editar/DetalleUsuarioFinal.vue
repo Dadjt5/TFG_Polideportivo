@@ -233,6 +233,11 @@
             </div>
           </div>
 
+          <!-- MENSAJE -->
+          <p v-if="mensaje" class="text-center text-danger mt-4">
+            {{ mensaje }}
+          </p>
+
           <!-- ACCIONES -->
       <div class="d-flex justify-content-center gap-3 mt-5">
         <button v-if="!isEditing" class="btn btn-primary btn-lg rounded-pill" @click="activarEdicion">
@@ -248,7 +253,7 @@
           </button>
         </template>
 
-        <button v-if="!isEditing" class="btn btn-danger btn-lg rounded-pill" @click="eliminar">
+        <button v-if="!isEditing" class="btn btn-danger btn-lg rounded-pill" @click="abrirConfirmacion">
           <i class="bi bi-trash me-2"></i> {{ t.deleteUser }}
         </button>
 
@@ -256,6 +261,54 @@
         </div>
       </div>
     </main>
+
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4">
+
+          <div class="modal-header">
+            <h5 class="modal-title">{{ t.confirmDelete }}</h5>
+          </div>
+
+          <div class="modal-body text-center">
+            <p>{{ t.confirmDeleteFinalUser }}</p>
+          </div>
+
+          <div class="modal-footer justify-content-center">
+            <button class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">
+              {{ t.cancel }}
+            </button>
+
+            <button class="btn btn-danger rounded-pill" @click="confirmarEliminar">
+              {{ t.deleteUser }}
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="successDeleteModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 text-center">
+
+          <div class="modal-body py-5">
+
+            <i class="bi bi-check-circle-fill text-success fs-1 mb-3"></i>
+
+            <h4 class="fw-semibold">
+              {{ mensaje }}
+            </h4>
+
+            <button class="btn btn-primary rounded-pill mt-4" @click="finalizar" data-bs-dismiss="modal">
+              {{ t.continue }}
+            </button>
+
+          </div>
+
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -263,6 +316,7 @@
 <script setup lang="ts">
 import { type Ref, ref, inject, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { Modal } from 'bootstrap'
 
 import { getUsuarioFinal, modificarUsuarioFinal, eliminarUsuarioFinal } from '@/services/usuarioFinalService';
 
@@ -342,13 +396,17 @@ function validarFormulario() {
   return valido
 }
 
+const mensaje = ref("")
+
 function activarEdicion() {
+  mensaje.value = ""
   usuarioOriginal.value = JSON.parse(JSON.stringify(usuario.value))
 	Object.keys(errores.value).forEach(k => errores.value[k] = false)
   isEditing.value = true
 }
 
 function cancelarEdicion() {
+  mensaje.value = ""
   usuarioOriginal.value = JSON.parse(JSON.stringify(usuario.value))
   isEditing.value = false
 }
@@ -408,6 +466,7 @@ function camposModificados() {
 }
 
 const guardarCambios = async () => {
+  mensaje.value = ""
   try {
 		if (!validarFormulario()) return
 
@@ -421,11 +480,37 @@ const guardarCambios = async () => {
   }
 }
 
-const eliminar = async () => {
+let confirmModal: Modal
+let successModal: Modal
+
+const eliminado = ref(false)
+
+function abrirConfirmacion() {
+  confirmModal.show()
+}
+
+async function confirmarEliminar() {
   try {
     await eliminarUsuarioFinal(usuario.value.id)
+
+    confirmModal.hide()
+    successModal.show()
+
+    mensaje.value = t.value.finalUserDeleted
+    eliminado.value = true
   } catch (e) {
+    mensaje.value = t.value.noDeleted
+    eliminado.value = false
     console.error("Error al eliminar el usuario final", e);
+  }
+}
+
+const finalizar = async () => {
+  if (eliminado.value) {
+    router.push({ name: 'gestion-usuarios' });
+  } else {
+    successModal.hide()
+    eliminado.value = false
   }
 }
 
@@ -436,10 +521,14 @@ function volver() {
 onMounted(async () => {
   const id = parseInt(props.id);
 
+  confirmModal = new Modal(document.getElementById('confirmDeleteModal')!)
+  successModal = new Modal(document.getElementById('successDeleteModal')!)
+
 	try {
 	  usuario.value = await getUsuarioFinal(id);
 		usuarioOriginal.value = JSON.parse(JSON.stringify(usuario.value))
 	} catch(e) {
+    mensaje.value = t.value.unexpectedError
 		console.log("Error al obtener informacion del usuario final", e);
 	}
 });

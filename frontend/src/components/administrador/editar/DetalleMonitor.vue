@@ -17,10 +17,8 @@
 
           <!-- MONITOR -->
           <div class="d-flex flex-column flex-md-row align-items-center gap-4 mb-4">
-            <div
-              class="rounded-circle bg-success bg-opacity-10 d-flex align-items-center justify-content-center"
-              style="width:96px;height:96px"
-            >
+            <div class="rounded-circle bg-success bg-opacity-10 d-flex align-items-center justify-content-center"
+              style="width:96px;height:96px">
               <i class="bi bi-person-badge-fill text-success fs-1"></i>
             </div>
 
@@ -38,12 +36,8 @@
             <!-- NOMBRE -->
             <div class="col-md-4">
               <label class="form-label">{{ t.name }}</label>
-              <input
-                v-if="isEditing"
-                class="form-control"
-                v-model="monitor.nombre"
-                :class="{ 'is-invalid': errores.nombre }"
-              />
+              <input v-if="isEditing" class="form-control" v-model="monitor.nombre"
+                :class="{ 'is-invalid': errores.nombre }" />
               <p v-else class="form-control-plaintext">
                 {{ monitor.nombre || '-' }}
               </p>
@@ -52,12 +46,8 @@
             <!-- APELLIDOS -->
             <div class="col-md-4">
               <label class="form-label">{{ t.surnames }}</label>
-              <input
-                v-if="isEditing"
-                class="form-control"
-                v-model="monitor.apellidos"
-                :class="{ 'is-invalid': errores.apellidos }"
-              />
+              <input v-if="isEditing" class="form-control" v-model="monitor.apellidos"
+                :class="{ 'is-invalid': errores.apellidos }" />
               <p v-else class="form-control-plaintext">
                 {{ monitor.apellidos || '-' }}
               </p>
@@ -89,7 +79,12 @@
 
           </div>
 
-         <!-- ACCIONES -->
+          <!-- MENSAJE -->
+          <p v-if="mensaje" class="text-center text-danger mt-4">
+            {{ mensaje }}
+          </p>
+
+          <!-- ACCIONES -->
           <div class="d-flex justify-content-center gap-4 mt-5">
 
             <button v-if="!isEditing" class="btn btn-primary btn-lg rounded-pill" @click="activarEdicion">
@@ -108,7 +103,7 @@
               </button>
             </template>
 
-            <button v-if="!isEditing" class="btn btn-danger btn-lg rounded-pill" @click="eliminar">
+            <button v-if="!isEditing" class="btn btn-danger btn-lg rounded-pill" @click="abrirConfirmacion">
               <i class="bi bi-trash me-2"></i>
               {{ t.deleteUser }}
             </button>
@@ -118,12 +113,61 @@
         </div>
       </div>
     </main>
+
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4">
+
+          <div class="modal-header">
+            <h5 class="modal-title">{{ t.confirmDelete }}</h5>
+          </div>
+
+          <div class="modal-body text-center">
+            <p>{{ t.confirmDeleteMonitor }}</p>
+          </div>
+
+          <div class="modal-footer justify-content-center">
+            <button class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">
+              {{ t.cancel }}
+            </button>
+
+            <button class="btn btn-danger rounded-pill" @click="confirmarEliminar">
+              {{ t.deleteUser }}
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="successDeleteModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 text-center">
+
+          <div class="modal-body py-5">
+
+            <i class="bi bi-check-circle-fill text-success fs-1 mb-3"></i>
+
+            <h4 class="fw-semibold">
+              {{ mensaje }}
+            </h4>
+
+            <button class="btn btn-primary rounded-pill mt-4" @click="finalizar" data-bs-dismiss="modal">
+              {{ t.continue }}
+            </button>
+
+          </div>
+
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, inject, onMounted, type Ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { Modal } from 'bootstrap'
 
 import { getMonitor, modificarMonitor, eliminarMonitor } from '@/services/monitorService'
 
@@ -137,6 +181,7 @@ const router = useRouter()
 const language = inject<Ref<Language>>('language')!
 const t = useI18n(language)
 
+const mensaje = ref("")
 const isEditing = ref(false)
 
 const monitor = ref({
@@ -145,7 +190,7 @@ const monitor = ref({
   apellidos: '',
   DNI: '',
   codigo_usuario: '',
-  email:''
+  email: ''
 })
 
 const monitorOriginal = ref<any>(null)
@@ -171,6 +216,7 @@ function validarFormulario() {
 }
 
 function activarEdicion() {
+  mensaje.value = ""
   monitorOriginal.value = JSON.parse(JSON.stringify(monitor.value))
   Object.keys(errores.value).forEach(
     k => (errores.value[k as keyof typeof errores.value] = false)
@@ -179,6 +225,7 @@ function activarEdicion() {
 }
 
 function cancelarEdicion() {
+  mensaje.value = ""
   monitor.value = JSON.parse(JSON.stringify(monitorOriginal.value))
   isEditing.value = false
 }
@@ -201,7 +248,33 @@ function camposModificados() {
   return data
 }
 
+let confirmModal: Modal
+let successModal: Modal
+
+const eliminado = ref(false)
+
+function abrirConfirmacion() {
+  confirmModal.show()
+}
+
+async function confirmarEliminar() {
+  try {
+    await eliminarMonitor(monitor.value.id)
+
+    confirmModal.hide()
+    successModal.show()
+
+    mensaje.value = t.value.monitorDeleted
+    eliminado.value = true
+  } catch (e) {
+    mensaje.value = t.value.noDeleted
+    eliminado.value = false
+    console.error("Error al eliminar el monitor", e);
+  }
+}
+
 async function guardarCambios() {
+  mensaje.value = ""
   if (!validarFormulario()) return
 
   const data = camposModificados()
@@ -218,11 +291,12 @@ async function guardarCambios() {
   }
 }
 
-const eliminar = async () => {
-  try {
-    await eliminarMonitor(monitor.value.id)
-  } catch (e) {
-    console.error("Error al eliminar el monitor", e);
+const finalizar = async () => {
+  if (eliminado.value) {
+    router.push({ name: 'gestion-usuarios' });
+  } else {
+    successModal.hide()
+    eliminado.value = false
   }
 }
 
@@ -233,10 +307,14 @@ function volver() {
 onMounted(async () => {
   const id = parseInt(props.id)
 
+  confirmModal = new Modal(document.getElementById('confirmDeleteModal')!)
+  successModal = new Modal(document.getElementById('successDeleteModal')!)
+
   try {
     monitor.value = await getMonitor(id)
     monitorOriginal.value = JSON.parse(JSON.stringify(monitor.value))
   } catch (e) {
+    mensaje.value = t.value.unexpectedError
     console.error('Error al obtener informacion del monitor', e)
   }
 })

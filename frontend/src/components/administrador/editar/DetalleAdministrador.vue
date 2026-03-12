@@ -71,15 +71,20 @@
 
           </div>
 
+          <!-- MENSAJE ERROR -->
+          <p v-if="mensaje" class="text-center text-danger mt-4">
+            {{ mensaje }}
+          </p>
+
           <!-- ACCIONES -->
           <div class="d-flex justify-content-center gap-4 mt-5">
 
-            <button v-if="!isEditing" class="btn btn-primary btn-lg rounded-pill" @click="activarEdicion">
+            <button v-if="!isEditing && !esYo()" class="btn btn-primary btn-lg rounded-pill" @click="activarEdicion">
               <i class="bi bi-pencil me-2"></i>
               {{ t.modifyUser }}
             </button>
 
-            <template v-else>
+            <template v-if="isEditing && !esYo()">
               <button class="btn btn-success btn-lg rounded-pill" @click="guardarCambios">
                 <i class="bi bi-check-lg me-2"></i>
                 {{ t.saveChanges }}
@@ -90,7 +95,7 @@
               </button>
             </template>
 
-            <button v-if="!isEditing" class="btn btn-danger btn-lg rounded-pill" @click="eliminar">
+            <button v-if="!isEditing && !esYo()" class="btn btn-danger btn-lg rounded-pill" @click="abrirConfirmacion">
               <i class="bi bi-trash me-2"></i>
               {{ t.deleteUser }}
             </button>
@@ -99,17 +104,68 @@
         </div>
       </div>
     </main>
+
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4">
+
+          <div class="modal-header">
+            <h5 class="modal-title">{{ t.confirmDelete }}</h5>
+          </div>
+
+          <div class="modal-body text-center">
+            <p>{{ t.confirmDeleteAdmin }}</p>
+          </div>
+
+          <div class="modal-footer justify-content-center">
+            <button class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">
+              {{ t.cancel }}
+            </button>
+
+            <button class="btn btn-danger rounded-pill" @click="confirmarEliminar">
+              {{ t.deleteUser }}
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="successDeleteModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 text-center">
+
+          <div class="modal-body py-5">
+
+            <i class="bi bi-check-circle-fill text-success fs-1 mb-3"></i>
+
+            <h4 class="fw-semibold">
+              {{ mensaje }}
+            </h4>
+
+            <button class="btn btn-primary rounded-pill mt-4" @click="finalizar" data-bs-dismiss="modal">
+              {{ t.continue }}
+            </button>
+
+          </div>
+
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, inject, onMounted, type Ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { Modal } from 'bootstrap'
 
 import { getAdministrador, modificarAdministrador, eliminarAdministrador } from '@/services/administradorService'
+import { useAuthStore } from '@/stores/auth'
 
 import type { Language } from '@/useI18N'
 import { useI18n } from '@/useI18N'
+import { useAdministradorStore } from '@/stores/administrador'
 
 const props = defineProps<{ id: string }>()
 
@@ -119,6 +175,9 @@ const language = inject<Ref<Language>>('language')!
 const t = useI18n(language)
 
 const isEditing = ref(false)
+const authStore = useAuthStore()
+const mensaje = ref("")
+const eliminado = ref(false)
 
 const admin = ref({
   id: 0,
@@ -152,6 +211,7 @@ function validarFormulario() {
 }
 
 function activarEdicion() {
+  mensaje.value = ""
   adminOriginal.value = JSON.parse(JSON.stringify(admin.value))
   Object.keys(errores.value).forEach(
     k => (errores.value[k as keyof typeof errores.value] = false)
@@ -160,6 +220,7 @@ function activarEdicion() {
 }
 
 function cancelarEdicion() {
+  mensaje.value = ""
   admin.value = JSON.parse(JSON.stringify(adminOriginal.value))
   isEditing.value = false
 }
@@ -182,8 +243,27 @@ function camposModificados() {
   return data
 }
 
+function comprobarPermisos() {
+  if (!authStore.isAdminRaiz && (adminOriginal.value.rol == "RAIZ" || admin.value.rol == "RAIZ")) {
+    return false
+  }
+
+  return true
+}
+
+const administradorStore = useAdministradorStore();
+
 async function guardarCambios() {
-  if (!validarFormulario()) return
+  mensaje.value = ""
+  if (!validarFormulario()) {
+    mensaje.value = t.value.missing
+    return
+  }
+
+  if (!comprobarPermisos()) {
+    mensaje.value = t.value.noPermissions
+    return
+  }
 
   const data = camposModificados()
   if (Object.keys(data).length === 0) {
@@ -199,11 +279,39 @@ async function guardarCambios() {
   }
 }
 
-const eliminar = async () => {
+function esYo() {
+  return admin.value.id === administradorStore.administrador.id
+}
+
+let confirmModal: Modal
+let successModal: Modal
+
+function abrirConfirmacion() {
+  confirmModal.show()
+}
+
+async function confirmarEliminar() {
   try {
     await eliminarAdministrador(admin.value.id)
+
+    confirmModal.hide()
+    successModal.show()
+
+    mensaje.value = t.value.adminDeleted
+    eliminado.value = true
   } catch (e) {
+    mensaje.value = t.value.noDeleted
+    eliminado.value = false
     console.error("Error al eliminar el administrador", e);
+  }
+}
+
+const finalizar = async () => {
+  if (eliminado.value) {
+    router.push({ name: 'gestion-usuarios' });
+  } else {
+    successModal.hide()
+    eliminado.value = false
   }
 }
 
@@ -212,11 +320,16 @@ function volver() {
 }
 
 onMounted(async () => {
+  const id = parseInt(props.id)
+
+  confirmModal = new Modal(document.getElementById('confirmDeleteModal')!)
+  successModal = new Modal(document.getElementById('successDeleteModal')!)
+
   try {
-    const id = parseInt(props.id)
     admin.value = await getAdministrador(id)
     adminOriginal.value = JSON.parse(JSON.stringify(admin.value))
   } catch (e) {
+    mensaje.value = t.value.unexpectedError
     console.error('Error al cargar el administrador', e)
   }
 })

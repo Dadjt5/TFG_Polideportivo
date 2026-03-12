@@ -49,3 +49,8 @@ class Monitor(Usuario):
     @classmethod
     def contar(cls):
         return cls.objects.count()
+
+    def delete(self, *args, **kwargs):
+        user = self.user
+        super().delete(*args, **kwargs)
+        user.delete()
