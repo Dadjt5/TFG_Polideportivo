@@ -20,10 +20,10 @@ class Notificacion(models.Model):
     fijado = models.BooleanField(default=False)
     debeMarcar = models.BooleanField(default=False)
 
-    actividad = models.ForeignKey('Actividad', on_delete=models.RESTRICT, blank=True, null=True)
-    instalacion = models.ForeignKey('Instalacion', on_delete=models.RESTRICT, blank=True, null=True)
-    pabellon = models.ForeignKey('Pabellon', on_delete=models.RESTRICT, blank=True, null=True)
-    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.RESTRICT)
+    actividad = models.ForeignKey('Actividad', on_delete=models.SET_NULL, blank=True, null=True)
+    instalacion = models.ForeignKey('Instalacion', on_delete=models.SET_NULL, blank=True, null=True)
+    pabellon = models.ForeignKey('Pabellon', on_delete=models.SET_NULL, blank=True, null=True)
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     class Meta:
         ordering = ['-fecha', '-hora']

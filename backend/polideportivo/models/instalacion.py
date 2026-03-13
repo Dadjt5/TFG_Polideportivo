@@ -35,7 +35,7 @@ class Instalacion(models.Model):
     numeroCalles = models.PositiveIntegerField(default=0)
 
     pabellon = models.ForeignKey(Pabellon, on_delete=models.RESTRICT)
-    tarifa = models.ForeignKey('TarifaInstalacion', on_delete=models.PROTECT, blank=True, null=True)
+    tarifa = models.ForeignKey('TarifaInstalacion', on_delete=models.RESTRICT, blank=True, null=True)
 
     tipoInstalacion = models.CharField(default=TipoInstalacion.SALA_MULTIUSOS, choices=TipoInstalacion.choices)
 

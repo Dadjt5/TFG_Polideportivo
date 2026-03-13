@@ -46,71 +46,55 @@
         <div v-if="tab === 1" class="row g-4">
           <div class="col-md-6">
             <label class="form-label fw-semibold">{{ t.name }}</label>
-            <input type="text" class="form-control form-control-lg"
-              v-model="actividad.nombre"
-              :disabled="!editando"
+            <input type="text" class="form-control form-control-lg" v-model="actividad.nombre" :disabled="!editando"
               :class="{ 'is-invalid': errores.nombre }" />
           </div>
 
           <div class="col-md-12">
             <label class="form-label fw-semibold">{{ t.description }}</label>
-            <textarea rows="3" class="form-control form-control-lg"
-              v-model="actividad.descripcion"
+            <textarea rows="3" class="form-control form-control-lg" v-model="actividad.descripcion"
               :disabled="!editando"></textarea>
           </div>
 
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.maxPlaces }}</label>
-            <input type="number" class="form-control form-control-lg"
-              v-model.number="actividad.plazasMaximas"
-              :disabled="!editando"
-              :class="{ 'is-invalid': errores.plazasMaximas }" />
+            <input type="number" class="form-control form-control-lg" v-model.number="actividad.plazasMaximas"
+              :disabled="!editando" :class="{ 'is-invalid': errores.plazasMaximas }" />
           </div>
 
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.reservedPlaces }}</label>
-            <input type="number" class="form-control form-control-lg"
-              v-model.number="actividad.plazasReservadas"
-              :disabled="!editando"
-              :class="{ 'is-invalid': errores.plazasReservadas }" />
+            <input type="number" class="form-control form-control-lg" v-model.number="actividad.plazasReservadas"
+              :disabled="!editando" :class="{ 'is-invalid': errores.plazasReservadas }" />
           </div>
 
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.minimumAge }}</label>
-            <input type="number" class="form-control form-control-lg"
-              v-model.number="actividad.edadMinima"
-              :disabled="!editando"
-              :class="{ 'is-invalid': errores.edadMinima }" />
+            <input type="number" class="form-control form-control-lg" v-model.number="actividad.edadMinima"
+              :disabled="!editando" :class="{ 'is-invalid': errores.edadMinima }" />
           </div>
 
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.credits }}</label>
-            <input type="number" class="form-control form-control-lg"
-              v-model.number="actividad.numeroCreditos"
-              :disabled="!editando"
-              :class="{ 'is-invalid': errores.numeroCreditos }" />
+            <input type="number" class="form-control form-control-lg" v-model.number="actividad.numeroCreditos"
+              :disabled="!editando" :class="{ 'is-invalid': errores.numeroCreditos }" />
           </div>
 
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.level }}</label>
-            <input type="text" class="form-control form-control-lg"
-              v-model="actividad.nivel"
-              :disabled="!editando" />
+            <input type="text" class="form-control form-control-lg" v-model="actividad.nivel" :disabled="!editando" />
           </div>
 
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.material }}</label>
-            <input type="text" class="form-control form-control-lg"
-              v-model="actividad.material"
+            <input type="text" class="form-control form-control-lg" v-model="actividad.material"
               :disabled="!editando" />
           </div>
 
           <!-- DEPORTE -->
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.sport }}</label>
-            <select class="form-select form-select-lg"
-              v-model="actividad.deportes"
-              :disabled="!editando"
+            <select class="form-select form-select-lg" v-model="actividad.deportes" :disabled="!editando"
               :class="{ 'is-invalid': errores.deporte }">
               <option disabled value="">{{ t.selectOption }}</option>
               <option v-for="d in deportes" :key="d.id" :value="d.id">{{ d.titulo }}</option>
@@ -119,9 +103,7 @@
 
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.reserveType }}</label>
-            <select class="form-select form-select-lg"
-              v-model="actividad.tipoReserva"
-              :disabled="!editando"
+            <select class="form-select form-select-lg" v-model="actividad.tipoReserva" :disabled="!editando"
               :class="{ 'is-invalid': errores.tipoReserva }">
               <option v-for="r in tiposStore.tiposReserva" :key="r[0]" :value="r[0]">{{ r[1] }}</option>
             </select>
@@ -129,9 +111,7 @@
 
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.terrainType }}</label>
-            <select class="form-select form-select-lg"
-              v-model="actividad.terreno"
-              :disabled="!editando"
+            <select class="form-select form-select-lg" v-model="actividad.terreno" :disabled="!editando"
               :class="{ 'is-invalid': errores.terreno }">
               <option v-for="t in tiposStore.terrenos" :key="t[0]" :value="t[0]">{{ t[1] }}</option>
             </select>
@@ -139,9 +119,7 @@
 
           <div class="col-md-4">
             <label class="form-label fw-semibold">{{ t.period }}</label>
-            <select class="form-select form-select-lg"
-              v-model="actividad.periodo"
-              :disabled="!editando"
+            <select class="form-select form-select-lg" v-model="actividad.periodo" :disabled="!editando"
               :class="{ 'is-invalid': errores.periodo }">
               <option v-for="t in tiposStore.periodos" :key="t[0]" :value="t[0]">{{ t[1] }}</option>
             </select>
@@ -149,10 +127,7 @@
 
           <div class="col-md-12">
             <div class="form-check form-switch mt-2">
-              <input class="form-check-input"
-                type="checkbox"
-                v-model="actividad.exterior"
-                :disabled="!editando" />
+              <input class="form-check-input" type="checkbox" v-model="actividad.exterior" :disabled="!editando" />
               <label class="form-check-label fw-semibold">{{ t.outdoor }}</label>
             </div>
           </div>
@@ -167,8 +142,8 @@
               <i class="bi bi-images text-primary"></i> {{ t.images }}
             </h5>
 
-            <img :src="actividad.imagenURL" class="img-fluid rounded mb-3 img-hover" v-if="actividad.imagenURL && !preview"
-              style="max-height: 300px; object-fit: cover;" />
+            <img :src="actividad.imagenURL" class="img-fluid rounded mb-3 img-hover"
+              v-if="actividad.imagenURL && !preview" style="max-height: 300px; object-fit: cover;" />
 
             <input v-if="editando" type="file" class="form-control form-control-lg mt-2" @change="onFileChange" />
 
@@ -181,9 +156,7 @@
         <div v-if="tab === 3">
           <div class="mb-4">
             <label class="form-label fw-semibold">{{ t.facility }}</label>
-            <select class="form-select form-select-lg"
-              v-model="actividad.instalacion"
-              :disabled="!editando"
+            <select class="form-select form-select-lg" v-model="actividad.instalacion" :disabled="!editando"
               :class="{ 'is-invalid': errores.instalacion }">
               <option :value="null">--</option>
               <option v-for="i in instalacionesFiltradas" :key="i.id" :value="i.id">{{ i.nombre }}</option>
@@ -192,9 +165,7 @@
 
           <div class="col-md-4" v-if="callesDisponibles.length > 0">
             <label class="form-label fw-semibold">{{ t.poolStreets }}</label>
-            <select class="form-select"
-              v-model="calleSeleccionada"
-              :disabled="!editando">
+            <select class="form-select" v-model="calleSeleccionada" :disabled="!editando">
               <option value="" disabled>--</option>
               <option v-for="c in callesDisponibles" :key="c.id" :value="c.numero">
                 {{ t.poolStreet }} {{ c.numero }}
@@ -239,9 +210,7 @@
 
           <div class="mb-4">
             <label class="form-label fw-semibold">{{ t.monitor }}</label>
-            <select class="form-select form-select-lg"
-              v-model="actividad.monitor"
-              :disabled="!editando"
+            <select class="form-select form-select-lg" v-model="actividad.monitor" :disabled="!editando"
               :class="{ 'is-invalid': errores.monitor }">
               <option :value="null">--</option>
               <option v-for="m in monitores" :key="m.id" :value="m.id">{{ m.nombre }}</option>
@@ -254,9 +223,7 @@
 
           <div>
             <label class="form-label fw-semibold">{{ t.tariff }}</label>
-            <select class="form-select form-select-lg"
-              v-model="actividad.tarifa"
-              :disabled="!editando"
+            <select class="form-select form-select-lg" v-model="actividad.tarifa" :disabled="!editando"
               :class="{ 'is-invalid': errores.tarifa }">
               <option :value="null">--</option>
               <option v-for="t in tarifas" :key="t.id" :value="t.id">{{ t.titulo }}</option>
@@ -403,9 +370,7 @@
         <!-- ACCIONES -->
         <div class="d-flex justify-content-center gap-4 mt-5">
 
-          <button v-if="!editando"
-            class="btn btn-primary btn-lg rounded-pill px-4"
-            @click="activarEdicion">
+          <button v-if="!editando" class="btn btn-primary btn-lg rounded-pill px-4" @click="activarEdicion">
             {{ t.modifyActivity }}
           </button>
 
@@ -418,9 +383,7 @@
             </button>
           </template>
 
-          <button v-if="!editando"
-            class="btn btn-outline-danger btn-lg rounded-pill px-4"
-            @click="abrirConfirmacion">
+          <button v-if="!editando" class="btn btn-outline-danger btn-lg rounded-pill px-4" @click="abrirConfirmacion">
             {{ t.deleteActivity }}
           </button>
 
@@ -461,14 +424,16 @@
 
           <div class="modal-body py-5">
 
-            <i class="bi bi-check-circle-fill text-success fs-1 mb-3"></i>
+            <i v-if="eliminado" class="bi bi-check-circle-fill text-success fs-1 mb-3"></i>
+            <i v-else class="bi bi-exclamation-octagon-fill text-danger fs-1 mb-3"></i>
 
             <h4 class="fw-semibold">
               {{ mensaje }}
             </h4>
 
             <button class="btn btn-primary rounded-pill mt-4" @click="finalizar" data-bs-dismiss="modal">
-              {{ t.continue }}
+              <span v-if="eliminado">{{ t.continue }}</span>
+              <span v-else>{{ t.return }}</span>
             </button>
 
           </div>
@@ -621,7 +586,10 @@ async function confirmarEliminar() {
     mensaje.value = t.value.activityDeleted
     eliminado.value = true
   } catch (e) {
-    mensaje.value = t.value.noDeleted
+    confirmModal.hide()
+    successModal.show()
+
+    mensaje.value = t.value.activityNoDeleted
     eliminado.value = false
     console.error("Error al eliminar la actividad", e);
   }

@@ -20,7 +20,7 @@ class Pago(models.Model):
     descuentoAplicado = models.FloatField(default=0.0)
     fecha = models.DateField(auto_now_add=True)
     
-    usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.RESTRICT)
+    usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.CASCADE)
 
     estadoPago = models.CharField(default=EstadoPago.PENDIENTE, choices=EstadoPago.choices)
     

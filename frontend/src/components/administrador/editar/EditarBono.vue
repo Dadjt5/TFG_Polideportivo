@@ -25,7 +25,7 @@
         <!-- INFORMACIÓN GENERAL -->
         <div class="col-lg-6">
           <div class="card shadow-lg rounded-4 p-4"
-               style="background-color: rgba(255,255,255,0.75); backdrop-filter: blur(10px);">
+            style="background-color: rgba(255,255,255,0.75); backdrop-filter: blur(10px);">
 
             <h4 class="mb-3 d-flex align-items-center">
               <i class="bi bi-currency-euro text-primary me-2"></i>
@@ -38,18 +38,16 @@
               <div class="col-6">
                 <span class="fw-medium">{{ t.uses }}:</span>
                 <p v-if="!editando">{{ bono.usos }}</p>
-                <input v-else type="number" min="1" class="form-control"
-                       v-model.number="bono.usos"
-                       :class="{ 'is-invalid': errores.usos }" />
+                <input v-else type="number" min="1" class="form-control" v-model.number="bono.usos"
+                  :class="{ 'is-invalid': errores.usos }" />
               </div>
 
               <!-- VALIDEZ -->
               <div class="col-6">
                 <span class="fw-medium">{{ t.validity }}:</span>
                 <p v-if="!editando">{{ bono.validez }}</p>
-                <input v-else type="number" min="1" class="form-control"
-                       v-model.number="bono.validez"
-                       :class="{ 'is-invalid': errores.validez }" />
+                <input v-else type="number" min="1" class="form-control" v-model.number="bono.validez"
+                  :class="{ 'is-invalid': errores.validez }" />
               </div>
 
             </div>
@@ -71,33 +69,29 @@
               <div class="col-6">
                 <span class="fw-medium">{{ t.priceTDA }}:</span>
                 <p v-if="!editando">{{ bono.precioTDA }} €</p>
-                <input v-else type="number" step="0.01" min="0" class="form-control"
-                       v-model.number="bono.precioTDA"
-                       :class="{ 'is-invalid': errores.precioTDA }" />
+                <input v-else type="number" step="0.01" min="0" class="form-control" v-model.number="bono.precioTDA"
+                  :class="{ 'is-invalid': errores.precioTDA }" />
               </div>
 
               <div class="col-6">
                 <span class="fw-medium">{{ t.priceUAM }}:</span>
                 <p v-if="!editando">{{ bono.precioUAM }} €</p>
-                <input v-else type="number" step="0.01" min="0" class="form-control"
-                       v-model.number="bono.precioUAM"
-                       :class="{ 'is-invalid': errores.precioUAM }" />
+                <input v-else type="number" step="0.01" min="0" class="form-control" v-model.number="bono.precioUAM"
+                  :class="{ 'is-invalid': errores.precioUAM }" />
               </div>
 
               <div class="col-6">
                 <span class="fw-medium">{{ t.priceSubscripcion }}:</span>
                 <p v-if="!editando">{{ bono.precioAbono }} €</p>
-                <input v-else type="number" step="0.01" min="0" class="form-control"
-                       v-model.number="bono.precioAbono"
-                       :class="{ 'is-invalid': errores.precioAbono }" />
+                <input v-else type="number" step="0.01" min="0" class="form-control" v-model.number="bono.precioAbono"
+                  :class="{ 'is-invalid': errores.precioAbono }" />
               </div>
 
               <div class="col-6">
                 <span class="fw-medium">{{ t.priceOthers }}:</span>
                 <p v-if="!editando">{{ bono.precioOtros }} €</p>
-                <input v-else type="number" step="0.01" min="0" class="form-control"
-                       v-model.number="bono.precioOtros"
-                       :class="{ 'is-invalid': errores.precioOtros }" />
+                <input v-else type="number" step="0.01" min="0" class="form-control" v-model.number="bono.precioOtros"
+                  :class="{ 'is-invalid': errores.precioOtros }" />
               </div>
 
             </div>
@@ -115,9 +109,8 @@
                 <span class="fw-medium">{{ t.facility }}:</span>
                 <p v-if="!editando">{{ bono.nombreInstalacion || "—" }}</p>
 
-                <select v-else class="form-select"
-                        v-model="bono.instalacion"
-                        :class="{ 'is-invalid': errores.instalacion }">
+                <select v-else class="form-select" v-model="bono.instalacion"
+                  :class="{ 'is-invalid': errores.instalacion }">
                   <option v-for="i in instalaciones" :key="i.id" :value="i.id">
                     {{ i.nombre }}
                   </option>
@@ -128,7 +121,7 @@
           </div>
         </div>
       </div>
-    
+
       <!-- MENSAJE -->
       <p v-if="mensaje" class="text-center text-danger mt-4">
         {{ mensaje }}
@@ -187,14 +180,16 @@
 
           <div class="modal-body py-5">
 
-            <i class="bi bi-check-circle-fill text-success fs-1 mb-3"></i>
+            <i v-if="eliminado" class="bi bi-check-circle-fill text-success fs-1 mb-3"></i>
+            <i v-else class="bi bi-exclamation-octagon-fill text-danger fs-1 mb-3"></i>
 
             <h4 class="fw-semibold">
               {{ mensaje }}
             </h4>
 
             <button class="btn btn-primary rounded-pill mt-4" @click="finalizar" data-bs-dismiss="modal">
-              {{ t.continue }}
+              <span v-if="eliminado">{{ t.continue }}</span>
+              <span v-else>{{ t.return }}</span>
             </button>
 
           </div>
@@ -313,7 +308,10 @@ async function confirmarEliminar() {
     mensaje.value = t.value.bonusDeleted
     eliminado.value = true
   } catch (e) {
-    mensaje.value = t.value.noDeleted
+    confirmModal.hide()
+    successModal.show()
+
+    mensaje.value = t.value.bonusNoDeleted
     eliminado.value = false
     console.error("Error al eliminar el bono", e);
   }
@@ -340,7 +338,7 @@ onMounted(async () => {
     bono.value = await getBonoDetalle(id);
     bonoOriginal.value = JSON.parse(JSON.stringify(bono.value));
     instalaciones.value = await getInstalacionesSimples();
-  } catch(e) {
+  } catch (e) {
     mensaje.value = t.value.unexpectedError
     console.error("Error al obtener los bonos y/o instalaciones", e)
   }

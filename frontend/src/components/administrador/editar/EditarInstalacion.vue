@@ -266,7 +266,8 @@
           </button>
         </template>
 
-        <button v-if="!editando" class="btn btn-outline-danger btn-lg rounded-pill px-5 bg-white" @click="abrirConfirmacion">
+        <button v-if="!editando" class="btn btn-outline-danger btn-lg rounded-pill px-5 bg-white"
+          @click="abrirConfirmacion">
           {{ t.deleteFacility }}
         </button>
       </div>
@@ -304,14 +305,16 @@
 
           <div class="modal-body py-5">
 
-            <i class="bi bi-check-circle-fill text-success fs-1 mb-3"></i>
+            <i v-if="eliminado" class="bi bi-check-circle-fill text-success fs-1 mb-3"></i>
+            <i v-else class="bi bi-exclamation-octagon-fill text-danger fs-1 mb-3"></i>
 
             <h4 class="fw-semibold">
               {{ mensaje }}
             </h4>
 
             <button class="btn btn-primary rounded-pill mt-4" @click="finalizar" data-bs-dismiss="modal">
-              {{ t.continue }}
+              <span v-if="eliminado">{{ t.continue }}</span>
+              <span v-else>{{ t.return }}</span>
             </button>
 
           </div>
@@ -495,7 +498,10 @@ async function confirmarEliminar() {
     mensaje.value = t.value.facilityDeleted
     eliminado.value = true
   } catch (e) {
-    mensaje.value = t.value.noDeleted
+    confirmModal.hide()
+    successModal.show()
+
+    mensaje.value = t.value.facilityNoDeleted
     eliminado.value = false
     console.error("Error al eliminar la instalacion", e);
   }

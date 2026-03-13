@@ -5,9 +5,9 @@ from django.utils.translation import gettext_lazy as _
 class Favorito(models.Model):
     """Modelo para representar las instalaciones y actividades marcadas como favoritas por un usuario final"""
 
-    usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.RESTRICT, related_name="favoritos")
-    actividad = models.ForeignKey('Actividad', on_delete=models.RESTRICT, null=True)
-    instalacion = models.ForeignKey('Instalacion', on_delete=models.RESTRICT, null=True)
+    usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.CASCADE, related_name="favoritos")
+    actividad = models.ForeignKey('Actividad', on_delete=models.CASCADE, null=True)
+    instalacion = models.ForeignKey('Instalacion', on_delete=models.CASCADE, null=True)
     
     @classmethod
     def contar(cls):

@@ -50,6 +50,19 @@ export default {
   confirmDeleteSport: "¿Seguro que desea eliminar el deporte?",
   sportDeleted: "El deporte se ha eliminado",
 
+  monitorNoDeleted: "El monitor no puede ser eliminado porque esta dirigiendo una o mas actividades",
+  finalUserNoDeleted: "El usuario final no pudo ser eliminado debido a un problema desconocido",
+  adminNoDeleted: "No tienes los permisos suficientes para eliminar este administrador",
+  tariffNoDeleted: "La tarifa no pudo ser eliminada debido a que esta siendo utilizada",
+  bonusNoDeleted: "El bono no pudo ser eliminado porque uno o mas usuarios lo han comprado",
+  subscriptionNoDeleted: "El abono no pudo ser eliminado porque ino o mas usuarios lo han comprado",
+  discountNoDeleted: "El descuento no pudo ser eliminado debido a un problema desconocido",
+  facilityNoDeleted: "La instalación no pudo ser eliminada debido a que contiene una o mas actividades",
+  pavilionNoDeleted: "El pabellón no pudo ser eliminado porque contiene una o mas instalaciones",
+  activityNoDeleted: "La actividad no pudo ser eliminada debido a un problema desconocido",
+  channelNoDeleted: "El canal no pudo ser eliminado debido a un problema desconocido",
+  sportNoDeleted: "El deporte no pudo ser eliminado porque se desarrolla en una o mas actividades",
+
   /* Mensajes */
   missing: "Hay campos vacios o erroneos",
   noDeleted: "No se ha podido eliminar",

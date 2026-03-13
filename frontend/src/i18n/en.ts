@@ -50,6 +50,19 @@ export default {
   confirmDeleteSport: "Are you sure you want to delete the sport?",
   sportDeleted: "The sport has been deleted",
 
+  monitorNoDeleted: "The monitor cannot be deleted because it is managing one or more activities",
+  finalUserNoDeleted: "The end user could not be deleted due to an unknown problem",
+  adminNoDeleted: "You do not have permissions to delete this administrator ",
+  tariffNoDeleted: "The tariff could not be deleted because it is currently in use",
+  bonusNoDeleted: "The bonus could not be deleted because one or more users have purchased it",
+  subscriptionNoDeleted: "The subscription could not be deleted because one or more users have purchased it",
+  discountNoDeleted: "The discount could not be deleted due to an unknown problem",
+  facilityNoDeleted: "The facility could not be deleted because it contains one or more activities",
+  pavilionNoDeleted: "The pavilion could not be deleted because it contains one or more facilities",
+  activityNoDeleted: "The activity could not be deleted due to an unknown problem",
+  channelNoDeleted: "The channel could not be deleted due to an unknown problem",
+  sportNoDeleted: "The sport could not be deleted because it is part of one or more activities",
+
   /* Mensajes */
   missing: "Missing or incorrect fields",
   noDeleted: "Could not be deleted",

@@ -19,7 +19,7 @@ class TDA(models.Model):
 
     estado = models.CharField(default=EstadoReserva.PENDIENTE, choices=EstadoReserva.choices)
 
-    tarifa = models.ForeignKey('TarifaTDA', on_delete=models.PROTECT, blank=True, null=True)
+    tarifa = models.ForeignKey('TarifaTDA', on_delete=models.RESTRICT, blank=True, null=True)
     usuarioFinal = models.ForeignKey(UsuarioFinal, on_delete=models.CASCADE, related_name="tda", blank=True, null=True)
 
     def __str__(self):

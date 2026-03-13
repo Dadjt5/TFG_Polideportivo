@@ -49,7 +49,7 @@ class CompraAbono(models.Model):
     
     fecha = models.DateTimeField(default=timezone.now)
 
-    usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.RESTRICT, related_name="abono", null=True, blank=True)
+    usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.CASCADE, related_name="abono", null=True, blank=True)
     abonoDeportivo = models.ForeignKey('AbonoDeportivo', on_delete=models.RESTRICT, related_name="compras_deportivo", blank=True, null=True)
     abonoVerano = models.ForeignKey('AbonoVerano', on_delete=models.RESTRICT, related_name="compras_verano", blank=True, null=True)
 

@@ -29,10 +29,8 @@
             <div class="col-6 mb-3">
               <span class="fw-medium">{{ t.name }}:</span>
               <p v-if="!editando">{{ abono.nombre }}</p>
-              <input v-else type="text" class="form-control"
-                v-model="abono.nombre"
-                :class="{ 'is-invalid': errores.nombre }"
-              />
+              <input v-else type="text" class="form-control" v-model="abono.nombre"
+                :class="{ 'is-invalid': errores.nombre }" />
             </div>
 
             <div class="row g-3">
@@ -41,45 +39,24 @@
               <div class="col-12 mb-3">
                 <span class="fw-medium">{{ t.priceTDA }}:</span>
                 <p v-if="!editando">{{ abono.precioTDA }} €</p>
-                <input
-                  v-else
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  class="form-control"
-                  v-model.number="abono.precioTDA"
-                  :class="{ 'is-invalid': errores.precioTDA }"
-                />
+                <input v-else type="number" step="0.01" min="0" class="form-control" v-model.number="abono.precioTDA"
+                  :class="{ 'is-invalid': errores.precioTDA }" />
               </div>
 
               <!-- PRECIO UAM -->
               <div class="col-12 mb-3">
                 <span class="fw-medium">{{ t.priceUAM }}:</span>
                 <p v-if="!editando">{{ abono.precioUAM }} €</p>
-                <input
-                  v-else
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  class="form-control"
-                  v-model.number="abono.precioUAM"
-                  :class="{ 'is-invalid': errores.precioUAM }"
-                />
+                <input v-else type="number" step="0.01" min="0" class="form-control" v-model.number="abono.precioUAM"
+                  :class="{ 'is-invalid': errores.precioUAM }" />
               </div>
 
               <!-- PRECIO OTROS -->
               <div class="col-12 mb-3">
                 <span class="fw-medium">{{ t.priceOthers }}:</span>
                 <p v-if="!editando">{{ abono.precioOtros }} €</p>
-                <input
-                  v-else
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  class="form-control"
-                  v-model.number="abono.precioOtros"
-                  :class="{ 'is-invalid': errores.precioOtros }"
-                />
+                <input v-else type="number" step="0.01" min="0" class="form-control" v-model.number="abono.precioOtros"
+                  :class="{ 'is-invalid': errores.precioOtros }" />
               </div>
 
             </div>
@@ -146,14 +123,16 @@
 
           <div class="modal-body py-5">
 
-            <i class="bi bi-check-circle-fill text-success fs-1 mb-3"></i>
+            <i v-if="eliminado" class="bi bi-check-circle-fill text-success fs-1 mb-3"></i>
+            <i v-else class="bi bi-exclamation-octagon-fill text-danger fs-1 mb-3"></i>
 
             <h4 class="fw-semibold">
               {{ mensaje }}
             </h4>
 
             <button class="btn btn-primary rounded-pill mt-4" @click="finalizar" data-bs-dismiss="modal">
-              {{ t.continue }}
+              <span v-if="eliminado">{{ t.continue }}</span>
+              <span v-else>{{ t.return }}</span>
             </button>
 
           </div>
@@ -266,7 +245,10 @@ async function confirmarEliminar() {
     mensaje.value = t.value.subscriptionDeleted
     eliminado.value = true
   } catch (e) {
-    mensaje.value = t.value.noDeleted
+    confirmModal.hide()
+    successModal.show()
+
+    mensaje.value = t.value.subscriptionNoDeleted
     eliminado.value = false
     console.error("Error al eliminar el abono de verano", e);
   }
@@ -292,7 +274,7 @@ onMounted(async () => {
   try {
     abono.value = await getAbonoVeranoDetalle(id);
     abonoOriginal.value = JSON.parse(JSON.stringify(abono.value));
-  } catch(e) {
+  } catch (e) {
     mensaje.value = t.value.unexpectedError
     console.error("Error al obtener la informacion de los abonos", e)
   }

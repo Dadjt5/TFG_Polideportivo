@@ -8,17 +8,12 @@
           ← {{ t.return }}
         </button>
 
-        <h1 class="fw-semibold text-primary mb-2"
-            style="text-shadow: 1px 1px 3px rgba(0,0,0,0.2);">
+        <h1 class="fw-semibold text-primary mb-2" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.2);">
 
           <span v-if="!editando">{{ tarifa.titulo }}</span>
 
-          <input
-            v-else
-            v-model="tarifa.titulo"
-            class="form-control form-control-lg text-center fw-semibold"
-            :class="{ 'is-invalid': errores.titulo }"
-          />
+          <input v-else v-model="tarifa.titulo" class="form-control form-control-lg text-center fw-semibold"
+            :class="{ 'is-invalid': errores.titulo }" />
         </h1>
 
         <div style="width:100px"></div>
@@ -30,7 +25,7 @@
         <!-- CONSULTA INDIVIDUAL -->
         <div class="col-12 col-md-6">
           <div class="card shadow-lg rounded-4 p-4"
-          style="background-color: rgba(255,255,255,0.75); backdrop-filter: blur(10px);">
+            style="background-color: rgba(255,255,255,0.75); backdrop-filter: blur(10px);">
 
             <h4 class="mb-4 d-flex align-items-center">
               <i class="bi bi-person-badge text-primary me-2"></i>
@@ -38,23 +33,14 @@
             </h4>
 
             <div class="row g-3">
-              <PrecioField label="tdaPrice"
-                v-model="tarifa.precioConsultaTDA"
-                :editando="editando"
-                :error="errores.precioConsultaTDA"
-                :t="t"/>
+              <PrecioField label="tdaPrice" v-model="tarifa.precioConsultaTDA" :editando="editando"
+                :error="errores.precioConsultaTDA" :t="t" />
 
-              <PrecioField label="uamPrice"
-                v-model="tarifa.precioConsultaUAM"
-                :editando="editando"
-                :error="errores.precioConsultaUAM"
-                :t="t"/>
+              <PrecioField label="uamPrice" v-model="tarifa.precioConsultaUAM" :editando="editando"
+                :error="errores.precioConsultaUAM" :t="t" />
 
-              <PrecioField label="otherPrice"
-                v-model="tarifa.precioConsultaOtros"
-                :editando="editando"
-                :error="errores.precioConsultaOtros"
-                :t="t"/>
+              <PrecioField label="otherPrice" v-model="tarifa.precioConsultaOtros" :editando="editando"
+                :error="errores.precioConsultaOtros" :t="t" />
             </div>
 
           </div>
@@ -64,7 +50,7 @@
         <!-- BONO 1-5 -->
         <div class="col-12 col-md-6">
           <div class="card shadow-lg rounded-4 p-4"
-          style="background-color: rgba(255,255,255,0.75); backdrop-filter: blur(10px);">
+            style="background-color: rgba(255,255,255,0.75); backdrop-filter: blur(10px);">
 
             <h4 class="mb-4 d-flex align-items-center">
               <i class="bi bi-123 text-success me-2"></i>
@@ -72,23 +58,14 @@
             </h4>
 
             <div class="row g-3">
-              <PrecioField label="tdaPrice"
-                v-model="tarifa.precioSesiones1_5TDA"
-                :editando="editando"
-                :error="errores.precioSesiones1_5TDA"
-                :t="t"/>
+              <PrecioField label="tdaPrice" v-model="tarifa.precioSesiones1_5TDA" :editando="editando"
+                :error="errores.precioSesiones1_5TDA" :t="t" />
 
-              <PrecioField label="uamPrice"
-                v-model="tarifa.precioSesiones1_5UAM"
-                :editando="editando"
-                :error="errores.precioSesiones1_5UAM"
-                :t="t"/>
+              <PrecioField label="uamPrice" v-model="tarifa.precioSesiones1_5UAM" :editando="editando"
+                :error="errores.precioSesiones1_5UAM" :t="t" />
 
-              <PrecioField label="otherPrice"
-                v-model="tarifa.precioSesiones1_5Otros"
-                :editando="editando"
-                :error="errores.precioSesiones1_5Otros"
-                :t="t"/>
+              <PrecioField label="otherPrice" v-model="tarifa.precioSesiones1_5Otros" :editando="editando"
+                :error="errores.precioSesiones1_5Otros" :t="t" />
             </div>
 
           </div>
@@ -98,7 +75,7 @@
         <!-- BONO 6+ -->
         <div class="col-12 col-md-6 mx-auto">
           <div class="card shadow-lg rounded-4 p-4"
-          style="background-color: rgba(255,255,255,0.75); backdrop-filter: blur(10px);">
+            style="background-color: rgba(255,255,255,0.75); backdrop-filter: blur(10px);">
 
             <h4 class="mb-4 d-flex align-items-center">
               <i class="bi bi-plus-circle text-warning me-2"></i>
@@ -106,23 +83,14 @@
             </h4>
 
             <div class="row g-3">
-              <PrecioField label="tdaPrice"
-                v-model="tarifa.precioSesiones6TDA"
-                :editando="editando"
-                :error="errores.precioSesiones6TDA"
-                :t="t"/>
+              <PrecioField label="tdaPrice" v-model="tarifa.precioSesiones6TDA" :editando="editando"
+                :error="errores.precioSesiones6TDA" :t="t" />
 
-              <PrecioField label="uamPrice"
-                v-model="tarifa.precioSesiones6UAM"
-                :editando="editando"
-                :error="errores.precioSesiones6UAM"
-                :t="t"/>
+              <PrecioField label="uamPrice" v-model="tarifa.precioSesiones6UAM" :editando="editando"
+                :error="errores.precioSesiones6UAM" :t="t" />
 
-              <PrecioField label="otherPrice"
-                v-model="tarifa.precioSesiones6Otros"
-                :editando="editando"
-                :error="errores.precioSesiones6Otros"
-                :t="t"/>
+              <PrecioField label="otherPrice" v-model="tarifa.precioSesiones6Otros" :editando="editando"
+                :error="errores.precioSesiones6Otros" :t="t" />
             </div>
 
           </div>
@@ -138,10 +106,7 @@
       <!-- ACCIONES -->
       <div class="d-flex justify-content-center gap-3 mt-5">
 
-        <button
-          v-if="!editando"
-          class="btn btn-primary btn-lg rounded-pill"
-          @click="activarEdicion">
+        <button v-if="!editando" class="btn btn-primary btn-lg rounded-pill" @click="activarEdicion">
 
           <i class="bi bi-pencil me-2"></i>
           {{ t.modifyTariff }}
@@ -149,27 +114,20 @@
 
         <template v-else>
 
-          <button
-            class="btn btn-success btn-lg rounded-pill"
-            @click="guardarCambios">
+          <button class="btn btn-success btn-lg rounded-pill" @click="guardarCambios">
 
             <i class="bi bi-check-lg me-2"></i>
             {{ t.saveChanges }}
           </button>
 
-          <button
-            class="btn btn-secondary btn-lg rounded-pill"
-            @click="cancelarEdicion">
+          <button class="btn btn-secondary btn-lg rounded-pill" @click="cancelarEdicion">
 
             {{ t.cancel }}
           </button>
 
         </template>
 
-        <button
-          v-if="!editando"
-          class="btn btn-danger btn-lg rounded-pill"
-          @click="abrirConfirmacion">
+        <button v-if="!editando" class="btn btn-danger btn-lg rounded-pill" @click="abrirConfirmacion">
 
           <i class="bi bi-trash me-2"></i>
           {{ t.deleteTariff }}
@@ -210,14 +168,16 @@
 
           <div class="modal-body py-5">
 
-            <i class="bi bi-check-circle-fill text-success fs-1 mb-3"></i>
+            <i v-if="eliminado" class="bi bi-check-circle-fill text-success fs-1 mb-3"></i>
+            <i v-else class="bi bi-exclamation-octagon-fill text-danger fs-1 mb-3"></i>
 
             <h4 class="fw-semibold">
               {{ mensaje }}
             </h4>
 
             <button class="btn btn-primary rounded-pill mt-4" @click="finalizar" data-bs-dismiss="modal">
-              {{ t.continue }}
+              <span v-if="eliminado">{{ t.continue }}</span>
+              <span v-else>{{ t.return }}</span>
             </button>
 
           </div>
@@ -320,7 +280,10 @@ async function confirmarEliminar() {
     mensaje.value = t.value.tariffDeleted
     eliminado.value = true
   } catch (e) {
-    mensaje.value = t.value.noDeleted
+    confirmModal.hide()
+    successModal.show()
+
+    mensaje.value = t.value.tariffNoDeleted
     eliminado.value = false
     console.error("Error al eliminar la tarifa de fisio", e);
   }
@@ -347,7 +310,7 @@ onMounted(async () => {
   try {
     tarifa.value = await getTarifaFisioterapiaDetalle(id)
     tarifaOriginal.value = JSON.parse(JSON.stringify(tarifa.value))
-  }catch(e) {
+  } catch (e) {
     mensaje.value = t.value.unexpectedError
     console.error("Error al obtener la informacion de la tarifa de fisio", e)
   }

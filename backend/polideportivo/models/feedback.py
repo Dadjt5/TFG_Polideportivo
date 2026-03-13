@@ -10,7 +10,7 @@ class Feedback(models.Model):
         SUGERENCIA = "SUGERENCIA", "Sugerencia"
 
     usuario = models.ForeignKey(
-        settings.AUTH_USER_MODEL,  # normalmente UsuarioFinal
+        settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,

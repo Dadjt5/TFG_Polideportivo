@@ -19,7 +19,7 @@
 
         <!-- INFORMACIÓN GENERAL -->
         <div class="col-lg-6">
-        <div class="card shadow-lg rounded-4 p-4"
+          <div class="card shadow-lg rounded-4 p-4"
             style="background-color: rgba(255,255,255,0.75); backdrop-filter: blur(10px);">
 
             <h4 class="mb-3">
@@ -33,83 +33,47 @@
               <div class="col-12">
                 <span class="fw-medium">{{ t.name }}:</span>
                 <p v-if="!editando">{{ descuento.nombre }}</p>
-                <input
-                  v-else
-                  class="form-control"
-                  v-model="descuento.nombre"
-                ></input>
+                <input v-else class="form-control" v-model="descuento.nombre"></input>
               </div>
 
               <!-- DESCRIPCIÓN -->
               <div class="col-12">
                 <span class="fw-medium">{{ t.description }}:</span>
                 <p v-if="!editando">{{ descuento.descripcion }}</p>
-                <textarea
-                  v-else
-                  class="form-control"
-                  rows="3"
-                  v-model="descuento.descripcion"
-                ></textarea>
+                <textarea v-else class="form-control" rows="3" v-model="descuento.descripcion"></textarea>
               </div>
 
               <!-- PORCENTAJE -->
               <div class="col-12">
                 <span class="fw-medium">{{ t.percentage }}:</span>
                 <p v-if="!editando">{{ descuento.porcentaje }}%</p>
-                <input
-                  v-else
-                  type="number"
-                  min="0"
-                  max="100"
-                  class="form-control"
-                  v-model="descuento.porcentaje"
-                />
+                <input v-else type="number" min="0" max="100" class="form-control" v-model="descuento.porcentaje" />
               </div>
 
               <!-- FECHAS -->
               <div class="col-6">
                 <span class="fw-medium">{{ t.startDate }}:</span>
                 <p v-if="!editando">{{ descuento.fechaInicio }}</p>
-                <input
-                  v-else
-                  type="date"
-                  class="form-control"
-                  v-model="descuento.fechaInicio"
-                />
+                <input v-else type="date" class="form-control" v-model="descuento.fechaInicio" />
               </div>
 
               <div class="col-6">
                 <span class="fw-medium">{{ t.endDate }}:</span>
                 <p v-if="!editando">{{ descuento.fechaFinValidez }}</p>
-                <input
-                  v-else
-                  type="date"
-                  class="form-control"
-                  v-model="descuento.fechaFinValidez"
-                />
+                <input v-else type="date" class="form-control" v-model="descuento.fechaFinValidez" />
               </div>
 
               <!-- CHECKS -->
               <div class="col-6">
                 <span class="fw-medium">{{ t.combinable }}:</span>
                 <p v-if="!editando">{{ descuento.combinable ? "Sí" : "No" }}</p>
-                <input
-                  v-else
-                  type="checkbox"
-                  class="form-check-input ms-2"
-                  v-model="descuento.combinable"
-                />
+                <input v-else type="checkbox" class="form-check-input ms-2" v-model="descuento.combinable" />
               </div>
 
               <div class="col-6">
                 <span class="fw-medium">{{ t.priority }}:</span>
                 <p v-if="!editando">{{ descuento.prioritario ? "Sí" : "No" }}</p>
-                <input
-                  v-else
-                  type="checkbox"
-                  class="form-check-input ms-2"
-                  v-model="descuento.prioritario"
-                />
+                <input v-else type="checkbox" class="form-check-input ms-2" v-model="descuento.prioritario" />
               </div>
 
             </div>
@@ -134,17 +98,9 @@
               </div>
 
               <div v-else class="d-flex flex-wrap gap-3">
-                <div
-                  v-for="tipo in estadisticasStore.data.tiposInstalacion"
-                  :key="tipo[0]"
-                  class="form-check"
-                >
-                  <input
-                    type="checkbox"
-                    class="form-check-input"
-                    :value="tipo[0]"
-                    v-model="descuento.tiposInstalacion"
-                  />
+                <div v-for="tipo in estadisticasStore.data.tiposInstalacion" :key="tipo[0]" class="form-check">
+                  <input type="checkbox" class="form-check-input" :value="tipo[0]"
+                    v-model="descuento.tiposInstalacion" />
                   <label class="form-check-label">
                     {{ tipo[1] }}
                   </label>
@@ -163,17 +119,8 @@
                 </p>
               </div>
 
-              <select
-                v-else
-                multiple
-                class="form-select"
-                v-model="descuento.deportes"
-              >
-                <option
-                  v-for="deporte in deportes"
-                  :key="deporte.id"
-                  :value="deporte.id"
-                >
+              <select v-else multiple class="form-select" v-model="descuento.deportes">
+                <option v-for="deporte in deportes" :key="deporte.id" :value="deporte.id">
                   {{ deporte.nombre }}
                 </option>
               </select>
@@ -206,7 +153,7 @@
         <button v-if="!editando" class="btn btn-danger btn-lg rounded-pill" @click="abrirConfirmacion">
           <i class="bi bi-trash me-2"></i> {{ t.deleteDiscount }}
         </button>
-        
+
       </div>
     </main>
 
@@ -242,14 +189,16 @@
 
           <div class="modal-body py-5">
 
-            <i class="bi bi-check-circle-fill text-success fs-1 mb-3"></i>
+            <i v-if="eliminado" class="bi bi-check-circle-fill text-success fs-1 mb-3"></i>
+            <i v-else class="bi bi-exclamation-octagon-fill text-danger fs-1 mb-3"></i>
 
             <h4 class="fw-semibold">
               {{ mensaje }}
             </h4>
 
             <button class="btn btn-primary rounded-pill mt-4" @click="finalizar" data-bs-dismiss="modal">
-              {{ t.continue }}
+              <span v-if="eliminado">{{ t.continue }}</span>
+              <span v-else>{{ t.return }}</span>
             </button>
 
           </div>
@@ -359,7 +308,10 @@ async function confirmarEliminar() {
     mensaje.value = t.value.discountDeleted
     eliminado.value = true
   } catch (e) {
-    mensaje.value = t.value.noDeleted
+    confirmModal.hide()
+    successModal.show()
+
+    mensaje.value = t.value.discountNoDeleted
     eliminado.value = false
     console.error("Error al eliminar el descuento", e);
   }
@@ -384,7 +336,7 @@ onMounted(async () => {
     descuento.value = await getDescuentoDetalle(parseInt(props.id))
     descuentoOriginal.value = JSON.parse(JSON.stringify(descuento.value))
     deportes.value = await getDeportes()
-  } catch(e) {
+  } catch (e) {
     mensaje.value = t.value.unexpectedError
     console.error("Error al obtener la informacion del descuento", e)
   }

@@ -23,8 +23,8 @@ class EntradaListaEspera(models.Model):
     fechaEntrada = models.DateField(auto_now=True)
     horaEntrada = models.TimeField(auto_now=True)
 
-    listaEspera = models.ForeignKey(ListaEspera, on_delete=models.RESTRICT, related_name="registro")
-    usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.RESTRICT, related_name="lista_espera")
+    listaEspera = models.ForeignKey(ListaEspera, on_delete=models.CASCADE, related_name="registro")
+    usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.CASCADE, related_name="lista_espera")
 
     def __str__(self):
         return f'Fecha: {self.fechaEntrada}, Hora: {self.horaEntrada}'

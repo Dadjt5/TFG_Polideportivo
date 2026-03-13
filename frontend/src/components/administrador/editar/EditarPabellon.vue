@@ -9,7 +9,7 @@
         </button>
 
         <h1 class="fw-semibold text-primary mb-2" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.2);">
-          {{ pabellon.nombre}}
+          {{ pabellon.nombre }}
         </h1>
 
         <div style="width: 100px"></div>
@@ -76,7 +76,7 @@
       <!-- MENSAJE -->
       <p v-if="mensaje" class="text-center text-danger mt-4">
         {{ mensaje }}
-      </p> 
+      </p>
 
       <!-- ACCIONES -->
       <div class="d-flex justify-content-center gap-3 mt-5">
@@ -131,14 +131,16 @@
 
           <div class="modal-body py-5">
 
-            <i class="bi bi-check-circle-fill text-success fs-1 mb-3"></i>
+            <i v-if="eliminado" class="bi bi-check-circle-fill text-success fs-1 mb-3"></i>
+            <i v-else class="bi bi-exclamation-octagon-fill text-danger fs-1 mb-3"></i>
 
             <h4 class="fw-semibold">
               {{ mensaje }}
             </h4>
 
             <button class="btn btn-primary rounded-pill mt-4" @click="finalizar" data-bs-dismiss="modal">
-              {{ t.continue }}
+              <span v-if="eliminado">{{ t.continue }}</span>
+              <span v-else>{{ t.return }}</span>
             </button>
 
           </div>
@@ -220,7 +222,7 @@ function camposModificados() {
   if (pabellonOriginal.value.direccion !== pabellon.value.direccion) {
     data.direccion = pabellon.value.direccion
   }
- 
+
   return data
 }
 
@@ -277,7 +279,10 @@ async function confirmarEliminar() {
     mensaje.value = t.value.pavilionDeleted
     eliminado.value = true
   } catch (e) {
-    mensaje.value = t.value.noDeleted
+    confirmModal.hide()
+    successModal.show()
+
+    mensaje.value = t.value.pavilionNoDeleted
     eliminado.value = false
     console.error("Error al eliminar el pabellon", e);
   }

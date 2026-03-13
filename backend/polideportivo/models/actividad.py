@@ -25,10 +25,10 @@ class Actividad(models.Model):
     material = models.CharField(max_length=1024, blank=True)
     exterior = models.BooleanField(default=False)
 
-    deportes = models.ForeignKey('Deporte', on_delete=models.CASCADE, related_name="actividades", null=True, blank=True)
+    deportes = models.ForeignKey('Deporte', on_delete=models.RESTRICT, related_name="actividades", null=True, blank=True)
     instalacion = models.ForeignKey('Instalacion', on_delete=models.RESTRICT, related_name="actividad")
     monitor = models.ForeignKey('Monitor', on_delete=models.RESTRICT, related_name="actividades")
-    tarifa = models.ForeignKey('TarifaActividad', on_delete=models.PROTECT, blank=True, null=True)
+    tarifa = models.ForeignKey('TarifaActividad', on_delete=models.RESTRICT, blank=True, null=True)
 
     tipoActividad = models.CharField(default=TipoActividad.OTROS, choices=TipoActividad.choices)
     tipoReserva = models.CharField(default=FormaReserva.NINGUNA, choices=FormaReserva.choices)
@@ -242,7 +242,7 @@ class Actividad(models.Model):
 class Sesion(models.Model):
     """Modelo para representar una sesion de una actividad"""
 
-    actividad = models.ForeignKey(Actividad, on_delete=models.RESTRICT, related_name="sesiones")
+    actividad = models.ForeignKey(Actividad, on_delete=models.CASCADE, related_name="sesiones")
     horaInicio = models.TimeField()
     horaFin = models.TimeField()
     numeroHoras = models.FloatField(default=0.0)

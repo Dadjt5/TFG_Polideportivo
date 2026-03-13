@@ -29,7 +29,7 @@ class CompraBono(models.Model):
     vecesUsado = models.PositiveIntegerField(default=0)
     fechaExpiracion = models.DateTimeField(blank=True, null=True)
 
-    usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.RESTRICT)
+    usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.CASCADE)
     bono = models.ForeignKey('Bono', on_delete=models.RESTRICT, related_name="compras_bono")
 
     estado = models.CharField(default=EstadoReserva.PENDIENTE, choices=EstadoReserva.choices)

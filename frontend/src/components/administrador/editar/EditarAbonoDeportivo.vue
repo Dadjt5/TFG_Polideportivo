@@ -33,20 +33,16 @@
               <div class="col-6">
                 <span class="fw-medium">{{ t.name }}:</span>
                 <p v-if="!editando">{{ abono.nombre }}</p>
-                <input v-else type="text" class="form-control"
-                  v-model="abono.nombre"
-                  :class="{ 'is-invalid': errores.nombre }"
-                />
+                <input v-else type="text" class="form-control" v-model="abono.nombre"
+                  :class="{ 'is-invalid': errores.nombre }" />
               </div>
 
               <!-- MESES -->
               <div class="col-6">
                 <span class="fw-medium">{{ t.months }}:</span>
                 <p v-if="!editando">{{ abono.meses }}</p>
-                <input v-else type="number" min="1" class="form-control"
-                  v-model.number="abono.meses"
-                  :class="{ 'is-invalid': errores.meses }"
-                />
+                <input v-else type="number" min="1" class="form-control" v-model.number="abono.meses"
+                  :class="{ 'is-invalid': errores.meses }" />
               </div>
 
               <!-- PRECIO TOTAL MENSUAL UAM -->
@@ -54,9 +50,7 @@
                 <span class="fw-medium">{{ t.monthlyPriceUAM }}:</span>
                 <p v-if="!editando">{{ abono.precioTotalMensual }} €</p>
                 <input v-else type="number" step="0.01" min="0" class="form-control"
-                  v-model.number="abono.precioTotalMensual"
-                  :class="{ 'is-invalid': errores.precioTotalMensual }"
-                />
+                  v-model.number="abono.precioTotalMensual" :class="{ 'is-invalid': errores.precioTotalMensual }" />
               </div>
 
               <!-- PRECIO PAGO ÚNICO UAM -->
@@ -64,9 +58,7 @@
                 <span class="fw-medium">{{ t.totalPriceUAM }}:</span>
                 <p v-if="!editando">{{ abono.precioPagoUnicoUAM }} €</p>
                 <input v-else type="number" step="0.01" min="0" class="form-control"
-                  v-model.number="abono.precioPagoUnicoUAM"
-                  :class="{ 'is-invalid': errores.precioPagoUnicoUAM }"
-                />
+                  v-model.number="abono.precioPagoUnicoUAM" :class="{ 'is-invalid': errores.precioPagoUnicoUAM }" />
               </div>
 
               <!-- PRECIO FAMILIAR -->
@@ -74,9 +66,7 @@
                 <span class="fw-medium">{{ t.familyPrice }}:</span>
                 <p v-if="!editando">{{ abono.precioFamiliar }} €</p>
                 <input v-else type="number" step="0.01" min="0" class="form-control"
-                  v-model.number="abono.precioFamiliar"
-                  :class="{ 'is-invalid': errores.precioFamiliar }"
-                />
+                  v-model.number="abono.precioFamiliar" :class="{ 'is-invalid': errores.precioFamiliar }" />
               </div>
 
               <!-- OTROS -->
@@ -85,17 +75,14 @@
                 <p v-if="!editando">{{ abono.precioTotalMensualOtros }} €</p>
                 <input v-else type="number" step="0.01" min="0" class="form-control"
                   v-model.number="abono.precioTotalMensualOtros"
-                  :class="{ 'is-invalid': errores.precioTotalMensualOtros }"
-                />
+                  :class="{ 'is-invalid': errores.precioTotalMensualOtros }" />
               </div>
 
               <div class="col-6">
                 <span class="fw-medium">{{ t.totalPriceOthers }}:</span>
                 <p v-if="!editando">{{ abono.precioPagoUnicoOtros }} €</p>
                 <input v-else type="number" step="0.01" min="0" class="form-control"
-                  v-model.number="abono.precioPagoUnicoOtros"
-                  :class="{ 'is-invalid': errores.precioPagoUnicoOtros }"
-                />
+                  v-model.number="abono.precioPagoUnicoOtros" :class="{ 'is-invalid': errores.precioPagoUnicoOtros }" />
               </div>
 
             </div>
@@ -117,8 +104,7 @@
                 <p v-if="!editando">{{ abono.descuentoPrimeraActividad }}</p>
                 <input v-else type="number" step="0.1" min="0" class="form-control"
                   v-model.number="abono.descuentoPrimeraActividad"
-                  :class="{ 'is-invalid': errores.descuentoPrimeraActividad }"
-                />
+                  :class="{ 'is-invalid': errores.descuentoPrimeraActividad }" />
               </div>
 
               <div class="col-12">
@@ -126,8 +112,7 @@
                 <p v-if="!editando">{{ abono.descuentoRestoActividades }}</p>
                 <input v-else type="number" step="0.1" min="0" class="form-control"
                   v-model.number="abono.descuentoRestoActividades"
-                  :class="{ 'is-invalid': errores.descuentoRestoActividades }"
-                />
+                  :class="{ 'is-invalid': errores.descuentoRestoActividades }" />
               </div>
 
               <div class="col-12">
@@ -135,8 +120,7 @@
                 <p v-if="!editando">{{ abono.descuentoActividadesExteriores }}</p>
                 <input v-else type="number" step="0.1" min="0" class="form-control"
                   v-model.number="abono.descuentoActividadesExteriores"
-                  :class="{ 'is-invalid': errores.descuentoActividadesExteriores }"
-                />
+                  :class="{ 'is-invalid': errores.descuentoActividadesExteriores }" />
               </div>
 
             </div>
@@ -205,14 +189,16 @@
 
           <div class="modal-body py-5">
 
-            <i class="bi bi-check-circle-fill text-success fs-1 mb-3"></i>
+            <i v-if="eliminado" class="bi bi-check-circle-fill text-success fs-1 mb-3"></i>
+            <i v-else class="bi bi-exclamation-octagon-fill text-danger fs-1 mb-3"></i>
 
             <h4 class="fw-semibold">
               {{ mensaje }}
             </h4>
 
             <button class="btn btn-primary rounded-pill mt-4" @click="finalizar" data-bs-dismiss="modal">
-              {{ t.continue }}
+              <span v-if="eliminado">{{ t.continue }}</span>
+              <span v-else>{{ t.return }}</span>
             </button>
 
           </div>
@@ -336,7 +322,10 @@ async function confirmarEliminar() {
     mensaje.value = t.value.subscriptionDeleted
     eliminado.value = true
   } catch (e) {
-    mensaje.value = t.value.noDeleted
+    confirmModal.hide()
+    successModal.show()
+
+    mensaje.value = t.value.subscriptionNoDeleted
     eliminado.value = false
     console.error("Error al eliminar el abono deportivo", e);
   }
@@ -363,7 +352,7 @@ onMounted(async () => {
   try {
     abono.value = await getAbonoDeportivoDetalle(id);
     abonoOriginal.value = JSON.parse(JSON.stringify(abono.value));
-  } catch(e) {
+  } catch (e) {
     mensaje.value = t.value.unexpectedError
     console.log("Error al obtener la informacion de los abonos deportivos", e)
   }

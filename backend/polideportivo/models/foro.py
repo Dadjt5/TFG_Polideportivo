@@ -34,7 +34,7 @@ class UsuarioCanal(models.Model):
     silenciado = models.BooleanField(default=False)
     expulsado = models.BooleanField(default=False)
     
-    usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.RESTRICT, related_name="canales")
+    usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.CASCADE, related_name="canales")
     canal = models.ForeignKey('Canal', on_delete=models.CASCADE, related_name="usuarioFinal")
 
     class Meta:
@@ -135,7 +135,7 @@ class Mensaje(models.Model):
     texto = models.TextField()
     fechaEnvio = models.DateTimeField(auto_now_add=True)
 
-    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
     canal = models.ForeignKey('Canal', on_delete=models.CASCADE, related_name="mensajes")
 
     class Meta:
