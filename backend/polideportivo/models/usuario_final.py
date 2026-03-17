@@ -4,6 +4,7 @@ from django.db import transaction
 from django.contrib.auth import get_user_model
 from django.conf import settings
 
+from .user import generar_codigo
 from .usuario import Usuario
 from .favorito import Favorito
 from .constantes import Sexo, Rol
@@ -29,10 +30,10 @@ class UsuarioFinal(Usuario):
     rol = models.CharField(default=Rol.EXTERNO, choices=Rol.choices)
 
     def save(self, *args, **kwargs):
-        if self.rol == Rol.EXTERNO:
-            self.esUAM = False
+        if not self.esUAM:
+            self.rol == Rol.EXTERNO
         else:
-            self.esUAM = True
+            self.rol = Rol.ESTUDIANTE
 
         super().save(*args, **kwargs)
 
@@ -99,7 +100,7 @@ class UsuarioFinal(Usuario):
             }
 
         with transaction.atomic():
-            codigo = User.generar_codigo()
+            codigo = generar_codigo()
     
             username = dni if dni else codigo
 

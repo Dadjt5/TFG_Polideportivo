@@ -55,7 +55,7 @@
               </div>
 
               <div class="col-12 col-sm-6" v-if="instalacion.tipoInstalacion">
-                <p><i class="bi bi-door-open-fill text-primary me-1"></i><span class="fw-medium">{{ t.facilityType }}:</span> {{ instalacion.tipoInstalacion }}</p>
+                <p><i class="bi bi-door-open-fill text-primary me-1"></i><span class="fw-medium">{{ t.facilityType }}:</span> {{ instalacion.tipoInstalacionDisplay }}</p>
               </div>
 
               <div class="col-12 col-sm-6" v-if="instalacion.horaApertura">
@@ -129,7 +129,8 @@ const instalacion = ref({
   horaApertura: "",
   horaCierre: "",
   pabellon: { id: -1, nombre: "", direccion: "" },
-  tipoInstalacion: ""
+  tipoInstalacion: "",
+  tipoInstalacionDisplay: ""
 });
 
 const cambiarFavorito = () => {
@@ -142,7 +143,6 @@ const pavilionDetail = (id: number) => {
     params: { id }
   });
 }
-
 
 const reservar = () => {
   router.push({
@@ -160,6 +160,7 @@ onMounted(async () => {
 
   try {
     instalacion.value = await getInstalacionDetalle(id);
+    console.log(instalacion.value)
   } catch(e) {
     console.log("Error al obtener la informacion de instalaciones", e);
   }

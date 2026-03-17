@@ -297,12 +297,18 @@ class InstalacionSerializer(serializers.ModelSerializer):
     calles = CalleSerializer(many=True, read_only=True)
     pabellon = PabellonSimpleSerializer(read_only=True)
 
+    tipoInstalacionDisplay = serializers.CharField(
+        source='get_tipoInstalacion_display',
+        read_only=True
+    )
+
     class Meta:
         model = Instalacion
         fields = (
             "id",
             "nombre",
             "tipoInstalacion",
+            "tipoInstalacionDisplay",
             "aforoMaximo",
             "luz",
             "imagenURL",

@@ -247,6 +247,10 @@ function camposModificados() {
     data.DNI = monitor.value.DNI
   }
 
+  if (monitorOriginal.value.email !== monitor.value.email) {
+    data.email = monitor.value.email
+  }
+
   return data
 }
 

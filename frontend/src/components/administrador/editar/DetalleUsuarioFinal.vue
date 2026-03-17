@@ -168,20 +168,6 @@
               </p>
             </div>
 
-            <!-- CUENTA -->
-            <div class="col-md-4">
-              <label class="form-label">{{ t.account }}</label>
-              <input
-                v-if="isEditing"
-                class="form-control"
-                v-model="usuario.cuentaBancaria"
-								:class="{ 'is-invalid': errores.cuentaBancaria }"
-              />
-              <p v-else class="form-control-plaintext">
-                {{ usuario.cuentaBancaria || '-' }}
-              </p>
-            </div>
-
             <!-- ACTIVIDADES -->
             <div class="col-md-4">
               <label class="form-label">{{ t.madeActivities }}</label>
@@ -348,7 +334,6 @@ const usuario = ref({
   municipio: '',
   localidad: '',
   codigoPostal: '',
-  cuentaBancaria: '',
   actividadesRealizadas: 0,
   esUAM: false,
   tieneAbono: false,
@@ -366,7 +351,6 @@ const errores = ref({
   municipio: false,
   localidad: false,
   codigoPostal: false,
-  cuentaBancaria: false,
 })
 
 
@@ -384,10 +368,6 @@ function validarFormulario() {
   errores.value.municipio = usuario.value.municipio === ''
   errores.value.localidad = usuario.value.localidad === ''
   errores.value.codigoPostal = usuario.value.codigoPostal === ''
-
-  errores.value.cuentaBancaria =
-    usuario.value.cuentaBancaria !== '' &&
-    usuario.value.cuentaBancaria.length < 20
 
   for (const key in errores.value) {
     if(errores.value[key]) {
@@ -417,48 +397,31 @@ function cancelarEdicion() {
 function camposModificados() {
   const data: any = {}
 
-	if(usuarioOriginal.value.nombre != usuario.value.nombre) {
-      data["nombre"] = usuario.value.nombre
-  }
+  const camposDirectos = [
+    "nombre",
+    "apellidos",
+    "DNI",
+    "email",
+    "sexo",
+    "fechaNacimiento",
+    "telefono",
+    "provincia",
+    "municipio",
+    "localidad",
+    "codigoPostal",
+    "esUAM",
+    "tieneAbono",
+    "tieneTDA"
+  ];
 
-	if(usuarioOriginal.value.apellidos != usuario.value.apellidos) {
-      data["apellidos"] = usuario.value.apellidos
-  }
+  camposDirectos.forEach(campo => {
+    if(usuarioOriginal.value[campo] !== usuario.value[campo]) {
+      data[campo] = usuario.value[campo];
+    }
+  });
 
-	if(usuarioOriginal.value.DNI != usuario.value.DNI) {
-      data["DNI"] = usuario.value.DNI
-  }
-
-  if(usuarioOriginal.value.sexo != usuario.value.sexo) {
-      data["sexo"] = usuario.value.sexo
-  }
-
-  if(usuarioOriginal.value.telefono != usuario.value.telefono) {
-    data["telefono"] = usuario.value.telefono
-  }
-
-  if(usuarioOriginal.value.provincia != usuario.value.provincia) {
-    data["provincia"] = usuario.value.provincia
-  }
-
-  if(usuarioOriginal.value.municipio != usuario.value.municipio) {
-    data["municipio"] = usuario.value.municipio
-  }
-
-  if(usuarioOriginal.value.localidad != usuario.value.localidad) {
-    data["localidad"] = usuario.value.localidad
-  }
-
-  if(usuarioOriginal.value.codigoPostal != usuario.value.codigoPostal) {
-    data["codigoPostal"] = usuario.value.codigoPostal
-  }
-
-  if(usuarioOriginal.value.cuentaBancaria != usuario.value.cuentaBancaria) {
-    data["cuentaBancaria"] = usuario.value.cuentaBancaria
-  }
-
-  const favoritosActuales = ((usuarioOriginal.value.deportes as {id: number, titulo: string}[]) || []).map(d => d.id).sort()
-  const favoritosNuevosIds = [...usuario.value.deportesFavoritos].sort()
+  const favoritosActuales = ((usuarioOriginal.value.deportes as {id: number, titulo: string}[]) || []).map(d => d.id).sort();
+  const favoritosNuevosIds = [...usuario.value.deportesFavoritos].sort();
 
   if(JSON.stringify(favoritosActuales) !== JSON.stringify(favoritosNuevosIds)) {
     data["deportes_ids"] = favoritosNuevosIds;
@@ -473,6 +436,7 @@ const guardarCambios = async () => {
 		if (!validarFormulario()) return
 
 		const data = camposModificados();
+    console.log(data)
     if(Object.keys(data).length > 0) {
       await modificarUsuarioFinal(usuario.value.id, data);
     }
@@ -531,6 +495,7 @@ onMounted(async () => {
 
 	try {
 	  usuario.value = await getUsuarioFinal(id);
+    console.log(usuario.value)
 		usuarioOriginal.value = JSON.parse(JSON.stringify(usuario.value))
 	} catch(e) {
     mensaje.value = t.value.unexpectedError
