@@ -32,21 +32,21 @@
         <h6 class="fw-bold mb-2">{{ t.tariff }}</h6>
 
         <!-- Tipo OTROS -->
-        <table v-if="reserva.tarifa.tipo === 'OTROS'" class="table table-sm mb-4">
+        <table v-if="reserva.tarifa.tipo === 'Otros'" class="table table-sm mb-4">
           <tbody>
             <tr :class="{ 'table-primary': usuarioFinalStore.isUAM }">
               <td>UAM</td>
               <td class="text-end">{{ reserva.tarifa.datos.precioUAM }} € / {{ reserva.tarifa.datos.numeroHorasSemana }} {{ t.weekHours }}</td>
             </tr>
             <tr :class="{ 'table-primary': !usuarioFinalStore.isUAM }">
-              <td>{{ t.other }}</td>
+              <td>{{ t.others }}</td>
               <td class="text-end">{{ reserva.tarifa.datos.precioOtros }} € / {{ reserva.tarifa.datos.numeroHorasSemana }} {{ t.weekHours }}</td>
             </tr>
           </tbody>
         </table>
 
         <!-- Tipo GRUPOS_REDUCIDOS -->
-        <table v-else-if="reserva.tarifa.tipo === 'GRUPOS_REDUCIDOS'" class="table table-sm mb-4 align-middle">
+        <table v-else-if="reserva.tarifa.tipo === 'Grupos reducidos'" class="table table-sm mb-4 align-middle">
           <tbody>
             <tr>
               <td><i class="bi bi-people me-2"></i>{{ t.people }}</td>
@@ -60,9 +60,9 @@
               <td><i class="bi bi-credit-card me-2"></i>{{ t.paymentMethod }}</td>
               <td class="text-end">
                 <select class="form-select form-select-sm text-end" v-model="reserva.seleccion.modalidad">
-                  <option value="mensual">{{ t.monthly }}</option>
-                  <option value="cuatrimestral">{{ t.quarterly }}</option>
-                  <option value="total">{{ t.fullPayment }}</option>
+                  <option value="Pago mensual">{{ t.monthly }}</option>
+                  <option value="Pago cuatrimestral">{{ t.quarterly }}</option>
+                  <option value="Pago unico">{{ t.fullPayment }}</option>
                 </select>
               </td>
             </tr>
@@ -76,7 +76,7 @@
         </table>
 
         <!-- Tipo FISIOTERAPIA -->
-        <table v-else-if="reserva.tarifa.tipo === 'FISIOTERAPIA'" class="table table-sm mb-4">
+        <table v-else-if="reserva.tarifa.tipo === 'Fisioterapia'" class="table table-sm mb-4">
           <tbody>
             <tr>
               <td>{{ t.sessionType }}</td>
@@ -95,7 +95,7 @@
               <td>UAM</td><td class="text-end">{{ precioFisioUAM }} €</td>
             </tr>
             <tr :class="{ 'table-primary': !usuarioFinalStore.isUAM && !usuarioFinalStore.hasTda }">
-              <td>{{ t.other }}</td><td class="text-end">{{ precioFisioOtros }} €</td>
+              <td>{{ t.others }}</td><td class="text-end">{{ precioFisioOtros }} €</td>
             </tr>
           </tbody>
         </table>
@@ -164,7 +164,7 @@ const reserva = ref({
   },
   seleccion: {
     personas: 1,
-    modalidad: 'total',
+    modalidad: 'Pago unico',
     tipoSesion: 'consulta'
   },
   descuento: {
@@ -191,9 +191,9 @@ function obtenerPrecioComun(precios: any) {
 
 function obtenerPrecioGrupo(precios: any, sel: any) {
   let precio = precios.precio;
-  if (sel.modalidad == "mensual") {
+  if (sel.modalidad == "Pago mensual") {
     precio = precios.precioMensual;
-  } else if (sel.modalidad == "cuatrimestral") {
+  } else if (sel.modalidad == "Pago cuatrimestral") {
     precio = precios.precioCuatrimestre
   }
 
@@ -255,15 +255,15 @@ const precioBase = computed(() => {
   const datos = reserva.value.tarifa.datos;
   const sel = reserva.value.seleccion;
 
-  if (tipo === 'OTROS') {
+  if (tipo === 'Otros') {
     return obtenerPrecioComun(datos);
   }
 
-  if (tipo === 'GRUPOS_REDUCIDOS') {
+  if (tipo === 'Grupos reducidos') {
     return obtenerPrecioGrupo(datos, sel)
   }
 
-  if (tipo === 'FISIOTERAPIA') {
+  if (tipo === 'Fisioterapia') {
     return obtenerPrecioFisioterapia(datos, sel)
   }
 
@@ -277,7 +277,12 @@ const total = computed(() => {
 })
 
 const continuarPago = async () => {
-  const response = await reservarActividad(reserva.value.tarifa.idActividad)
+  const response = await reservarActividad(
+    reserva.value.tarifa.idActividad,
+    reserva.value.seleccion.personas,
+    reserva.value.seleccion.modalidad,
+    reserva.value.seleccion.tipoSesion
+  )
 
   const idPago = response.idPago
 

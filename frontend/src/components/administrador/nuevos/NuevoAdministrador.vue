@@ -41,10 +41,10 @@
                     :class="{ 'is-invalid': errores.rol }"
                     v-model="administrador.rol">
               <option value="" disabled>{{ t.selectOption }}</option>
-              <option value="RAIZ">{{ t.rootAdmin }}</option>
-              <option value="USUARIOS">{{ t.usersAdmin }}</option>
-              <option value="ESPACIOS">{{ t.spacesAdmin }}</option>
-              <option value="TARIFAS">{{ t.tariffsAdmin }}</option>
+              <option value="Administrador raiz">{{ t.rootAdmin }}</option>
+              <option value="Administrador de usuarios">{{ t.usersAdmin }}</option>
+              <option value="Administrador de espacios">{{ t.spacesAdmin }}</option>
+              <option value="Administrador de tarifas">{{ t.tariffsAdmin }}</option>
             </select>
           </div>
 
@@ -186,7 +186,7 @@ function validarFormulario() {
 }
 
 function comprobarPermisos() {
-  if (!authStore.isAdminRaiz && administrador.value.rol == "RAIZ") {
+  if (!authStore.isAdminRaiz && administrador.value.rol == "Administrador raiz") {
     return false
   }
 

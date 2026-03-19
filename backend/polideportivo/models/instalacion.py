@@ -1,11 +1,11 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from datetime import time, datetime, timedelta
+from datetime import time, datetime, timedelta, date
 from django.db.models import Q
 
 from .agenda import Agenda
 from .actividad import Sesion
-from .constantes import TipoInstalacion, Dia
+from .constantes import TipoInstalacion, Dia, TipoReserva, Periodo
 
 
 class Pabellon(models.Model):
@@ -87,7 +87,47 @@ class Instalacion(models.Model):
 
         self.save()
         return True
-    
+
+    def actualizarMapa(self, sesiones):
+        print(sesiones)
+        for sesion in sesiones:
+            dia = sesion.get('dia')
+            hora_inicio = sesion.get('horaInicio')
+            hora_fin = sesion.get('horaFin')
+            calle_num = sesion.get('calle')
+
+            agenda = Agenda.objects.filter(dia__iexact=dia).first()
+
+            print(agenda, dia, hora_inicio, hora_fin)
+
+            if agenda:
+                if isinstance(hora_inicio, str):
+                    hora_inicio = datetime.strptime(hora_inicio, "%H:%M").time()
+
+                if isinstance(hora_fin, str):
+                    hora_fin = datetime.strptime(hora_fin, "%H:%M").time()
+
+                hora_actual = datetime.combine(datetime.today(), hora_inicio)
+                hora_fin_dt = datetime.combine(datetime.today(), hora_fin)
+
+                while hora_actual < hora_fin_dt:
+                    siguiente_hora = hora_actual + timedelta(hours=1)
+
+                    mapa = agenda.mapa_reservas.filter(
+                        horaInicio=hora_actual.time(),
+                        horaFin=siguiente_hora.time(),
+                        calle=calle_num
+                    ).first()
+
+                    print(mapa)
+
+                    if mapa:
+                        print(mapa.estado)
+                        mapa.estado = TipoReserva.ACTIVIDAD
+                        mapa.save()
+
+                    hora_actual = siguiente_hora
+
     def sincronizarMapaReservas(self, agenda, minutos=60):
         if not agenda.abierto:
             agenda.mapa_reservas.all().delete()
@@ -153,8 +193,17 @@ class Instalacion(models.Model):
         if agenda.horaApertura > hora_inicio or agenda.horaCierre < hora_fin:
             return False
 
+        mes = date.today().month
+        if 9 <= mes or mes == 1:
+            periodo = Periodo.PRIMER_CUATRIMESTRE
+        elif 2 <= mes <= 5:
+            periodo = Periodo.SEGUNDO_CUATRIMESTRE
+        else:
+            periodo = Periodo.ANUAL
+
         conflictos = Sesion.objects.filter(
             actividad__instalacion=self,
+            actividad__periodo__in=[periodo, "ANUAL"],
             dia__iexact=dia,
             horaInicio__lt=hora_fin,
             horaFin__gt=hora_inicio

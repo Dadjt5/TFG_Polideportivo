@@ -4,10 +4,10 @@ from django.conf import settings
 class Feedback(models.Model):
 
     class TipoFeedback(models.TextChoices):
-        GENERAL = "GENERAL", "General"
-        MEJORA = "MEJORA", "Mejora"
-        BUG = "BUG", "Bug"
-        SUGERENCIA = "SUGERENCIA", "Sugerencia"
+        GENERAL = "General"
+        MEJORA = "Mejora"
+        BUG = "Bug"
+        SUGERENCIA = "Sugerencia"
 
     usuario = models.ForeignKey(
         settings.AUTH_USER_MODEL,

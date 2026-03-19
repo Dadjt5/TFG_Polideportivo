@@ -8,10 +8,10 @@
         <div class="mb-3">
           <label class="form-label fw-semibold">Tipo de comentario</label>
           <select v-model="tipo" class="form-select">
-            <option value="GENERAL">General</option>
-            <option value="MEJORA">Mejora</option>
-            <option value="BUG">Bug</option>
-            <option value="SUGERENCIA">Sugerencia</option>
+            <option value="General">General</option>
+            <option value="Mejora">Mejora</option>
+            <option value="Bug">Bug</option>
+            <option value="Sugerencia">Sugerencia</option>
           </select>
         </div>
 
@@ -70,10 +70,10 @@
           <label class="form-label fw-semibold me-2">Filtrar por tipo:</label>
           <select v-model="filtroTipo" class="form-select d-inline-block w-auto">
             <option value="">Todos</option>
-            <option value="GENERAL">General</option>
-            <option value="MEJORA">Mejora</option>
-            <option value="BUG">Bug</option>
-            <option value="SUGERENCIA">Sugerencia</option>
+            <option value="General">General</option>
+            <option value="Mejora">Mejora</option>
+            <option value="Bug">Bug</option>
+            <option value="Sugerencia">Sugerencia</option>
           </select>
         </div>
         <div>
@@ -136,7 +136,7 @@ import { nuevoFeedback, getFeedback } from '@/services/feedbackService'
 
 const authStore = useAuthStore();
 
-const tipo = ref('GENERAL')
+const tipo = ref('General')
 const valoracion = ref<number | null>(null)
 const mensaje = ref('')
 const loading = ref(false)
@@ -158,7 +158,7 @@ const enviarFeedback = async () => {
     success.value = true
     mensaje.value = ''
     valoracion.value = null
-    tipo.value = 'GENERAL'
+    tipo.value = 'General'
   } catch (e: any) {
     console.error(e)
     error.value = e.response?.data?.detail || 'Error enviando el feedback'

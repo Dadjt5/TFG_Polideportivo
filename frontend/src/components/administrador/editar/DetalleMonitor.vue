@@ -105,7 +105,7 @@
 
             <button v-if="!isEditing" class="btn btn-danger btn-lg rounded-pill" @click="abrirConfirmacion">
               <i class="bi bi-trash me-2"></i>
-              {{ t.deleteUser }}
+              {{ t.delete }}
             </button>
 
           </div>
@@ -132,7 +132,7 @@
             </button>
 
             <button class="btn btn-danger rounded-pill" @click="confirmarEliminar">
-              {{ t.deleteUser }}
+              {{ t.delete }}
             </button>
           </div>
 

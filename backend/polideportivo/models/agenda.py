@@ -54,45 +54,6 @@ class Agenda(models.Model):
 
         return False
 
-    def generarMapa(self, minutos=60):
-        if not self.abierto:
-            return
-
-        inicio_base = datetime.combine(datetime.today(), self.horaApertura)
-        fin = datetime.combine(datetime.today(), self.horaCierre)
-
-        instalacion = self.instalacion
-        if instalacion.tipoInstalacion != TipoInstalacion.PISCINA:
-            inicio = inicio_base
-
-            while inicio < fin:
-                siguiente = inicio + timedelta(minutes=minutos)
-
-                MapaReservas.objects.get_or_create(
-                    agenda=self,
-                    calle=None,
-                    horaInicio=inicio.time(),
-                    horaFin=siguiente.time(),
-                )
-
-                inicio = siguiente
-
-        else:
-            for calle in instalacion.calles.all():
-                inicio = inicio_base
-
-                while inicio < fin:
-                    siguiente = inicio + timedelta(minutes=minutos)
-
-                    MapaReservas.objects.get_or_create(
-                        agenda=self,
-                        calle=calle,
-                        horaInicio=inicio.time(),
-                        horaFin=siguiente.time(),
-                    )
-
-                    inicio = siguiente
-
 
 class MapaReservas(models.Model):
     """Modelo para representar el mapa de reservas de un dia"""
@@ -110,3 +71,6 @@ class MapaReservas(models.Model):
 
     def __str__(self):
         return f'{self.agenda.dia} {self.horaInicio}-{self.horaFin}'
+
+    class Meta:
+        ordering = ['horaInicio']

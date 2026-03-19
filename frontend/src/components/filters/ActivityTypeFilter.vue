@@ -70,12 +70,12 @@ const titleClass = computed(() => props.theme === 'dark'
     <div style="max-width: 750px; margin: 0 auto;" class="d-grid gap-3 mb-4">
       <button
         v-for="type in estadisticasStore.data.tiposActividad"
-        :key="type[0]"
+        :key="type"
         type="button"
-        :class="buttonClass(type[1])"
-        @click="toggleType(type[1])"
+        :class="buttonClass(type)"
+        @click="toggleType(type)"
       >
-        {{ type[1] }}
+        {{ type }}
       </button>
     </div>
 

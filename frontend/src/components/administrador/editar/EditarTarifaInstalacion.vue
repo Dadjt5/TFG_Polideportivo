@@ -123,7 +123,7 @@
             </button>
 
             <button class="btn btn-danger rounded-pill" @click="confirmarEliminar">
-              {{ t.deleteUser }}
+              {{ t.delete }}
             </button>
           </div>
 

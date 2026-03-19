@@ -48,7 +48,7 @@ class Configuracion(models.Model):
 
             if 'dias_minimo_cancelacion' in data and data['dias_minimo_cancelacion'] != valor_original_cancelacion:
                 from .notificacion import Notificacion
-                Notificacion.notificarCambioCancelacion(valor_original_cancelacion, data['dias_minimo_cancelacion'])
+                Notificacion.notificarCambioCancelacion()
 
             return True
         except Exception as e:

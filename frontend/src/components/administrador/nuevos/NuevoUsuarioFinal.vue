@@ -26,9 +26,9 @@
             <div class="col-md-6">
               <select class="form-select" :class="{ 'is-invalid': errores.sexo }" v-model="usuarioFinal.sexo">
                 <option value="">{{ t.selectOption }}</option>
-                <option value="HOMBRE">{{ t.male }}</option>
-                <option value="MUJER">{{ t.female }}</option>
-                <option value="NINGUNO">{{ t.other }}</option>
+                <option value="Mujer">{{ t.female }}</option>
+                <option value="Hombre">{{ t.male }}</option>
+                <option value="Prefiero no decirlo">{{ t.other }}</option>
               </select>
             </div>
 

@@ -140,7 +140,16 @@ class Notificacion(models.Model):
             usuario=usuario.user,
             actividad=actividad
         )
-
+    
+    @classmethod
+    def notificarProblemasPago(cls, usuario):
+        configuracion = Configuracion.objects.all().first()
+        
+        cls.objects.create(
+            titulo=configuracion.titulo_problemas_pago,
+            descripcion=configuracion.texto_problemas_pago,
+            usuario=usuario,
+        )
 
     @classmethod
     def notificarSalidaListaDeEspera(cls, usuario, actividad):

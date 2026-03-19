@@ -22,6 +22,7 @@ export default {
   reject: "Rechazar",
   poolStreet: "Calle de la piscina",
   poolStreets: "Calles de la piscina",
+  changeImage: "Cambiar imagen",
 
   /* Eliminaciones */
   confirmDelete: "Confirmar eliminación",
@@ -33,10 +34,10 @@ export default {
   finalUserDeleted: "Se ha eliminado el usuario final",
   confirmDeleteTariff: "¿Seguro que desea eliminar la tarifa?",
   tariffDeleted: "La tarifa se ha eliminado",
-  confirmDeleteBonus: "¿Seguro que desea eliminar la bonificación?",
-  bonusDeleted: "La bonificación se ha eliminado",
-  confirmDeleteSubscription: "¿Seguro que desea eliminar la suscripción?",
-  subscriptionDeleted: "La suscripción se ha eliminado",
+  confirmDeleteBonus: "¿Seguro que desea eliminar el bono?",
+  bonusDeleted: "El bono se ha eliminado",
+  confirmDeleteSubscription: "¿Seguro que desea eliminar el abono?",
+  subscriptionDeleted: "El abono se ha eliminado",
   confirmDeleteDiscount: "¿Seguro que desea eliminar el descuento?",
   discountDeleted: "El descuento se ha eliminado",
   confirmDeleteFacility: "¿Seguro que desea eliminar la instalación?",
@@ -49,6 +50,8 @@ export default {
   channelDeleted: "El canal se ha eliminado",
   confirmDeleteSport: "¿Seguro que desea eliminar el deporte?",
   sportDeleted: "El deporte se ha eliminado",
+  confirmReservationDelete: "¿Seguro que desea eliminar la reserva?",
+  reservationDeleted: "La reserva ha sido eliminada",
 
   monitorNoDeleted: "El monitor no puede ser eliminado porque esta dirigiendo una o mas actividades",
   finalUserNoDeleted: "El usuario final no pudo ser eliminado debido a un problema desconocido",
@@ -62,6 +65,7 @@ export default {
   activityNoDeleted: "La actividad no pudo ser eliminada debido a un problema desconocido",
   channelNoDeleted: "El canal no pudo ser eliminado debido a un problema desconocido",
   sportNoDeleted: "El deporte no pudo ser eliminado porque se desarrolla en una o mas actividades",
+  reservationNoDeleted: "La reserva no pudo ser eliminada",
 
   /* Mensajes */
   missing: "Hay campos vacios o erroneos",
@@ -74,7 +78,7 @@ export default {
   cantBooking: "Esta actividad no puede ser reservada",
   noSessionWarning: "La actividad no tiene sesiones",
   wrongTimetable: "La hora de inicio no puede ser mas tarde que la de fin",
-  cannotCancel: "La reserva de la actividad no se puede cancelar en este momento",
+  cannotCancel: "La reserva no se puede cancelar en este momento",
   timeRemaining: "Tiempo restante para completar el pago",
   selectLane: "Debe seleccionar un canal",
   cannotChangeType: "No se puede cambiar a ese tipo de instalación",
@@ -189,7 +193,7 @@ export default {
   sex: "Sexo",
   male: "Hombre",
   female: "Mujer",
-  other: "Otro",
+  other: "Prefiero no decirlo",
   birth: "Fecha de nacimiento",
   payFract: "Pago fraccionado",
   selectOption: "Selecciona una opción",

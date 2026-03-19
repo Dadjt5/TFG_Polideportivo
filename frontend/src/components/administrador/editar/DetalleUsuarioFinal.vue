@@ -76,9 +76,9 @@
             <div class="col-md-4">
               <label class="form-label">{{ t.sex }}</label>
               <select v-if="isEditing" class="form-select" :class="{ 'is-invalid': errores.sexo }" v-model="usuario.sexo">
-                <option value="MUJER">{{ t.female }}</option>
-                <option value="HOMBRE">{{ t.male }}</option>
-                <option value="NINGUNO">{{ t.other }}</option>
+                <option value="Mujer">{{ t.female }}</option>
+                <option value="Hombre">{{ t.male }}</option>
+                <option value="Prefiero no decirlo">{{ t.other }}</option>
               </select>
               <p v-else class="form-control-plaintext">{{ usuario.sexo || '-' }}</p>
             </div>
@@ -240,7 +240,7 @@
         </template>
 
         <button v-if="!isEditing" class="btn btn-danger btn-lg rounded-pill" @click="abrirConfirmacion">
-          <i class="bi bi-trash me-2"></i> {{ t.deleteUser }}
+          <i class="bi bi-trash me-2"></i> {{ t.delete }}
         </button>
 
       </div>
@@ -436,7 +436,6 @@ const guardarCambios = async () => {
 		if (!validarFormulario()) return
 
 		const data = camposModificados();
-    console.log(data)
     if(Object.keys(data).length > 0) {
       await modificarUsuarioFinal(usuario.value.id, data);
     }
@@ -495,7 +494,6 @@ onMounted(async () => {
 
 	try {
 	  usuario.value = await getUsuarioFinal(id);
-    console.log(usuario.value)
 		usuarioOriginal.value = JSON.parse(JSON.stringify(usuario.value))
 	} catch(e) {
     mensaje.value = t.value.unexpectedError

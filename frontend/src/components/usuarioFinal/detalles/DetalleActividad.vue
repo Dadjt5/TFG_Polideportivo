@@ -74,8 +74,8 @@
                 <p>
                   <i class="bi bi-building text-primary me-1"></i>
                   <span class="fw-medium">{{ t.facility }}: </span>
-                  <span class="text-primary fw-medium" style="cursor: pointer;" @click="facilityDetail(actividad.instalacion.id)">
-                    {{ actividad.instalacion.nombre }}
+                  <span class="text-primary fw-medium" style="cursor: pointer;" @click="facilityDetail(actividad.instalacion)">
+                    {{ actividad.nombreInstalacion }}
                   </span>
                 </p>
               </div>
@@ -130,13 +130,13 @@
       </div>
 
       <div class="text-center mt-4"
-        v-if="usuarioFinalStore.isLogged && actividad.tipoReserva !== 'ONLINE' && actividad.tipoReserva !== 'AMBAS'">
+        v-if="usuarioFinalStore.isLogged && actividad.tipoReserva !== 'Permite la reserva solo online' && actividad.tipoReserva !== 'Permite ambos tipos de reserva'">
         <p>{{ t.cantBooking }}</p>
       </div>
 
       <!-- Reserva y Volver -->
       <div class="d-flex justify-content-center mt-5">
-        <button v-if="usuarioFinalStore.isLogged && (actividad.tipoReserva === 'ONLINE' || actividad.tipoReserva === 'AMBAS')" class="btn btn-success btn-lg px-5 me-4" @click="reservar">
+        <button v-if="usuarioFinalStore.isLogged && (actividad.tipoReserva === 'Permite la reserva solo online' || actividad.tipoReserva === 'Permite ambos tipos de reserva')" class="btn btn-success btn-lg px-5 me-4" @click="reservar">
           {{ t.booking }}
         </button>
 
@@ -194,6 +194,7 @@ const actividad = ref({
   dias: "",
   nombreMonitor: "",
   nombreDeporte: "",
+  nombreInstalacion: "",
   horasSemanales: "",
   instalacion: {
     id: 0,
@@ -227,6 +228,5 @@ const volver = () => {
 onMounted(async () => {
   const id = parseInt(props.id);
   actividad.value = await getActividadDetalle(id);
-  console.log(actividad)
 });
 </script>

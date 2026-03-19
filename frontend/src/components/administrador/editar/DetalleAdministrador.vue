@@ -50,10 +50,10 @@
               <select v-if="isEditing" class="form-select form-select-lg" :class="{ 'is-invalid': errores.rol }"
                 v-model="admin.rol">
                 <option value="" disabled>{{ t.selectOption }}</option>
-                <option value="RAIZ">{{ t.rootAdmin }}</option>
-                <option value="USUARIOS">{{ t.usersAdmin }}</option>
-                <option value="ESPACIOS">{{ t.spacesAdmin }}</option>
-                <option value="TARIFAS">{{ t.tariffsAdmin }}</option>
+                <option value="Administrador raiz">{{ t.rootAdmin }}</option>
+                <option value="Administrador de usuarios">{{ t.usersAdmin }}</option>
+                <option value="Administrador de espacios">{{ t.spacesAdmin }}</option>
+                <option value="Administrador de tarifas">{{ t.tariffsAdmin }}</option>
               </select>
 
               <p v-else class="form-control-plaintext">
@@ -97,7 +97,7 @@
 
             <button v-if="!isEditing && !esYo()" class="btn btn-danger btn-lg rounded-pill" @click="abrirConfirmacion">
               <i class="bi bi-trash me-2"></i>
-              {{ t.deleteUser }}
+              {{ t.delete }}
             </button>
 
           </div>
@@ -123,7 +123,7 @@
             </button>
 
             <button class="btn btn-danger rounded-pill" @click="confirmarEliminar">
-              {{ t.deleteUser }}
+              {{ t.delete }}
             </button>
           </div>
 
@@ -246,7 +246,7 @@ function camposModificados() {
 }
 
 function comprobarPermisos() {
-  if (!authStore.isAdminRaiz && (adminOriginal.value.rol == "RAIZ" || admin.value.rol == "RAIZ")) {
+  if (!authStore.isAdminRaiz && (adminOriginal.value.rol == "Administrador raiz" || admin.value.rol == "Administrador raiz")) {
     return false
   }
 

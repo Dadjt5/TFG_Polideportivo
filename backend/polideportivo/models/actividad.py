@@ -221,6 +221,7 @@ class Actividad(models.Model):
     def buscar(cls, nombre=None, tipo=None, horaInicio=None, horaFin=None, dias=None):
         res = cls.objects.all()
 
+        print(res, nombre, tipo, horaInicio, horaFin, dias)
         if nombre:
             res = res.filter(nombre__icontains=nombre)
 
@@ -236,6 +237,7 @@ class Actividad(models.Model):
         if dias:
             res = res.filter(sesiones__dia__in=dias)
 
+        print(res)
         return res.distinct()
 
 

@@ -117,6 +117,7 @@ urlpatterns = [
     path("alquileres/<int:alquiler_id>/cancelar/", views.CancelarAlquilerView.as_view(), name="cancelar-alquiler"),
     path("abonos/<int:compra_id>/cancelar/", views.CancelarAbonoView.as_view(), name="cancelar-abono"),
     path("bonos/<int:compra_id>/cancelar/", views.CancelarBonoView.as_view(), name="cancelar-bono"),
+    path("stripe/webhook/", views.StripeWebhookView.as_view(), name="webhook-stripe"),
     path("password_reset/", include("django_rest_passwordreset.urls", namespace="password_reset")),
     path('', include(router.urls)),
 ]

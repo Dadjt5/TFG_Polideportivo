@@ -56,9 +56,8 @@
                   </template>
 
                   <template v-else>
-                    <p class="mb-1"><i class="bi bi-calendar-event me-1"></i>{{ t.days }}: {{ reserva.actividad.dias.join(", ") }}</p>
-                    <p class="mb-1"><i class="bi bi-clock me-1"></i>{{ t.weekHours }}: {{ reserva.actividad.horasSemanales }}</p>
-                    <p class="mb-1"><i class="bi bi-tag me-1"></i>{{ t.tariff }}: {{ reserva.tarifa?.nombre }}</p>
+                    <p class="mb-1"><i class="bi bi-calendar-event me-1"></i>{{ t.days }}: {{ reserva.actividad?.dias.join(", ") }}</p>
+                    <p class="mb-1"><i class="bi bi-clock me-1"></i>{{ t.weekHours }}: {{ reserva.actividad?.horasSemanales }}</p>
                     <p v-if="reserva.descuentos?.length" class="mb-0">
                       <i class="bi bi-percent me-1"></i>{{ t.discounts }}:
                       <span v-for="d in reserva.descuentos" :key="d.id">{{ d.nombre }} ({{ d.porcentaje }}%)</span>
@@ -77,7 +76,7 @@
                 <button
                   class="btn btn-danger btn-sm rounded-pill px-3"
                   :disabled="!puedeCancelar(reserva)"
-                  @click="cancelarReserva(reserva)"
+                  @click="abrirConfirmacion(reserva)"
                 >
                   <i class="bi bi-x-circle me-1"></i>
                   {{ t.cancel }}
@@ -89,12 +88,62 @@
         </div>
       </div>
 
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4">
+
+          <div class="modal-header">
+            <h5 class="modal-title">{{ t.confirmDelete }}</h5>
+          </div>
+
+          <div class="modal-body text-center">
+            <p>{{ t.confirmReservationDelete }}</p>
+          </div>
+
+          <div class="modal-footer justify-content-center">
+            <button class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">
+              {{ t.cancel }}
+            </button>
+
+            <button class="btn btn-danger rounded-pill" @click="cancelarReserva">
+              {{ t.delete }}
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="successDeleteModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 text-center">
+
+          <div class="modal-body py-5">
+
+            <i v-if="eliminado" class="bi bi-check-circle-fill text-success fs-1 mb-3"></i>
+            <i v-else class="bi bi-exclamation-octagon-fill text-danger fs-1 mb-3"></i>
+
+            <h4 class="fw-semibold">
+              {{ mensaje }}
+            </h4>
+
+            <button class="btn btn-primary rounded-pill mt-4" @click="finalizar" data-bs-dismiss="modal">
+              <span v-if="eliminado">{{ t.continue }}</span>
+              <span v-else>{{ t.return }}</span>
+            </button>
+
+          </div>
+
+        </div>
+      </div>
+    </div>
     </main>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, inject, type Ref } from "vue"
+import { Modal } from 'bootstrap'
 
 import { getReservasRealizadas } from "@/services/usuarioFinalService"
 import { cancelarReservaActividad, cancelarAlquiler } from "@/services/cancelarService"
@@ -140,9 +189,14 @@ type Reserva = {
 
 const configuracionStore = useConfiguracionStore();
 const reservas = ref<Reserva[]>([])
+const mensaje = ref("")
+const eliminado = ref(false)
+
+let confirmModal: Modal
+let successModal: Modal
 
 const puedeCancelar = (reserva: Reserva) => {
-  if (reserva.estado !== "ACTIVO") return false
+  if (reserva.estado !== "CONFIRMADA") return false
 
   if (!reserva.actividad) return reserva.tipo === "ALQUILER" ? true : false
 
@@ -156,29 +210,56 @@ const puedeCancelar = (reserva: Reserva) => {
   return hoy >= fechaLimiteCancelar && hoy < primerDiaProximoMes
 }
 
-const cancelarReserva = async (reserva: Reserva) => {
+const reservaElegida = ref()
+
+function abrirConfirmacion(reserva: Reserva) {
+  reservaElegida.value = reserva
+  confirmModal.show()
+}
+
+function finalizar() {
+  successModal.hide()
+}
+
+const cancelarReserva = async () => {
+  const reserva = reservaElegida.value
 
   if (!puedeCancelar(reserva)) return
 
   try {
-
     if (reserva.tipo === "ALQUILER") {
       await cancelarAlquiler(reserva.id)
     } else {
       await cancelarReservaActividad(reserva.id)
     }
 
-    reservas.value = reservas.value.filter(r => r.id !== reserva.id)
+    confirmModal.hide()
+    successModal.show()
 
+    mensaje.value = t.value.reservationDeleted
+    eliminado.value = true
+    reservas.value = reservas.value.filter(r => r.id !== reserva.id)
+    reservaElegida.value = null
   } catch (e) {
+    confirmModal.hide()
+    successModal.show()
+
+    mensaje.value = t.value.reservationNoDeleted
+    eliminado.value = false
+    reservaElegida.value = null
     console.error("Error cancelando reserva", e)
   }
 }
 
 onMounted(async () => {
+  confirmModal = new Modal(document.getElementById('confirmDeleteModal')!)
+  successModal = new Modal(document.getElementById('successDeleteModal')!)
+
   try {
     reservas.value = await getReservasRealizadas()
+    configuracionStore.obtenerConfiguracion()
   } catch (e) {
+    mensaje.value = t.value.unexpectedError
     console.error("Error al obtener reservas", e)
   }
 })

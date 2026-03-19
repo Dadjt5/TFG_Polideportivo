@@ -1,9 +1,10 @@
 <template>
-  <div class="container py-4">
+  <div class="min-vh-100" style="background: linear-gradient(135deg, #fff4e0, #e0f7ff);">
+    <main class="container py-5" style="max-width: 1120px;">
 
     <!-- HEADER -->
     <div class="text-center mb-5">
-      <h1 class="fw-bold">{{ t.activities }}</h1>
+      <h1 class="fw-bold text-primary">{{ t.activities }}</h1>
     </div>
 
     <div class="tab-content">
@@ -48,7 +49,7 @@
         {{ t.noResults }}
       </div>
     </div>
-
+  </main>
   </div>
 </template>
 

@@ -22,6 +22,7 @@ class UsuarioFinal(Usuario):
     esUAM = models.BooleanField(default=False)
     tieneAbono = models.BooleanField(default=False)
     tieneTDA = models.BooleanField(default=False)
+    stripe_customer_id = models.CharField(max_length=255, null=True, blank=True)
 
     deportesFavoritos = models.ManyToManyField('Deporte', blank=True, related_name="usuariosFinales")
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="usuario_final")
@@ -81,7 +82,7 @@ class UsuarioFinal(Usuario):
     @classmethod
     def registrar_usuario(cls, *, nombre, apellidos, sexo, fechaNacimiento,
                           dni, telefono, email, provincia, municipio,
-                          localidad, codigoPostal, password):
+                          localidad, codigoPostal, password, esUAM):
 
         from .foro import Canal
 
@@ -122,7 +123,8 @@ class UsuarioFinal(Usuario):
                 provincia=provincia,
                 municipio=municipio,
                 localidad=localidad,
-                codigoPostal=codigoPostal
+                codigoPostal=codigoPostal,
+                esUAM=esUAM
             )
 
             for canal in Canal.objects.all():

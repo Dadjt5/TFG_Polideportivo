@@ -52,7 +52,7 @@ from polideportivo.models import (
     ReservaActividad, Alquiler, Administrador, User, CompraBono, CompraAbono,
     Mensaje, Sesion, MapaReservas, TipoActividad, TipoInstalacion, FormaReserva,
     Terreno, Estado, Dia, ActividadComun, GrupoReducido, Fisioterapia, EstadoPago,
-    EstadoReserva, Periodo, Feedback, Calle, RolAdministrador
+    EstadoReserva, Periodo, Feedback, Calle, RolAdministrador, TipoReserva, TipoPago
 )
 
 
@@ -158,6 +158,27 @@ class AgendaViewSet(viewsets.ModelViewSet):
     queryset = Agenda.objects.all()
     serializer_class = AgendaSerializer
     permission_classes = [AllowAny]
+
+    def destroy(self, request, *args, **kwargs):
+        sesion = self.get_object()
+
+        dia = sesion.dia
+        hora_inicio = sesion.horaInicio
+        hora_fin = sesion.horaFin
+        calle = sesion.calle
+
+        agenda = Agenda.objects.filter(dia__iexact=dia).first()
+
+        if agenda:
+            agenda.mapa_reservas.filter(
+                calle=calle,
+                horaInicio__gte=hora_inicio,
+                horaInicio__lt=hora_fin,
+                estado=TipoReserva.ACTIVIDAD
+            ).update(estado=TipoReserva.LIBRE)
+
+        self.perform_destroy(sesion)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class MapaReservasViewSet(viewsets.ModelViewSet):
@@ -588,27 +609,29 @@ class meAPIView(APIView):
             "id": user.id,
             "username": user.username,
             "email": user.email,
-            "is_monitor": user.is_monitor,
-            "is_usuario_final": user.is_usuario_final,
-            "is_administrador": user.is_administrador,
-            "is_superuser": user.is_superuser
+            "is_monitor": getattr(user, "is_monitor", False),
+            "is_usuario_final": getattr(user, "is_usuario_final", False),
+            "is_administrador": getattr(user, "is_administrador", False),
+            "is_superuser": getattr(user, "is_superuser", False),
         }
 
-        if user.is_usuario_final:
+        try:
             data["usuario_final_id"] = user.usuario_final.id
-        else:
+        except User.usuario_final.RelatedObjectDoesNotExist:
             data["usuario_final_id"] = None
 
-        if user.is_monitor:
+        try:
             data["monitor_id"] = user.monitor.id
-        else:
+        except User.monitor.RelatedObjectDoesNotExist:
             data["monitor_id"] = None
 
-        if user.is_administrador:
-            data["administrador_id"] = user.administrador.id
-            data["rol"] = user.administrador.rol
-        else:
+        try:
+            admin = user.administrador
+            data["administrador_id"] = admin.id
+            data["rol"] = getattr(admin, "rol", None)
+        except User.administrador.RelatedObjectDoesNotExist:
             data["administrador_id"] = None
+            data["rol"] = None
 
         return Response(data)
 
@@ -670,8 +693,8 @@ class BuscarView(APIView):
         tiposActividad = request.query_params.getlist('tiposActividad')
         tiposInstalacion = request.query_params.getlist('tiposInstalacion')
 
-        instalaciones = Instalacion.buscar(nombre,tiposInstalacion,horaApertura,horaCierre)
-        actividades = Actividad.buscar(nombre,tiposActividad,horaInicioSesion,horaFinSesion,dias)
+        instalaciones = Instalacion.buscar(nombre, tiposInstalacion, horaApertura, horaCierre)
+        actividades = Actividad.buscar(nombre, tiposActividad, horaInicioSesion, horaFinSesion, dias)
 
         data = {
             "instalaciones": InstalacionSerializer(instalaciones, many=True).data,
@@ -698,12 +721,13 @@ class RegistroView(APIView):
         localidad = request.data.get('localidad')
         codigoPostal = request.data.get('codigoPostal')
         password = request.data.get('password')
+        esUAM = request.data.get('esUAM')
 
         respuesta = UsuarioFinal.registrar_usuario(
             nombre=nombre, apellidos=apellidos, sexo=sexo, fechaNacimiento=fechaNacimiento,
             dni=dni, telefono=telefono, email=email, provincia=provincia,
             municipio=municipio, localidad=localidad, codigoPostal=codigoPostal,
-            password=password
+            password=password, esUAM=esUAM
         )
 
         if respuesta["error"]:
@@ -916,7 +940,7 @@ class ReservasView(APIView):
             reservas.append({
                 "id": alquiler.id,
                 "tipo": "ALQUILER",
-                "estado": "ACTIVO",
+                "estado": "CONFIRMADA",
                 "puede_cancelar": True,
                 "instalacion": {
                     "id": alquiler.instalacion.id,
@@ -937,7 +961,7 @@ class ReservasView(APIView):
                 "id": reserva_act.id,
                 "tipo": "RESERVA",
                 "estado": reserva_act.estado,
-                "puede_cancelar": True,  # opcional, según lógica del frontend
+                "puede_cancelar": True,
                 "actividad": {
                     "id": reserva_act.actividad.id,
                     "nombre": reserva_act.actividad.nombre,
@@ -948,13 +972,9 @@ class ReservasView(APIView):
                 "fecha": str(reserva_act.actividad.periodo_inicio) if hasattr(reserva_act.actividad, "periodo_inicio") else None,
                 "horaInicio": None,
                 "horaFin": None,
-                "tarifa": {
-                    "id": getattr(reserva_act.tarifa, "id", None),
-                    "nombre": getattr(reserva_act.tarifa, "nombre", None)
-                },
                 "descuentos": [
                     {"id": d.id, "nombre": d.nombre, "porcentaje": d.porcentaje} 
-                    for d in getattr(reserva_act, "descuentos", [])
+                    for d in getattr(reserva_act, "descuentos", []).all()
                 ],
             })
 
@@ -1366,7 +1386,6 @@ class NuevaActividadView(APIView):
 
     @transaction.atomic
     def post(self, request):
-
         actividad_json = request.POST.get("actividad", "{}")
         actividad_data = json.loads(actividad_json)
         imagen = request.FILES.get("imagenURL")
@@ -1433,6 +1452,7 @@ class NuevaActividadView(APIView):
         actividad.deportes = deporte
         actividad.save()
 
+        instalacion.actualizarMapa(sesiones)
         Notificacion.notificarNuevaActividad(actividad)
 
         return Response({
@@ -1755,11 +1775,21 @@ class ReservarActividadView(APIView):
         actividad = get_object_or_404(Actividad, id=actividad_id)
         complementos = request.data.get('complementos')
 
+        formaPago = complementos.get("forma")
+        if formaPago == TipoPago.UNICO:
+            forma = TipoPago.UNICO
+        elif formaPago == TipoPago.MENSUAL:
+            forma = TipoPago.MENSUAL
+        elif formaPago == TipoPago.CUATRIMESTRAL:
+            forma = TipoPago.CUATRIMESTRAL
+        else:
+            return Response({"respuesta": "No se puede reservar la actividad de esta forma"}, status=status.HTTP_400_BAD_REQUEST)
+
         res = ReservaActividad.nuevaReserva(request.user.usuario_final, actividad)
         if not res:
             return Response({"respuesta": "Error al reservar la actividad"}, status=status.HTTP_400_BAD_REQUEST)
 
-        pago = Pago.nuevoPago("Pago por reserva de la actividad", request.user.usuario_final, res, complementos)
+        pago = Pago.nuevoPago("Pago por reserva de la actividad", request.user.usuario_final, forma, res, complementos)
 
         if res and pago:
             return Response({"idPago": pago.id})
@@ -1818,7 +1848,7 @@ class ReservaInstalacionView(APIView):
         if not res:
             return Response({"respuesta": "Error al alquilar, la instalacion esta ocupada"}, status=status.HTTP_400_BAD_REQUEST)
 
-        pago = Pago.nuevoPago("Pago por el alquiler de una instalación", request.user.usuario_final, res)
+        pago = Pago.nuevoPago("Pago por el alquiler de una instalación", request.user.usuario_final, TipoPago.UNICO, res)
 
         if res and pago:
             return Response({"idPago": pago.id})
@@ -1839,11 +1869,20 @@ class ComprarAbonoView(APIView):
         elif tipoAbono == "abono_verano":
             abono = get_object_or_404(AbonoVerano, id=abono_id)
 
+        formaPago = complementos.get("forma")
+        familiar = complementos.get("familiar", False)
+        if formaPago == TipoPago.UNICO or familiar:
+            forma = TipoPago.UNICO
+        elif formaPago == TipoPago.MENSUAL:
+            forma = TipoPago.MENSUAL
+        else:
+            return Response({"respuesta": "No se puede comprar el abono de esta forma"}, status=status.HTTP_400_BAD_REQUEST)
+
         compra = CompraAbono.compraAbono(abono, request.user.usuario_final, tipoAbono)
         if not compra:
             return Response({"respuesta": "Error al comprar el abono"}, status=status.HTTP_400_BAD_REQUEST)
 
-        pago = Pago.nuevoPago(f'Pago por nuevo {tipoAbono}', request.user.usuario_final, compra, complementos)
+        pago = Pago.nuevoPago(f'Pago por nuevo {tipoAbono}', request.user.usuario_final, forma, compra, complementos)
 
         if compra and pago:
             return Response({"idPago": pago.id})
@@ -1862,7 +1901,7 @@ class ComprarBonoView(APIView):
         if not compra:
             return Response({"respuesta": "Error al comprar el bono"}, status=status.HTTP_400_BAD_REQUEST)
 
-        pago = Pago.nuevoPago(f'Pago por nuevo bono', request.user.usuario_final, compra)
+        pago = Pago.nuevoPago(f'Pago por nuevo bono', request.user.usuario_final, TipoPago.UNICO, compra)
 
         if compra and pago:
             return Response({"idPago": pago.id})
@@ -1879,7 +1918,7 @@ class ComprarTDAView(APIView):
         if not compra:
             return Response({"respuesta": "Error al comprar la TDA"}, status=status.HTTP_400_BAD_REQUEST)
 
-        pago = Pago.nuevoPago(f'Pago por nueva TDA', request.user.usuario_final, compra)
+        pago = Pago.nuevoPago(f'Pago por nueva TDA', request.user.usuario_final, TipoPago.ANUAL, compra)
 
         if compra and pago:
             return Response({"idPago": pago.id})
@@ -1901,6 +1940,7 @@ class ResumenPagoView(APIView):
                 "id": reserva.id,
                 "estado": reserva.estado,
                 "nombre": reserva.actividad.nombre,
+                "tipo": "mensual",
                 "pago": {
                     "concepto": pago.concepto,
                     "coste": pago.coste,
@@ -1917,6 +1957,7 @@ class ResumenPagoView(APIView):
                 "id": alquiler.id,
                 "estado": alquiler.estado,
                 "nombre": alquiler.instalacion.nombre,
+                "tipo": "unico",
                 "pago": {
                     "concepto": pago.concepto,
                     "coste": pago.coste,
@@ -1934,6 +1975,7 @@ class ResumenPagoView(APIView):
                 "id": compra.id,
                 "estado": compra.estado,
                 "nombre": abono.nombre,
+                "tipo": "mensual",
                 "pago": {
                     "concepto": pago.concepto,
                     "coste": pago.coste,
@@ -1950,6 +1992,7 @@ class ResumenPagoView(APIView):
                 "id": compra.id,
                 "estado": compra.estado,
                 "nombre": f'Bono para {compra.bono.instalacion.nombre}',
+                "tipo": "unico",
                 "pago": {
                     "concepto": pago.concepto,
                     "coste": pago.coste,
@@ -1966,6 +2009,7 @@ class ResumenPagoView(APIView):
                 "id": compra.id,
                 "estado": compra.estado,
                 "nombre": f'TDA',
+                "tipo": "anual",
                 "pago": {
                     "concepto": pago.concepto,
                     "coste": pago.coste,
@@ -1992,20 +2036,21 @@ class CrearIntentoPagoView(APIView):
         if pago.estadoPago != EstadoPago.PENDIENTE:
             return Response({"respuesta": "Pago incorrecto"}, status=status.HTTP_400_BAD_REQUEST)
 
-        intent = stripe.PaymentIntent.create(
-            amount=int(pago.coste * 100), # En centimos
-            currency="eur",
-            metadata={
-                "pago_id": pago.id,
-                "usuario_id": request.user.id
-            }
-        )
+        if pago.tipoPago == TipoPago.UNICO:
+            intent = pago.aplicarPagoUnico(request.user.usuario_final)
 
-        pago.stripe_payment_intent = intent.id
-        pago.save()
+            client_secret = intent.client_secret
+        else:
+            usuario = request.user.usuario_final
+            subscription = pago.aplicarSubscripcion(usuario)
+
+            if not subscription:
+                return Response({"respuesta": "Tipo de subscripcion invalida"}, status=status.HTTP_400_BAD_REQUEST)
+
+            client_secret = subscription.latest_invoice.confirmation_secret.client_secret
 
         return Response({
-            "client_secret": intent.client_secret
+            "client_secret": client_secret
         })
 
 
@@ -2016,27 +2061,49 @@ class ConfirmarPagoView(APIView):
     def post(self, request, pago_id):
         pago = get_object_or_404(Pago, id=pago_id)
 
-        intent = stripe.PaymentIntent.retrieve(pago.stripe_payment_intent)
-
-        if intent.status == "succeeded":
+        estado = pago.comprobarPago()
+        if estado:
             pago.confirmarPago()
             return Response({"respuesta": "Pago completado con exito"}, status=status.HTTP_200_OK)
         else:
             pago.cancelarPago()
             return Response({"respuesta": "Error al pagar"}, status=status.HTTP_400_BAD_REQUEST)
 
-
+from django.contrib.contenttypes.models import ContentType
 # Cancelar una reserva de actividad
 class CancelarReservaActividadView(APIView):
     permission_classes = [IsUsuarioFinal]
-    
+
     def delete(self, request, reserva_id):
-        reserva = get_object_or_404(ReservaActividad, id=reserva_id)
-        
+        reserva = get_object_or_404(ReservaActividad, id=reserva_id, usuarioFinal=request.user.usuario_final)
+
+        reserva_ct = ContentType.objects.get_for_model(ReservaActividad)
+        pago = Pago.objects.get(content_type=reserva_ct, object_id=reserva.id)
+
+        configuracion = Configuracion.objects.first()
+
+        hoy = timezone.now()
+
+        if hoy.month == 12:
+            siguiente_mes = datetime(hoy.year + 1, 1, 1, tzinfo=timezone.utc)
+        else:
+            siguiente_mes = datetime(hoy.year, hoy.month + 1, 1, tzinfo=timezone.utc)
+
+        fecha_limite = siguiente_mes - timedelta(days=configuracion.dias_minimo_cancelacion)
+
+        if hoy < fecha_limite:
+            return Response(
+                {"respuesta": "El plazo de cancelación para el próximo mes ha finalizado"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if pago.stripe_subscription_id:
+            stripe.Subscription.delete(pago.stripe_subscription_id)
+
         reserva.cancelarCompra()
         reserva.delete()
-        
-        return Response({"respuesta": "Reserva eliminada"}, status=status.HTTP_200_OK)
+
+        return Response({"respuesta": "Reserva cancelada correctamente"}, status=200)
 
 
 # Cancelar un alquiler
@@ -2045,7 +2112,27 @@ class CancelarAlquilerView(APIView):
     
     def delete(self, request, alquiler_id):
         alquiler = get_object_or_404(Alquiler, id=alquiler_id)
-        
+
+        alquiler_ct = ContentType.objects.get_for_model(Alquiler)
+        pago = Pago.objects.get(content_type=alquiler_ct, object_id=alquiler.id)
+
+        ahora = timezone.localtime()
+
+        fecha_alquiler = alquiler.fecha
+        hora_inicio = alquiler.horaInicio
+
+        inicio_alquiler = datetime.combine(fecha_alquiler, hora_inicio)
+        inicio_alquiler = timezone.make_aware(inicio_alquiler)
+
+        if inicio_alquiler <= ahora:
+            return Response({"respuesta": "No se puede cancelar un alquiler ya iniciado"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if pago.estadoPago == EstadoPago.PAGADO:
+            stripe.Refund.create(payment_intent=pago.stripe_payment_intent)
+
+            pago.estadoPago = EstadoPago.CANCELADO
+            pago.save()
+
         alquiler.cancelarCompra()
         alquiler.delete()
         
@@ -2058,48 +2145,97 @@ class CancelarAbonoView(APIView):
 
     def delete(self, request, compra_id):
         compra = get_object_or_404(CompraAbono, id=compra_id)
+        
+        compra_ct = ContentType.objects.get_for_model(CompraAbono)
+        pago = Pago.objects.get(content_type=compra_ct, object_id=compra.id)
+
+        if pago.stripe_subscription_id:
+            stripe.Subscription.delete(pago.stripe_subscription_id)
 
         compra.cancelarCompra()
         compra.delete()
-        
-        return Response({"respuesta": "Compra de abono eliminado"}, status=status.HTTP_200_OK)
+
+        return Response({"respuesta": "Compra de abono eliminada"}, status=200)
 
 
 # Cancelar un abono
 class CancelarBonoView(APIView):
     permission_classes = [IsUsuarioFinal]
-    
+
     def delete(self, request, compra_id):
         compra = get_object_or_404(CompraBono, id=compra_id)
-        
+
+        compra_ct = ContentType.objects.get_for_model(CompraBono)
+        pago = Pago.objects.get(content_type=compra_ct, object_id=compra.id)
+
+        if pago.estadoPago == EstadoPago.PAGADO and compra.vecesUsado == 0:
+            stripe.Refund.create(payment_intent=pago.stripe_payment_intent)
+
+            pago.estadoPago = EstadoPago.CANCELADO
+            pago.save()
+
         compra.cancelarCompra()
         compra.delete()
-        
-        return Response({"respuesta": "Compra de bono eliminado"}, status=status.HTTP_200_OK)
+
+        return Response({"respuesta": "Compra de bono eliminada"}, status=status.HTTP_200_OK)
+
+
+class StripeWebhookView(APIView):
+    permission_classes = []
+
+    def post(self, request):
+        payload = request.body
+        sig_header = request.META.get('HTTP_STRIPE_SIGNATURE', '')
+        endpoint_secret = settings.STRIPE_WEBHOOK_SECRET
+
+        try:
+            event = stripe.Webhook.construct_event(
+                payload, sig_header, endpoint_secret
+            )
+        except ValueError:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        except stripe.error.SignatureVerificationError:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        if event['type'] == 'invoice.payment_failed':
+            invoice = event['data']['object']
+            subscription_id = invoice['subscription']
+            try:
+                pago = Pago.objects.get(stripe_subscription_id=subscription_id)
+                Notificacion.notificarProblemasPago(pago.usuarioFinal)
+
+                if pago.stripe_subscription_id:
+                    stripe.Subscription.delete(pago.stripe_subscription_id)
+
+                pago.cancelarPago()
+            except Pago.DoesNotExist:
+                pass
+
+        return Response(status=status.HTTP_200_OK)
 
 
 # Obtener estadisticas para el admin
 class ObtenerEstadisticasAdministradorView(APIView):
     permission_classes = [IsAdministrador]
-    
+
     def get(self, request):
         hoy = now()
         reservas_mes = ReservaActividad.objects.filter(
             created_at__year=hoy.year,
             created_at__month=hoy.month
         ).count()
-        
+
         alquiler_mes = Alquiler.objects.filter(
             created_at__year=hoy.year,
             created_at__month=hoy.month
         ).count()
-        
+
         ingresos_mes = Pago.objects.filter(
             fecha__year=hoy.year,
             fecha__month=hoy.month,
             estadoPago=EstadoPago.PAGADO
         ).aggregate(total=Sum("costeFinal"))["total"] or 0
-        
+
         reservas_12_meses = (
             ReservaActividad.objects
             .filter(created_at__gte=hoy - timedelta(days=365))

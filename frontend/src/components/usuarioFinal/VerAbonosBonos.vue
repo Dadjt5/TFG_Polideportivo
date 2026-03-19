@@ -46,7 +46,7 @@
               </div>
             </div>
             <div class="mt-3 text-end" v-if="b.valido">
-              <button class="btn btn-outline-danger btn-sm" @click="cancelarCompraBono(b.id)">
+              <button class="btn btn-outline-danger btn-sm" @click="abrirConfirmacion(b.id, 'bono')">
                 <i class="bi bi-x-circle me-1"></i>
                 {{ t.cancel }}
               </button>
@@ -88,7 +88,7 @@
             </div>
 
             <div class="mt-3 text-end" v-if="esValido(a)">
-              <button class="btn btn-outline-danger btn-sm" @click="cancelarCompraAbono(a.id)">
+              <button class="btn btn-outline-danger btn-sm" @click="abrirConfirmacion(a.id, 'abono')">
                 <i class="bi bi-x-circle me-1"></i>
                 {{ t.cancel }}
               </button>
@@ -97,12 +97,88 @@
         </div>
       </section>
 
+    <div class="modal fade" id="confirmDeleteModalBono" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4">
+
+          <div class="modal-header">
+            <h5 class="modal-title">{{ t.confirmDelete }}</h5>
+          </div>
+
+          <div class="modal-body text-center">
+            <p>{{ t.confirmDeleteBonus }}</p>
+          </div>
+
+          <div class="modal-footer justify-content-center">
+            <button class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">
+              {{ t.cancel }}
+            </button>
+
+            <button class="btn btn-danger rounded-pill" @click="cancelarCompraBono">
+              {{ t.deleteUser }}
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="confirmDeleteModalAbono" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4">
+
+          <div class="modal-header">
+            <h5 class="modal-title">{{ t.confirmDelete }}</h5>
+          </div>
+
+          <div class="modal-body text-center">
+            <p>{{ t.confirmDeleteSubscription }}</p>
+          </div>
+
+          <div class="modal-footer justify-content-center">
+            <button class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">
+              {{ t.cancel }}
+            </button>
+
+            <button class="btn btn-danger rounded-pill" @click="cancelarCompraAbono">
+              {{ t.delete }}
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="successDeleteModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 text-center">
+
+          <div class="modal-body py-5">
+
+            <i v-if="eliminado" class="bi bi-check-circle-fill text-success fs-1 mb-3"></i>
+            <i v-else class="bi bi-exclamation-octagon-fill text-danger fs-1 mb-3"></i>
+
+            <h4 class="fw-semibold">
+              {{ mensaje }}
+            </h4>
+
+            <button class="btn btn-primary rounded-pill mt-4" @click="finalizar" data-bs-dismiss="modal">
+              <span v-if="eliminado">{{ t.continue }}</span>
+              <span v-else>{{ t.return }}</span>
+            </button>
+
+          </div>
+
+        </div>
+      </div>
+    </div>
     </main>
   </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref, inject, type Ref } from 'vue'
+import { Modal } from 'bootstrap'
 
 import { getAbonos, getBonos } from '@/services/usuarioFinalService'
 import { cancelarAbono, cancelarBono } from '@/services/cancelarService'
@@ -153,6 +229,12 @@ type AbonoActivo = {
 }
 
 const abonos = ref<AbonoActivo[]>([])
+const mensaje = ref("")
+const eliminado = ref(false)
+
+let confirmModalAbono: Modal
+let confirmModalBono: Modal
+let successModal: Modal
 
 const getInicioVerano = () => {
   const year = new Date().getFullYear()
@@ -200,25 +282,72 @@ const esValido = (a: AbonoActivo) => {
   return a.valido
 }
 
-const cancelarCompraBono = async (id: number) => {
+const id_objeto = ref()
+
+function abrirConfirmacion(id: number, tipo: string) {
+  id_objeto.value = id
+  if(tipo == "abono") {
+    confirmModalAbono.show()
+  } else {
+    confirmModalBono.show()
+  }
+}
+
+function finalizar() {
+  successModal.hide()
+}
+
+const cancelarCompraBono = async () => {
+  const id = id_objeto.value
   try {
     await cancelarBono(id)
+
+    confirmModalBono.hide()
+    successModal.show()
+
+    mensaje.value = t.value.bonusDeleted
+    eliminado.value = true
     bonos.value = bonos.value.filter(b => b.id !== id)
+    id_objeto.value = null
   } catch (e) {
+    confirmModalBono.hide()
+    successModal.show()
+
+    mensaje.value = t.value.bonusNoDeleted
+    eliminado.value = false
+    id_objeto.value = null
     console.error("Error cancelando bono", e)
   }
 }
 
-const cancelarCompraAbono = async (id: number) => {
+const cancelarCompraAbono = async () => {
+  const id = id_objeto.value
   try {
     await cancelarAbono(id)
+
+    confirmModalAbono.hide()
+    successModal.show()
+
+    mensaje.value = t.value.subscriptionDeleted
+    eliminado.value = true
     abonos.value = abonos.value.filter(a => a.id !== id)
+    id_objeto.value = null
   } catch (e) {
+    confirmModalAbono.hide()
+    successModal.show()
+
+    mensaje.value = t.value.subscriptionNoDeleted
+    eliminado.value = false
     console.error("Error cancelando abono", e)
+    id_objeto.value = null
   }
 }
 
 onMounted(async () => {
+  confirmModalAbono = new Modal(document.getElementById('confirmDeleteModalAbono')!)
+  confirmModalBono = new Modal(document.getElementById('confirmDeleteModalBono')!)
+  successModal = new Modal(document.getElementById('successDeleteModal')!)
+
   try {
     bonos.value = await getBonos();
     abonos.value = await getAbonos();

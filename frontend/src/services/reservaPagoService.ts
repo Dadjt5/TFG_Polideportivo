@@ -28,8 +28,8 @@ export const getAlquiler = async (id: number) => {
 
 
 /* Función para reservar la actividad */
-export const reservarActividad = async(id: number) => {
-  const response = await api.post(`api/v1/actividades/${id}/reservar/`)
+export const reservarActividad = async(id: number, personas: number, modalidad: string, tipoSesion: string) => {
+  const response = await api.post(`api/v1/actividades/${id}/reservar/`, {"complementos": {"personas": personas, "forma": modalidad, "tipoSesion": tipoSesion}})
   return response.data;
 }
 

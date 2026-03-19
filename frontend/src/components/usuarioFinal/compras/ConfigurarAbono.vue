@@ -1,7 +1,6 @@
 <template>
   <div class="min-vh-100 d-flex align-items-center justify-content-center"
        style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
-
     <div class="container" style="max-width: 700px;">
 
       <!-- TÍTULO -->
@@ -27,8 +26,8 @@
             <div class="mb-3">
               <label class="form-label fw-semibold">{{ t.paymentMethod }}</label>
               <select class="form-select" v-model="seleccion.forma" :disabled="seleccion.familiar">
-                <option value="MENSUAL">{{ t.monthly }}</option>
-                <option value="TOTAL">{{ t.fullPayment }}</option>
+                <option value="Pago mensual">{{ t.monthly }}</option>
+                <option value="Pago unico">{{ t.fullPayment }}</option>
               </select>
             </div>
 
@@ -43,25 +42,25 @@
               <table class="table table-sm table-hover">
                 <tbody>
                   <tr
-                    :class="{ 'table-primary fw-bold': !seleccion.familiar && usuarioStore.isUAM && seleccion.forma === 'MENSUAL' && abono.precioTotalMensual === total }">
+                    :class="{ 'table-primary fw-bold': !seleccion.familiar && usuarioStore.isUAM && seleccion.forma === 'Pago mensual' && abono.precioTotalMensual === total }">
                     <td>{{ t.monthlyPriceUAM }}</td>
                     <td class="text-end">{{ abono.precioTotalMensual }} €</td>
                   </tr>
 
                   <tr
-                    :class="{ 'table-primary fw-bold': !seleccion.familiar && !usuarioStore.isUAM && seleccion.forma === 'MENSUAL' && abono.precioTotalMensualOtros === total }">
+                    :class="{ 'table-primary fw-bold': !seleccion.familiar && !usuarioStore.isUAM && seleccion.forma === 'Pago mensual' && abono.precioTotalMensualOtros === total }">
                     <td>{{ t.monthlyPriceOthers }}</td>
                     <td class="text-end">{{ abono.precioTotalMensualOtros }} €</td>
                   </tr>
 
                   <tr
-                    :class="{ 'table-primary fw-bold': !seleccion.familiar && usuarioStore.isUAM && seleccion.forma === 'TOTAL' && abono.precioPagoUnicoUAM === total }">
+                    :class="{ 'table-primary fw-bold': !seleccion.familiar && usuarioStore.isUAM && seleccion.forma === 'Pago unico' && abono.precioPagoUnicoUAM === total }">
                     <td>{{ t.totalPriceUAM }}</td>
                     <td class="text-end">{{ abono.precioPagoUnicoUAM }} €</td>
                   </tr>
 
                   <tr
-                    :class="{ 'table-primary fw-bold': !seleccion.familiar && !usuarioStore.isUAM && seleccion.forma === 'TOTAL' && abono.precioPagoUnicoOtros === total }">
+                    :class="{ 'table-primary fw-bold': !seleccion.familiar && !usuarioStore.isUAM && seleccion.forma === 'Pago unico' && abono.precioPagoUnicoOtros === total }">
                     <td>{{ t.totalPriceOthers }}</td>
                     <td class="text-end">{{ abono.precioPagoUnicoOtros }} €</td>
                   </tr>
@@ -143,7 +142,7 @@ const tipo = String(route.params.tipo)
 const abono = ref<any>(null)
 
 const seleccion = ref({
-  forma: 'TOTAL',
+  forma: 'Pago unico',
   familiar: false
 })
 
@@ -161,12 +160,12 @@ const total = computed(() => {
     }
 
     if (usuarioStore.isUAM) {
-      if (seleccion.value.forma === 'MENSUAL') {
+      if (seleccion.value.forma === 'Pago mensual') {
         return abono.value.precioTotalMensual
       }
       return abono.value.precioPagoUnicoUAM
     } else {
-      if (seleccion.value.forma === 'MENSUAL') {
+      if (seleccion.value.forma === 'Pago mensual') {
         return abono.value.precioTotalMensualOtros
       }
       return abono.value.precioPagoUnicoOtros

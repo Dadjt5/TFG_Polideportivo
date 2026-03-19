@@ -59,13 +59,13 @@
                 <select v-if="editando" class="form-select form-select-lg" v-model="instalacion.tipoInstalacion"
                   :class="{ 'is-invalid': errores.tipoInstalacion }">
                   <option value="" disabled>--</option>
-                  <option v-for="t in tiposStore.tiposInstalacion" :key="t[0]" :value="t[0]">{{ t[1] }}</option>
+                  <option v-for="t in tiposStore.tiposInstalacion" :key="t" :value="t">{{ t }}</option>
                 </select>
                 <div v-else class="form-control form-control-lg bg-light text-muted">{{ instalacion.tipoInstalacion ||
                   '---' }}</div>
               </div>
 
-              <div class="col-md-4" v-if="instalacion.tipoInstalacion === 'PISCINA'">
+              <div class="col-md-4" v-if="instalacion.tipoInstalacion === 'Piscina'">
                 <label class="form-label fw-semibold">{{ t.poolStreets }}</label>
                 <input v-if="editando" type="number" min="1" class="form-control form-control-lg"
                   v-model.number="instalacion.numeroCalles" :class="{ 'is-invalid': errores.numeroCalles }" />
@@ -143,11 +143,11 @@
                     <div v-if="dia.abierto">
                       <div v-if="editando" class="row g-2">
                         <div class="col-6">
-                          <label class="small text-muted fw-bold">Apertura</label>
+                          <label class="small text-muted fw-bold">{{ t.openHour }}</label>
                           <input type="time" class="form-control form-control-sm" v-model="dia.horaApertura" />
                         </div>
                         <div class="col-6">
-                          <label class="small text-muted fw-bold">Cierre</label>
+                          <label class="small text-muted fw-bold">{{ t.closeHour }}</label>
                           <input type="time" class="form-control form-control-sm" v-model="dia.horaCierre" />
                         </div>
                       </div>
@@ -170,7 +170,7 @@
             <div v-if="editando" class="mb-4">
               <button class="btn btn-primary rounded-pill px-4 shadow-sm"
                 @click="fechasEspeciales.push({ fecha: '', horaApertura: '08:00', horaCierre: '22:00', abierto: true })">
-                <i class="bi bi-plus-circle me-2"></i> + Añadir fecha especial
+                <i class="bi bi-plus-circle me-2"></i> + {{ t.newSpecialDate }}
               </button>
             </div>
 
@@ -188,7 +188,7 @@
                   <div class="mb-3">
                     <div v-if="editando" class="form-check form-switch">
                       <input class="form-check-input" type="checkbox" v-model="fecha.abierto" />
-                      <label class="form-check-label fw-medium ms-1">Abierto</label>
+                      <label class="form-check-label fw-medium ms-1">{{ t.open }}</label>
                     </div>
                     <span v-else class="badge" :class="fecha.abierto ? 'bg-success' : 'bg-danger'">{{ fecha.abierto ?
                       'Abierto' : 'Cerrado' }}</span>
@@ -196,11 +196,11 @@
                   <div v-if="fecha.abierto">
                     <div v-if="editando" class="row g-2">
                       <div class="col-6">
-                        <label class="small text-muted fw-bold">Apertura</label>
+                        <label class="small text-muted fw-bold">{{ t.openHour }}</label>
                         <input type="time" class="form-control form-control-sm" v-model="fecha.horaApertura" />
                       </div>
                       <div class="col-6">
-                        <label class="small text-muted fw-bold">Cierre</label>
+                        <label class="small text-muted fw-bold">{{ t.closeHour }}</label>
                         <input type="time" class="form-control form-control-sm" v-model="fecha.horaCierre" />
                       </div>
                     </div>
@@ -233,7 +233,7 @@
                   class="img-fluid rounded mb-3 shadow-sm" style="max-height: 300px; object-fit: cover;" />
 
                 <div v-if="editando" class="mt-2">
-                  <label class="form-label fw-semibold">Cambiar imagen</label>
+                  <label class="form-label fw-semibold">{{ t.changeImage }}</label>
                   <input type="file" class="form-control form-control-lg" accept="image/*" @change="onFileChange" />
                 </div>
 
@@ -291,7 +291,7 @@
             </button>
 
             <button class="btn btn-danger rounded-pill" @click="confirmarEliminar">
-              {{ t.deleteUser }}
+              {{ t.delete }}
             </button>
           </div>
 
@@ -399,7 +399,7 @@ function validarFormulario() {
   errores.value.tarifa
   errores.value.numeroCalles =
     instalacion.value.numeroCalles <= 0 &&
-    instalacion.value.tipoInstalacion === "PISCINA"
+    instalacion.value.tipoInstalacion === "Piscina"
 
   for (const key in errores.value) {
     if (errores.value[key]) {
@@ -428,12 +428,12 @@ function cancelarEdicion() {
 
 function validarTipoInstalacion() {
   // Si el tipo es piscina no puede ser otro y viceversa
-  if (instalacion.value.tipoInstalacion == "PISCINA" && instalacionOriginal.value.tipoInstalacion != "PISCINA") {
+  if (instalacion.value.tipoInstalacion == "Piscina" && instalacionOriginal.value.tipoInstalacion != "Piscina") {
     errores.value.tipoInstalacion = true;
     return false;
   }
 
-  if (instalacion.value.tipoInstalacion != "PISCINA" && instalacionOriginal.value.tipoInstalacion == "PISCINA") {
+  if (instalacion.value.tipoInstalacion != "Piscina" && instalacionOriginal.value.tipoInstalacion == "Piscina") {
     errores.value.tipoInstalacion = true;
     return false;
   }
@@ -524,7 +524,7 @@ watch(
   () => instalacion.value.tipoInstalacion,
   (tipo) => {
     mensaje.value = ""
-    if (tipo !== "PISCINA") {
+    if (tipo !== "Piscina") {
       instalacion.value.numeroCalles = 0
     }
   }

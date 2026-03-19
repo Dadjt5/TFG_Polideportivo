@@ -33,7 +33,7 @@
           <div class="col-md-3">
             <label class="form-label fw-semibold">{{ t.priceTDA }}</label>
             <input type="number" step="0.01" class="form-control form-control-lg"
-                   v-model.number="bono.precioOtros" :class="{ 'is-invalid': errores.precioTDA }"/>
+                   v-model.number="bono.precioTDA" :class="{ 'is-invalid': errores.precioTDA }"/>
           </div>
 
           <div class="col-md-3">

@@ -45,14 +45,14 @@
             <select class="form-select form-select-lg" :class="{ 'is-invalid': errores.tipoInstalacion }"
               v-model="instalacion.tipoInstalacion">
               <option value="" disabled>--</option>
-              <option v-for="t in tiposStore.tiposInstalacion" :key="t[0]" :value="t[0]">
-                {{ t[1] }}
+              <option v-for="t in tiposStore.tiposInstalacion" :key="t" :value="t">
+                {{ t }}
               </option>
             </select>
           </div>
 
           <!-- NÚMERO DE CALLES (solo piscina) -->
-          <div class="col-md-4" v-if="instalacion.tipoInstalacion === 'PISCINA'">
+          <div class="col-md-4" v-if="instalacion.tipoInstalacion === 'Piscina'">
             <label class="form-label fw-semibold">{{ t.poolStreets }}</label>
 
             <input type="number" min="1" class="form-control form-control-lg"
@@ -324,7 +324,7 @@ function validarFormulario() {
   errores.value.tipoInstalacion = instalacion.value.tipoInstalacion === ""
   errores.value.numeroCalles =
     instalacion.value.numeroCalles <= 0 &&
-    instalacion.value.tipoInstalacion === "PISCINA"
+    instalacion.value.tipoInstalacion === "Piscina"
 
   for (const k in errores.value) {
     if (errores.value[k]) valido = false
@@ -372,7 +372,7 @@ const volver = () => router.back()
 watch(
   () => instalacion.value.tipoInstalacion,
   (tipo) => {
-    if (tipo !== "PISCINA") {
+    if (tipo !== "Piscina") {
       instalacion.value.numeroCalles = 0
     }
   }

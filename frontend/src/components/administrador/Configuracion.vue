@@ -169,7 +169,7 @@
         </div>
       </div>
 
-      <p v-if="mensaje" class="text-center text-danger mt-4">
+      <p v-if="mensaje" class="text-center text-primary mt-4">
           {{ mensaje }}
       </p>
 

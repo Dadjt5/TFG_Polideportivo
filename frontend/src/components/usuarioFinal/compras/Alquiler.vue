@@ -174,6 +174,7 @@ const reserva = ref({
     reservas: [] as {
       horaInicio: string,
       horaFin: string,
+      periodo: string,
       estado: 'LIBRE' | 'USUARIO' | 'ACTIVIDAD'
     }[],
     alquileres: [] as {
@@ -202,6 +203,35 @@ const reserva = ref({
 
 const mensaje = ref("")
 const horasSeleccionadas = ref<string[]>([])
+
+function periodoPorFecha(fechaStr: string) {
+  const fecha = new Date(fechaStr)
+  const mes = fecha.getMonth() + 1
+
+  if (mes >= 9 || mes === 1) return "PRIMER_CUATRIMESTRE"
+  if (mes >= 2 && mes <= 5) return "SEGUNDO_CUATRIMESTRE"
+  return "ANUAL"
+}
+
+function esActividadValida(intervalo: any, fecha: string) {
+  const periodoActual = periodoPorFecha(fecha)
+
+  return (
+    intervalo.estado === "ACTIVIDAD" &&
+    (intervalo.periodo === periodoActual || intervalo.periodo === "ANUAL")
+  )
+}
+
+const claseHora = (hora: any) => {
+  if (esAlquilerUsuario(hora)) return "bg-danger text-white"
+  if (esActividadValida(hora, reserva.value.seleccion.fecha)) return "bg-warning text-dark"
+  if (hora.estado === "LIBRE") {
+    return horasSeleccionadas.value.includes(hora.horaInicio)
+      ? "bg-primary text-white"
+      : "bg-success text-white"
+  }
+  return "bg-secondary text-white"
+}
 
 // Se debe revisar si es una piscina o no, si lo es se deben mostrar las reservas por calle
 const reservasActuales = computed(() => {
@@ -237,11 +267,15 @@ const estaBloqueada = (hora: any) => {
   const fechaSeleccionada = new Date(reserva.value.seleccion.fecha)
   const esHoy = hoy.toISOString().slice(0, 10) === fechaSeleccionada.toISOString().slice(0, 10)
 
+  if (fechaSeleccionada < new Date(minFecha.value) || fechaSeleccionada > new Date(maxFecha)) {
+    return true
+  }
+
   if (esHoy) {
     const [h, m] = hora.horaInicio.split(":").map(Number)
     const horaReserva = new Date()
     horaReserva.setHours(h, m, 0, 0)
-    if (horaReserva <= hoy) return true
+    if (horaReserva < hoy) return true
   }
 
   return false
@@ -253,17 +287,6 @@ const esAlquilerUsuario = (hora: any) => {
     if (a.fecha !== fechaSeleccionada) return false
     return hora.horaInicio >= a.horaInicio && hora.horaInicio < a.horaFin
   })
-}
-
-const claseHora = (hora: any) => {
-  if (esAlquilerUsuario(hora)) return "bg-danger text-white"
-  if (hora.estado === "ACTIVIDAD") return "bg-warning text-dark"
-  if (hora.estado === "LIBRE") {
-    return horasSeleccionadas.value.includes(hora.horaInicio)
-      ? "bg-primary text-white"
-      : "bg-success text-white"
-  }
-  return "bg-secondary text-white"
 }
 
 const toggleHora = (intervalo: any) => {
@@ -385,7 +408,6 @@ onMounted(async () => {
     reserva.value.tarifa = data.tarifa
     reserva.value.descuento = data.descuento
     reserva.value.tarifa.calles = data.calles;
-    console.log(usuarioFinalStore)
   } catch (e: any) {
     mensaje.value = e.response?.data?.respuesta
     console.error("Error al actualizar la fecha:", e);

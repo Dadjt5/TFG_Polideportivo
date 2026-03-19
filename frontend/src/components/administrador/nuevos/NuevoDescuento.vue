@@ -63,11 +63,11 @@
             </label>
 
             <div class="row g-3">
-              <div v-for="tipo in estadisticasStore.data.tiposInstalacion" :key="tipo[0]" class="col-md-4">
+              <div v-for="tipo in estadisticasStore.data.tiposInstalacion" :key="tipo" class="col-md-4">
                 <div class="border rounded-3 p-3 h-100 cursor-pointer text-center"
-                     :class="{ 'border-primary bg-white shadow-sm': descuento.tiposInstalacion.includes(tipo[0]) }"
-                     @click="toggleTipo(tipo[0])">
-                  {{ tipo[1] }}
+                     :class="{ 'border-primary bg-white shadow-sm': descuento.tiposInstalacion.includes(tipo) }"
+                     @click="toggleTipo(tipo)">
+                  {{ tipo }}
                 </div>
               </div>
             </div>

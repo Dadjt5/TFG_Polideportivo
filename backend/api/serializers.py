@@ -240,9 +240,21 @@ class CompraAbonoSerializer(serializers.ModelSerializer):
 # --------------------
 
 class MapaReservasSerializer(serializers.ModelSerializer):
+    periodo = serializers.SerializerMethodField()
+
     class Meta:
         model = MapaReservas
-        fields = '__all__'
+        fields = ("id", "horaInicio", "horaFin", "estado", "periodo")
+    
+    def get_periodo(self, obj):
+        sesion = Sesion.objects.filter(
+            horaInicio__lte=obj.horaInicio,
+            horaFin__gt=obj.horaInicio
+        ).first()
+
+        if sesion and sesion.actividad:
+            return sesion.actividad.periodo
+        return None
 
 
 class AgendaSerializer(serializers.ModelSerializer):
@@ -297,18 +309,12 @@ class InstalacionSerializer(serializers.ModelSerializer):
     calles = CalleSerializer(many=True, read_only=True)
     pabellon = PabellonSimpleSerializer(read_only=True)
 
-    tipoInstalacionDisplay = serializers.CharField(
-        source='get_tipoInstalacion_display',
-        read_only=True
-    )
-
     class Meta:
         model = Instalacion
         fields = (
             "id",
             "nombre",
             "tipoInstalacion",
-            "tipoInstalacionDisplay",
             "aforoMaximo",
             "luz",
             "imagenURL",
@@ -362,6 +368,7 @@ class ActividadSerializer(serializers.ModelSerializer):
     horasSemanales = serializers.SerializerMethodField()
     dias = serializers.SerializerMethodField()
     nombreDeporte = serializers.SerializerMethodField()
+    nombreInstalacion = serializers.SerializerMethodField()
     nombreMonitor = serializers.SerializerMethodField()
 
     class Meta:
@@ -393,6 +400,7 @@ class ActividadSerializer(serializers.ModelSerializer):
             "sesiones",
             "nombreDeporte",
             "nombreMonitor",
+            "nombreInstalacion"
         )
 
     def get_horasSemanales(self, obj):
@@ -403,6 +411,9 @@ class ActividadSerializer(serializers.ModelSerializer):
 
     def get_nombreMonitor(self, obj):
         return obj.monitor.nombre if obj.monitor else None
+
+    def get_nombreInstalacion(self, obj):
+        return obj.instalacion.nombre if obj.instalacion else None
 
     def get_dias(self, obj):
         return [sesion.dia for sesion in obj.sesiones.all()]

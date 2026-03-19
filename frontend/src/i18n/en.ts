@@ -22,6 +22,7 @@ export default {
   reject: "Reject",
   poolStreet: "Pool street",
   poolStreets: "Pool streets",
+  changeImage: "Change image",
 
   /* Eliminaciones */
   confirmDelete: "Confirm deletion",
@@ -49,6 +50,8 @@ export default {
   channelDeleted: "The channel has been deleted",
   confirmDeleteSport: "Are you sure you want to delete the sport?",
   sportDeleted: "The sport has been deleted",
+  confirmReservationDelete: "Are you sure you want to delete the reservation?",
+  reservationDeleted: "The reservation has been deleted",
 
   monitorNoDeleted: "The monitor cannot be deleted because it is managing one or more activities",
   finalUserNoDeleted: "The end user could not be deleted due to an unknown problem",
@@ -62,6 +65,7 @@ export default {
   activityNoDeleted: "The activity could not be deleted due to an unknown problem",
   channelNoDeleted: "The channel could not be deleted due to an unknown problem",
   sportNoDeleted: "The sport could not be deleted because it is part of one or more activities",
+  reservationNoDeleted: "The reservation could not be deleted",
 
   /* Mensajes */
   missing: "Missing or incorrect fields",
@@ -74,7 +78,7 @@ export default {
   cantBooking: "This activity cannot be reserved",
   noSessionWarning: "The activity has no sessions",
   wrongTimetable: "The start hour cannot be later than the end hour",
-  cannotCancel: "The activity reservation cannot be canceled yet",
+  cannotCancel: "The reservation cannot be canceled yet",
   timeRemaining: "Time remaining to complete payment",
   selectLane: "You must select a pool lane",
   cannotChangeType: "You cannot change to this facility type",
@@ -189,7 +193,7 @@ export default {
   sex: "Gender",
   male: "Male",
   female: "Female",
-  other: "Other",
+  other: "I'd rather not say",
   birth: "Date of birth",
   payFract: "Installment payment",
   selectOption: "Select an option",

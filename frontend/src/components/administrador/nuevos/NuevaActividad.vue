@@ -54,8 +54,7 @@
           <div class="col-md-12">
             <label class="form-label fw-semibold">{{ t.images }}</label>
 
-            <input type="file" class="form-control form-control-lg"
-              accept="image/*" @change="onFileChange" />
+            <input type="file" class="form-control form-control-lg" accept="image/*" @change="onFileChange" />
 
             <!-- preview -->
             <img v-if="preview" :src="preview" class="mt-3 rounded" style="max-width:250px" />
@@ -127,7 +126,7 @@
             <label class="form-label fw-semibold">{{ t.activityType }}</label>
             <select class="form-select form-select-lg" :class="{ 'is-invalid': errores.tipoActividad }"
               v-model="actividad.tipoActividad">
-              <option v-for="t in tiposStore.tiposActividad" :key="t[0]" :value="t[0]">{{ t[1] }}</option>
+              <option v-for="t in tiposStore.tiposActividad" :key="t" :value="t">{{ t }}</option>
             </select>
           </div>
 
@@ -136,7 +135,7 @@
             <label class="form-label fw-semibold">{{ t.reserveType }}</label>
             <select class="form-select form-select-lg" :class="{ 'is-invalid': errores.tipoReserva }"
               v-model="actividad.tipoReserva">
-              <option v-for="r in tiposStore.tiposReserva" :key="r[0]" :value="r[0]">{{ r[1] }}</option>
+              <option v-for="r in tiposStore.tiposReserva" :key="r" :value="r">{{ r }}</option>
             </select>
           </div>
 
@@ -145,7 +144,7 @@
             <label class="form-label fw-semibold">{{ t.terrainType }}</label>
             <select class="form-select form-select-lg" :class="{ 'is-invalid': errores.terreno }"
               v-model="actividad.terreno">
-              <option v-for="t in tiposStore.terrenos" :key="t[0]" :value="t[0]">{{ t[1] }}</option>
+              <option v-for="t in tiposStore.terrenos" :key="t" :value="t">{{ t }}</option>
             </select>
           </div>
 
@@ -154,7 +153,7 @@
             <label class="form-label fw-semibold">{{ t.period }}</label>
             <select class="form-select form-select-lg" :class="{ 'is-invalid': errores.periodo }"
               v-model="actividad.periodo">
-              <option v-for="t in tiposStore.periodos" :key="t[0]" :value="t[0]">{{ t[1] }}</option>
+              <option v-for="t in tiposStore.periodos" :key="t" :value="t">{{ t }}</option>
             </select>
           </div>
 
@@ -189,7 +188,7 @@
             <select class="form-select" v-model="calleSeleccionada">
               <option value="" disabled>--</option>
               <option v-for="c in callesDisponibles" :key="c.id" :value="c.numero">
-                {{t.poolStreet}} {{ c.numero }}
+                {{ t.poolStreet }} {{ c.numero }}
               </option>
             </select>
           </div>
@@ -221,9 +220,9 @@
                   <div v-if="dia.abierto">
                     <div v-for="intervalo in dia.mapa_reservas" :key="intervalo.id"
                       class="small mb-1 px-2 py-1 rounded text-white" :class="{
-                        'bg-success': intervalo.estado === 'LIBRE',
-                        'bg-warning text-dark': intervalo.estado === 'ACTIVIDAD',
-                        'bg-primary': intervalo.estado === 'PROPIO'
+                        'bg-primary': esPropio(intervalo, dia),
+                        'bg-success': intervalo.estado === 'Libre' && !esPropio(intervalo, dia),
+                        'bg-warning text-dark': esActividadValida(intervalo, dia)
                       }">
                       {{ intervalo.horaInicio.slice(0, 5) }} - {{ intervalo.horaFin.slice(0, 5) }}
                     </div>
@@ -268,7 +267,7 @@
               <div v-if="tarifaSeleccionada" class="mt-4 p-4 bg-white rounded-4 shadow-sm border">
                 <h5 class="mb-3 text-primary">{{ t.tariff }}</h5>
 
-                <div v-if="actividad.tipoActividad === 'OTROS'" class="row g-3">
+                <div v-if="actividad.tipoActividad === 'Otros'" class="row g-3">
                   <div class="col-md-6">
                     <div class="p-3 bg-light rounded-3">
                       <strong>{{ t.priceUAM }}:</strong> {{ tarifaSeleccionada.precioUAM }} €
@@ -286,7 +285,7 @@
                   </div>
                 </div>
 
-                <div v-else-if="actividad.tipoActividad === 'GRUPOS_REDUCIDOS'" class="row g-3">
+                <div v-else-if="actividad.tipoActividad === 'Grupos reducidos'" class="row g-3">
                   <div class="col-md-4">
                     <div class="p-3 bg-light rounded-3">
                       <strong>{{ t.price }}:</strong> {{ tarifaSeleccionada.precio }} €
@@ -314,7 +313,7 @@
                   </div>
                 </div>
 
-                <div v-else-if="actividad.tipoActividad === 'FISIOTERAPIA'" class="row g-3 mt-3">
+                <div v-else-if="actividad.tipoActividad === 'Fisioterapia'" class="row g-3 mt-3">
                   <!-- TDA -->
                   <div class="col-md-4">
                     <div class="p-3 bg-light rounded-3 shadow-sm">
@@ -372,8 +371,8 @@
               <label class="form-label fw-semibold">{{ t.day }}</label>
               <select class="form-select" v-model="crearSesion.dia">
                 <option value="">--</option>
-                <option v-for="d in tiposStore.dias" :key="d[0]" :value="d[0]">
-                  {{ d[1] }}
+                <option v-for="d in tiposStore.dias" :key="d" :value="d">
+                  {{ d }}
                 </option>
               </select>
             </div>
@@ -470,7 +469,7 @@ const actividad = ref({
   exterior: false,
   instalacion: null,
   monitor: null,
-  tipoActividad: "OTROS",
+  tipoActividad: "Otros",
   tarifa: null,
   tipoReserva: "",
   terreno: "",
@@ -515,6 +514,35 @@ const crearSesion = ref({
   horaFin: ""
 })
 
+function esPropio(intervalo: any, dia: any) {
+  return sesiones.value.some(sesion => {
+    return (
+      sesion.dia === dia.dia &&
+      intervalo.horaInicio >= sesion.horaInicio &&
+      intervalo.horaFin <= sesion.horaFin
+    )
+  })
+}
+
+
+function esActividadValida(intervalo: any, dia: any) {
+  const mes = new Date().getMonth() + 1
+
+  let periodoActual = ""
+  if (mes >= 9 || mes === 1) {
+    periodoActual = "Desde septiembre hasta enero"
+  } else if (mes >= 2 && mes <= 5) {
+    periodoActual = "Desde febrero hasta mayo"
+  } else {
+    periodoActual = "Todo el año"
+  }
+
+  return (
+    intervalo.estado === "Reserva actividad" &&
+    (intervalo.periodo === periodoActual || intervalo.periodo === "Todo el año")
+  )
+}
+
 const monitorSeleccionado = computed(() =>
   monitores.value.find(m => m.id === actividad.value.monitor)
 )
@@ -537,9 +565,9 @@ function onFileChange(e: Event) {
 
 function agregarSesion() {
   if (!crearSesion.value.dia ||
-      !crearSesion.value.horaInicio ||
-      !crearSesion.value.horaFin ||
-      (callesDisponibles.value.length > 0 && !calleSeleccionada.value)) {
+    !crearSesion.value.horaInicio ||
+    !crearSesion.value.horaFin ||
+    (callesDisponibles.value.length > 0 && !calleSeleccionada.value)) {
     mensaje.value = t.value.selectLane
     return
   }
@@ -659,11 +687,11 @@ watch(
       return
     }
 
-    if (nuevoTipo === "OTROS") {
+    if (nuevoTipo === "Otros") {
       tarifas.value = await getTarifasActividadComun()
-    } else if (nuevoTipo === "GRUPOS_REDUCIDOS") {
+    } else if (nuevoTipo === "Grupos reducidos") {
       tarifas.value = await getTarifasGrupoReducido()
-    } else if (nuevoTipo === "FISIOTERAPIA") {
+    } else if (nuevoTipo === "Fisioterapia") {
       tarifas.value = await getTarifasFisioterapia()
     }
   }

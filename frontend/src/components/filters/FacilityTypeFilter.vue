@@ -81,12 +81,12 @@ const applyBtnClass = computed(() =>
     <div style="max-width: 750px; margin: 0 auto;" class="d-grid gap-3 mb-4">
       <button
         v-for="type in estadisticasStore.data.tiposInstalacion"
-        :key="type[0]"
+        :key="type"
         type="button"
-        :class="buttonClasses(localSelection.includes(type[1]))"
-        @click="toggleType(type[1])"
+        :class="buttonClasses(localSelection.includes(type))"
+        @click="toggleType(type)"
       >
-        {{ type[1] }}
+        {{ type }}
       </button>
     </div>
 

@@ -166,8 +166,6 @@ onMounted(async () => {
     const resumenResponse = await getResumenPago(parseInt(props.id), props.tipo)
     resumen.value = resumenResponse
 
-    console.log(resumenResponse)
-
     if (resumen.value.estado !== "PENDIENTE") {
       router.replace("/")
       return
