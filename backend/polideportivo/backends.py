@@ -8,19 +8,18 @@ UserModel = get_user_model()
 class DNIoCodigoBackend(ModelBackend):
 
     def authenticate(self, request, username=None, password=None, **kwargs):
-
         if username is None or password is None:
             return None
 
         try:
-            uuid_obj = uuid.UUID(username)
-            query = Q(username=username) | Q(codigo_usuario=uuid_obj)
+            users = UserModel.objects.filter(
+                Q(username=username) | Q(codigo_usuario=username)
+            )
 
-        except ValueError:
-            query = Q(username=username)
+            if not users.exists():
+                return None
 
-        try:
-            user = UserModel.objects.get(query)
+            user = users.first()
         except UserModel.DoesNotExist:
             return None
 
