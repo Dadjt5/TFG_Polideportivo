@@ -37,16 +37,16 @@ export const useAuthStore = defineStore("auth", {
     adminRole: (state) => state.user?.rol ?? null,
 
     isAdminRaiz: (state) =>
-      state.user?.is_administrador && state.user?.rol === "RAIZ",
+      state.user?.is_administrador && state.user?.rol === "Administrador raiz",
 
     isAdminUsuarios: (state) =>
-      state.user?.is_administrador && state.user?.rol === "USUARIOS",
+      state.user?.is_administrador && state.user?.rol === "Administrador de usuarios",
 
     isAdminEspacios: (state) =>
-      state.user?.is_administrador && state.user?.rol === "ESPACIOS",
+      state.user?.is_administrador && state.user?.rol === "Administrador de espacios",
 
     isAdminTarifas: (state) =>
-      state.user?.is_administrador && state.user?.rol === "TARIFAS",
+      state.user?.is_administrador && state.user?.rol === "Administrador de tarifas",
   },
 
   actions: {
@@ -54,6 +54,7 @@ export const useAuthStore = defineStore("auth", {
       if (!this.access) return;
 
       this.user = await getMe();
+      console.log(this.user)
     },
 
     setAccess(token: string) {

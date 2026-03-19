@@ -59,7 +59,7 @@ export const useUserStore = defineStore("user", {
     isLogged: (state) => !!state.usuarioFinal,
     hasTda: (s) => {
       if (!s.tda) return false;
-      if (s.tda.estado != "CONFIRMADA") return false;
+      if (s.tda.estado != "Confirmada") return false;
       const hoy = new Date();
       const fechaExpiracion = new Date(s.tda.fechaExpiracion);
       return hoy <= fechaExpiracion;
