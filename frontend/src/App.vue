@@ -39,6 +39,8 @@ const activeStore = computed(() => {
 });
 
 function logoutUsuario() {
+  if (!userStore.isAuthenticated) return;
+
   activeStore.value.cerrarSesion();
   userStore.logout();
   router.push("/");
@@ -55,6 +57,8 @@ onMounted(() => {
   window.addEventListener('mousemove', resetInactivityTimer);
   window.addEventListener('keydown', resetInactivityTimer);
   window.addEventListener('click', resetInactivityTimer);
+  window.addEventListener('scroll', resetInactivityTimer);
+  window.addEventListener('touchstart', resetInactivityTimer);
 
   resetInactivityTimer();
 });
@@ -63,5 +67,9 @@ onUnmounted(() => {
   window.removeEventListener('mousemove', resetInactivityTimer);
   window.removeEventListener('keydown', resetInactivityTimer);
   window.removeEventListener('click', resetInactivityTimer);
+  window.removeEventListener('scroll', resetInactivityTimer);
+  window.removeEventListener('touchstart', resetInactivityTimer);
+
+  clearTimeout(inactivityTimer);
 });
 </script>
