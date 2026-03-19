@@ -636,6 +636,10 @@ class meAPIView(APIView):
         return Response(data)
 
 
+# Funcion auxuliar para obtener el formato de las enumeraciones
+def format_choices(choices):
+    return [value for value, label in choices]
+
 # Estadisticas para el usuario
 class EstadisticasView(APIView):
     permission_classes = [AllowAny]
@@ -650,8 +654,8 @@ class EstadisticasView(APIView):
             "pabellones": Pabellon.contar(),
             "deportes": Deporte.contar(),
             "usuarios": UsuarioFinal.contar(),
-            "tiposActividad": TipoActividad.choices,
-            "tiposInstalacion": TipoInstalacion.choices,
+            "tiposActividad": format_choices(TipoActividad.choices),
+            "tiposInstalacion": format_choices(TipoInstalacion.choices),
             "tiposDeporte": deportes
         }
 
@@ -664,13 +668,13 @@ class TiposViews(APIView):
 
     def get(self, request):
         data = {
-            "tiposActividad": TipoActividad.choices,
-            "tiposInstalacion": TipoInstalacion.choices,
-            "tiposReserva": FormaReserva.choices,
-            "terrenos": Terreno.choices,
-            "estados": Estado.choices,
-            "dias": Dia.choices,
-            "periodos": Periodo.choices
+            "tiposActividad": format_choices(TipoActividad.choices),
+            "tiposInstalacion": format_choices(TipoInstalacion.choices),
+            "tiposReserva": format_choices(FormaReserva.choices),
+            "terrenos": format_choices(Terreno.choices),
+            "estados": format_choices(Estado.choices),
+            "dias": format_choices(Dia.choices),
+            "periodos": format_choices(Periodo.choices)
         }
 
         return Response(data)
