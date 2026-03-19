@@ -54,7 +54,6 @@ export const useAuthStore = defineStore("auth", {
       if (!this.access) return;
 
       this.user = await getMe();
-      console.log(this.user)
     },
 
     setAccess(token: string) {
