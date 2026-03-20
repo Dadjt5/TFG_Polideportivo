@@ -36,25 +36,25 @@ class Administrador(models.Model):
             }
 
         with transaction.atomic():
-            auth_user = User.objects.create_user(
-                username=dni,
-                email=email,
-                password=password
-            )
-
-            if rol == "USUARIOS":
+            if rol == RolAdministrador.USUARIOS:
                 rolAdmin = RolAdministrador.USUARIOS
-            elif rol == "TARIFAS":
+            elif rol == RolAdministrador.TARIFAS:
                 rolAdmin = RolAdministrador.TARIFAS
-            elif rol == "ESPACIOS":
+            elif rol == RolAdministrador.ESPACIOS:
                 rolAdmin = RolAdministrador.ESPACIOS
-            elif rol == "RAIZ":
+            elif rol == RolAdministrador.RAIZ:
                 rolAdmin = RolAdministrador.RAIZ
             else:
                 return {
                     "respuesta": "Rol de administrador inválido",
                     "error": True
                 }
+            
+            auth_user = User.objects.create_user(
+                username=dni,
+                email=email,
+                password=password
+            )
 
             admin = cls.objects.create(
                 user=auth_user,
