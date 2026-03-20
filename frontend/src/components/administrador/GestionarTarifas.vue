@@ -275,7 +275,7 @@ const tarifaInstalacionDetail = (id: number) => {
 
 const tarifaTDADetail = (id: number) => {
   router.push({
-    name: "editar-tarifa-TDA",
+    name: "editar-tarifa-tda",
     params: { id }
   })
 };

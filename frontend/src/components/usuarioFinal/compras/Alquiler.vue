@@ -154,7 +154,7 @@ const otroCaso = ref(false)
 type ReservaMapa = {
   horaInicio: string;
   horaFin: string;
-  estado: 'LIBRE' | 'USUARIO' | 'ACTIVIDAD';
+  estado: 'Libre' | 'Reserva usuario' | 'Reserva actividad';
 };
 
 type CalleMapa = {
@@ -175,7 +175,7 @@ const reserva = ref({
       horaInicio: string,
       horaFin: string,
       periodo: string,
-      estado: 'LIBRE' | 'USUARIO' | 'ACTIVIDAD'
+      estado: 'Libre' | 'Reserva usuario' | 'Reserva actividad'
     }[],
     alquileres: [] as {
       id: number,
@@ -217,7 +217,7 @@ function esActividadValida(intervalo: any, fecha: string) {
   const periodoActual = periodoPorFecha(fecha)
 
   return (
-    intervalo.estado === "ACTIVIDAD" &&
+    intervalo.estado === "Reserva actividad" &&
     (intervalo.periodo === periodoActual || intervalo.periodo === "ANUAL")
   )
 }
@@ -225,7 +225,7 @@ function esActividadValida(intervalo: any, fecha: string) {
 const claseHora = (hora: any) => {
   if (esAlquilerUsuario(hora)) return "bg-danger text-white"
   if (esActividadValida(hora, reserva.value.seleccion.fecha)) return "bg-warning text-dark"
-  if (hora.estado === "LIBRE") {
+  if (hora.estado === "Libre") {
     return horasSeleccionadas.value.includes(hora.horaInicio)
       ? "bg-primary text-white"
       : "bg-success text-white"
@@ -261,7 +261,7 @@ const maxFechaStr = maxFecha.toISOString().slice(0, 10)
 // Funciones para horas
 const estaBloqueada = (hora: any) => {
   if (esAlquilerUsuario(hora)) return true
-  if (hora.estado !== "LIBRE") return true
+  if (hora.estado !== "Libre") return true
 
   const hoy = new Date()
   const fechaSeleccionada = new Date(reserva.value.seleccion.fecha)
@@ -304,7 +304,7 @@ const toggleHora = (intervalo: any) => {
   fechaMax.setHours(0, 0, 0, 0)
 
   if (fechaSeleccionada < fechaMin || fechaSeleccionada > fechaMax) return
-  if (intervalo.estado !== 'LIBRE') return
+  if (intervalo.estado !== 'Libre') return
 
   const key = intervalo.horaInicio
   if (horasSeleccionadas.value.includes(key)) {

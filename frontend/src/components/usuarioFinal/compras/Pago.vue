@@ -166,11 +166,6 @@ onMounted(async () => {
     const resumenResponse = await getResumenPago(parseInt(props.id), props.tipo)
     resumen.value = resumenResponse
 
-    if (resumen.value.estado !== "PENDIENTE") {
-      router.replace("/")
-      return
-    }
-
     const pagoResponse = await intentarPago(parseInt(props.id))
     clientSecret = pagoResponse.client_secret
 

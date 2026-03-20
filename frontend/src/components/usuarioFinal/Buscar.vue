@@ -8,13 +8,8 @@
         <div class="container-fluid">
           <div class="search-hero">
 
-            <input
-              type="text"
-              class="form-control border-0 fs-5"
-              :placeholder="t.searchPlaceholder"
-              v-model="textoBusqueda"
-              @keyup.enter="buscar"
-            />
+            <input type="text" class="form-control border-0 fs-5" :placeholder="t.searchPlaceholder"
+              v-model="textoBusqueda" @keyup.enter="buscar" />
 
             <button class="btn btn-search px-4" @click="buscar">
               {{ t.searchButton }}
@@ -26,118 +21,76 @@
       </div>
 
 
-      <!-- TABS -->
-      <div class="tabs-hero mb-3">
-
-        <button :class="{ active: activeTab === 'activities' }" @click="activeTab = 'activities'">
-          {{ t.activities }}
-        </button>
-
-        <button :class="{ active: activeTab === 'facilities' }" @click="activeTab = 'facilities'">
-          {{ t.facilities }}
-        </button>
-
-      </div>
-
-
-      <!-- FILTROS -->
-      <div class="filter-container mb-4">
-
-        <div class="tab-content">
-
-          <!-- ACTIVIDADES -->
-          <div
-            class="tab-pane fade"
-            :class="{ show: activeTab === 'activities', active: activeTab === 'activities' }"
-          >
-
-            <div class="row g-4">
-
-              <div class="col-md-4">
-                <FilterCard
-                  :icon="Calendar"
-                  :title="t.dayOfWeek"
-                  :subtitle="orderedSelectedDays.join(', ')"
-                  @click="activar('A1')"
-                  :theme="'light'"
-                />
-              </div>
-
-              <div class="col-md-4">
-                <FilterCard
-                  :icon="Activity"
-                  :title="t.activityType"
-                  :subtitle="selectedActivityTypes.join(', ')"
-                  @click="activar('A2')"
-                  :theme="'light'"
-                />
-              </div>
-
-              <div class="col-md-4">
-                <FilterCard
-                  :icon="Clock"
-                  :title="t.sessionTime"
-                  :subtitle="activityStartTime || activityEndTime ? `${activityStartTime} - ${activityEndTime}`: ''"
-                  @click="activar('A3')"
-                  :theme="'light'"
-                />
-              </div>
-
+      <!-- TAB CONTENT -->
+      <div class="tab-content mb-3">
+        <!-- ACTIVIDADES -->
+        <div class="tab-pane fade" :class="{ show: activeTab === 'activities', active: activeTab === 'activities' }">
+          <div class="row g-4">
+            <div class="col-md-4">
+              <FilterCard :icon="Calendar" :title="t.dayOfWeek" :subtitle="orderedSelectedDays.join(', ')"
+                @click="activar('A1')" :theme="'light'" />
             </div>
 
-          </div>
-
-          <!-- INSTALACIONES -->
-          <div
-            class="tab-pane fade"
-            :class="{ show: activeTab === 'facilities', active: activeTab === 'facilities' }"
-          >
-
-            <div class="row g-4">
-
-              <div class="col-md-6">
-                <FilterCard
-                  :icon="Building2"
-                  :title="t.facilityType"
-                  :subtitle="selectedFacilityTypes.join(', ')"
-                  @click="activar('I1')"
-                  :theme="'light'"
-                />
-              </div>
-
-              <div class="col-md-6">
-                <FilterCard
-                  :icon="Clock"
-                  :title="t.openingHours"
-                  :subtitle="facilityStartTime || facilityEndTime ? `${facilityStartTime} - ${facilityEndTime}`: ''"
-                  @click="activar('I2')"
-                  :theme="'light'"
-                />
-              </div>
-
+            <div class="col-md-4">
+              <FilterCard :icon="Activity" :title="t.activityType" :subtitle="selectedActivityTypes.join(', ')"
+                @click="activar('A2')" :theme="'light'" />
             </div>
 
+            <div class="col-md-4">
+              <FilterCard :icon="Clock" :title="t.sessionTime"
+                :subtitle="activityStartTime || activityEndTime ? `${activityStartTime} - ${activityEndTime}` : ''"
+                @click="activar('A3')" :theme="'light'" />
+            </div>
           </div>
-
         </div>
 
+        <!-- INSTALACIONES -->
+        <div class="tab-pane fade" :class="{ show: activeTab === 'facilities', active: activeTab === 'facilities' }">
+          <div class="row g-4 justify-content-center">
+            <div class="col-md-6">
+              <FilterCard :icon="Building2" :title="t.facilityType" :subtitle="selectedFacilityTypes.join(', ')"
+                @click="activar('I1')" :theme="'light'" />
+            </div>
+
+            <div class="col-md-6">
+              <FilterCard :icon="Clock" :title="t.openingHours"
+                :subtitle="facilityStartTime || facilityEndTime ? `${facilityStartTime} - ${facilityEndTime}` : ''"
+                @click="activar('I2')" :theme="'light'" />
+            </div>
+          </div>
+        </div>
       </div>
+
+      <DayOfWeekFilter :open="dayFilterOpen" @update:open="dayFilterOpen = $event" :selectedDays="selectedDays"
+        @apply="selectedDays = $event" :theme="'light'" />
+
+      <ActivityTypeFilter :open="activityTypeFilterOpen" @update:open="activityTypeFilterOpen = $event"
+        :selectedTypes="selectedActivityTypes" @apply="selectedActivityTypes = $event"
+        :tiposActividad="estadisticasStore.data.tiposActividad" :theme="'light'" />
+
+      <TimeRangeFilter :open="activityTimeFilterOpen" @update:open="activityTimeFilterOpen = $event"
+        :startTime="activityStartTime" :endTime="activityEndTime"
+        @apply="({ start, end }) => { activityStartTime = start; activityEndTime = end }" title="Horario de sesión"
+        description="Selecciona el rango horario." :theme="'light'" />
+
+      <FacilityTypeFilter :open="facilityTypeFilterOpen" @update:open="facilityTypeFilterOpen = $event"
+        :selectedTypes="selectedFacilityTypes" @apply="selectedFacilityTypes = $event"
+        :tiposInstalacion="estadisticasStore.data.tiposInstalacion" :theme="'light'" />
+
+      <TimeRangeFilter :open="facilityTimeFilterOpen" @update:open="facilityTimeFilterOpen = $event"
+        :startTime="facilityStartTime" :endTime="facilityEndTime"
+        @apply="({ start, end }) => { facilityStartTime = start; facilityEndTime = end }" title="Horario de apertura"
+        description="Selecciona el horario de la instalación." :theme="'light'" />
+
 
 
       <!-- ORDEN -->
       <div class="d-flex justify-content-end mb-4">
-
-        <select
-  class="form-select order-select"
-  v-model="orderBy"
->
-        
+        <select class="form-select order-select" v-model="orderBy">
           <option value="nombre_asc">{{ t.orderByNameAsc }}</option>
           <option value="nombre_desc">{{ t.orderByNameDesc }}</option>
         </select>
-
       </div>
-
 
       <!-- RESULTADOS -->
       <div class="results-container">
@@ -146,17 +99,9 @@
         <p class="fs-4 text-center" v-if="sinActividades">{{ t.noResults }}</p>
 
         <div class="row">
-          <div
-            v-for="act in actividadesOrdenadas"
-            :key="act.id"
-            class="col-12 col-sm-6 col-lg-4 mt-3 card-hover"
-            @click="activityDetail(act.id)"
-          >
-            <ActivityCard
-              :icon="Activity"
-              :actividad="act"
-              :theme="'light'"
-            />
+          <div v-for="act in actividadesOrdenadas" :key="act.id" class="col-12 col-sm-6 col-lg-4 mt-3 card-hover"
+            @click="activityDetail(act.id)">
+            <ActivityCard :icon="Activity" :actividad="act" :theme="'light'" />
           </div>
         </div>
 
@@ -165,22 +110,13 @@
         <p class="fs-4 text-center" v-if="sinInstalaciones">{{ t.noResults }}</p>
 
         <div class="row">
-          <div
-            v-for="inst in instalacionesOrdenadas"
-            :key="inst.id"
-            class="col-12 col-sm-6 col-lg-4 mt-3 card-hover"
-            @click="facilityDetail(inst.id)"
-          >
-            <FacilityCard
-              :icon="Building2"
-              :instalacion="inst"
-              :theme="'light'"
-            />
+          <div v-for="inst in instalacionesOrdenadas" :key="inst.id" class="col-12 col-sm-6 col-lg-4 mt-3 card-hover"
+            @click="facilityDetail(inst.id)">
+            <FacilityCard :icon="Building2" :instalacion="inst" :theme="'light'" />
           </div>
         </div>
 
       </div>
-
     </main>
   </div>
 </template>
@@ -277,7 +213,7 @@ const activar = (tipo: string) => {
     facilityTimeFilterOpen.value = false;
   } else if (tipo === 'A2') {
     activityTypeFilterOpen.value = !activityTypeFilterOpen.value;
-    
+
     dayFilterOpen.value = false;
     activityTimeFilterOpen.value = false;
     facilityTypeFilterOpen.value = false;
@@ -344,35 +280,35 @@ function buscar() {
 
   /* Controlamos la existencia de cada filtro para no enviarlo en caso de no necesitarlo */
 
-  if(textoBusqueda.value != '') {
+  if (textoBusqueda.value != '') {
     busquedaCompleta["busqueda"] = textoBusqueda.value
   }
 
-  if(selectedDays.value.length > 0) {
+  if (selectedDays.value.length > 0) {
     busquedaCompleta["dias"] = selectedDays.value
   }
 
-  if(selectedActivityTypes.value.length > 0) {
+  if (selectedActivityTypes.value.length > 0) {
     busquedaCompleta["tiposActividad"] = selectedActivityTypes.value
   }
 
-  if(selectedFacilityTypes.value.length > 0) {
+  if (selectedFacilityTypes.value.length > 0) {
     busquedaCompleta["tiposInstalacion"] = selectedFacilityTypes.value
   }
-  
-  if(activityStartTime.value != '') {
+
+  if (activityStartTime.value != '') {
     busquedaCompleta["tiempoInicioActividad"] = activityStartTime.value
   }
 
-  if(activityEndTime.value != '') {
+  if (activityEndTime.value != '') {
     busquedaCompleta["tiempoFinActividad"] = activityEndTime.value
   }
 
-  if(facilityStartTime.value != '') {
+  if (facilityStartTime.value != '') {
     busquedaCompleta["tiempoInicioInstalacion"] = facilityStartTime.value
   }
 
-  if(facilityEndTime.value != '') {
+  if (facilityEndTime.value != '') {
     busquedaCompleta["tiempoFinInstalacion"] = facilityEndTime.value
   }
 
@@ -387,12 +323,12 @@ watch(() =>
   async (newQuery) => {
     try {
       resultados.value = await getBusqueda(newQuery)
-      if (resultados.value.actividades != null && resultados.value.actividades.length != 0 ) {
+      if (resultados.value.actividades != null && resultados.value.actividades.length != 0) {
         sinActividades.value = false
       } else {
         sinActividades.value = true
       }
-      if (resultados.value.instalaciones != null && resultados.value.instalaciones.length != 0 ) {
+      if (resultados.value.instalaciones != null && resultados.value.instalaciones.length != 0) {
         sinInstalaciones.value = false
       } else {
         sinInstalaciones.value = true
@@ -438,13 +374,17 @@ onMounted(async () => {
   facilityEndTime.value = String(route.query.tiempoFinInstalacion ?? "")
 
   try {
+    if (!estadisticasStore.data.modificado) {
+      await estadisticasStore.cargarEstadisticas();
+    }
+
     resultados.value = await getBusqueda(route.query);
-    if (resultados.value.actividades != null && resultados.value.actividades.length != 0 ) {
+    if (resultados.value.actividades != null && resultados.value.actividades.length != 0) {
       sinActividades.value = false
     } else {
       sinActividades.value = true
     }
-    if (resultados.value.instalaciones != null && resultados.value.instalaciones.length != 0 ) {
+    if (resultados.value.instalaciones != null && resultados.value.instalaciones.length != 0) {
       sinInstalaciones.value = false
     } else {
       sinInstalaciones.value = true
@@ -472,94 +412,94 @@ onMounted(async () => {
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
 }
 
-.tabs-hero{
-  display:flex;
-  justify-content:center;
-  gap:6px;
+.tabs-hero {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
 
-  background:white;
-  border-radius:40px;
-  padding:6px;
+  background: white;
+  border-radius: 40px;
+  padding: 6px;
 
-  width:fit-content;
-  margin:auto;
+  width: fit-content;
+  margin: auto;
 
-  box-shadow:0 4px 12px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-.tabs-hero button{
-  border:none;
-  background:transparent;
-  color:#555;
-  padding:10px 28px;
-  border-radius:30px;
-  font-weight:500;
-  transition:all .25s;
+.tabs-hero button {
+  border: none;
+  background: transparent;
+  color: #555;
+  padding: 10px 28px;
+  border-radius: 30px;
+  font-weight: 500;
+  transition: all .25s;
 }
 
-.tabs-hero button.active{
-  background:linear-gradient(135deg,#4facfe,#00f2fe);
-  color:white;
+.tabs-hero button.active {
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  color: white;
 }
 
-.tabs-hero button:hover{
-  background:rgba(255,255,255,0.2);
+.tabs-hero button:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
-.order-select{
-  width:220px;
-  border-radius:12px;
-  border:1px solid rgba(0,0,0,0.08);
-  box-shadow:0 4px 12px rgba(0,0,0,0.06);
+.order-select {
+  width: 220px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
 }
 
-.search-hero{
-  display:flex;
-  align-items:center;
-  gap:15px;
+.search-hero {
+  display: flex;
+  align-items: center;
+  gap: 15px;
 
-  background:white;
-  border-radius:16px;
-  padding:14px 18px;
+  background: white;
+  border-radius: 16px;
+  padding: 14px 18px;
 
-  border:1px solid rgba(0,0,0,0.08);
+  border: 1px solid rgba(0, 0, 0, 0.08);
 
-  box-shadow:0 6px 20px rgba(0,0,0,0.08);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
 
-  max-width:900px;
-  margin:auto;
+  max-width: 900px;
+  margin: auto;
 }
 
-.filter-container{
-  background:rgba(255,255,255,0.85);
-  backdrop-filter:blur(10px);
-  border-radius:20px;
-  padding:30px;
-  box-shadow:0 10px 25px rgba(0,0,0,0.1);
+.filter-container {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
 
-.results-container{
-  padding-bottom:40px;
-  margin-top:20px;
+.results-container {
+  padding-bottom: 40px;
+  margin-top: 20px;
 }
 
-.section-title{
-  font-size:1.6rem;
-  font-weight:600;
-  text-align:center;
-  margin-bottom:25px;
-  color:#333;
+.section-title {
+  font-size: 1.6rem;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 25px;
+  color: #333;
 }
 
-.card-hover{
-  transition:all .25s;
+.card-hover {
+  transition: all .25s;
 }
 
-.card-hover:hover{
-  transform:translateY(-6px);
+.card-hover:hover {
+  transform: translateY(-6px);
 }
 
-.results-container{
-  padding-bottom:40px;
+.results-container {
+  padding-bottom: 40px;
 }
 </style>
