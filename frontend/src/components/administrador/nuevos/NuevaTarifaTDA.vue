@@ -45,7 +45,12 @@
                    :class="{ 'is-invalid': errores.precioReposicion }"
                    v-model.number="tarifa.precioReposicion" />
           </div>
+        </div>
 
+        <div v-if="mostrarMensaje" class="text-center mb-3">
+          <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
+            {{ mensajeEditar }}
+          </div>
         </div>
 
         <!-- BOTONES -->
@@ -77,6 +82,10 @@ const t = useI18n(language)
 
 const router = useRouter()
 
+const mensajeEditar = ref('')
+const tipoMensaje = ref<'success' | 'error' | ''>('')
+const mostrarMensaje = ref(false)
+
 const tarifa = ref({
 	titulo: '',
 	precioUAM: 0,
@@ -90,6 +99,16 @@ const errores = ref({
 	precioOtros: false,
 	precioReposicion: false
 })
+
+function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
+  mensajeEditar.value = texto
+  tipoMensaje.value = tipo
+  mostrarMensaje.value = true
+
+  setTimeout(() => {
+    mostrarMensaje.value = false
+  }, 5000)
+}
 
 function validarFormulario() {
 	let valido = true
@@ -109,12 +128,16 @@ function validarFormulario() {
 }
 
 const crearTarifa = async () => {
-	if (!validarFormulario()) return
+	if (!validarFormulario()) {
+    lanzarMensaje(t.value.missing, "error")
+    return
+  }
 
 	try {
 		await nuevaTarifaTDA(tarifa.value)
 		router.back()
 	} catch (e) {
+    lanzarMensaje(t.value.tariffNoCreated, "error")
 		console.log("Error al crear la tarifa TDA", e)
 	}
 }

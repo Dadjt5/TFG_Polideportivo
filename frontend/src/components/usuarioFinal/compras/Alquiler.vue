@@ -98,10 +98,7 @@
         <!-- HORARIOS -->
         <h5 class="fw-bold mt-3 mb-3">{{ t.timetable }}</h5>
 
-        <div v-if="mensaje" class="text-center mt-5 fs-5">
-          <p class="text-danger">{{ mensaje }}</p>
-        </div>
-        <div v-else class="d-flex flex-wrap gap-2">
+        <div v-if="!error" class="d-flex flex-wrap gap-2">
           <button v-for="hora in reservasActuales" :key="hora.horaInicio" class="btn btn-outline-primary"
             :class="claseHora(hora)" :disabled="estaBloqueada(hora)" @click="toggleHora(hora)">
             {{ hora.horaInicio }} - {{ hora.horaFin }}
@@ -114,6 +111,12 @@
           <span class="badge bg-primary">{{ t.selected }}</span>
           <span class="badge bg-danger">{{ t.reserved }}</span>
           <span class="badge bg-warning text-dark">{{ t.activity }}</span>
+        </div>
+
+        <div v-if="mostrarMensaje" class="text-center mb-3">
+          <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
+            {{ mensaje }}
+          </div>
         </div>
 
         <!-- ACCIONES -->
@@ -201,8 +204,11 @@ const reserva = ref({
   }
 })
 
-const mensaje = ref("")
 const horasSeleccionadas = ref<string[]>([])
+const mensaje = ref('')
+const tipoMensaje = ref<'success' | 'error' | ''>('')
+const mostrarMensaje = ref(false)
+
 
 function periodoPorFecha(fechaStr: string) {
   const fecha = new Date(fechaStr)
@@ -349,6 +355,17 @@ const total = computed(() => {
   return base - descuento
 })
 
+function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
+  mensaje.value = texto
+  tipoMensaje.value = tipo
+  mostrarMensaje.value = true
+
+  setTimeout(() => {
+    mostrarMensaje.value = false
+  }, 5000)
+}
+
+
 const continuarPago = async () => {
   const complementos = {
     fecha: reserva.value.seleccion.fecha,
@@ -364,9 +381,9 @@ const continuarPago = async () => {
       name: 'pasarela-pago',
       params: { tipo: "alquiler_instalacion", id: idPago }
     })
-  } catch (e: any) {
-    mensaje.value = e.response?.data?.respuesta
-    console.error("Error al reservar:", e);
+  } catch (e) {
+    lanzarMensaje(t.value.noFacilityReservation, "error")
+    console.error("Error al alquilar:", e);
   }
 }
 
@@ -400,6 +417,8 @@ watch(
   }
 );
 
+const error = ref(false)
+
 onMounted(async () => {
   const id = parseInt(props.id);
   try {
@@ -409,7 +428,7 @@ onMounted(async () => {
     reserva.value.descuento = data.descuento
     reserva.value.tarifa.calles = data.calles;
   } catch (e: any) {
-    mensaje.value = e.response?.data?.respuesta
+    error.value = true
     console.error("Error al actualizar la fecha:", e);
   }
 });

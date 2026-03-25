@@ -32,6 +32,12 @@
 
         </div>
 
+        <div v-if="mostrarMensaje" class="text-center mb-3">
+          <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
+            {{ mensajeEditar }}
+          </div>
+        </div>
+
         <div class="d-flex justify-content-center gap-3 mt-5">
           <button class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm" @click="crear">
             {{ t.createSummerSubscription }}
@@ -61,6 +67,10 @@ const t = useI18n(language);
 
 const router = useRouter()
 
+const mensajeEditar = ref('')
+const tipoMensaje = ref<'success' | 'error' | ''>('')
+const mostrarMensaje = ref(false)
+
 const abono = ref({
   nombre: "",
   precioTDA: 0,
@@ -74,6 +84,16 @@ const errores = ref({
   precioUAM: false,
   precioOtros: false,
 })
+
+function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
+  mensajeEditar.value = texto
+  tipoMensaje.value = tipo
+  mostrarMensaje.value = true
+
+  setTimeout(() => {
+    mostrarMensaje.value = false
+  }, 5000)
+}
 
 function validar() {
   let valido = true
@@ -91,12 +111,16 @@ function validar() {
 }
 
 const crear = async () => {
-  if (!validar()) return
+  if (!validar()) {
+    lanzarMensaje(t.value.missing, "error")
+    return
+  }
 
   try {
     await nuevoAbonoVerano(abono.value)
     router.back()
   } catch (error) {
+    lanzarMensaje(t.value.subscriptionNoCreated, "error")
     console.error("Error creando abono de verano:", error)
   }
 }

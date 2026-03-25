@@ -73,10 +73,11 @@
 
       </div>
 
-      <!-- MENSAJE -->
-      <p v-if="mensaje" class="text-center text-danger mt-4">
-        {{ mensaje }}
-      </p>
+      <div v-if="mostrarMensaje" class="text-center mb-3">
+        <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
+          {{ mensajeEditar }}
+        </div>
+      </div>
 
       <!-- ACCIONES -->
       <div class="d-flex justify-content-center gap-3 mt-5">
@@ -173,6 +174,9 @@ const editando = ref(false)
 const imagen = ref<File | null>(null)
 const preview = ref<string | null>(null)
 const mensaje = ref("")
+const mensajeEditar = ref('')
+const tipoMensaje = ref<'success' | 'error' | ''>('')
+const mostrarMensaje = ref(false)
 
 const pabellon = ref({
   id: 0,
@@ -187,6 +191,16 @@ const errores = ref({
 })
 
 const pabellonOriginal = ref<any>(null);
+
+function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
+  mensajeEditar.value = texto
+  tipoMensaje.value = tipo
+  mostrarMensaje.value = true
+
+  setTimeout(() => {
+    mostrarMensaje.value = false
+  }, 5000)
+}
 
 function validarFormulario() {
   let valido = true
@@ -234,8 +248,10 @@ function onFileChange(e: Event) {
 }
 
 const guardarCambios = async () => {
-  mensaje.value = ""
-  if (!validarFormulario()) return
+  if (!validarFormulario()) {
+    lanzarMensaje(t.value.missing, "error")
+    return
+  }
 
   const data = camposModificados()
   const formData = new FormData()
@@ -251,11 +267,14 @@ const guardarCambios = async () => {
   if (formData.has("nombre") || formData.has("descripcion") || formData.has("direccion") || imagen.value) {
     try {
       await modificarPabellon(pabellon.value.id, formData)
+      lanzarMensaje(t.value.correctlyUpdate, "success")
       editando.value = false
     } catch (e) {
+      lanzarMensaje(t.value.noModify, "error")
       console.error("Error al modificar el pabellon", e)
     }
   } else {
+    lanzarMensaje(t.value.noChanges, "success")
     editando.value = false
   }
 }

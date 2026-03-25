@@ -80,9 +80,11 @@
           </div>
         </div>
 
-        <p v-if="mensaje" class="text-center text-danger mt-4">
-          {{ mensaje }}
-        </p>
+        <div v-if="mostrarMensaje" class="text-center mb-3">
+          <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
+            {{ mensajeEditar }}
+          </div>
+        </div>
 
         <!-- Mensaje del identificador único -->
         <div v-if="showIdentifier" class="text-center mt-4">
@@ -135,6 +137,9 @@ const router = useRouter();
 
 const userIdentifier = ref("");
 const showIdentifier = ref(false);
+const mensajeEditar = ref('')
+const tipoMensaje = ref<'success' | 'error' | ''>('')
+const mostrarMensaje = ref(false)
 
 const monitor = ref({
   nombre: "",
@@ -156,10 +161,19 @@ const errores = ref({
 
 /* Expresion regular para comprobar el email */
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const mensaje = ref("")
 
 const showPassword = ref(false)
 const showConfirmPassword = ref(false)
+
+function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
+  mensajeEditar.value = texto
+  tipoMensaje.value = tipo
+  mostrarMensaje.value = true
+
+  setTimeout(() => {
+    mostrarMensaje.value = false
+  }, 5000)
+}
 
 const togglePassword = () => {
   showPassword.value = !showPassword.value
@@ -194,20 +208,19 @@ function validarFormulario() {
 }
 
 const crearMonitor = async () => {
-	if(!validarFormulario()) return
+	if (!validarFormulario()) {
+    lanzarMensaje(t.value.missing, "error")
+    return
+  }
 
 	try {
     const data = await registrarMonitor(monitor.value);
 
     userIdentifier.value = data.codigo_usuario;
     showIdentifier.value = true;
-    mensaje.value = data.mensaje;
-  } catch (error: any) {
-    if (error.response && error.response.data?.mensaje) {
-      mensaje.value = error.response.data.mensaje;
-    } else {
-      mensaje.value = t.value.unexpectedError
-    }
+  } catch (e) {
+    lanzarMensaje(t.value.monitorNoCreated, "error")
+    console.error("Error al crear el nuevo monitor", e)
   }
 };
 

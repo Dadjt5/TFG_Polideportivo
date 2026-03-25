@@ -7,7 +7,7 @@
       </h2>
 
       <div class="card p-4 shadow-lg border-0 rounded-4"
-           style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(10px);">
+        style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(10px);">
 
         <div class="mb-3">
           <label class="form-label fw-medium">{{ t.title }}</label>
@@ -41,10 +41,17 @@
           </select>
         </div>
 
-        <button class="btn btn-primary mt-3 rounded-3 px-4 py-2 fw-semibold d-flex align-items-center gap-2" @click="enviar">
+        <button class="btn btn-primary mt-3 rounded-3 px-4 py-2 fw-semibold d-flex align-items-center gap-2"
+          @click="enviar">
           <i class="bi bi-send-fill"></i>
           {{ t.sendNotification }}
         </button>
+
+        <div v-if="mostrarMensaje" class="text-center mb-3">
+          <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
+            {{ mensajeEditar }}
+          </div>
+        </div>
 
       </div>
     </div>
@@ -69,6 +76,9 @@ const router = useRouter();
 const loading = ref(false);
 const error = ref<string | null>(null);
 const success = ref(false);
+const mensajeEditar = ref('')
+const tipoMensaje = ref<'success' | 'error' | ''>('')
+const mostrarMensaje = ref(false)
 
 const form = ref({
   titulo: "",
@@ -82,6 +92,16 @@ const form = ref({
 const actividades = ref<any[]>([]);
 const instalaciones = ref<any[]>([]);
 const pabellones = ref<any[]>([]);
+
+function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
+  mensajeEditar.value = texto
+  tipoMensaje.value = tipo
+  mostrarMensaje.value = true
+
+  setTimeout(() => {
+    mostrarMensaje.value = false
+  }, 5000)
+}
 
 const validar = () => {
   if (!form.value.titulo || !form.value.descripcion) {
@@ -111,7 +131,10 @@ const enviar = async () => {
   error.value = null;
   success.value = false;
 
-  if (!validar()) return;
+  if (!validar()) {
+    lanzarMensaje(t.value.missing, "error")
+    return
+  }
 
   loading.value = true;
 
@@ -127,11 +150,9 @@ const enviar = async () => {
 
     success.value = true;
     router.push({ name: 'notificaciones' })
-  } catch (e: any) {
-    error.value = e.response?.data?.respuesta
-    console.error(e);
-  } finally {
-    loading.value = false;
+  } catch (e) {
+    lanzarMensaje(t.value.notificationNoCreated, "error")
+    console.error("Error al crear la notificacion", e);
   }
 };
 

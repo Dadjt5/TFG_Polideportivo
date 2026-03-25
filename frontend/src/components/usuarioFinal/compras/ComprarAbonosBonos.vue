@@ -34,7 +34,7 @@
           <div class="row g-4">
             <div class="col-md-4" v-for="b in bonos" :key="b.id">
               <div class="card h-100 shadow-sm rounded-4 border-0 card-hover"
-                   style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(8px);">
+                style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(8px);">
                 <div class="card-body">
                   <p><strong>{{ t.facility }}:</strong> {{ b.nombreInstalacion }}</p>
                   <p><strong>{{ t.uses }}:</strong> {{ b.usos }}</p>
@@ -43,6 +43,11 @@
                   <p v-if="b.textoPrecio != ''">{{ b.textoPrecio }}</p>
                 </div>
                 <div class="card-footer bg-transparent border-0">
+                  <div v-if="mostrarMensaje" class="text-center mb-3">
+                    <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
+                      {{ mensaje }}
+                    </div>
+                  </div>
                   <button class="btn btn-success w-100 rounded-pill" @click="nuevoBono(b.id)">
                     {{ t.buy }}
                   </button>
@@ -101,8 +106,10 @@
                       <h5 class="fw-bold mb-3 text-primary">{{ ab.nombre }}</h5>
                       <ul class="list-unstyled small mb-3 flex-grow-1">
                         <li class="mb-2">{{ t.months }}: <strong>{{ ab.meses }}</strong></li>
-                        <li class="mb-2">{{ t.firstActivityDiscount }}: <strong>{{ ab.descuentoPrimeraActividad }}%</strong></li>
-                        <li class="mb-2">{{ t.otherActivitiesDiscount }}: <strong>{{ ab.descuentoRestoActividades }}%</strong></li>
+                        <li class="mb-2">{{ t.firstActivityDiscount }}: <strong>{{ ab.descuentoPrimeraActividad
+                            }}%</strong></li>
+                        <li class="mb-2">{{ t.otherActivitiesDiscount }}: <strong>{{ ab.descuentoRestoActividades
+                            }}%</strong></li>
                         <li>{{ t.outdoorDiscount }}: <strong>{{ ab.descuentoActividadesExteriores }}%</strong></li>
                       </ul>
                       <div class="border-top pt-3 mt-auto">
@@ -187,6 +194,10 @@ const t = useI18n(language);
 
 const router = useRouter();
 
+const mensaje = ref('')
+const tipoMensaje = ref<'success' | 'error' | ''>('')
+const mostrarMensaje = ref(false)
+
 const abonos = ref({
   abonosDeportivos: [] as {
     id: 0,
@@ -212,22 +223,38 @@ const abonos = ref({
 
 const bonos = ref<any[]>([])
 
+function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
+  mensaje.value = texto
+  tipoMensaje.value = tipo
+  mostrarMensaje.value = true
+
+  setTimeout(() => {
+    mostrarMensaje.value = false
+  }, 5000)
+}
+
+
 const nuevoAbono = async (id: number, tipoAbono: string) => {
   router.push({
     name: 'configurar-abono',
-    params: {"id": id, "tipo": tipoAbono}
+    params: { "id": id, "tipo": tipoAbono }
   })
 }
 
 const nuevoBono = async (id: number) => {
-  const response = await comprarBono(id)
+  try {
+    const response = await comprarBono(id)
 
-  const idPago = response.idPago
+    const idPago = response.idPago
 
-  router.push({
-    name: 'pasarela-pago',
-    params: { tipo: "comprar_bono", id: idPago }
-  })
+    router.push({
+      name: 'pasarela-pago',
+      params: { tipo: "comprar_bono", id: idPago }
+    })
+  } catch (e) {
+    lanzarMensaje(t.value.noBonusBuy, "error")
+    console.error("Error al comprar el bono", e)
+  }
 }
 
 onMounted(async () => {

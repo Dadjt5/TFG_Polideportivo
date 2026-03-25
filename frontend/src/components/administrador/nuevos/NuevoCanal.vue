@@ -44,7 +44,12 @@
               </label>
             </div>
           </div>
+        </div>
 
+        <div v-if="mostrarMensaje" class="text-center mb-3">
+          <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
+            {{ mensajeEditar }}
+          </div>
         </div>
 
         <!-- BOTONES -->
@@ -81,6 +86,10 @@ const t = useI18n(language)
 
 const router = useRouter()
 
+const mensajeEditar = ref('')
+const tipoMensaje = ref<'success' | 'error' | ''>('')
+const mostrarMensaje = ref(false)
+
 const canal = ref({
   titulo: "",
   tema: "",
@@ -92,6 +101,17 @@ const errores = ref({
   titulo: false,
   tema: false
 })
+
+function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
+  mensajeEditar.value = texto
+  tipoMensaje.value = tipo
+  mostrarMensaje.value = true
+
+  setTimeout(() => {
+    mostrarMensaje.value = false
+  }, 5000)
+}
+
 
 function validarFormulario() {
   let valido = true
@@ -109,13 +129,18 @@ function validarFormulario() {
 const volver = () => router.back()
 
 const crearCanal = async () => {
-  if (!validarFormulario()) return
-	const id = parseInt(props.id)
+  if (!validarFormulario()) {
+    lanzarMensaje(t.value.missing, "error")
+    return
+  }
+
+  const id = parseInt(props.id)
 
   try {
     await nuevoCanal(id, canal.value)
     router.back()
   } catch (e) {
+    lanzarMensaje(t.value.channelNoCreated, "error")
     console.error("Error al crear el canal", e)
   }
 }

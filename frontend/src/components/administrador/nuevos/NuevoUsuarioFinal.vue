@@ -124,10 +124,11 @@
             </div>
           </div>
 
-          <!-- MENSAJE -->
-          <p v-if="mensaje" class="text-center text-danger">
-            {{ mensaje }}
-          </p>
+          <div v-if="mostrarMensaje" class="text-center mb-3">
+            <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
+              {{ mensajeEditar }}
+            </div>
+          </div>
 
           <!-- Mensaje del identificador único -->
           <div v-if="showIdentifier" class="text-center mt-4">
@@ -175,6 +176,10 @@ const t = useI18n(language);
 const userIdentifier = ref("");
 const showIdentifier = ref(false);
 const esMenor = ref(false)
+
+const mensajeEditar = ref('')
+const tipoMensaje = ref<'success' | 'error' | ''>('')
+const mostrarMensaje = ref(false)
 
 const usuarioFinal = ref({
   nombre: '',
@@ -224,6 +229,17 @@ const toggleConfirmPassword = () => {
   showConfirmPassword.value = !showConfirmPassword.value
 }
 
+function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
+  mensajeEditar.value = texto
+  tipoMensaje.value = tipo
+  mostrarMensaje.value = true
+
+  setTimeout(() => {
+    mostrarMensaje.value = false
+  }, 5000)
+}
+
+
 const checkAge = () => {
   if (!usuarioFinal.value.fechaNacimiento) return
   const birth = new Date(usuarioFinal.value.fechaNacimiento)
@@ -262,16 +278,18 @@ function validarFormulario() {
 }
 
 const nuevoUsuario = async () => {
-  if (!validarFormulario()) return
+  if (!validarFormulario()) {
+    lanzarMensaje(t.value.missing, "error")
+    return
+  }
 
   try {
     const data = await registrarse(usuarioFinal.value);
 
     userIdentifier.value = data.codigo_usuario;
     showIdentifier.value = true;
-    mensaje.value = data.mensaje;
-  } catch (e: any) {
-    mensaje.value = e.response?.data?.respuesta
+  } catch (e) {
+    lanzarMensaje(t.value.finalUserNoCreated, "error")
     console.log("Error al crear el nuevo usuario", e);
   }
 };

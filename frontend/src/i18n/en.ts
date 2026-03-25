@@ -66,6 +66,7 @@ export default {
   channelNoDeleted: "The channel could not be deleted due to an unknown problem",
   sportNoDeleted: "The sport could not be deleted because it is part of one or more activities",
   reservationNoDeleted: "The reservation could not be deleted",
+  notificationNoCreated: "The notification could not be delivered",
 
   /* Mensajes */
   missing: "Missing or incorrect fields",
@@ -85,6 +86,25 @@ export default {
   onTheHourWarning: "Sessions must begin and end on the hour",
   noPermissions: "You do not have permission to perform this action",
 
+  monitorNoCreated: 'The monitor already exists in the system',
+  finalUserNoCreated: 'The end user already exists in the system',
+  adminNoCreated: 'The administrator already exists in the system',
+  tariffNoCreated: 'The tariff could not be created',
+  bonusNoCreated: 'The bonus could not be created',
+  subscriptionNoCreated: 'The subscription could not be created',
+  discountNoCreated: 'The discount could not be created',
+  facilityNoCreated: 'The facility could not be created',
+  pavilionNoCreated: 'The pavilion could not be created',
+  activityNoCreated: 'The activity could not be created',
+  channelNoCreated: 'The channel could not be created',
+  sportNoCreated: 'The sport could not be created',
+  noActivityReservation: 'You have already registered for this activity',
+  noFacilityReservation: 'You cannot book this facility',
+  noSubscripcionBuy: 'You already have this subscription',
+  noBonusBuy: 'You already have this voucher',
+  expiredPay: "The booking has been cancelled due to the time limit expiring",
+  payError: "Error during payment",
+
   /* Perfil */
   role: "Role",
   identity: "Identification",
@@ -96,6 +116,11 @@ export default {
   moreModifyPersonalData: "Manage your name, password, email, and other information",
   viewTickets: "View passes and vouchers",
   emptyFields: "There are empty mandatory fields.",
+  passwordNotMatch: "The passwords do not match",
+  noChanges: "There are no new values to save.",
+  correctlyUpdate: "Data updated correctly",
+  passwordUpdate: "Data updated, you must log in again",
+  noModify: "The data could not be modified",
   moreUserStats: "Check your statistics",
   bonusSubscriptionsOwn: "Own bonus and subscriptions",
   loginCode: "Identifier",
@@ -156,6 +181,8 @@ export default {
 
   orderByNameAsc: "Name (A-Z)",
   orderByNameDesc: "Name (Z-A)",
+  orderByPlacesAsc: "Occupied places ▲",
+  orderByPlacesDesc: "Occupied places ▼",
   noResults: "No results",
   days: "Days",
   places: "Places",
@@ -322,6 +349,7 @@ export default {
   linkButton: 'Link card',
   TDAsuccess: 'Card linked successfully.',
   TDAerror: 'Invalid ID or already linked.',
+  successTDA: 'TDA linked correctly',
 
   /* TDA activa */
   TDATitle: "Annual Sports Card",

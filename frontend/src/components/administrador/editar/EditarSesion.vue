@@ -123,9 +123,13 @@
 
           </div>
         </div>
-
       </div>
 
+      <div v-if="mostrarMensaje" class="text-center mb-3">
+        <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
+          {{ mensajeEditar }}
+        </div>
+      </div>
 
       <!-- ACCIONES -->
       <div class="d-flex justify-content-center gap-3 mt-5">
@@ -191,6 +195,9 @@ const t = useI18n(language);
 const router = useRouter();
 
 const editando = ref(false)
+const mensajeEditar = ref('')
+const tipoMensaje = ref<'success' | 'error' | ''>('')
+const mostrarMensaje = ref(false)
 
 const sesion = ref({
 	id: '',
@@ -219,6 +226,16 @@ const errores = ref({
   horaInicio: false,
   horaFin: false
 })
+
+function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
+  mensajeEditar.value = texto
+  tipoMensaje.value = tipo
+  mostrarMensaje.value = true
+
+  setTimeout(() => {
+    mostrarMensaje.value = false
+  }, 5000)
+}
 
 const sesionOriginal = ref<any>(null);
 
@@ -271,14 +288,21 @@ function camposModificados() {
 }
 
 const guardarCambios = async () => {
-  try {
-		if (!validarFormulario()) return
+  if (!validarFormulario()) {
+    lanzarMensaje(t.value.missing, "error")
+    return
+  }
 
+  try {
 		const data = camposModificados();
     if(Object.keys(data).length > 0) {
       await modificarSesion(sesion.value.id, data);
+      lanzarMensaje(t.value.correctlyUpdate, "success")
+    } else {
+      lanzarMensaje(t.value.noChanges, "success")
     }
   } catch (e) {
+    lanzarMensaje(t.value.noModify, "error")
     console.error("Error al modificar la sesion", e);
   }
 }

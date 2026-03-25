@@ -118,10 +118,11 @@
           <button class="btn btn-success" v-else @click="handleFinish">{{ t.finish }}</button>
         </div>
 
-        <!-- Mensaje -->
-        <p v-if="mensaje" class="text-center mt-3 fw-medium" :class="step === 3 ? 'text-primary' : 'text-secondary'">
+        <div v-if="mostrarMensaje" class="text-center mb-3">
+        <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
           {{ mensaje }}
-        </p>
+        </div>
+      </div>
 
         <!-- Mensaje del identificador único -->
         <div v-if="showIdentifier" class="text-center mt-4">
@@ -195,10 +196,22 @@ const errores = ref({
 });
 
 const step = ref(1)
-const mensaje = ref("")
+const mensaje = ref('')
+const tipoMensaje = ref<'success' | 'error' | ''>('')
+const mostrarMensaje = ref(false)
 
 /* Expresion regular para comprobar el email */
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
+  mensaje.value = texto
+  tipoMensaje.value = tipo
+  mostrarMensaje.value = true
+
+  setTimeout(() => {
+    mostrarMensaje.value = false
+  }, 5000)
+}
 
 /* Para evitar multiples llamadas al backend realizamos aqui ciertas comprobaciones */
 const siguiente = () => {
@@ -285,6 +298,8 @@ const siguiente = () => {
 
   if (continuar.value) {
     step.value += 1
+  } else {
+    lanzarMensaje(t.value.missing, "error")
   }
 }
 
@@ -314,6 +329,7 @@ const handleFinish = async () => {
   if (formData.password == '') {
     errores.value.password = true
     continuar.value = false
+    lanzarMensaje(t.value.emptyFields, "error")
   } else {
     errores.value.password = false
   }
@@ -321,6 +337,7 @@ const handleFinish = async () => {
   if (formData.confirmPassword == '' || formData.password != formData.confirmPassword) {
     errores.value.confirmPassword = true
     continuar.value = false
+    lanzarMensaje(t.value.passwordNotMatch, "error")
   } else {
     errores.value.confirmPassword = false
   }
@@ -332,12 +349,9 @@ const handleFinish = async () => {
     showIdentifier.value = true;
     mensaje.value = data.mensaje;
 
-  } catch (error: any) {
-    if (error.response && error.response.data?.mensaje) {
-      mensaje.value = error.response.data.mensaje;
-    } else {
-      mensaje.value = t.value.unexpectedError
-    }
+  } catch (e) {
+    lanzarMensaje(t.value.noModify, "error")
+    console.error("Error al reguistrarse", e)
   }
 }
 

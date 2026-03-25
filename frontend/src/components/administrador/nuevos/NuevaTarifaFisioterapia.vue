@@ -74,9 +74,11 @@
 
         </div>
 
-        <p v-if="mensaje" class="text-center text-danger mt-4">
-          {{ mensaje }}
-        </p>
+        <div v-if="mostrarMensaje" class="text-center mb-3">
+          <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
+            {{ mensajeEditar }}
+          </div>
+        </div>
 
         <!-- BOTONES -->
         <div class="d-flex justify-content-center gap-3 mt-5">
@@ -106,7 +108,9 @@ const language = inject<Ref<Language>>("language")!
 const t = useI18n(language)
 
 const router = useRouter()
-const mensaje = ref("")
+const mensajeEditar = ref('')
+const tipoMensaje = ref<'success' | 'error' | ''>('')
+const mostrarMensaje = ref(false)
 
 const tarifa = ref({
   titulo: '',
@@ -134,6 +138,16 @@ const errores = ref({
   precioSesiones6Otros: false
 })
 
+function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
+  mensajeEditar.value = texto
+  tipoMensaje.value = tipo
+  mostrarMensaje.value = true
+
+  setTimeout(() => {
+    mostrarMensaje.value = false
+  }, 5000)
+}
+
 function validarFormulario() {
   let valido = true
 
@@ -148,12 +162,16 @@ function validarFormulario() {
 }
 
 const crearTarifa = async () => {
-  if (!validarFormulario()) return
+  if (!validarFormulario()) {
+    lanzarMensaje(t.value.missing, "error")
+    return
+  }
 
   try {
     await nuevaTarifaFisioterapia(tarifa.value)
     router.back()
   } catch (e) {
+    lanzarMensaje(t.value.tariffNoCreated, "error")
     console.log("Error al crear la tarifa para fisioterapia", e)
   }
 }

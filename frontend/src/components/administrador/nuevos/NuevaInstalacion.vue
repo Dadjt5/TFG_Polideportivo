@@ -209,9 +209,10 @@
 
         </div>
 
-        <!-- MENSAJE ERROR -->
-        <div class="text-center mt-4">
-          <p v-if="mensaje" class="text-danger">{{ mensaje }}</p>
+        <div v-if="mostrarMensaje" class="text-center mb-3">
+          <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
+            {{ mensajeEditar }}
+          </div>
         </div>
 
         <!-- BOTONES -->
@@ -249,6 +250,9 @@ const router = useRouter()
 
 const tiposStore = useTiposStore();
 const mensaje = ref("")
+const mensajeEditar = ref('')
+const tipoMensaje = ref<'success' | 'error' | ''>('')
+const mostrarMensaje = ref(false)
 
 const tab = ref(1)
 
@@ -272,6 +276,16 @@ const errores = ref({
   tipoInstalacion: false,
   numeroCalles: false
 })
+
+function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
+  mensajeEditar.value = texto
+  tipoMensaje.value = tipo
+  mostrarMensaje.value = true
+
+  setTimeout(() => {
+    mostrarMensaje.value = false
+  }, 5000)
+}
 
 const diasSemana = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"];
 const agenda = ref(diasSemana.map(d => ({
@@ -342,9 +356,8 @@ function onFileChange(e: Event) {
 }
 
 const crearInstalacion = async () => {
-  mensaje.value = ""
   if (!validarFormulario()) {
-    mensaje.value = t.value.emptyFields
+    lanzarMensaje(t.value.missing, "error")
     return
   }
 
@@ -361,8 +374,8 @@ const crearInstalacion = async () => {
   try {
     await nuevaInstalacion(formData)
     router.push({ name: 'gestion-espacios' })
-  } catch (e: any) {
-    mensaje.value = e.response?.data?.respuesta
+  } catch (e) {
+    lanzarMensaje(t.value.facilityNoCreated, "error")
     console.log("Error al crear la instalacion", e)
   }
 }

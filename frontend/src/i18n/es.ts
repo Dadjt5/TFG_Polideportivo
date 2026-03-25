@@ -67,6 +67,24 @@ export default {
   sportNoDeleted: "El deporte no pudo ser eliminado porque se desarrolla en una o mas actividades",
   reservationNoDeleted: "La reserva no pudo ser eliminada",
 
+  monitorNoCreated: "El monitor ya existe en el sistema",
+  finalUserNoCreated: "El usuario final ya existe en el sistema",
+  adminNoCreated: "El administrador ya existe en el sistema",
+  tariffNoCreated: "La tarifa no se ha podido crear",
+  bonusNoCreated: "El bono no se ha podido crear",
+  subscriptionNoCreated: "El abono no se ha podido crear",
+  discountNoCreated: "El descuento no se ha podido crear",
+  facilityNoCreated: "La instalación no se ha podido crear",
+  pavilionNoCreated: "El pabellón no se ha podido crear",
+  activityNoCreated: "La actividad no se ha podido crear",
+  channelNoCreated: "El canal no se ha podido crear",
+  sportNoCreated: "El deporte no se ha podido crear",
+  noActivityReservation: "Ya te has inscrito en esta actividad",
+  noFacilityReservation: "No puedes alquilar esta instalación",
+  noSubscripcionBuy: "Ya tienes en tu poder este abono",
+  noBonusBuy: "Ya tienes en tu poder este bono",
+  notificationNoCreated: "La notificación no se ha podido enviar",
+
   /* Mensajes */
   missing: "Hay campos vacios o erroneos",
   noDeleted: "No se ha podido eliminar",
@@ -84,6 +102,8 @@ export default {
   cannotChangeType: "No se puede cambiar a ese tipo de instalación",
   onTheHourWarning: "Las sesiones deben comenzar y acabar en horas en punto",
   noPermissions: "No tienes permisos para realizar esta acción",
+  expiredPay: "Se ha cancelado la reserva por tiempo agotado",
+  payError: 'Error al efectuar el pago',
 
   /* Perfil */
   role: "Rol",
@@ -96,6 +116,11 @@ export default {
   moreModifyPersonalData: "Modifica tu nombre, contraseña, email y otra información",
   viewTickets: "Ver Abonos y bonos",
   emptyFields: "Hay campos obligatorios vacios.",
+  passwordNotMatch: "Las contraseñas no coinciden",
+  noChanges: "No hay valores nuevos que guardar.",
+  correctlyUpdate: "Datos actualizados correctamente",
+  passwordUpdate: "Datos actualizados, debes volver a iniciar sesión",
+  noModify: "Los datos no han podido ser modificados",
   moreUserStats: "Revisa tus estadísticas",
   bonusSubscriptionsOwn: "Bonos y abonos propios",
   loginCode: "Identificador",
@@ -156,6 +181,8 @@ export default {
 
   orderByNameAsc: "Nombre (A-Z)",
   orderByNameDesc: "Nombre (Z-A)",
+  orderByPlacesAsc: "Plazas ocupadas ▲",
+  orderByPlacesDesc: "Plazas ocupadas ▼",
   noResults: "Sin resultados",
   days: "Días",
   places: "Plazas",
@@ -322,6 +349,7 @@ export default {
   linkButton: 'Vincular tarjeta',
   TDAsuccess: 'Tarjeta vinculada correctamente.',
   TDAerror: 'ID no válido o ya vinculado.',
+  successTDA: 'TDA vinculada correctamente',
 
   /* TDA activa */
   TDATitle: "Tarjeta Deportiva Anual",

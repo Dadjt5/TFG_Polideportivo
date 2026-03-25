@@ -59,7 +59,12 @@
               </option>
             </select>
           </div>
+        </div>
 
+        <div v-if="mostrarMensaje" class="text-center mb-3">
+          <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
+            {{ mensajeEditar }}
+          </div>
         </div>
 
         <!-- BOTONES -->
@@ -94,6 +99,10 @@ const t = useI18n(language);
 
 const router = useRouter()
 
+const mensajeEditar = ref('')
+const tipoMensaje = ref<'success' | 'error' | ''>('')
+const mostrarMensaje = ref(false)
+
 const bono = ref({
   usos: 10,
   validez: 1,
@@ -115,6 +124,16 @@ const errores = ref({
   precioOtros: false,
   instalacion: false
 })
+
+function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
+  mensajeEditar.value = texto
+  tipoMensaje.value = tipo
+  mostrarMensaje.value = true
+
+  setTimeout(() => {
+    mostrarMensaje.value = false
+  }, 5000)
+}
 
 function validar() {
   let valido = true
@@ -143,12 +162,16 @@ const cargarDatos = async () => {
 }
 
 const crearAbono = async () => {
-  if (!validar()) return
+  if (!validar()) {
+    lanzarMensaje(t.value.missing, "error")
+    return
+  }
 
   try {
     await nuevoBono(bono.value)
     router.back()
   } catch (e) {
+    lanzarMensaje(t.value.bonusNoCreated, "error")
     console.error("Error creando bono", e);
   }
 }

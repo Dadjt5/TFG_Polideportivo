@@ -246,9 +246,10 @@
         </div>
       </div>
 
-      <!-- MENSAJE -->
-      <div class="text-center mt-3 fs-5">
-        <p v-if="mensaje" class="text-danger fw-bold">{{ mensaje }}</p>
+      <div v-if="mostrarMensaje" class="text-center mb-3">
+        <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
+          {{ mensajeEditar }}
+        </div>
       </div>
 
       <!-- ACCIONES -->
@@ -351,6 +352,9 @@ const router = useRouter();
 
 const editando = ref(false)
 const mensaje = ref("")
+const mensajeEditar = ref('')
+const tipoMensaje = ref<'success' | 'error' | ''>('')
+const mostrarMensaje = ref(false)
 
 const imagen = ref<File | null>(null)
 const preview = ref<string | null>(null)
@@ -386,6 +390,16 @@ const errores = ref({
 })
 
 const instalacionOriginal = ref<any>(null);
+
+function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
+  mensajeEditar.value = texto
+  tipoMensaje.value = tipo
+  mostrarMensaje.value = true
+
+  setTimeout(() => {
+    mostrarMensaje.value = false
+  }, 5000)
+}
 
 function validarFormulario() {
   let valido = true
@@ -449,14 +463,13 @@ function onFileChange(e: Event) {
 }
 
 async function guardarCambios() {
-  mensaje.value = ""
   if (!validarFormulario()) {
-    mensaje.value = t.value.emptyFields
+    lanzarMensaje(t.value.missing, "error")
     return
   }
 
   if (!validarTipoInstalacion()) {
-    mensaje.value = t.value.cannotChangeType
+    lanzarMensaje(t.value.cannotChangeType, "error")
     return
   }
 
@@ -472,10 +485,10 @@ async function guardarCambios() {
 
   try {
     await modificarInstalacion(parseInt(props.id), formData)
-    router.back()
-  } catch (e: any) {
-    mensaje.value = e.response?.data?.respuesta
-    console.error(e)
+    lanzarMensaje(t.value.correctlyUpdate, "success")
+  } catch (e) {
+    lanzarMensaje(t.value.noModify, "error")
+    console.error("Error al modificar la instalacion", e)
   }
 }
 

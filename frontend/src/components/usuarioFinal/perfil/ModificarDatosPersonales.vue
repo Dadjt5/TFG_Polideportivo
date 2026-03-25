@@ -4,7 +4,8 @@
       <h2 class="mb-4 mt-3 text-center fw-bold text-primary">{{ t.personalDataTitle }}</h2>
 
       <!-- Información no editable -->
-      <div class="card mb-5 mt-4 rounded-4" style="background-color: rgba(255,255,255,0.9); backdrop-filter: blur(10px);">
+      <div class="card mb-5 mt-4 rounded-4"
+        style="background-color: rgba(255,255,255,0.9); backdrop-filter: blur(10px);">
         <div class="card-body">
           <h5 class="fw-semibold mb-3 text-primary">{{ t.inmutableData }}</h5>
 
@@ -43,6 +44,12 @@
           <h5 class="fw-semibold mb-3 text-primary">{{ t.editableData }}</h5>
 
           <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label">{{ t.email }}</label>
+              <input type="text" class="form-control" :class="{ 'is-invalid': errores.email }" v-model="usuario.email">
+            </div>
+
+
             <div class="col-md-4">
               <label class="form-label">{{ t.sex }}</label>
               <select class="form-select" :class="{ 'is-invalid': errores.sexo }" v-model="usuario.sexo">
@@ -154,6 +161,12 @@
         </div>
       </div>
 
+      <div v-if="mostrarMensaje" class="text-center mb-3">
+        <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
+          {{ mensaje }}
+        </div>
+      </div>
+
       <!-- BOTÓN GUARDAR -->
       <div class="text-center mb-5">
         <button class="btn btn-primary btn-lg px-4 me-3" @click="guardarCambios">
@@ -183,6 +196,7 @@ import { modificarUsuarioFinal } from '@/services/usuarioFinalService';
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
 import type { Language } from "@/useI18N";
 import { useI18n } from "@/useI18N";
+import { useAuthStore } from '@/stores/auth';
 
 const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);
@@ -192,6 +206,10 @@ const estadisticasStore = useEstadisticasStore()
 const configuracionStore = useConfiguracionStore()
 
 const router = useRouter()
+
+const mensaje = ref('')
+const tipoMensaje = ref<'success' | 'error' | ''>('')
+const mostrarMensaje = ref(false)
 
 const usuario = ref({
   id: 0,
@@ -206,6 +224,7 @@ const usuario = ref({
   localidad: '',
   codigoPostal: '',
   sexo: '',
+  email: '',
   password: '',
   confirmPassword: '',
   deportesFavoritos: [] as number[],
@@ -216,6 +235,7 @@ const errores = ref({
   telefono: false,
   provincia: false,
   municipio: false,
+  email: false,
   localidad: false,
   codigoPostal: false,
   password: false,
@@ -223,6 +243,7 @@ const errores = ref({
 
 const showPassword = ref(false)
 const showConfirmPassword = ref(false)
+const deportesRestantes = ref(configuracionStore.max_deportes_por_usuario)
 
 const togglePassword = () => {
   showPassword.value = !showPassword.value
@@ -232,8 +253,15 @@ const toggleConfirmPassword = () => {
   showConfirmPassword.value = !showConfirmPassword.value
 }
 
+function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
+  mensaje.value = texto
+  tipoMensaje.value = tipo
+  mostrarMensaje.value = true
 
-const deportesRestantes = ref(configuracionStore.max_deportes_por_usuario)
+  setTimeout(() => {
+    mostrarMensaje.value = false
+  }, 5000)
+}
 
 const favoritosSeleccionados = computed(() => {
   return Object.values(estadisticasStore.data.tiposDeporte)
@@ -252,19 +280,21 @@ const removeFavorite = (deporte: any) => {
   deportesRestantes.value += 1
 };
 
+/* Expresion regular para comprobar el email */
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 function validarFormulario() {
   let valido = true
 
+  errores.value.email = usuario.value.email === '' ||
+    !emailRegex.test(usuario.value.email)
   errores.value.sexo = usuario.value.sexo === ''
   errores.value.telefono = usuario.value.telefono === ''
   errores.value.provincia = usuario.value.provincia === ''
   errores.value.municipio = usuario.value.municipio === ''
   errores.value.localidad = usuario.value.localidad === ''
   errores.value.codigoPostal = usuario.value.codigoPostal === ''
-
-  errores.value.password =
-    usuario.value.password === '' ||
-    usuario.value.password === usuario.value.confirmPassword
+  errores.value.password = usuario.value.password !== usuario.value.confirmPassword
 
   for (const key in errores.value) {
     if (errores.value[key]) {
@@ -278,6 +308,10 @@ function validarFormulario() {
 /* Solo mandamos al backend para modificar los campos que se hayan modificado */
 function camposModificados() {
   const data: any = {}
+
+  if (usuarioFinalStore.usuarioFinal.email != usuario.value.email) {
+    data["email"] = usuario.value.email
+  }
 
   if (usuarioFinalStore.usuarioFinal.sexo != usuario.value.sexo) {
     data["sexo"] = usuario.value.sexo
@@ -317,19 +351,39 @@ function camposModificados() {
   return data
 }
 
+const authStore = useAuthStore()
+
 const guardarCambios = async () => {
   try {
-    if (!validarFormulario) return
+    if (!validarFormulario()) {
+      if (errores.value.password) {
+        lanzarMensaje(t.value.passwordNotMatch, "error")
+      } else {
+        lanzarMensaje(t.value.emptyFields, "error")
+      }
+      return
+    }
 
     const data = camposModificados()
     if (Object.keys(data).length > 0) {
       await modificarUsuarioFinal(usuario.value.id, data)
       await usuarioFinalStore.fetchUser(usuario.value.id)
-      router.push({
-        path: '/perfil'
-      })
+
+      if (data.password) {
+        lanzarMensaje(t.value.passwordUpdate, "success")
+        setTimeout(() => {
+          usuarioFinalStore.cerrarSesion()
+          authStore.logout()
+          router.push("/login")
+        }, 2500)
+      } else {
+        lanzarMensaje(t.value.correctlyUpdate, "success")
+      }
+    } else {
+      lanzarMensaje(t.value.noChanges, "success")
     }
   } catch (e) {
+    lanzarMensaje(t.value.noModify, "error")
     console.error("Error al modificar el usuario final", e)
   }
 }

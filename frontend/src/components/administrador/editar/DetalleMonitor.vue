@@ -79,10 +79,11 @@
 
           </div>
 
-          <!-- MENSAJE -->
-          <p v-if="mensaje" class="text-center text-danger mt-4">
-            {{ mensaje }}
-          </p>
+          <div v-if="mostrarMensaje" class="text-center mb-3">
+            <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
+              {{ mensajeEditar }}
+            </div>
+          </div>
 
           <!-- ACCIONES -->
           <div class="d-flex justify-content-center gap-4 mt-5">
@@ -185,6 +186,9 @@ const t = useI18n(language)
 
 const mensaje = ref("")
 const isEditing = ref(false)
+const mensajeEditar = ref('')
+const tipoMensaje = ref<'success' | 'error' | ''>('')
+const mostrarMensaje = ref(false)
 
 const monitor = ref({
   id: 0,
@@ -201,6 +205,16 @@ const errores = ref({
   nombre: false,
   apellidos: false,
 })
+
+function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
+  mensajeEditar.value = texto
+  tipoMensaje.value = tipo
+  mostrarMensaje.value = true
+
+  setTimeout(() => {
+    mostrarMensaje.value = false
+  }, 5000)
+}
 
 function validarFormulario() {
   let valido = true
@@ -283,19 +297,24 @@ async function confirmarEliminar() {
 }
 
 async function guardarCambios() {
-  mensaje.value = ""
-  if (!validarFormulario()) return
+  if (!validarFormulario()) {
+    lanzarMensaje(t.value.missing, "error")
+    return
+  }
 
   const data = camposModificados()
   if (Object.keys(data).length === 0) {
+    lanzarMensaje(t.value.noChanges, "success")
     isEditing.value = false
     return
   }
 
   try {
     await modificarMonitor(monitor.value.id, data)
+    lanzarMensaje(t.value.correctlyUpdate, "success")
     isEditing.value = false
   } catch (e) {
+    lanzarMensaje(t.value.noModify, "error")
     console.error('Error al modificar el monitor', e)
   }
 }

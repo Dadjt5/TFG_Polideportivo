@@ -79,10 +79,11 @@
 
         </div>
 
-        <!-- MENSAJE ERROR -->
-        <p v-if="mensaje" class="text-center text-danger mt-4">
-          {{ mensaje }}
-        </p>
+        <div v-if="mostrarMensaje" class="text-center mb-3">
+          <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
+            {{ mensajeEditar }}
+          </div>
+        </div>
 
         <!-- Mensaje del identificador único -->
         <div v-if="showIdentifier" class="text-center mt-4">
@@ -131,6 +132,9 @@ const userIdentifier = ref("");
 const showIdentifier = ref(false);
 const showPassword = ref(false)
 const showConfirmPassword = ref(false)
+const mensajeEditar = ref('')
+const tipoMensaje = ref<'success' | 'error' | ''>('')
+const mostrarMensaje = ref(false)
 
 const togglePassword = () => {
   showPassword.value = !showPassword.value
@@ -138,6 +142,16 @@ const togglePassword = () => {
 
 const toggleConfirmPassword = () => {
   showConfirmPassword.value = !showConfirmPassword.value
+}
+
+function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
+  mensajeEditar.value = texto
+  tipoMensaje.value = tipo
+  mostrarMensaje.value = true
+
+  setTimeout(() => {
+    mostrarMensaje.value = false
+  }, 5000)
 }
 
 const administrador = ref({
@@ -194,14 +208,13 @@ function comprobarPermisos() {
 }
 
 const crearAdministrador = async () => {
-  mensaje.value = ""
   if (!validarFormulario()) {
-    mensaje.value = t.value.missing
+    lanzarMensaje(t.value.missing, "error")
     return
   }
 
   if (!comprobarPermisos()) {
-    mensaje.value = t.value.noPermissions
+    lanzarMensaje(t.value.noPermissions, "error")
     return
   }
 
@@ -210,13 +223,9 @@ const crearAdministrador = async () => {
 
     userIdentifier.value = data.codigo_usuario;
     showIdentifier.value = true;
-    mensaje.value = data.mensaje
-  } catch (error: any) {
-    if (error.response?.data?.mensaje) {
-      mensaje.value = error.response.data.mensaje
-    } else {
-      mensaje.value = t.value.unexpectedError
-    }
+  } catch (e) {
+    lanzarMensaje(t.value.adminNoCreated, "error")
+    console.error("Error al crear el administrador", e)
   }
 }
 

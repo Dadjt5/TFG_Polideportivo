@@ -65,10 +65,11 @@
         </div>
       </div>
 
-      <!-- MENSAJE -->
-      <p v-if="mensaje" class="text-center text-danger mt-4">
-        {{ mensaje }}
-      </p>
+      <div v-if="mostrarMensaje" class="text-center mb-3">
+        <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
+          {{ mensajeEditar }}
+        </div>
+      </div>
 
       <!-- ACCIONES -->
       <div class="d-flex justify-content-center gap-3 mt-5">
@@ -166,6 +167,9 @@ const editando = ref(false);
 const abono = ref<any>({});
 const abonoOriginal = ref<any>(null);
 const mensaje = ref("");
+const mensajeEditar = ref('')
+const tipoMensaje = ref<'success' | 'error' | ''>('')
+const mostrarMensaje = ref(false)
 
 // ERRORES
 const errores = ref({
@@ -176,15 +180,23 @@ const errores = ref({
 })
 
 function activarEdicion() {
-  mensaje.value = ""
   abonoOriginal.value = JSON.parse(JSON.stringify(abono.value));
   editando.value = true;
 }
 
 function cancelarEdicion() {
-  mensaje.value = ""
   abono.value = JSON.parse(JSON.stringify(abonoOriginal.value));
   editando.value = false;
+}
+
+function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
+  mensajeEditar.value = texto
+  tipoMensaje.value = tipo
+  mostrarMensaje.value = true
+
+  setTimeout(() => {
+    mostrarMensaje.value = false
+  }, 5000)
 }
 
 function camposModificados() {
@@ -214,15 +226,27 @@ function validar() {
 }
 
 const guardarCambios = async () => {
-  mensaje.value = ""
-
-  if (!validar()) return;
+  if (!validar()) {
+    lanzarMensaje(t.value.missing, "error")
+    return
+  }
 
   const data = camposModificados();
-  if (Object.keys(data).length > 0) {
-    await modificarAbonoVerano(abono.value.id, data);
-    abonoOriginal.value = JSON.parse(JSON.stringify(abono.value));
-    editando.value = false;
+
+  try {
+    if (Object.keys(data).length > 0) {
+      await modificarAbonoVerano(abono.value.id, data);
+      abonoOriginal.value = JSON.parse(JSON.stringify(abono.value));
+
+      lanzarMensaje(t.value.correctlyUpdate, "success")
+      editando.value = false;
+    } else {
+      lanzarMensaje(t.value.noChanges, "success")
+      return;
+    }
+  } catch(e) {
+    lanzarMensaje(t.value.noModify, "error")
+    console.error('Error al modificar el abono de verano', e) 
   }
 };
 

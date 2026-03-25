@@ -4,14 +4,13 @@
 
       <!-- Tarjeta de perfil -->
       <div class="card border-0 mb-4 rounded-4 mx-auto shadow-lg"
-           style="background-color: rgba(180,220,255,0.6); backdrop-filter: blur(10px);">
+        style="background-color: rgba(180,220,255,0.6); backdrop-filter: blur(10px);">
         <div class="card-body p-4">
           <div class="row align-items-center">
 
             <!-- Avatar -->
             <div class="col-md-3 text-center mb-3 mb-md-0">
-              <div
-                class="rounded-circle d-flex align-items-center justify-content-center mx-auto shadow"
+              <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto shadow"
                 style="width: 110px; height: 110px; background: linear-gradient(135deg, #0072ff, #00c6ff);">
                 <i class="bi bi-person text-white fs-1"></i>
               </div>
@@ -32,7 +31,8 @@
               </p>
 
               <p class="mb-0">
-                <span class="fw-medium text-secondary">{{ t.loginCode }}:</span> {{ monitorStore.monitor?.codigo_usuario }}
+                <span class="fw-medium text-secondary">{{ t.loginCode }}:</span> {{ monitorStore.monitor?.codigo_usuario
+                }}
               </p>
             </div>
 
@@ -42,7 +42,7 @@
 
       <!-- Edición -->
       <div class="card border-0 rounded-4 mx-auto shadow-lg"
-           style="background-color: rgba(180,220,255,0.6); backdrop-filter: blur(10px);">
+        style="background-color: rgba(180,220,255,0.6); backdrop-filter: blur(10px);">
         <div class="card-body p-4 p-md-5">
           <h2 class="fs-3 fw-semibold mb-4 text-primary">
             {{ t.editableData }}
@@ -59,7 +59,7 @@
             <div>
               <label class="form-label fw-medium">{{ t.email }}</label>
               <input type="email" class="form-control" :class="{ 'is-invalid': errores.email }"
-                     :placeholder="monitorStore.monitor?.email" v-model="monitor.email" />
+                :placeholder="monitorStore.monitor?.email" v-model="monitor.email" />
             </div>
 
             <!-- Contraseña -->
@@ -67,12 +67,12 @@
               <label class="form-label">{{ t.passwordPlaceholder }}</label>
               <div class="position-relative d-flex align-items-center">
                 <input :type="showPassword ? 'text' : 'password'" class="form-control pe-5"
-                       :class="{ 'is-invalid': errores.password }" v-model="monitor.password" />
+                  :class="{ 'is-invalid': errores.password }" v-model="monitor.password" />
                 <button type="button"
-                        class="position-absolute end-0 me-3 border-0 bg-transparent d-flex align-items-center justify-content-center"
-                        style="height: 100%; top: 0;" @click="togglePassword">
+                  class="position-absolute end-0 me-3 border-0 bg-transparent d-flex align-items-center justify-content-center"
+                  style="height: 100%; top: 0;" @click="togglePassword">
                   <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"
-                     style="font-size: 1.2rem; color: #0072ff;"></i>
+                    style="font-size: 1.2rem; color: #0072ff;"></i>
                 </button>
               </div>
             </div>
@@ -82,13 +82,19 @@
               <label class="form-label">{{ t.passwordConfirm }}</label>
               <div class="position-relative d-flex align-items-center">
                 <input :type="showConfirmPassword ? 'text' : 'password'" class="form-control pe-5"
-                       :class="{ 'is-invalid': errores.password }" v-model="monitor.confirmPassword" />
+                  :class="{ 'is-invalid': errores.password }" v-model="monitor.confirmPassword" />
                 <button type="button"
-                        class="position-absolute end-0 me-3 border-0 bg-transparent d-flex align-items-center justify-content-center"
-                        style="height: 100%; top: 0;" @click="toggleConfirmPassword">
+                  class="position-absolute end-0 me-3 border-0 bg-transparent d-flex align-items-center justify-content-center"
+                  style="height: 100%; top: 0;" @click="toggleConfirmPassword">
                   <i :class="showConfirmPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"
-                     style="font-size: 1.2rem; color: #0072ff;"></i>
+                    style="font-size: 1.2rem; color: #0072ff;"></i>
                 </button>
+              </div>
+            </div>
+
+            <div v-if="mostrarMensaje" class="text-center mb-3">
+              <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
+                {{ mensaje }}
               </div>
             </div>
 
@@ -136,6 +142,10 @@ const router = useRouter();
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const continuar = ref(true);
 
+const mensaje = ref('')
+const tipoMensaje = ref<'success' | 'error' | ''>('')
+const mostrarMensaje = ref(false)
+
 const monitor = ref({
   email: '',
   password: '',
@@ -156,6 +166,16 @@ const togglePassword = () => {
 
 const toggleConfirmPassword = () => {
   showConfirmPassword.value = !showConfirmPassword.value
+}
+
+function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
+  mensaje.value = texto
+  tipoMensaje.value = tipo
+  mostrarMensaje.value = true
+
+  setTimeout(() => {
+    mostrarMensaje.value = false
+  }, 5000)
 }
 
 /* Solo mandamos al backend para modificar los campos que se hayan modificado */
@@ -190,19 +210,32 @@ const guardarCambios = async () => {
   try {
     const data = camposModificados()
 
-    if (!continuar.value) return
-
-    await modificarMonitor(monitorStore.monitor.id, data)
-
-    if (data.password) {
-      monitorStore.cerrarSesion()
-      authStore.logout()
-      router.push("/login")
+    if (!continuar.value) {
+      if (errores.value.password) {
+        lanzarMensaje(t.value.passwordNotMatch, "error")
+      } else {
+        lanzarMensaje(t.value.emptyFields, "error")
+      }
       return
     }
 
+    await modificarMonitor(monitorStore.monitor.id, data)
+
+    lanzarMensaje(t.value.correctlyUpdate, "success")
+
+    if (data.password) {
+      lanzarMensaje(t.value.passwordUpdate, "success")
+      setTimeout(() => {
+        monitorStore.cerrarSesion()
+        authStore.logout()
+        router.push("/login")
+      }, 2500)
+    } else {
+      lanzarMensaje(t.value.correctlyUpdate, "success")
+    }
     await monitorStore.fetchUser(monitorStore.monitor.id)
   } catch (e) {
+    lanzarMensaje(t.value.noModify, "error")
     console.error("Error al modificar el monitor", e)
   }
 }

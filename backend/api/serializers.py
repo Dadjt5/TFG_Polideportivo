@@ -117,10 +117,16 @@ class UsuarioFinalSerializer(serializers.ModelSerializer):
         )
         
     def update(self, instance, validated_data):
-        password = validated_data.pop("password", None)
+        user_data = validated_data.pop('user', {})
+
+        if 'email' in user_data:
+            instance.user.email = user_data['email']
+
+        password = validated_data.pop('password', None)
         if password:
             instance.user.set_password(password)
-            instance.user.save()
+
+        instance.user.save()
 
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
@@ -191,18 +197,37 @@ class AdministradorSimpleSerializer(serializers.ModelSerializer):
 
 
 class AdministradorSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, required=False, allow_blank=True)
     email = serializers.SerializerMethodField()
     codigo_usuario = serializers.SerializerMethodField()
 
     class Meta:
         model = Administrador
-        fields = ('id', 'DNI', 'nombre', 'user', 'email', 'rol', 'codigo_usuario')
+        fields = ('id', 'DNI', 'nombre', 'user', 'email', 'rol', 'codigo_usuario', 'password')
 
     def get_email(self, obj):
         return obj.user.email
 
     def get_codigo_usuario(self, obj):
         return obj.user.codigo_usuario
+
+    def update(self, instance, validated_data):
+        user_data = validated_data.pop('user', {})
+
+        if 'email' in user_data:
+            instance.user.email = user_data['email']
+
+        password = validated_data.pop('password', None)
+        if password:
+            instance.user.set_password(password)
+
+        instance.user.save()
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+        return instance
 
 # --------------------
 # Abonos

@@ -92,10 +92,11 @@
 
         </div>
 
-        <!-- MENSAJE -->
-        <p v-if="mensaje" class="text-center text-danger mt-4">
-          {{ mensaje }}
-        </p>
+        <div v-if="mostrarMensaje" class="text-center mb-3">
+          <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
+            {{ mensajeEditar }}
+          </div>
+        </div>
 
         <!-- BOTONES -->
         <div class="d-flex justify-content-center gap-3 mt-5">
@@ -148,8 +149,20 @@ const errores = ref({
   porcentaje: false
 })
 
-const mensaje = ref("")
+const mensajeEditar = ref('')
+const tipoMensaje = ref<'success' | 'error' | ''>('')
+const mostrarMensaje = ref(false)
 const deportes = ref<any[]>([])
+
+function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
+  mensajeEditar.value = texto
+  tipoMensaje.value = tipo
+  mostrarMensaje.value = true
+
+  setTimeout(() => {
+    mostrarMensaje.value = false
+  }, 5000)
+}
 
 function validar() {
   errores.value.nombre = descuento.value.nombre === ""
@@ -180,13 +193,17 @@ function toggleTipo(valor: string) {
 }
 
 const crearDescuento = async () => {
-  if (!validar()) return
+  if (!validar()) {
+    lanzarMensaje(t.value.missing, "error")
+    return
+  }
 
   try {
     await nuevoDescuento(descuento.value)
     router.push({ name: "gestion-tarifas" })
-  } catch (error: any) {
-    mensaje.value = t.value.unexpectedError
+  } catch (e) {
+    lanzarMensaje(t.value.discountNoCreated, "error")
+    console.error("Error al crear el descuento", e)
   }
 }
 

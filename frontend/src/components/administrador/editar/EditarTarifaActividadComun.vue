@@ -64,10 +64,11 @@
         </div>
       </div>
 
-      <!-- MENSAJE -->
-      <p v-if="mensaje" class="text-center text-danger mt-4">
-        {{ mensaje }}
-      </p>
+      <div v-if="mostrarMensaje" class="text-center mb-3">
+        <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
+          {{ mensajeEditar }}
+        </div>
+      </div>
 
       <!-- ACCIONES -->
       <div class="d-flex justify-content-center gap-3 mt-5">
@@ -162,6 +163,9 @@ const t = useI18n(language);
 const router = useRouter()
 const editando = ref(false)
 const mensaje = ref("")
+const mensajeEditar = ref('')
+const tipoMensaje = ref<'success' | 'error' | ''>('')
+const mostrarMensaje = ref(false)
 
 const tarifa = ref({
   id: 0,
@@ -179,6 +183,16 @@ const errores = ref({
 })
 
 const tarifaOriginal = ref<any>(null)
+
+function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
+  mensajeEditar.value = texto
+  tipoMensaje.value = tipo
+  mostrarMensaje.value = true
+
+  setTimeout(() => {
+    mostrarMensaje.value = false
+  }, 5000)
+}
 
 function validarFormulario() {
   let valido = true
@@ -219,14 +233,26 @@ function camposModificados() {
 }
 
 const guardarCambios = async () => {
-  mensaje.value = ""
-  if (!validarFormulario()) return
+  if (!validarFormulario()) {
+    lanzarMensaje(t.value.missing, "error")
+    return
+  }
 
-  const data = camposModificados()
-  if (Object.keys(data).length > 0) {
-    await modificarTarifaActividadComun(tarifa.value.id, data)
-    tarifaOriginal.value = JSON.parse(JSON.stringify(tarifa.value))
+  try {
+    const data = camposModificados()
+    if (Object.keys(data).length > 0) {
+      await modificarTarifaActividadComun(tarifa.value.id, data)
+      tarifaOriginal.value = JSON.parse(JSON.stringify(tarifa.value))
+    
+      lanzarMensaje(t.value.correctlyUpdate, "success")
+    } else {
+      lanzarMensaje(t.value.noChanges, "success")
+    }
+
     editando.value = false
+  } catch(e) {
+    lanzarMensaje(t.value.noModify, "error")
+    console.error("Error al modificar la tarifa de actividad comun", e)
   }
 }
 

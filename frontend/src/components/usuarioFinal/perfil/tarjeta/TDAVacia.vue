@@ -18,7 +18,12 @@
           <button class="btn btn-primary w-100 mb-4" @click="vincularTarjeta">{{ t.linkButton }}</button>
           <button class="btn btn-success w-100 mb-4" @click="comprarTDA">{{ t.buy }}</button>
 
-          <p class="text-danger" v-if="error">{{ t.TDAerror }}</p>
+          <div v-if="mostrarMensaje" class="text-center mb-3">
+        <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
+          {{ mensaje }}
+        </div>
+      </div>
+
         </div>
       </div>
     </div>
@@ -47,9 +52,13 @@ const router = useRouter();
 
 const codigo = ref('');
 const error = ref(false);
+const mensaje = ref('')
+const tipoMensaje = ref<'success' | 'error' | ''>('')
+const mostrarMensaje = ref(false)
 
 const vincularTarjeta = async () => {
   if (codigo.value.trim() === '') {
+    lanzarMensaje(t.value.TDAerror, "error")
     error.value = true
     return;
   }
@@ -58,11 +67,23 @@ const vincularTarjeta = async () => {
 
   if(respuesta.status == "error") {
     error.value = true
+    lanzarMensaje(t.value.TDAerror, "error")
   } else {
     error.value = false
+    lanzarMensaje(t.value.successTDA, "success")
     await usuarioFinalStore.fetchTDA();
   }
 };
+
+function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
+  mensaje.value = texto
+  tipoMensaje.value = tipo
+  mostrarMensaje.value = true
+
+  setTimeout(() => {
+    mostrarMensaje.value = false
+  }, 5000)
+}
 
 const comprarTDA = async () => {
   const response = await comprarTarjetaDeportivaAnual()

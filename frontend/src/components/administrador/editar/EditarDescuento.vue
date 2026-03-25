@@ -130,10 +130,11 @@
         </div>
       </div>
 
-      <!-- MENSAJE -->
-      <p v-if="mensaje" class="text-center text-danger mt-4">
-        {{ mensaje }}
-      </p>
+      <div v-if="mostrarMensaje" class="text-center mb-3">
+        <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
+          {{ mensajeEditar }}
+        </div>
+      </div>
 
       <!-- ACCIONES -->
       <div class="d-flex justify-content-center gap-3 mt-5">
@@ -230,6 +231,9 @@ const estadisticasStore = useEstadisticasStore()
 const router = useRouter()
 const editando = ref(false)
 const mensaje = ref("")
+const mensajeEditar = ref('')
+const tipoMensaje = ref<'success' | 'error' | ''>('')
+const mostrarMensaje = ref(false)
 
 const descuento = ref<any>({
   id: 0,
@@ -244,6 +248,14 @@ const descuento = ref<any>({
   deportes: []
 })
 
+const errores = ref({
+  nombre: false,
+  descripcion: false,
+  porcentaje: false,
+  fechaInicio: false,
+  fechaFinValidez: false
+})
+
 const descuentoOriginal = ref<any>(null)
 
 const deportes = ref<any[]>([])
@@ -253,6 +265,38 @@ const nombresDeportesSeleccionados = computed(() => {
     .filter(d => descuento.value.deportes.includes(d.id))
     .map(d => d.nombre)
 })
+
+function validarFormulario() {
+  let valido = true
+
+  errores.value.nombre = descuento.value.nombre.trim() === ''
+  errores.value.descripcion = descuento.value.descripcion.trim() === ''
+  errores.value.porcentaje =
+    descuento.value.porcentaje === '' ||
+    descuento.value.porcentaje < 0 ||
+    descuento.value.porcentaje > 100
+
+  errores.value.fechaInicio = descuento.value.fechaInicio === ''
+  errores.value.fechaFinValidez = descuento.value.fechaFinValidez === ''
+
+  for (const key in errores.value) {
+    if (errores.value[key]) {
+      valido = false
+    }
+  }
+
+  return valido
+}
+
+function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
+  mensajeEditar.value = texto
+  tipoMensaje.value = tipo
+  mostrarMensaje.value = true
+
+  setTimeout(() => {
+    mostrarMensaje.value = false
+  }, 5000)
+}
 
 function activarEdicion() {
   mensaje.value = ""
@@ -279,14 +323,25 @@ function camposModificados() {
 }
 
 const guardarCambios = async () => {
-  mensaje.value = ""
-  const data = camposModificados()
-
-  if (Object.keys(data).length > 0) {
-    await modificarDescuento(descuento.value.id, data)
+  if (!validarFormulario()) {
+    lanzarMensaje(t.value.missing, "error")
+    return
   }
 
-  editando.value = false
+  try {
+    const data = camposModificados()
+    if (Object.keys(data).length > 0) {
+      await modificarDescuento(descuento.value.id, data)
+      lanzarMensaje(t.value.correctlyUpdate, "success")
+    } else {
+      lanzarMensaje(t.value.noChanges, "success") 
+    }
+
+    editando.value = false
+  } catch(e) {
+    lanzarMensaje(t.value.noModify, "error")
+    console.error('Error al modificar el descuento', e)
+  }
 }
 
 let confirmModal: Modal

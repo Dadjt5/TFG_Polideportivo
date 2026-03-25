@@ -118,6 +118,12 @@
           </div>
         </div>
 
+        <div v-if="mostrarMensaje" class="text-center mb-3">
+          <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
+            {{ mensaje }}
+          </div>
+        </div>
+
         <!-- Botones -->
         <div class="d-flex justify-content-end gap-2 mt-4">
           <button class="btn btn-outline-secondary" @click="cancelar">{{ t.cancel }}</button>
@@ -148,6 +154,9 @@ const t = useI18n(language);
 
 const router = useRouter();
 const usuarioFinalStore = useUserStore();
+const mensaje = ref('')
+const tipoMensaje = ref<'success' | 'error' | ''>('')
+const mostrarMensaje = ref(false)
 
 const reserva = ref({
   tarifa: {
@@ -176,6 +185,16 @@ const reserva = ref({
     }[]
   }
 })
+
+function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
+  mensaje.value = texto
+  tipoMensaje.value = tipo
+  mostrarMensaje.value = true
+
+  setTimeout(() => {
+    mostrarMensaje.value = false
+  }, 5000)
+}
 
 function obtenerPrecioComun(precios: any) {
   let precio = precios.precioOtros;
@@ -256,6 +275,7 @@ const precioBase = computed(() => {
   const sel = reserva.value.seleccion;
 
   if (tipo === 'Otros') {
+
     return obtenerPrecioComun(datos);
   }
 
@@ -277,19 +297,24 @@ const total = computed(() => {
 })
 
 const continuarPago = async () => {
-  const response = await reservarActividad(
-    reserva.value.tarifa.idActividad,
-    reserva.value.seleccion.personas,
-    reserva.value.seleccion.modalidad,
-    reserva.value.seleccion.tipoSesion
-  )
+  try {
+    const response = await reservarActividad(
+      reserva.value.tarifa.idActividad,
+      reserva.value.seleccion.personas,
+      reserva.value.seleccion.modalidad,
+      reserva.value.seleccion.tipoSesion
+    )
 
-  const idPago = response.idPago
+    const idPago = response.idPago
 
-  router.push({
-    name: 'pasarela-pago',
-    params: { tipo: "reserva_actividad", id: idPago }
-  })
+    router.push({
+      name: 'pasarela-pago',
+      params: { tipo: "reserva_actividad", id: idPago }
+    })
+  } catch(e) {
+    lanzarMensaje(t.value.noActivityReservation, "error")
+    console.error("Error al reservar la actividad", e)
+  }
 }
 
 function cancelar() {

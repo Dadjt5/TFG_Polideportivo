@@ -75,7 +75,12 @@
             <input type="number" step="0.1" class="form-control form-control-lg"
                    v-model.number="abono.descuentoActividadesExteriores" :class="{ 'is-invalid': errores.descuentoActividadesExteriores }"/>
           </div>
+        </div>
 
+        <div v-if="mostrarMensaje" class="text-center mb-3">
+          <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
+            {{ mensajeEditar }}
+          </div>
         </div>
 
         <div class="d-flex justify-content-center gap-3 mt-5">
@@ -108,6 +113,10 @@ const t = useI18n(language);
 
 const router = useRouter()
 
+const mensajeEditar = ref('')
+const tipoMensaje = ref<'success' | 'error' | ''>('')
+const mostrarMensaje = ref(false)
+
 const abono = ref({
   nombre: "",
   meses: 1,
@@ -133,6 +142,16 @@ const errores = ref({
   precioTotalMensualOtros: false,
   precioPagoUnicoOtros: false
 })
+
+function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
+  mensajeEditar.value = texto
+  tipoMensaje.value = tipo
+  mostrarMensaje.value = true
+
+  setTimeout(() => {
+    mostrarMensaje.value = false
+  }, 5000)
+}
 
 function validar() {
   let valido = true
@@ -161,9 +180,18 @@ function validar() {
 }
 
 const crearAbono = async () => {
-  if (!validar()) return
-  await nuevoAbonoDeportivo(abono.value)
-  router.back()
+  if (!validar()) {
+    lanzarMensaje(t.value.missing, "error")
+    return
+  }
+
+  try {
+    await nuevoAbonoDeportivo(abono.value)
+    router.back()
+  } catch(e) {
+    lanzarMensaje(t.value.subscriptionNoCreated, "error")
+    console.error("Error al crear el abono deportivo", e);
+  }
 }
 
 const volver = () => router.back()

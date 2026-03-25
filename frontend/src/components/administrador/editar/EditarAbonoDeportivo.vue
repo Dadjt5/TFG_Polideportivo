@@ -129,10 +129,11 @@
 
       </div>
 
-      <!-- MENSAJE -->
-      <p v-if="mensaje" class="text-center text-danger mt-4">
-        {{ mensaje }}
-      </p>
+      <div v-if="mostrarMensaje" class="text-center mb-3">
+        <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
+          {{ mensajeEditar }}
+        </div>
+      </div>
 
       <!-- ACCIONES -->
       <div class="d-flex justify-content-center gap-3 mt-5">
@@ -232,6 +233,9 @@ const editando = ref(false);
 const abono = ref<any>({});
 const abonoOriginal = ref<any>(null);
 const mensaje = ref("")
+const mensajeEditar = ref('')
+const tipoMensaje = ref<'success' | 'error' | ''>('')
+const mostrarMensaje = ref(false)
 
 // ERRORES
 const errores = ref({
@@ -246,6 +250,17 @@ const errores = ref({
   descuentoRestoActividades: false,
   descuentoActividadesExteriores: false
 })
+
+function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
+  mensajeEditar.value = texto
+  tipoMensaje.value = tipo
+  mostrarMensaje.value = true
+
+  setTimeout(() => {
+    mostrarMensaje.value = false
+  }, 5000)
+}
+
 
 function activarEdicion() {
   mensaje.value = ""
@@ -292,14 +307,26 @@ function validar() {
 }
 
 const guardarCambios = async () => {
-  mensaje.value = ""
-  if (!validar()) return;
+  if (!validar()) {
+    lanzarMensaje(t.value.missing, "error")
+    return
+  }
 
   const data = camposModificados();
-  if (Object.keys(data).length > 0) {
-    await modificarAbonoDeportivo(abono.value.id, data);
-    abonoOriginal.value = JSON.parse(JSON.stringify(abono.value));
+
+  try {
+    if (Object.keys(data).length > 0) {
+      await modificarAbonoDeportivo(abono.value.id, data);
+      abonoOriginal.value = JSON.parse(JSON.stringify(abono.value));
+
+      lanzarMensaje(t.value.correctlyUpdate, "success")    
+    } else {
+      lanzarMensaje(t.value.noChanges, "success")
+    }
     editando.value = false;
+  } catch(e) {
+    lanzarMensaje(t.value.noModify, "error")
+    console.error('Error al modificar el abono deportivo', e)
   }
 };
 

@@ -46,7 +46,7 @@
             <!-- FOTO -->
             <div>
               <label class="form-label fw-medium">{{ t.photo }}</label>
-              <input type="file" class="form-control rounded-3"/>
+              <input type="file" class="form-control rounded-3" />
             </div>
 
             <!-- PASSWORD -->
@@ -55,18 +55,12 @@
 
               <div class="position-relative d-flex align-items-center">
 
-                <input
-                  :type="showPassword ? 'text' : 'password'"
-                  class="form-control pe-5 rounded-3"
-                  :class="{ 'is-invalid': errores.password }"
-                  v-model="administrador.password"
-                />
+                <input :type="showPassword ? 'text' : 'password'" class="form-control pe-5 rounded-3"
+                  :class="{ 'is-invalid': errores.password }" v-model="administrador.password" />
 
-                <button
-                  type="button"
+                <button type="button"
                   class="position-absolute end-0 me-3 border-0 bg-transparent d-flex align-items-center justify-content-center"
-                  style="height:100%; top:0;"
-                  @click="togglePassword">
+                  style="height:100%; top:0;" @click="togglePassword">
 
                   <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"
                     style="font-size:1.2rem; color:#6c757d;"></i>
@@ -82,22 +76,22 @@
 
               <div class="position-relative d-flex align-items-center">
 
-                <input
-                  :type="showConfirmPassword ? 'text' : 'password'"
-                  class="form-control pe-5 rounded-3"
-                  :class="{ 'is-invalid': errores.password }"
-                  v-model="administrador.confirmPassword"
-                />
+                <input :type="showConfirmPassword ? 'text' : 'password'" class="form-control pe-5 rounded-3"
+                  :class="{ 'is-invalid': errores.password }" v-model="administrador.confirmPassword" />
 
-                <button
-                  type="button"
+                <button type="button"
                   class="position-absolute end-0 me-3 border-0 bg-transparent d-flex align-items-center justify-content-center"
-                  style="height:100%; top:0;"
-                  @click="toggleConfirmPassword">
+                  style="height:100%; top:0;" @click="toggleConfirmPassword">
 
                   <i :class="showConfirmPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"
                     style="font-size:1.2rem; color:#6c757d;"></i>
                 </button>
+              </div>
+            </div>
+
+            <div v-if="mostrarMensaje" class="text-center mb-3">
+              <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
+                {{ mensaje }}
               </div>
             </div>
 
@@ -111,9 +105,7 @@
 
       <!-- LOGOUT -->
       <div class="mt-5 d-flex justify-content-center">
-        <button
-          class="btn btn-danger rounded-3 px-4 py-2 d-flex align-items-center gap-2 shadow-sm"
-          @click="logout">
+        <button class="btn btn-danger rounded-3 px-4 py-2 d-flex align-items-center gap-2 shadow-sm" @click="logout">
 
           <i class="bi bi-box-arrow-right"></i>
           {{ t.logout }}
@@ -143,6 +135,9 @@ const authStore = useAuthStore();
 const router = useRouter()
 
 const continuar = ref(true);
+const mensaje = ref('')
+const tipoMensaje = ref<'success' | 'error' | ''>('')
+const mostrarMensaje = ref(false)
 
 const showPassword = ref(false)
 const showConfirmPassword = ref(false)
@@ -163,6 +158,16 @@ const administrador = ref({
 const errores = ref({
   password: false
 });
+
+function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
+  mensaje.value = texto
+  tipoMensaje.value = tipo
+  mostrarMensaje.value = true
+
+  setTimeout(() => {
+    mostrarMensaje.value = false
+  }, 5000)
+}
 
 /* Solo mandamos al backend para modificar los campos que se hayan modificado */
 function camposModificados() {
@@ -186,19 +191,30 @@ const guardarCambios = async () => {
   try {
     const data = camposModificados()
 
-    if (!continuar.value) return
+    if (!continuar.value) {
+      if (errores.value.password) {
+        lanzarMensaje(t.value.passwordNotMatch, "error")
+      } else {
+        lanzarMensaje(t.value.emptyFields, "error")
+      }
+      return
+    }
 
     await modificarAdministrador(administradorStore.administrador.id, data)
 
     if (data.password) {
-      administradorStore.cerrarSesion()
-      authStore.logout()
-      router.push("/login")
-      return
+      lanzarMensaje(t.value.passwordUpdate, "success")
+      setTimeout(() => {
+        administradorStore.cerrarSesion()
+        authStore.logout()
+        router.push("/login")
+      }, 2500)
+    } else {
+      lanzarMensaje(t.value.correctlyUpdate, "success")
     }
-
     await administradorStore.fetchUser(administradorStore.administrador.id)
   } catch (e) {
+    lanzarMensaje(t.value.noModify, "error")
     console.error("Error al modificar el administrador", e)
   }
 }

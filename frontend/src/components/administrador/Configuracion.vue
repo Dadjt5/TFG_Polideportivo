@@ -169,9 +169,11 @@
         </div>
       </div>
 
-      <p v-if="mensaje" class="text-center text-primary mt-4">
-          {{ mensaje }}
-      </p>
+      <div v-if="mostrarMensaje" class="text-center mb-3">
+        <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
+          {{ mensajeEditar }}
+        </div>
+      </div>
 
       <div class="text-center mt-4">
         <button class="fs-4 btn btn-primary rounded-pill px-4 mt-4" @click="guardarConfiguracion">
@@ -196,16 +198,28 @@ const t = useI18n(language)
 
 const configuracionStore = useConfiguracionStore();
 const activeTab = ref<"params" | "notifs">("params");
-const mensaje = ref("");
+
+const mensajeEditar = ref('')
+const tipoMensaje = ref<'success' | 'error' | ''>('')
+const mostrarMensaje = ref(false)
+
+function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
+  mensajeEditar.value = texto
+  tipoMensaje.value = tipo
+  mostrarMensaje.value = true
+
+  setTimeout(() => {
+    mostrarMensaje.value = false
+  }, 5000)
+}
 
 const guardarConfiguracion = async () => {
-  mensaje.value = ""
   const response = await configuracionStore.editarConfiguracion()
 
   if(response) {
-    mensaje.value = t.value.configurationSuccess
+    lanzarMensaje(t.value.configurationSuccess, "success")
   } else {
-    mensaje.value = t.value.unexpectedError
+    lanzarMensaje(t.value.noModify, "error")
   }
 };
 

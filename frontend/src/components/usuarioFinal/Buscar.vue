@@ -89,6 +89,8 @@
         <select class="form-select order-select" v-model="orderBy">
           <option value="nombre_asc">{{ t.orderByNameAsc }}</option>
           <option value="nombre_desc">{{ t.orderByNameDesc }}</option>
+          <option value="plazas_asc">{{ t.orderByPlacesAsc }}</option>
+          <option value="plazas_desc">{{ t.orderByPlacesDesc }}</option>
         </select>
       </div>
 
@@ -153,7 +155,7 @@ const sinActividades = ref(false)
 const sinInstalaciones = ref(false)
 const error = ref("");
 
-const orderBy = ref<'nombre_asc' | 'nombre_desc'>('nombre_asc')
+const orderBy = ref<'nombre_asc' | 'nombre_desc' | 'plazas_asc' | 'plazas_desc'>('nombre_asc')
 
 const route = useRoute()
 const router = useRouter()
@@ -180,8 +182,6 @@ const weekOrder = [
 ];
 
 const estadisticasStore = useEstadisticasStore();
-
-const estadisticas = estadisticasStore.data;
 
 const activeTab = ref('activities');
 
@@ -248,8 +248,13 @@ const actividadesOrdenadas = computed(() => {
   return [...resultados.value.actividades].sort((a, b) => {
     if (orderBy.value === 'nombre_asc') {
       return a.nombre.localeCompare(b.nombre)
+    } else if (orderBy.value === 'nombre_desc') {
+      return b.nombre.localeCompare(a.nombre)
+    } else if (orderBy.value === 'plazas_asc') {
+      return a.plazasReservadas.localeCompare(b.plazasReservadas)
     }
-    return b.nombre.localeCompare(a.nombre)
+
+    return b.plazasReservadas.localeCompare(a.plazasReservadas)
   })
 })
 

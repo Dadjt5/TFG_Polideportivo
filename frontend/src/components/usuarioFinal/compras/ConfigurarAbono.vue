@@ -105,6 +105,12 @@
             </div>
           </div>
 
+          <div v-if="mostrarMensaje" class="text-center mb-3">
+          <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
+            {{ mensaje }}
+          </div>
+        </div>
+
           <!-- BOTONES -->
           <div class="d-flex justify-content-end gap-2 mt-4">
             <button class="btn btn-outline-secondary" @click="cancelar">{{ t.cancel }}</button>
@@ -140,6 +146,9 @@ const id = Number(route.params.id)
 const tipo = String(route.params.tipo)
 
 const abono = ref<any>(null)
+const mensaje = ref('')
+const tipoMensaje = ref<'success' | 'error' | ''>('')
+const mostrarMensaje = ref(false)
 
 const seleccion = ref({
   forma: 'Pago unico',
@@ -182,21 +191,36 @@ const total = computed(() => {
   return abono.value.precioOtros
 })
 
+function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
+  mensaje.value = texto
+  tipoMensaje.value = tipo
+  mostrarMensaje.value = true
+
+  setTimeout(() => {
+    mostrarMensaje.value = false
+  }, 5000)
+}
+
 
 const continuarPago = async () => {
-  const response = await comprarAbono(
-    id,
-    tipo,
-    seleccion.value.forma,
-    seleccion.value.familiar
-  )
+  try {
+    const response = await comprarAbono(
+      id,
+      tipo,
+      seleccion.value.forma,
+      seleccion.value.familiar
+    )
 
-  const idPago = response.idPago
+    const idPago = response.idPago
 
-  router.push({
-    name: 'pasarela-pago',
-    params: { tipo: "comprar_abono", id: idPago }
-  })
+    router.push({
+      name: 'pasarela-pago',
+      params: { tipo: "comprar_abono", id: idPago }
+    })
+  }catch(e) {
+    lanzarMensaje(t.value.noSubscripcionBuy, "error")
+    console.error("Error al comprar el abono", e)
+  }
 }
 
 function cancelar() {

@@ -362,9 +362,10 @@
 
         </div>
 
-        <!-- MENSAJE -->
-        <div class="text-center mt-4 fs-5">
-          <p v-if="mensaje" class="text-danger">{{ mensaje }}</p>
+        <div v-if="mostrarMensaje" class="text-center mb-3">
+          <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
+            {{ mensajeEditar }}
+          </div>
         </div>
 
         <!-- ACCIONES -->
@@ -495,6 +496,9 @@ const actividadOriginal = ref<any>(null);
 const sesiones = ref<any[]>([])
 const crearSesion = ref({ id: -1, dia: "", horaInicio: "", horaFin: "" })
 const mensaje = ref("")
+const mensajeEditar = ref('')
+const tipoMensaje = ref<'success' | 'error' | ''>('')
+const mostrarMensaje = ref(false)
 const editando = ref(false)
 const callesDisponibles = ref<any[]>([])
 const calleSeleccionada = ref<number | null>(null)
@@ -561,14 +565,12 @@ const instalacionesFiltradas = computed(() => {
 })
 
 function activarEdicion() {
-  mensaje.value = ""
   actividadOriginal.value = JSON.parse(JSON.stringify(actividad.value))
   Object.keys(errores.value).forEach(k => errores.value[k] = false)
   editando.value = true
 }
 
 function cancelarEdicion() {
-  mensaje.value = ""
   actividadOriginal.value = JSON.parse(JSON.stringify(actividad.value))
   preview.value = null
   imagen.value = null
@@ -694,6 +696,16 @@ function validarTipoInstalacion() {
   return true
 }
 
+function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
+  mensajeEditar.value = texto
+  tipoMensaje.value = tipo
+  mostrarMensaje.value = true
+
+  setTimeout(() => {
+    mostrarMensaje.value = false
+  }, 5000)
+}
+
 function onFileChange(e: Event) {
   const input = e.target as HTMLInputElement
   if (!input.files || input.files.length === 0) return
@@ -703,24 +715,23 @@ function onFileChange(e: Event) {
 }
 
 async function guardarCambios() {
-  mensaje.value = ""
   if (!validarFormulario()) {
-    mensaje.value = t.value.emptyFields
+    lanzarMensaje(t.value.missing, "error")
     return
   }
 
   if (!validarTipoInstalacion()) {
-    mensaje.value = t.value.cannotChangeType
+    lanzarMensaje(t.value.cannotChangeType, "error")
     return
   }
 
   if (!horasValidas()) {
-    mensaje.value = t.value.wrongTimetable
+    lanzarMensaje(t.value.wrongTimetable, "error")
     return
   }
 
   if (!horasEnPunto()) {
-    mensaje.value = t.value.onTheHourWarning
+    lanzarMensaje(t.value.onTheHourWarning, "error")
     return
   }
 
@@ -742,10 +753,10 @@ async function guardarCambios() {
 
   try {
     await modificarActividad(parseInt(props.id), formData)
-    router.back()
-  } catch (e: any) {
-    mensaje.value = e.response?.data?.respuesta
-    console.error(e)
+    lanzarMensaje(t.value.correctlyUpdate, "success")
+  } catch (e) {
+    lanzarMensaje(t.value.noModify, "error")
+    console.error("No se ha podido editar la actividad", e)
   }
 }
 

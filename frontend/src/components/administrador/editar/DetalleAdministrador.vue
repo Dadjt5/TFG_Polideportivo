@@ -71,10 +71,11 @@
 
           </div>
 
-          <!-- MENSAJE ERROR -->
-          <p v-if="mensaje" class="text-center text-danger mt-4">
-            {{ mensaje }}
-          </p>
+          <div v-if="mostrarMensaje" class="text-center mb-3">
+            <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
+              {{ mensajeEditar }}
+            </div>
+          </div>
 
           <!-- ACCIONES -->
           <div class="d-flex justify-content-center gap-4 mt-5">
@@ -180,6 +181,9 @@ const isEditing = ref(false)
 const authStore = useAuthStore()
 const mensaje = ref("")
 const eliminado = ref(false)
+const mensajeEditar = ref('')
+const tipoMensaje = ref<'success' | 'error' | ''>('')
+const mostrarMensaje = ref(false)
 
 const admin = ref({
   id: 0,
@@ -197,6 +201,16 @@ const errores = ref({
   rol: false
 })
 
+function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
+  mensajeEditar.value = texto
+  tipoMensaje.value = tipo
+  mostrarMensaje.value = true
+
+  setTimeout(() => {
+    mostrarMensaje.value = false
+  }, 5000)
+}
+
 function validarFormulario() {
   let valido = true
 
@@ -213,7 +227,6 @@ function validarFormulario() {
 }
 
 function activarEdicion() {
-  mensaje.value = ""
   adminOriginal.value = JSON.parse(JSON.stringify(admin.value))
   Object.keys(errores.value).forEach(
     k => (errores.value[k as keyof typeof errores.value] = false)
@@ -222,7 +235,6 @@ function activarEdicion() {
 }
 
 function cancelarEdicion() {
-  mensaje.value = ""
   admin.value = JSON.parse(JSON.stringify(adminOriginal.value))
   isEditing.value = false
 }
@@ -256,27 +268,29 @@ function comprobarPermisos() {
 const administradorStore = useAdministradorStore();
 
 async function guardarCambios() {
-  mensaje.value = ""
   if (!validarFormulario()) {
-    mensaje.value = t.value.missing
+    lanzarMensaje(t.value.missing, "error")
     return
   }
 
   if (!comprobarPermisos()) {
-    mensaje.value = t.value.noPermissions
+    lanzarMensaje(t.value.noPermissions, "error")
     return
   }
 
   const data = camposModificados()
   if (Object.keys(data).length === 0) {
+    lanzarMensaje(t.value.noChanges, "success")
     isEditing.value = false
     return
   }
 
   try {
     await modificarAdministrador(admin.value.id, data)
+    lanzarMensaje(t.value.correctlyUpdate, "success")
     isEditing.value = false
   } catch (e) {
+    lanzarMensaje(t.value.noModify, "error")
     console.error('Error al modificar el administrador', e)
   }
 }

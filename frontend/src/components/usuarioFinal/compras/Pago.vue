@@ -1,9 +1,9 @@
 <template>
   <div class="min-vh-100 d-flex align-items-center justify-content-center"
-       style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
+    style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
 
     <div class="card rounded-4 shadow-lg p-5 card-hover"
-         style="width: 500px; background-color: rgba(255,255,255,0.85); backdrop-filter: blur(8px);">
+      style="width: 500px; background-color: rgba(255,255,255,0.85); backdrop-filter: blur(8px);">
 
       <!-- Título -->
       <h3 class="text-center text-primary mb-4 fw-bold" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.1);">
@@ -34,12 +34,12 @@
         </p>
       </div>
 
-      <hr class="my-3"/>
+      <hr class="my-3" />
 
       <!-- Tiempo restante -->
       <div class="mb-3">
         <div class="alert d-flex align-items-center justify-content-center fw-semibold"
-             :class="tiempoRestante <= 60 ? 'alert-danger' : 'alert-warning'">
+          :class="tiempoRestante <= 60 ? 'alert-danger' : 'alert-warning'">
           <i class="bi bi-hourglass-split me-2"></i>
           {{ t.timeRemaining }}:
           <strong class="ms-1">{{ minutos }}:{{ segundos }}</strong>
@@ -52,21 +52,25 @@
         <div class="mb-3">
           <label class="form-label fw-semibold">{{ t.cardInfo }}</label>
           <div id="payment-element" class="rounded-2 p-2"
-               style="background-color: rgba(255,255,255,0.95); border: 1px solid #dee2e6;"></div>
+            style="background-color: rgba(255,255,255,0.95); border: 1px solid #dee2e6;"></div>
         </div>
 
-        <!-- Error -->
-        <div v-if="error" class="alert alert-danger rounded-2">
-          {{ error }}
+        <div v-if="mostrarMensaje" class="mb-3">
+          <div class="alert text-center rounded-3" :class="{
+            'alert-danger': tipoMensaje === 'error',
+            'alert-success': tipoMensaje === 'success',
+            'alert-warning': tipoMensaje === 'warning'
+          }">
+            {{ mensaje }}
+          </div>
         </div>
 
         <!-- Botón pagar -->
-        <button type="submit" class="btn btn-primary w-100 mt-3 rounded-3"
-                :disabled="loading">
+        <button type="submit" class="btn btn-primary w-100 mt-3 rounded-3" :disabled="loading">
           <span v-if="loading" class="spinner-border spinner-border-sm me-2"></span>
-          {{ loading 
-            ? `${t.processing}...` 
-            : `${t.payment} ${resumen.pago.costeFinal.toFixed(2)} €` 
+          {{ loading
+            ? `${t.processing}...`
+            : `${t.payment} ${resumen.pago.costeFinal.toFixed(2)} €`
           }}
         </button>
 
@@ -98,21 +102,23 @@ const t = useI18n(language);
 const router = useRouter()
 
 const resumen = ref({
-	id: 0,
-	estado: '',
-	nombre: '',
-	pago: {
-		concepto: '',
+  id: 0,
+  estado: '',
+  nombre: '',
+  pago: {
+    concepto: '',
     coste: 0.0,
     costeFinal: 0.0,
     descuentoAplicado: 0.0,
     fecha: '',
-    estadoPago: '',    
-	}
+    estadoPago: '',
+  }
 })
 
 const loading = ref(false)
-const error = ref("")
+const mensaje = ref('')
+const tipoMensaje = ref<'success' | 'error' | 'warning' | ''>('')
+const mostrarMensaje = ref(false)
 
 let stripe: any
 let cardElement: any
@@ -125,13 +131,23 @@ const countdown = setInterval(() => {
 
   if (tiempoRestante.value <= 0) {
     clearInterval(countdown)
-    error.value = "Se ha cancelado la reserva por tiempo agotado."
-    
+    lanzarMensaje(t.value.expiredPay, "warning")
+
     setTimeout(() => {
       router.replace("/")
     }, 3000)
   }
 }, 1000)
+
+function lanzarMensaje(texto: string, tipo: 'success' | 'error' | 'warning') {
+  mensaje.value = texto
+  tipoMensaje.value = tipo
+  mostrarMensaje.value = true
+
+  setTimeout(() => {
+    mostrarMensaje.value = false
+  }, 5000)
+}
 
 const minutos = computed(() => {
   const m = Math.floor(tiempoRestante.value / 60)
@@ -147,7 +163,6 @@ let elements: any
 
 const pagar = async () => {
   loading.value = true
-  error.value = ""
 
   const { error: stripeError } = await stripe.confirmPayment({
     elements,
@@ -157,9 +172,10 @@ const pagar = async () => {
   })
 
   if (stripeError) {
-    error.value = stripeError.message
+    lanzarMensaje(t.value.payError, "error")
     loading.value = false
-  }}
+  }
+}
 
 onMounted(async () => {
   try {
@@ -176,7 +192,7 @@ onMounted(async () => {
     paymentElement.mount("#payment-element")
     cardElement = paymentElement
   } catch (e) {
-    error.value = "Error al cargar el pago"
+    lanzarMensaje(t.value.payError, "error")
     console.error(e)
   }
 })

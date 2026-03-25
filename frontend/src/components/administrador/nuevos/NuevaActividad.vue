@@ -407,15 +407,17 @@
               <button type="button" class="btn btn-sm btn-danger" @click="sesiones.splice(index, 1)">
                 X
               </button>
-
             </div>
-
           </div>
-
         </div>
-
         <div class="text-center mt-5 fs-5">
           <p v-if="mensaje" class="text-danger">{{ mensaje }}</p>
+        </div>
+
+        <div v-if="mostrarMensaje" class="text-center mb-3">
+          <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
+            {{ mensajeEditar }}
+          </div>
         </div>
 
         <!-- BOTONES -->
@@ -506,6 +508,10 @@ const deporteSeleccionado = ref("")
 const nuevoDeporteNombre = ref("")
 const callesDisponibles = ref<any[]>([])
 const calleSeleccionada = ref<number | null>(null)
+
+const mensajeEditar = ref('')
+const tipoMensaje = ref<'success' | 'error' | ''>('')
+const mostrarMensaje = ref(false)
 
 const sesiones = ref<any[]>([])
 const crearSesion = ref({
@@ -611,6 +617,16 @@ function validarFormulario() {
   return ok
 }
 
+function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
+  mensajeEditar.value = texto
+  tipoMensaje.value = tipo
+  mostrarMensaje.value = true
+
+  setTimeout(() => {
+    mostrarMensaje.value = false
+  }, 5000)
+}
+
 function horasValidas() {
   for (const s of sesiones.value) {
     if (s.horaInicio >= s.horaFin) {
@@ -631,24 +647,23 @@ function horasEnPunto() {
 }
 
 const crearActividad = async () => {
-  mensaje.value = ""
   if (!validarFormulario()) {
-    mensaje.value = t.value.emptyFields
+    lanzarMensaje(t.value.missing, "error")
     return
   }
 
   if (sesiones.value.length === 0) {
-    mensaje.value = t.value.noSessionWarning
+    lanzarMensaje(t.value.noSessionWarning, "error")
     return
   }
 
   if (!horasValidas()) {
-    mensaje.value = t.value.wrongTimetable
+    lanzarMensaje(t.value.wrongTimetable, "error")
     return
   }
 
   if (!horasEnPunto()) {
-    mensaje.value = t.value.onTheHourWarning
+    lanzarMensaje(t.value.onTheHourWarning, "error")
     return
   }
 
@@ -670,8 +685,8 @@ const crearActividad = async () => {
   try {
     await nuevaActividad(formData)
     router.push({ name: "gestion-actividades" })
-  } catch (e: any) {
-    mensaje.value = e.response?.data?.respuesta
+  } catch (e) {
+    lanzarMensaje(t.value.activityNoCreated, "error")
     console.log("Error al crear la actividad", e)
   }
 }
