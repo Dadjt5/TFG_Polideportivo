@@ -67,12 +67,14 @@ class Command(BaseCommand):
                 titulo_salida_lista_espera="Salida de la lista de espera",
                 titulo_ausencias="Aviso por falta de asistencia",
                 titulo_material_especial="Nuevo material especial necesario",
+                titulo_cambios_sesiones="Cambio en las sesiones",
                 texto_cambios_cancelaciones="Los tiempos mínimos de las cancelaciones han cambiado.",
                 texto_avisos_actividades="Hay una nueva actividad que podría interesarle.",
                 texto_problemas_pago="Si tiene problemas con el pago contacte con administración.",
                 texto_salida_lista_espera="Ha salido de la lista de espera.",
                 texto_ausencias="Recuerde justificar sus ausencias.",
-                texto_material_especial="Algunas actividades requieren nuevo material."
+                texto_material_especial="Algunas actividades requieren nuevo material.",
+                texto_cambios_sesiones="Las sesiones de la actividad indicada han cambiado."
             )
 
             self.stdout.write(self.style.SUCCESS("Configuración global creada"))

@@ -139,6 +139,8 @@ class ReservaActividad(Reserva):
             actividad.plazasReservadas = cls.objects.filter(actividad=actividad, estado__in=[EstadoReserva.PENDIENTE, EstadoReserva.CONFIRMADA]).count()
             actividad.save()
 
+            actividad.activarAsistencia(usuario)
+
             return reserva
 
 

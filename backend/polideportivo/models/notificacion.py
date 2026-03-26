@@ -115,7 +115,20 @@ class Notificacion(models.Model):
                 usuario=usuario.user,
                 actividad=actividad
             )
+    
+    @classmethod
+    def notificarCambioSesiones(cls, actividad):
+        configuracion = Configuracion.objects.all().first()
+        
+        usuarios = UsuarioFinal.objects.filter(reservas_actividad__actividad=actividad).distinct()
 
+        for usuario in usuarios:
+            cls.objects.create(
+                titulo=configuracion.titulo_cambios_sesiones,
+                descripcion=configuracion.texto_cambios_sesiones,
+                usuario=usuario.user,
+                actividad=actividad
+            )
 
     @classmethod
     def notificarCambioCancelacion(cls):

@@ -23,6 +23,15 @@ export default {
   poolStreet: "Calle de la piscina",
   poolStreets: "Calles de la piscina",
   changeImage: "Cambiar imagen",
+  all: "Todos",
+  anyone: "Ninguno",
+  assistance: "Asistencia",
+  attendees: "Asistentes",
+  absentes: "Ausentes",
+  duration: "Duracion",
+  terrain: "Terreno",
+  registeredUsers: "Usuarios inscritos",
+  noSessions: "Sin sesiones",
 
   /* Eliminaciones */
   confirmDelete: "Confirmar eliminación",
@@ -595,6 +604,7 @@ export default {
   textPaymentProblems: "Problemas de pago",
   textAbsences: "Ausencias acumuladas",
   textWaitingListExit: "Salida lista de espera",
+  textSessionChanges: "Cambios en las sesiones",
   minDaysFacilityReservation: "Días mínimos para alquilar",
   maxDaysActivityReservation: "Cantidad máxima de días para reservar la actividad",
   minCancellationDays: "Cantidad de días mínima para cancelar la reserva",

@@ -39,6 +39,10 @@ class Actividad(models.Model):
     def __str__(self):
         return f'{self.nombre}, en la instalacion {self.instalacion}'
 
+    def activarAsistencia(self, usuario):
+        for sesion in self.sesiones:
+            Asistencia.objects.get_or_create(sesion=sesion, usuarioFinal=usuario)
+
     def obtener_precios(self):
         if self.tipoActividad == TipoActividad.OTROS:
             return {
@@ -314,8 +318,8 @@ class Asistencia(models.Model):
 
     presente = models.BooleanField(default=False)
 
-    usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.RESTRICT)
-    sesion = models.ForeignKey(Sesion, on_delete=models.RESTRICT, related_name="asistencias")
+    usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.CASCADE)
+    sesion = models.ForeignKey(Sesion, on_delete=models.CASCADE, related_name="asistencias")
 
     class Meta:
         unique_together = ('usuarioFinal', 'sesion')

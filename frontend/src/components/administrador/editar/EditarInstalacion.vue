@@ -254,8 +254,8 @@
 
       <!-- ACCIONES -->
       <div class="d-flex justify-content-center gap-4 mt-4 mb-5">
-        <button v-if="!editando" class="btn btn-primary btn-lg rounded-pill px-5 shadow" @click="activarEdicion">
-          {{ t.modifyFacility }}
+        <button v-if="!editando" class="btn btn-primary btn-lg rounded-pill" @click="activarEdicion">
+          <i class="bi bi-pencil me-2"></i> {{ t.modifyFacility }}
         </button>
 
         <template v-else>
@@ -267,9 +267,9 @@
           </button>
         </template>
 
-        <button v-if="!editando" class="btn btn-outline-danger btn-lg rounded-pill px-5 bg-white"
+        <button v-if="!editando" class="btn btn-danger btn-lg rounded-pill"
           @click="abrirConfirmacion">
-          {{ t.deleteFacility }}
+          <i class="bi bi-trash me-2"></i> {{ t.deleteFacility }}
         </button>
       </div>
     </main>

@@ -17,12 +17,14 @@ export const useConfiguracionStore = defineStore("configuracion", {
 		titulo_salida_lista_espera: '',
 		titulo_ausencias: '',
 		titulo_material_especial: '',
+		titulo_cambios_sesiones: '',
 		texto_cambios_cancelaciones: '',
 		texto_avisos_actividades: '',
 		texto_problemas_pago: '',
 		texto_salida_lista_espera: '',
 		texto_ausencias: '',
 		texto_material_especial: '',
+		texto_cambios_sesiones: '',
 		modificado: false
 	}),
 
@@ -45,6 +47,7 @@ export const useConfiguracionStore = defineStore("configuracion", {
 				this.titulo_salida_lista_espera = data.titulo_salida_lista_espera;
 				this.titulo_ausencias = data.titulo_ausencias;
 				this.titulo_material_especial = data.titulo_material_especial;
+				this.titulo_cambios_sesiones = data.titulo_cambios_sesiones;
 
 				this.texto_cambios_cancelaciones = data.texto_cambios_cancelaciones;
 				this.texto_avisos_actividades = data.texto_avisos_actividades;
@@ -52,6 +55,7 @@ export const useConfiguracionStore = defineStore("configuracion", {
 				this.texto_salida_lista_espera = data.texto_salida_lista_espera;
 				this.texto_ausencias = data.texto_ausencias;
 				this.texto_material_especial = data.texto_material_especial;
+				this.texto_cambios_sesiones = data.texto_cambios_sesiones;
 
 				this.guardarEnLocalStorage();
 
@@ -76,12 +80,14 @@ export const useConfiguracionStore = defineStore("configuracion", {
 					titulo_salida_lista_espera: this.titulo_salida_lista_espera,
 					titulo_ausencias: this.titulo_ausencias,
 					titulo_material_especial: this.titulo_material_especial,
+					titulo_cambios_sesiones: this.titulo_cambios_sesiones,
 					texto_cambios_cancelaciones: this.texto_cambios_cancelaciones,
 					texto_avisos_actividades: this.texto_avisos_actividades,
 					texto_problemas_pago: this.texto_problemas_pago,
 					texto_salida_lista_espera: this.texto_salida_lista_espera,
 					texto_ausencias: this.texto_ausencias,
 					texto_material_especial: this.texto_material_especial,
+					texto_cambios_sesiones: this.texto_cambios_sesiones,
 				};
 
 				const data = await editarConfiguracion(payload);
@@ -112,12 +118,14 @@ export const useConfiguracionStore = defineStore("configuracion", {
 				titulo_salida_lista_espera: this.titulo_salida_lista_espera,
 				titulo_ausencias: this.titulo_ausencias,
 				titulo_material_especial: this.titulo_material_especial,
+				titulo_cambios_sesiones: this.titulo_cambios_sesiones,
 				texto_cambios_cancelaciones: this.texto_cambios_cancelaciones,
 				texto_avisos_actividades: this.texto_avisos_actividades,
 				texto_problemas_pago: this.texto_problemas_pago,
 				texto_salida_lista_espera: this.texto_salida_lista_espera,
 				texto_ausencias: this.texto_ausencias,
 				texto_material_especial: this.texto_material_especial,
+				texto_cambios_sesiones: this.texto_cambios_sesiones,
 			}));
 		}
 	}

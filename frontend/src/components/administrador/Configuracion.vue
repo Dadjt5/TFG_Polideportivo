@@ -166,6 +166,17 @@
               v-model="configuracionStore.texto_material_especial" />
           </div>
 
+          <!-- CAMBIO SESIONES -->
+          <div class="mb-4">
+            <label class="form-label fw-semibold">{{ t.title }} - {{ t.textSessionChanges }}</label>
+            <input type="text" class="form-control mb-2"
+              v-model="configuracionStore.titulo_cambios_sesiones" />
+
+            <label class="form-label fw-semibold">{{ t.textSessionChanges }}</label>
+            <textarea class="form-control" rows="3"
+              v-model="configuracionStore.texto_cambios_sesiones" />
+          </div>
+
         </div>
       </div>
 

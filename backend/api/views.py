@@ -1141,18 +1141,21 @@ class DetalleSesionView(APIView):
             "dia": sesion.dia,
             "horaInicio": sesion.horaInicio,
             "horaFin": sesion.horaFin,
+            "duracion": sesion.numeroHoras * 60,
+            "totalParticipantes": actividad.plazasReservadas,
+            "presentes": sesion.asistencias.filter(presente=True).count(),
             "actividad": {
                 "nombre": actividad.nombre,
                 "periodo": actividad.periodo,
-                "estado": actividad.estado,
+                "terreno": actividad.terreno,
+                "nivel": actividad.nivel,
                 "instalacion": {
                     "id": actividad.instalacion.id,
                     "nombre": actividad.instalacion.nombre
+                }
                 },
-                "nivel": actividad.nivel
-            },
-            "participantes": []
-        }
+                "participantes": []
+            }
 
         for asistencia in sesion.asistencias.all():
             data["participantes"].append({
@@ -1491,6 +1494,7 @@ class EditarActividadView(APIView):
             sesiones_bd = actividad.sesiones.all()
             ids_recibidos = []
 
+            cambios = False
             for sesion_data in sesiones_recibidas:
                 dia = sesion_data.get('dia')
                 hora_inicio = sesion_data.get('horaInicio')
@@ -1513,7 +1517,7 @@ class EditarActividadView(APIView):
                 if not sesion_id or sesion_id == -1:
                     nueva = actividad.nuevaSesion(dia, hora_inicio, hora_fin)
                     ids_recibidos.append(nueva.id)
-
+                    cambios = True
                 else:
                     sesion_existente = sesiones_bd.filter(id=sesion_id).first()
 
@@ -1525,10 +1529,15 @@ class EditarActividadView(APIView):
                         sesion_existente.save()
 
                         ids_recibidos.append(sesion_existente.id)
+                        cambios = True
 
             for sesion in sesiones_bd:
                 if sesion.id not in ids_recibidos:
                     sesion.delete()
+                    cambios = True
+
+            if cambios:
+                Notificacion.notificarCambioSesiones(actividad)
 
             # Nombre del deporte
             nombre_json = request.POST.get("deportes", "[]")

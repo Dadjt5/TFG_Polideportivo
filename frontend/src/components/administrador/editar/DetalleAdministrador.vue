@@ -2,6 +2,7 @@
   <div class="min-vh-100 pt-4" style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
     <main class="container-fluid px-5 py-4" style="max-width: 1600px;">
 
+      <!-- HEADER -->
       <div class="d-flex justify-content-between align-items-center mb-4">
         <button class="btn btn-secondary rounded-pill" @click="volver">
           ← {{ t.return }}
@@ -12,100 +13,125 @@
         <div style="width: 100px"></div>
       </div>
 
-      <div class="card border-0 shadow-lg rounded-4">
-        <div class="card-body p-4 p-md-5">
-
-          <!-- DATOS -->
-          <div class="row g-3">
-
-            <!-- NOMBRE -->
-            <div class="col-md-4">
-              <label class="form-label">{{ t.name }}</label>
-              <input v-if="isEditing" class="form-control" v-model="admin.nombre"
-                :class="{ 'is-invalid': errores.nombre }" />
-              <p v-else class="form-control-plaintext">
-                {{ admin.nombre || '-' }}
-              </p>
-            </div>
-
-            <!-- DNI -->
-            <div class="col-md-4">
-              <label class="form-label">DNI</label>
-              <p class="form-control-plaintext">
-                {{ admin.DNI || '-' }}
-              </p>
-            </div>
-
-            <!-- Codigo usuario -->
-            <div class="col-md-4">
-              <label class="form-label">{{ t.loginCode }}</label>
-              <p class="form-control-plaintext">
-                {{ admin.codigo_usuario || '-' }}
-              </p>
-            </div>
-
-            <!-- ROL -->
-            <div class="col-md-4">
-              <label class="form-label">{{ t.role }}</label>
-              <select v-if="isEditing" class="form-select form-select-lg" :class="{ 'is-invalid': errores.rol }"
-                v-model="admin.rol">
-                <option value="" disabled>{{ t.selectOption }}</option>
-                <option value="Administrador raiz">{{ t.rootAdmin }}</option>
-                <option value="Administrador de usuarios">{{ t.usersAdmin }}</option>
-                <option value="Administrador de espacios">{{ t.spacesAdmin }}</option>
-                <option value="Administrador de tarifas">{{ t.tariffsAdmin }}</option>
-              </select>
-
-              <p v-else class="form-control-plaintext">
-                {{ admin.rol || '-' }}
-              </p>
-            </div>
-
-            <!-- Correo -->
-            <div class="col-md-4">
-              <label class="form-label">{{ t.email }}</label>
-              <p class="form-control-plaintext">
-                {{ admin.email }}
-              </p>
-            </div>
-
+      <div class="card shadow-sm rounded-4 p-4 p-md-5">
+        
+        <!-- ADMIN AVATAR -->
+        <div class="d-flex flex-column flex-md-row align-items-center gap-4 mb-4">
+          <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center"
+               style="width:96px;height:96px">
+            <i class="bi bi-person-badge-fill text-primary fs-1"></i>
           </div>
 
-          <div v-if="mostrarMensaje" class="text-center mb-3">
-            <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
-              {{ mensajeEditar }}
-            </div>
+          <div class="flex-fill text-center text-md-start">
+            <h3 class="fw-semibold mb-1">
+              {{ admin.nombre }} {{ admin.apellidos }}
+            </h3>
+            <p class="text-muted mb-0">{{ t.admin }}</p>
+          </div>
+        </div>
+
+        <!-- DATOS -->
+        <div class="row g-3">
+
+          <!-- NOMBRE -->
+          <div class="col-md-4">
+            <label class="form-label">{{ t.name }}</label>
+            <input v-if="isEditing" class="form-control" v-model="admin.nombre"
+                   :class="{ 'is-invalid': errores.nombre }" />
+            <p v-else class="form-control-plaintext">
+              {{ admin.nombre || '-' }}
+            </p>
           </div>
 
-          <!-- ACCIONES -->
-          <div class="d-flex justify-content-center gap-4 mt-5">
+          <!-- APELLIDOS -->
+          <div class="col-md-4">
+            <label class="form-label">{{ t.surnames }}</label>
+            <input v-if="isEditing" class="form-control" v-model="admin.apellidos"
+                   :class="{ 'is-invalid': errores.apellidos }" />
+            <p v-else class="form-control-plaintext">
+              {{ admin.apellidos || '-' }}
+            </p>
+          </div>
 
-            <button v-if="!isEditing && !esYo()" class="btn btn-primary btn-lg rounded-pill" @click="activarEdicion">
-              <i class="bi bi-pencil me-2"></i>
-              {{ t.modifyUser }}
+          <!-- DNI -->
+          <div class="col-md-4">
+            <label class="form-label">DNI</label>
+            <p class="form-control-plaintext">
+              {{ admin.DNI || '-' }}
+            </p>
+          </div>
+
+          <!-- Codigo usuario -->
+          <div class="col-md-4">
+            <label class="form-label">{{ t.loginCode }}</label>
+            <p class="form-control-plaintext">
+              {{ admin.codigo_usuario || '-' }}
+            </p>
+          </div>
+
+          <!-- ROL -->
+          <div class="col-md-4">
+            <label class="form-label">{{ t.role }}</label>
+            <select v-if="isEditing" class="form-select form-select-lg" :class="{ 'is-invalid': errores.rol }"
+                    v-model="admin.rol">
+              <option value="" disabled>{{ t.selectOption }}</option>
+              <option value="Administrador raiz">{{ t.rootAdmin }}</option>
+              <option value="Administrador de usuarios">{{ t.usersAdmin }}</option>
+              <option value="Administrador de espacios">{{ t.spacesAdmin }}</option>
+              <option value="Administrador de tarifas">{{ t.tariffsAdmin }}</option>
+            </select>
+
+            <p v-else class="form-control-plaintext">
+              {{ admin.rol || '-' }}
+            </p>
+          </div>
+
+          <!-- Correo -->
+          <div class="col-md-4">
+            <label class="form-label">{{ t.email }}</label>
+            <p class="form-control-plaintext">
+              {{ admin.email }}
+            </p>
+          </div>
+
+        </div>
+
+        <!-- MENSAJE -->
+        <div v-if="mostrarMensaje" class="text-center mb-3">
+          <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
+            {{ mensajeEditar }}
+          </div>
+        </div>
+
+        <!-- ACCIONES -->
+        <div class="d-flex justify-content-center gap-4 mt-5">
+
+          <button v-if="!isEditing && !esYo()" class="btn btn-primary btn-lg rounded-pill" @click="activarEdicion">
+            <i class="bi bi-pencil me-2"></i>
+            {{ t.modifyUser }}
+          </button>
+
+          <template v-if="isEditing && !esYo()">
+            <button class="btn btn-success btn-lg rounded-pill" @click="guardarCambios">
+              <i class="bi bi-check-lg me-2"></i>
+              {{ t.saveChanges }}
             </button>
 
-            <template v-if="isEditing && !esYo()">
-              <button class="btn btn-success btn-lg rounded-pill" @click="guardarCambios">
-                <i class="bi bi-check-lg me-2"></i>
-                {{ t.saveChanges }}
-              </button>
-
-              <button class="btn btn-secondary btn-lg rounded-pill" @click="cancelarEdicion">
-                {{ t.cancel }}
-              </button>
-            </template>
-
-            <button v-if="!isEditing && !esYo()" class="btn btn-danger btn-lg rounded-pill" @click="abrirConfirmacion">
-              <i class="bi bi-trash me-2"></i>
-              {{ t.delete }}
+            <button class="btn btn-secondary btn-lg rounded-pill" @click="cancelarEdicion">
+              {{ t.cancel }}
             </button>
+          </template>
 
-          </div>
+          <button v-if="!isEditing && !esYo()" class="btn btn-danger btn-lg rounded-pill" @click="abrirConfirmacion">
+            <i class="bi bi-trash me-2"></i>
+            {{ t.delete }}
+          </button>
+
         </div>
       </div>
     </main>
 
+    <!-- MODALES -->
     <div class="modal fade" id="confirmDeleteModal" tabindex="-1">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content rounded-4">
@@ -155,6 +181,7 @@
         </div>
       </div>
     </div>
+
   </div>
 </template>
 

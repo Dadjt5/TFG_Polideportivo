@@ -23,6 +23,15 @@ export default {
   poolStreet: "Pool street",
   poolStreets: "Pool streets",
   changeImage: "Change image",
+  all: "All",
+  anyone: "Anyone",
+  assistance: "Attendance",
+  attendees: "Attendees",
+  absentes: "Absentes",
+  duration: "Duration",
+  terrain: "Terrain",
+  registeredUsers: "Registered users",
+  noSessions: "Without sessions",
 
   /* Eliminaciones */
   confirmDelete: "Confirm deletion",
@@ -596,6 +605,7 @@ export default {
   textPaymentProblems: "Payment issues",
   textAbsences: "Accumulated absences",
   textWaitingListExit: "Waitlist exit",
+  textSessionChanges: "Changes in sessions",
   minDaysFacilityReservation: "Minimum number of days to book the facility",
   maxDaysActivityReservation: "Maximum number of days to book the activity",
   minCancellationDays: "Minimum number of days required to cancel a reservation",

@@ -129,9 +129,7 @@
     <div class="modal fade" id="successDeleteModal" tabindex="-1">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content rounded-4 text-center">
-
           <div class="modal-body py-5">
-
             <i v-if="eliminado" class="bi bi-check-circle-fill text-success fs-1 mb-3"></i>
             <i v-else class="bi bi-exclamation-octagon-fill text-danger fs-1 mb-3"></i>
 
@@ -143,9 +141,7 @@
               <span v-if="eliminado">{{ t.continue }}</span>
               <span v-else>{{ t.return }}</span>
             </button>
-
           </div>
-
         </div>
       </div>
     </div>

@@ -40,7 +40,7 @@ const cambiarFavorito = () => {
   usuarioFinalStore.marcarActividadFavorita(props.actividad.id)
 }
 
-// Clases dinámicas según theme
+// Clases dinámicas según tema
 const cardClass = computed(() =>
   props.theme === 'dark'
     ? 'card shadow-sm h-100 activity-card bg-white bg-opacity-10 border border-white border-opacity-25'
@@ -96,7 +96,7 @@ const badgeClass = computed(() =>
       <div :class="['small', textOpacityClass]">
         <div class="d-flex justify-content-between mb-1">
           <span>{{ t.days }}</span>
-          <strong>{{ actividad.dias }}</strong>
+          <strong>{{ actividad.dias.join(', ') }}</strong>
         </div>
 
         <div class="d-flex justify-content-between mb-1">

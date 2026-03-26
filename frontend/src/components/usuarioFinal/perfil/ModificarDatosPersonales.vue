@@ -5,7 +5,7 @@
 
       <!-- Información no editable -->
       <div class="card mb-5 mt-4 rounded-4"
-        style="background-color: rgba(255,255,255,0.9); backdrop-filter: blur(10px);">
+        style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(10px);">
         <div class="card-body">
           <h5 class="fw-semibold mb-3 text-primary">{{ t.inmutableData }}</h5>
 
@@ -39,7 +39,7 @@
       </div>
 
       <!-- Información editable -->
-      <div class="card mb-5 rounded-4" style="background-color: rgba(255,255,255,0.9); backdrop-filter: blur(10px);">
+      <div class="card mb-5 rounded-4" style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(10px);">
         <div class="card-body">
           <h5 class="fw-semibold mb-3 text-primary">{{ t.editableData }}</h5>
 

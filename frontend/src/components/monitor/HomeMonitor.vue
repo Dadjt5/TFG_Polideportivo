@@ -69,17 +69,17 @@
                     </div>
 
                     <!-- Si no hay sesiones -->
-                    <div v-if="sesionesPorDia[dia].length === 0" class="text-muted small py-2">
+                    <div v-if="sesionesPorDia[dia].length === 0" class="text-light small py-2">
                       -
                     </div>
 
                     <!-- Lista de sesiones -->
                     <div v-else class="d-flex flex-column gap-2">
                       <button v-for="sesion in sesionesPorDia[dia]" :key="sesion.idSesion"
-                        class="btn btn-outline-primary btn-sm text-start"
+                        class="btn btn-outline-primary btn-sm text-start text-light"
                         @click="sesionDetail(sesion.idActividad, sesion.idSesion)">
                         {{ sesion.nombre }}
-                        <small class="d-block text-muted">
+                        <small class="d-block text-light">
                           {{ sesion.horaInicio }} - {{ sesion.horaFin }}
                         </small>
                       </button>

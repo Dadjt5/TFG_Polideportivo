@@ -7,40 +7,43 @@
         <button class="btn btn-secondary rounded-pill" @click="volver">
           ← {{ t.return }}
         </button>
-        <h1 class="fw-semibold mb-0">{{ actividad.nombre }}</h1>
+        <h1 class="fw-semibold mb-0 text-primary">{{ actividad.nombre }}</h1>
         <div style="width: 100px"></div>
       </div>
 
-      <div class="card border-0 shadow-lg rounded-4 p-4">
+      <!-- CARD PRINCIPAL -->
+      <div class="card shadow-lg border-0 rounded-4 p-4"
+        style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(10px);">
 
-        <!-- TABS -->
-        <ul class="nav nav-tabs nav-fill mb-4">
+        <!-- NAV DE TABS -->
+        <ul class="nav nav-pills nav-fill mb-4">
           <li class="nav-item">
-            <button type="button" class="nav-link" :class="{ active: tab === 1 }" @click="tab = 1">
+            <button class="nav-link fw-bold" :class="{ active: tab === 1 }" @click="tab = 1">
               {{ t.data }}
             </button>
           </li>
           <li class="nav-item">
-            <button type="button" class="nav-link" :class="{ active: tab === 2 }" @click="tab = 2">
+            <button class="nav-link fw-bold" :class="{ active: tab === 2 }" @click="tab = 2">
               {{ t.images }}
             </button>
           </li>
           <li class="nav-item">
-            <button type="button" class="nav-link" :class="{ active: tab === 3 }" @click="tab = 3">
+            <button class="nav-link fw-bold" :class="{ active: tab === 3 }" @click="tab = 3">
               {{ t.facility }}
             </button>
           </li>
           <li class="nav-item">
-            <button type="button" class="nav-link" :class="{ active: tab === 4 }" @click="tab = 4">
+            <button class="nav-link fw-bold" :class="{ active: tab === 4 }" @click="tab = 4">
               {{ t.monitorTariff }}
             </button>
           </li>
           <li class="nav-item">
-            <button type="button" class="nav-link" :class="{ active: tab === 5 }" @click="tab = 5">
+            <button class="nav-link fw-bold" :class="{ active: tab === 5 }" @click="tab = 5">
               {{ t.sessions }}
             </button>
           </li>
         </ul>
+
 
         <!-- TAB 1: DATOS GENERALES -->
         <div v-if="tab === 1" class="row g-4">
@@ -189,11 +192,12 @@
                     <span class="fw-semibold">{{ dia.dia }}</span>
                     <span v-if="!dia.abierto" class="text-danger fw-semibold">{{ t.close }}</span>
                   </div>
+                  <!-- Intervalos -->
                   <div v-if="dia.abierto">
                     <div v-for="intervalo in dia.mapa_reservas" :key="intervalo.id"
                       class="small mb-1 px-2 py-1 rounded text-white" :class="{
                         'bg-primary': esPropio(intervalo, dia),
-                        'bg-success': intervalo.estado === 'LIBRE' && !esPropio(intervalo, dia),
+                        'bg-success': intervalo.estado === 'Libre' && !esPropio(intervalo, dia),
                         'bg-warning text-dark': esActividadValida(intervalo, dia)
                       }">
                       {{ intervalo.horaInicio.slice(0, 5) }} - {{ intervalo.horaFin.slice(0, 5) }}
@@ -360,9 +364,60 @@
             </div>
           </div>
 
-        </div>
+          <!-- LISTA DE SESIONES -->
+          <div class="row g-3">
+            <div v-for="sesion in sesiones" :key="sesion.id" class="col-md-6">
+              <div class="card shadow rounded-4 p-3"
+                style="background-color: rgba(255,255,255,0.75); backdrop-filter: blur(8px);">
 
-        <div v-if="mostrarMensaje" class="text-center mb-3">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+
+                  <!-- MODO EDICIÓN -->
+                  <template v-if="editando">
+                    <div class="d-flex gap-2 flex-wrap align-items-center">
+
+                      <!-- DIA -->
+                      <select class="form-select form-select-sm" v-model="sesion.dia" style="width: 130px;">
+                        <option v-for="d in tiposStore.dias" :key="d" :value="d">
+                          {{ d }}
+                        </option>
+                      </select>
+
+                      <!-- HORA INICIO -->
+                      <input type="time" class="form-control form-control-sm" v-model="sesion.horaInicio"
+                        style="width: 120px;" />
+
+                      <!-- HORA FIN -->
+                      <input type="time" class="form-control form-control-sm" v-model="sesion.horaFin"
+                        style="width: 120px;" />
+                    </div>
+                  </template>
+
+                  <!-- MODO VISUAL -->
+                  <template v-else>
+                    <div>
+                      <strong>{{ sesion.dia }}</strong> |
+                      {{ sesion.horaInicio }} - {{ sesion.horaFin }}
+                    </div>
+                  </template>
+
+                  <!-- BOTÓN ELIMINAR -->
+                  <button v-if="editando" class="btn btn-sm btn-danger" @click="eliminarSesion(sesion.id)">
+                    {{ t.delete }}
+                  </button>
+
+                </div>
+              </div>
+            </div>
+
+            <!-- SIN SESIONES -->
+            <div v-if="sesiones.length === 0" class="col-12 text-center text-muted mt-3">
+              {{ t.noSessions }}
+            </div>
+          </div>
+
+        </div>
+        <div v-if="mostrarMensaje" class="text-center mt-5">
           <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
             {{ mensajeEditar }}
           </div>
@@ -370,22 +425,21 @@
 
         <!-- ACCIONES -->
         <div class="d-flex justify-content-center gap-4 mt-5">
-
-          <button v-if="!editando" class="btn btn-primary btn-lg rounded-pill px-4" @click="activarEdicion">
-            {{ t.modifyActivity }}
+          <button v-if="!editando" class="btn btn-primary btn-lg rounded-pill" @click="activarEdicion">
+            <i class="bi bi-pencil me-2"></i> {{ t.modifyActivity }}
           </button>
 
           <template v-else>
-            <button class="btn btn-success btn-lg rounded-pill px-4" @click="guardarCambios">
+            <button class="btn btn-success btn-lg rounded-pill px-5" @click="guardarCambios">
               {{ t.saveChanges }}
             </button>
-            <button class="btn btn-secondary btn-lg rounded-pill px-4" @click="cancelarEdicion">
+            <button class="btn btn-secondary btn-lg rounded-pill px-5" @click="cancelarEdicion">
               {{ t.cancel }}
             </button>
           </template>
 
-          <button v-if="!editando" class="btn btn-outline-danger btn-lg rounded-pill px-4" @click="abrirConfirmacion">
-            {{ t.deleteActivity }}
+          <button v-if="!editando" class="btn btn-danger btn-lg rounded-pill" @click="abrirConfirmacion">
+            <i class="bi bi-trash me-2"></i> {{ t.deleteActivity }}
           </button>
         </div>
       </div>
@@ -552,6 +606,7 @@ const instalaciones = ref<any[]>([])
 const monitores = ref<any[]>([])
 const tarifas = ref<any[]>([])
 const deportes = ref<any[]>([])
+const sesionesOriginal = ref<any[]>([])
 
 const instalacionesFiltradas = computed(() => {
   if (!actividad.value.instalacion) return instalaciones.value
@@ -566,12 +621,14 @@ const instalacionesFiltradas = computed(() => {
 
 function activarEdicion() {
   actividadOriginal.value = JSON.parse(JSON.stringify(actividad.value))
+  sesionesOriginal.value = JSON.parse(JSON.stringify(sesiones.value))
   Object.keys(errores.value).forEach(k => errores.value[k] = false)
   editando.value = true
 }
 
 function cancelarEdicion() {
   actividadOriginal.value = JSON.parse(JSON.stringify(actividad.value))
+  sesiones.value = JSON.parse(JSON.stringify(sesionesOriginal.value))
   preview.value = null
   imagen.value = null
   editando.value = false
@@ -593,6 +650,10 @@ function agregarSesion() {
 
   crearSesion.value = { id: -1, dia: "", horaInicio: "", horaFin: "" }
   calleSeleccionada.value = null
+}
+
+function eliminarSesion(id: number) {
+  sesiones.value = sesiones.value.filter(s => s.id !== id)
 }
 
 let confirmModal: Modal
@@ -754,6 +815,7 @@ async function guardarCambios() {
   try {
     await modificarActividad(parseInt(props.id), formData)
     lanzarMensaje(t.value.correctlyUpdate, "success")
+    cancelarEdicion()
   } catch (e) {
     lanzarMensaje(t.value.noModify, "error")
     console.error("No se ha podido editar la actividad", e)

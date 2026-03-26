@@ -4,7 +4,7 @@
 
       <!-- Tarjeta de perfil -->
       <div class="card border-0 mb-4 rounded-4 mx-auto shadow-lg"
-        style="background-color: rgba(180,220,255,0.6); backdrop-filter: blur(10px);">
+        style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(10px);">
         <div class="card-body p-4">
           <div class="row align-items-center">
 
@@ -42,7 +42,7 @@
 
       <!-- Edición -->
       <div class="card border-0 rounded-4 mx-auto shadow-lg"
-        style="background-color: rgba(180,220,255,0.6); backdrop-filter: blur(10px);">
+        style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(10px);">
         <div class="card-body p-4 p-md-5">
           <h2 class="fs-3 fw-semibold mb-4 text-primary">
             {{ t.editableData }}
@@ -119,7 +119,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, inject, type Ref, ref } from 'vue';
+import { inject, type Ref, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { useAuthStore } from "@/stores/auth";
