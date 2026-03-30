@@ -53,14 +53,14 @@
                 = {{ (reserva.tarifa.datos.precioAbonado * horasSeleccionadas.length).toFixed(2) }} €
               </td>
             </tr>
-            <tr :class="{ 'table-primary': usuarioFinalStore.isUAM }">
+            <tr :class="{ 'table-primary': usuarioFinalStore.isUAM && !usuarioFinalStore.hasAbono }">
               <td>UAM</td>
               <td class="text-end">
                 {{ reserva.tarifa.datos.precioUAM }} € × {{ horasSeleccionadas.length }}
                 = {{ (reserva.tarifa.datos.precioUAM * horasSeleccionadas.length).toFixed(2) }} €
               </td>
             </tr>
-            <tr :class="{ 'table-primary': usuarioFinalStore.hasTda }">
+            <tr :class="{ 'table-primary': usuarioFinalStore.hasTda && !usuarioFinalStore.isUAM}">
               <td>TDA</td>
               <td class="text-end">
                 {{ reserva.tarifa.datos.precioTDA }} € × {{ horasSeleccionadas.length }}
@@ -68,7 +68,7 @@
               </td>
             </tr>
             <tr :class="{ 'table-primary': otroCaso }">
-              <td>{{ t.other }}</td>
+              <td>{{ t.others }}</td>
               <td class="text-end">
                 {{ reserva.tarifa.datos.precioOtros }} € × {{ horasSeleccionadas.length }}
                 = {{ (reserva.tarifa.datos.precioOtros * horasSeleccionadas.length).toFixed(2) }} €
@@ -85,6 +85,14 @@
               {{ descuento.nombre }} ({{ descuento.porcentaje }}%)
             </li>
           </ul>
+        </div>
+
+        <!-- LUZ -->
+        <div v-if="reserva.tarifa.tieneLuz" class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" id="luzCheck" v-model="reserva.seleccion.luz">
+          <label class="form-check-label" for="luzCheck">
+            {{ t.light }}
+          </label>
         </div>
 
         <!-- TOTAL -->
@@ -171,6 +179,7 @@ const reserva = ref({
     nombre: '',
     horaApertura: '',
     horaCierre: '',
+    tieneLuz: '',
     abierto: true,
     numeroCalles: 0,
     datos: {} as any,
@@ -192,7 +201,8 @@ const reserva = ref({
   },
   seleccion: {
     fecha: new Date().toISOString().slice(0, 10),
-    calle: 1
+    calle: 1,
+    luz: false
   },
   descuento: {
     porcentaje_total: 0,
@@ -351,6 +361,11 @@ const total = computed(() => {
   }
 
   base = base * horasSeleccionadas.value.length
+
+  if (reserva.value.seleccion.luz) {
+    base = base + reserva.value.tarifa.datos.costeIluminacion
+  }
+
   const descuento = (base * reserva.value.descuento.porcentaje_total) / 100
   return base - descuento
 })
@@ -370,7 +385,8 @@ const continuarPago = async () => {
   const complementos = {
     fecha: reserva.value.seleccion.fecha,
     horas: horasSeleccionadas.value,
-    calle: reserva.value.seleccion.calle
+    calle: reserva.value.seleccion.calle,
+    luz: reserva.value.seleccion.luz
   }
 
   try {
@@ -427,6 +443,7 @@ onMounted(async () => {
     reserva.value.tarifa = data.tarifa
     reserva.value.descuento = data.descuento
     reserva.value.tarifa.calles = data.calles;
+    console.log(data)
   } catch (e: any) {
     error.value = true
     console.error("Error al actualizar la fecha:", e);

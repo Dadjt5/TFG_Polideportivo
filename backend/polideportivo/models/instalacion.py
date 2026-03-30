@@ -54,7 +54,8 @@ class Instalacion(models.Model):
             "precioAbonado": self.tarifa.precioAbonado,
             "precioUAM": self.tarifa.precioUAM,
             "precioTDA": self.tarifa.precioTDA,
-            "precioOtros": self.tarifa.precioOtros
+            "precioOtros": self.tarifa.precioOtros,
+            "costeIluminacion": self.tarifa.costeIluminacion
         }
 
     def _calcular_precio_base(self, usuario):

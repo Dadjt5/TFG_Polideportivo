@@ -16,11 +16,17 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.db.models.deletion import RestrictedError
 from django.conf import settings
+from django.db.models import Q
 from django.db.models import Sum, Count
 from django.utils.timezone import now
 from django.db.models.functions import TruncMonth, ExtractWeekDay
 from datetime import timedelta, datetime
 from django.utils import timezone
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.lib.pagesizes import A4
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
+from django.http import HttpResponse
 
 from .permissions import IsAdministradorRaiz, IsAdministradorEspacios, IsAdministradorTarifas, IsAdministradorUsuarios, IsMonitor, IsUsuarioFinal, IsAdministrador, IsSuperUser
 
@@ -791,7 +797,6 @@ class RegistroAdministradorView(APIView):
 
         return Response(admin)
 
-
 # Crear nuevas notificaciones
 class NuevaNotificacionView(APIView):
     permission_classes = [IsAdministrador]
@@ -817,9 +822,20 @@ class NuevaNotificacionView(APIView):
         return Response({"respuesta": "Notificacion creada correctamente"}, status=status.HTTP_200_OK)
 
 
-# Guardar informacion de notificaciones
+# Guardar informacion de notificaciones o recuperarlas
 class GuardarNotificacionView(APIView):
     permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+
+        if user.usuario_final:
+            user.usuario_final.revisarActividades()
+        elif user.monitor:
+            user.monitor.revisarActividades()
+
+        notificaciones = Notificacion.objects.filter(usuario=user)
+        return Response(NotificacionSerializer(notificaciones, many=True).data)
 
     def post(self, request):
         notificaciones = request.data.get('notificaciones', [])
@@ -898,9 +914,7 @@ class NuevaSesionView(APIView):
             if not respuesta:
                 return Response({"respuesta": "No se ha podido crear ninguna sesión"}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({"respuesta": "sesiones creadas correctamente"}, status=status.HTTP_200_OK)
-
-        
+        return Response({"respuesta": "sesiones creadas correctamente"}, status=status.HTTP_200_OK)        
 
 
 # Marcar o desmarcar actividades o instalaciones como favoritos
@@ -936,8 +950,18 @@ class ReservasView(APIView):
     def get(self, request):
         user = request.user
         reservas = []
+        ahora = timezone.now()
+        hoy = ahora.date()
+        hora_actual = ahora.time()
 
-        alquileres = Alquiler.objects.filter(usuarioFinal__user=user, estado=EstadoReserva.CONFIRMADA)
+        alquileres = Alquiler.objects.filter(
+            usuarioFinal__user=user,
+            estado=EstadoReserva.CONFIRMADA
+        ).filter(
+            Q(fecha__gt=hoy) |
+            Q(fecha=hoy, horaInicio__gte=hora_actual)
+        )
+
         actividades = ReservaActividad.objects.filter(usuarioFinal__user=user, estado=EstadoReserva.CONFIRMADA)
 
         for alquiler in alquileres:
@@ -969,8 +993,16 @@ class ReservasView(APIView):
                 "actividad": {
                     "id": reserva_act.actividad.id,
                     "nombre": reserva_act.actividad.nombre,
-                    "dias": [s.dia for s in sesiones],
+                    "dias": [
+                        {
+                            "dia": s.dia,
+                            "horaInicio": s.horaInicio.strftime("%H:%M"),
+                            "horaFin": s.horaFin.strftime("%H:%M"),
+                        }
+                        for s in sesiones
+                    ],
                     "horasSemanales": getattr(reserva_act.actividad, "calcularHorasSemanales", lambda: None)(),
+                    "periodo": reserva_act.actividad.periodo,
                 },
                 "instalacion": None,
                 "fecha": str(reserva_act.actividad.periodo_inicio) if hasattr(reserva_act.actividad, "periodo_inicio") else None,
@@ -1404,7 +1436,7 @@ class NuevaActividadView(APIView):
         tarifa = get_object_or_404(TarifaActividad, id=tarifa_id)
         instalacion = get_object_or_404(Instalacion, id=instalacion_id)
         monitor = get_object_or_404(Monitor, id=monitor_id)
-        
+
         sesiones_json = request.POST.get("sesiones", "[]")
         sesiones = json.loads(sesiones_json)
 
@@ -1536,9 +1568,6 @@ class EditarActividadView(APIView):
                     sesion.delete()
                     cambios = True
 
-            if cambios:
-                Notificacion.notificarCambioSesiones(actividad)
-
             # Nombre del deporte
             nombre_json = request.POST.get("deportes", "[]")
             nombre = json.loads(nombre_json)
@@ -1551,6 +1580,8 @@ class EditarActividadView(APIView):
                 actividad.deportes = deporte
 
             actividad.modificarInformacion(actividad_data, tarifa, instalacion, monitor, imagen)
+            if cambios:
+                Notificacion.notificarCambioSesiones(actividad)
 
             return Response({"respuesta": "Deporte asignado correctamente"}, status=status.HTTP_200_OK)
 
@@ -1665,6 +1696,7 @@ class TarifaInstalacionView(APIView):
                 "nombre": instalacion.nombre,
                 "horaApertura": horaApertura,
                 "horaCierre": horaCierre,
+                "tieneLuz": instalacion.luz,
                 "abierto": abierto,
                 "datos": precios,
                 "reservas": reservas if instalacion.tipoInstalacion != TipoInstalacion.PISCINA else [],
@@ -1822,6 +1854,7 @@ class ReservaInstalacionView(APIView):
         fecha = datetime.strptime(fecha_str, "%Y-%m-%d").date()
         horas = complementos.get("horas")
         calle = complementos.get("calle")
+        luz = complementos.get("luz")
 
         calle_obj = None
         if instalacion.tipoInstalacion == TipoInstalacion.PISCINA:
@@ -1857,7 +1890,7 @@ class ReservaInstalacionView(APIView):
         if fecha == timezone.localdate() and hora_inicio <= timezone.localtime().time():
             return Response({"respuesta": "No se puede reservar en horas anteriores a la actual"}, status=status.HTTP_400_BAD_REQUEST)
 
-        res = Alquiler.nuevaReserva(request.user.usuario_final, instalacion, fecha, hora_inicio, hora_fin, calle_obj)
+        res = Alquiler.nuevaReserva(request.user.usuario_final, instalacion, fecha, hora_inicio, hora_fin, luz, calle_obj)
         if not res:
             return Response({"respuesta": "Error al alquilar, la instalacion esta ocupada"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -1959,6 +1992,7 @@ class ResumenPagoView(APIView):
                     "coste": pago.coste,
                     "costeFinal": pago.costeFinal,
                     "descuentoAplicado": pago.descuentoAplicado,
+                    "descripcionPorcentajes": pago.descripcionPorcentajes,
                     "fecha": pago.fecha,
                     "estadoPago": pago.estadoPago
                 }
@@ -1976,6 +2010,7 @@ class ResumenPagoView(APIView):
                     "coste": pago.coste,
                     "costeFinal": pago.costeFinal,
                     "descuentoAplicado": pago.descuentoAplicado,
+                    "descripcionPorcentajes": pago.descripcionPorcentajes,
                     "fecha": pago.fecha,
                     "estadoPago": pago.estadoPago
                 }
@@ -1994,6 +2029,7 @@ class ResumenPagoView(APIView):
                     "coste": pago.coste,
                     "costeFinal": pago.costeFinal,
                     "descuentoAplicado": pago.descuentoAplicado,
+                    "descripcionPorcentajes": pago.descripcionPorcentajes,
                     "fecha": pago.fecha,
                     "estadoPago": pago.estadoPago
                 }
@@ -2011,6 +2047,7 @@ class ResumenPagoView(APIView):
                     "coste": pago.coste,
                     "costeFinal": pago.costeFinal,
                     "descuentoAplicado": pago.descuentoAplicado,
+                    "descripcionPorcentajes": pago.descripcionPorcentajes,
                     "fecha": pago.fecha,
                     "estadoPago": pago.estadoPago
                 }
@@ -2028,6 +2065,7 @@ class ResumenPagoView(APIView):
                     "coste": pago.coste,
                     "costeFinal": pago.costeFinal,
                     "descuentoAplicado": pago.descuentoAplicado,
+                    "descripcionPorcentajes": pago.descripcionPorcentajes,
                     "fecha": pago.fecha,
                     "estadoPago": pago.estadoPago
                 }
@@ -2081,6 +2119,20 @@ class ConfirmarPagoView(APIView):
         else:
             pago.cancelarPago()
             return Response({"respuesta": "Error al pagar"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+# Cancelar un pago
+class CancelarPagoView(APIView):
+    permission_classes = [IsUsuarioFinal]
+
+    def post(self, request, pago_id):
+        pago = get_object_or_404(Pago, id=pago_id)
+
+        if pago.estadoPago != EstadoPago.CANCELADO:
+            pago.cancelarPago()
+
+        return Response({"respuesta": "Pago cancelado correctamente"}, status=status.HTTP_200_OK)
+
 
 from django.contrib.contenttypes.models import ContentType
 # Cancelar una reserva de actividad
@@ -2141,10 +2193,21 @@ class CancelarAlquilerView(APIView):
             return Response({"respuesta": "No se puede cancelar un alquiler ya iniciado"}, status=status.HTTP_400_BAD_REQUEST)
 
         if pago.estadoPago == EstadoPago.PAGADO:
-            stripe.Refund.create(payment_intent=pago.stripe_payment_intent)
+            try:
+                refund = stripe.Refund.create(
+                    payment_intent=pago.stripe_payment_intent
+                )
 
-            pago.estadoPago = EstadoPago.CANCELADO
-            pago.save()
+                print("Refund creado:", refund.id, refund.status)
+
+                pago.estadoPago = EstadoPago.CANCELADO
+                pago.save()
+            except stripe.error.StripeError as e:
+                print("Error en el refund:", str(e))
+                return Response(
+                    {"error": "No se pudo procesar el reembolso"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
         alquiler.cancelarCompra()
         alquiler.delete()
@@ -2226,38 +2289,87 @@ class StripeWebhookView(APIView):
 
         return Response(status=status.HTTP_200_OK)
 
-
 # Obtener estadisticas para el admin
 class ObtenerEstadisticasAdministradorView(APIView):
     permission_classes = [IsAdministrador]
 
     def get(self, request):
         hoy = now()
-        reservas_mes = ReservaActividad.objects.filter(
-            created_at__year=hoy.year,
-            created_at__month=hoy.month
-        ).count()
 
-        alquiler_mes = Alquiler.objects.filter(
-            created_at__year=hoy.year,
-            created_at__month=hoy.month
-        ).count()
+        mes = request.query_params.get("mes")
+        anio = request.query_params.get("anio")
+        actividad_id = request.query_params.get("actividad_id")
 
-        ingresos_mes = Pago.objects.filter(
-            fecha__year=hoy.year,
-            fecha__month=hoy.month,
+        mes = int(mes) if mes else hoy.month
+        anio = int(anio) if anio else hoy.year
+
+        reservas_qs = ReservaActividad.objects.filter(
+            created_at__year=anio,
+            created_at__month=mes,
+            estado=EstadoReserva.CONFIRMADA
+        )
+
+        alquiler_qs = Alquiler.objects.filter(
+            created_at__year=anio,
+            created_at__month=mes
+        )
+
+        pagos_qs = Pago.objects.filter(
+            fecha__year=anio,
+            fecha__month=mes,
             estadoPago=EstadoPago.PAGADO
-        ).aggregate(total=Sum("costeFinal"))["total"] or 0
+        )
+
+        if actividad_id:
+            reservas_qs = reservas_qs.filter(actividad_id=actividad_id)
+            reservas_ids = ReservaActividad.objects.filter(actividad_id=actividad_id).values_list("id", flat=True)
+            ct_reserva = ContentType.objects.get_for_model(ReservaActividad)
+            pagos_qs = pagos_qs.filter(content_type=ct_reserva, object_id__in=reservas_ids)
+
+        reservas_mes = alquiler_qs.count()
+        inscripciones = reservas_qs.count()
+
+        ingresos_mes = pagos_qs.aggregate(
+            total=Sum("costeFinal")
+        )["total"] or 0
+
+        content_types_map = {
+            ct.id: ct.model
+            for ct in ContentType.objects.all()
+        }
+
+        MAPEO_TIPOS = {
+            "reservaactividad": "actividad",
+            "alquiler": "instalacion",
+            "compraabono": "abono",
+            "comprabono": "bono",
+            "tda": "tda",
+        }
+
+        ingresos_por_tipo = pagos_qs.values("content_type").annotate(
+            total=Sum("costeFinal")
+        )
+
+        ingresos_detallados = {}
+        for item in ingresos_por_tipo:
+            ct_id = item["content_type"]
+            total = item["total"] or 0
+
+            modelo = content_types_map.get(ct_id)
+            tipo = MAPEO_TIPOS.get(modelo, "otros")
+
+            ingresos_detallados[tipo] = ingresos_detallados.get(tipo, 0) + total
 
         reservas_12_meses = (
             ReservaActividad.objects
             .filter(created_at__gte=hoy - timedelta(days=365))
+            .filter(estado=EstadoReserva.CONFIRMADA)
             .annotate(mes=TruncMonth("created_at"))
             .values("mes")
             .annotate(total=Count("id"))
             .order_by("mes")
         )
-        
+
         reservas_por_mes = [
             {
                 "mes": r["mes"].strftime("%Y-%m"),
@@ -2265,9 +2377,10 @@ class ObtenerEstadisticasAdministradorView(APIView):
             }
             for r in reservas_12_meses
         ]
-        
+
         actividades_top = (
             ReservaActividad.objects
+            .filter(estado=EstadoReserva.CONFIRMADA)
             .values("actividad__nombre")
             .annotate(total=Count("id"))
             .order_by("-total")[:5]
@@ -2280,10 +2393,17 @@ class ObtenerEstadisticasAdministradorView(APIView):
             }
             for a in actividades_top
         ]
-        
+
         uso_pabellones = []
         for pab in Pabellon.objects.all():
-            horas = Sesion.objects.filter(actividad__instalacion__pabellon=pab).count() * 1
+            sesiones = Sesion.objects.filter(
+                actividad__instalacion__pabellon=pab
+            )
+
+            if actividad_id:
+                sesiones = sesiones.filter(actividad_id=actividad_id)
+
+            horas = sesiones.count()
 
             capacidad_total = 200
             ocupacion = min(int((horas / capacidad_total) * 100), 100)
@@ -2294,6 +2414,23 @@ class ObtenerEstadisticasAdministradorView(APIView):
                 "ocupacion": ocupacion
             })
 
+        # Número de inscripciones activas por actividad
+        inscripciones_actividad = (
+            ReservaActividad.objects
+            .filter(estado=EstadoReserva.CONFIRMADA)
+            .values("actividad__nombre")
+            .annotate(inscritos=Count("usuarioFinal", distinct=True))
+            .order_by("-inscritos")
+        )
+
+        inscripciones_por_actividad = [
+            {
+                "actividad": i["actividad__nombre"],
+                "inscritos": i["inscritos"]
+            }
+            for i in inscripciones_actividad
+        ]
+
         data = {
             "instalaciones": Instalacion.contar(),
             "actividades": Actividad.contar(),
@@ -2302,12 +2439,16 @@ class ObtenerEstadisticasAdministradorView(APIView):
             "deportes": Deporte.contar(),
             "usuarios": UsuarioFinal.contar(),
             "monitores": Monitor.contar(),
-            "dinero": Pago.contarDinero(),
-            "reservas_mes": reservas_mes+alquiler_mes,
+
+            "inscripciones": inscripciones,
+            "reservas_mes": reservas_mes,
             "ingresos_mes": ingresos_mes,
+
+            "ingresos_detallados": ingresos_detallados,
             "reservas_12_meses": reservas_por_mes,
             "actividades_top": actividades_mas_reservadas,
             "uso_pabellones": uso_pabellones,
+            "inscripciones_por_actividad": inscripciones_por_actividad,
         }
 
         return Response(data)
@@ -2418,7 +2559,7 @@ class ObtenerEstadisticasUsuarioFinalView(APIView):
             .annotate(total=Count("id"))
         )
 
-        dias_labels = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"]
+        dias_labels = ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"]
         dias_data = [0] * 7
 
         for r in reservas_por_dia_qs:
@@ -2452,3 +2593,56 @@ class ObtenerEstadisticasUsuarioFinalView(APIView):
         }
 
         return Response(data)
+
+
+class DescargarHorarioView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, instalacion_id):
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="horarios_instalacion_{instalacion_id}.pdf"'
+
+        doc = SimpleDocTemplate(response, pagesize=A4)
+        elements = []
+
+        styles = getSampleStyleSheet()
+
+        elements.append(Paragraph("Horarios de la instalación", styles['Title']))
+        elements.append(Spacer(1, 12))
+
+        agendas = Agenda.objects.filter(instalacion_id=instalacion_id).order_by('dia', 'fecha')
+
+        data = [["Día / Fecha", "Estado", "Apertura", "Cierre"]]
+
+        for agenda in agendas:
+            if agenda.dia:
+                nombre = agenda.dia
+            else:
+                nombre = str(agenda.fecha)
+
+            estado = "Abierto" if agenda.abierto else "Cerrado"
+
+            apertura = agenda.horaApertura.strftime("%H:%M") if agenda.abierto else "-"
+            cierre = agenda.horaCierre.strftime("%H:%M") if agenda.abierto else "-"
+
+            data.append([nombre, estado, apertura, cierre])
+
+        table = Table(data)
+
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#0d6efd")),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
+
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+        ]))
+
+        elements.append(table)
+
+        doc.build(elements)
+        return response

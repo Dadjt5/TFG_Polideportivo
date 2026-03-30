@@ -19,11 +19,38 @@
 
         <!-- Descuento aplicado -->
         <p class="mb-1" v-if="resumen.pago.descuentoAplicado > 0">
-          <strong>{{ t.discount }}:</strong>
+          <strong>{{ t.discount }}: </strong>
           <span class="text-success fw-semibold">
             {{ resumen.pago.descuentoAplicado }} %
           </span>
         </p>
+
+        <!-- Desglose de descuentos -->
+        <div v-if="resumen.pago.descripcionPorcentajes && Object.keys(resumen.pago.descripcionPorcentajes).length">
+          <p class="fw-semibold mb-1">{{ t.discountDetails }}</p>
+
+          <ul class="mb-2">
+            <li v-for="(valor, clave) in resumen.pago.descripcionPorcentajes" :key="clave">
+
+              <!-- Caso simple -->
+              <template v-if="typeof valor === 'number'">
+                {{ clave }}:
+                <span class="text-success">{{ valor }} %</span>
+              </template>
+
+              <!-- Caso objeto (subdescuentos) -->
+              <template v-else>
+                {{ clave }}:
+                <ul>
+                  <li v-for="(subValor, subClave) in valor" :key="subClave">
+                    {{ subClave }}:
+                    <span class="text-success">{{ subValor }} %</span>
+                  </li>
+                </ul>
+              </template>
+            </li>
+          </ul>
+        </div>
 
         <!-- Precio final -->
         <p class="mb-1">
@@ -80,12 +107,13 @@
   </div>
 </template>
 
+
 <script setup lang="ts">
-import { computed, onMounted, type Ref, ref, inject } from "vue"
+import { computed, onMounted, type Ref, ref, inject, onBeforeUnmount } from "vue"
 import { useRouter } from "vue-router"
 import { loadStripe } from "@stripe/stripe-js"
 
-import { confirmarPago, intentarPago, getResumenPago } from "@/services/reservaPagoService";
+import { cancelarIntentoPago, intentarPago, getResumenPago } from "@/services/reservaPagoService";
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
 import type { Language } from "@/useI18N";
@@ -110,6 +138,7 @@ const resumen = ref({
     coste: 0.0,
     costeFinal: 0.0,
     descuentoAplicado: 0.0,
+    descripcionPorcentajes: {},
     fecha: '',
     estadoPago: '',
   }
@@ -126,12 +155,21 @@ let clientSecret = ""
 
 const tiempoRestante = ref(900)
 
+const cancelarPago = async () => {
+  try {
+    await cancelarIntentoPago(parseInt(props.id))
+  } catch (e) {
+    console.warn("No se pudo cancelar el pago", e)
+  }
+}
+
 const countdown = setInterval(() => {
   tiempoRestante.value -= 1
 
   if (tiempoRestante.value <= 0) {
     clearInterval(countdown)
     lanzarMensaje(t.value.expiredPay, "warning")
+    cancelarPago()
 
     setTimeout(() => {
       router.replace("/")
@@ -176,6 +214,10 @@ const pagar = async () => {
     loading.value = false
   }
 }
+
+onBeforeUnmount(() => {
+  cancelarPago()
+})
 
 onMounted(async () => {
   try {

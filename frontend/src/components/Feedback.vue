@@ -16,7 +16,7 @@
         </div>
 
         <div class="mb-3">
-          <label class="form-label fw-semibold">Valoración</label>
+          <label class="form-label fw-semibold">Importancia</label>
           <div>
             <span
               v-for="i in 5"

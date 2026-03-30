@@ -49,6 +49,7 @@ class Terreno(models.TextChoices):
     AGUA = 'Piscinas'
     TIERRA = 'Campos de tierra'
     PISTA = 'Terreno de pista'
+    ARENA = 'Terreno de arena'
 
 
 class Periodo(models.TextChoices):
@@ -56,11 +57,12 @@ class Periodo(models.TextChoices):
     Clase para enumerar los tipos periodos en los que se realizan las actividades
 
     Tipos de periodo:
-    - PRIMER_CUATRIMESTRE, SEGUNDO_CUATRIMESTRE, ANUAL
+    - PRIMER_CUATRIMESTRE, SEGUNDO_CUATRIMESTRE, TERCER_CUATRIMESTRE, ANUAL
     """
     
     PRIMER_CUATRIMESTRE = 'Desde septiembre hasta enero'
     SEGUNDO_CUATRIMESTRE = 'Desde febrero hasta mayo'
+    TERCER_CUATRIMESTRE = 'Meses de verano'
     ANUAL = 'Todo el año'
 
 

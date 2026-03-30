@@ -75,6 +75,12 @@
             <input type="number" step="0.1" class="form-control form-control-lg"
                    v-model.number="abono.descuentoActividadesExteriores" :class="{ 'is-invalid': errores.descuentoActividadesExteriores }"/>
           </div>
+
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">{{ t.rentDiscount }} (%)</label>
+            <input type="number" step="0.1" class="form-control form-control-lg"
+                   v-model.number="abono.descuentoAlquileres" :class="{ 'is-invalid': errores.descuentoAlquileres }"/>
+          </div>
         </div>
 
         <div v-if="mostrarMensaje" class="text-center mb-3">
@@ -127,7 +133,8 @@ const abono = ref({
   precioPagoUnicoUAM: 0,
   precioFamiliar: 0,
   precioTotalMensualOtros: 0,
-  precioPagoUnicoOtros: 0
+  precioPagoUnicoOtros: 0,
+  descuentoAlquileres: 0
 })
 
 const errores = ref({
@@ -140,7 +147,8 @@ const errores = ref({
   precioPagoUnicoUAM: false,
   precioFamiliar: false,
   precioTotalMensualOtros: false,
-  precioPagoUnicoOtros: false
+  precioPagoUnicoOtros: false,
+  descuentoAlquileres: false
 })
 
 function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
@@ -171,6 +179,9 @@ function validar() {
 
   errores.value.descuentoActividadesExteriores = 
     abono.value.descuentoActividadesExteriores <= 0 || abono.value.descuentoActividadesExteriores > 100
+
+  errores.value.descuentoAlquileres = 
+    abono.value.descuentoAlquileres <= 0 || abono.value.descuentoAlquileres > 100
 
 	for (const key in errores.value) {
 		if (errores.value[key]) valido = false

@@ -32,6 +32,10 @@ export default {
   terrain: "Terrain",
   registeredUsers: "Registered users",
   noSessions: "Without sessions",
+  downloadTimetable: "Download timetable",
+  lightCost: "Lighting cost",
+  rentDiscount: "Rent discount",
+  discountDetails: "Discount details",
 
   /* Eliminaciones */
   confirmDelete: "Confirm deletion",
@@ -531,6 +535,7 @@ export default {
   createActivity: "Create activity",
   maxPlaces: "Max places",
   outdoor: "Outdoor",
+  userCanBook: "Can be reserved",
   newActivity: "Nueva actividad",
   data: "Data",
   monitor: "Monitor",
@@ -599,19 +604,22 @@ export default {
   tabParams: "Settings",
   tabNotifs: "Notifications",
   notificationTitle: "Notification templates",
-  textActivityNotices: "Activity reminder",
+  textActivityNotices: "Notice: New activity",
   textChangesCancellations: "Changes or cancellations",
   textSpecialMaterial: "Special material",
   textPaymentProblems: "Payment issues",
   textAbsences: "Accumulated absences",
   textWaitingListExit: "Waitlist exit",
   textSessionChanges: "Changes in sessions",
-  minDaysFacilityReservation: "Minimum number of days to book the facility",
-  maxDaysActivityReservation: "Maximum number of days to book the activity",
+  textActivityAdviceFinalUsers: 'Activity advice for end users',
+  textActivityAdviceMonitors: 'Activity advice for monitors',
+  sportsUserMaxNumber: "Number of favorite sports per end user",
+  minDaysFacilityReservation: "Minimum number of days to rent the facility",
+  maxDaysActivityReservation: "Maximum number of days prior to the month of the reservation to cancel",
   minCancellationDays: "Minimum number of days required to cancel a reservation",
   previousNotificationHours: "Hours in advance to send a notification",
-  maxPercentage: "Maximum applicable percentage",
-  maxDaysFacilityReservation: "Maximum number of days for which the facility can be rented",
+  maxPercentage: "Maximum applicable percentage in a discount",
+  maxDaysFacilityReservation: "Maximum number of days to rent the facility",
   consecutiveHours: "Maximum consecutive hours for hire",
 
   /* Nueva notificacion */
@@ -634,6 +642,16 @@ export default {
   unmute: "unmute",
   modifyChannel: "Modify channel",
   channelDetail: "Channel details",
+
+  /* Estadísticas Administrador */
+  month: 'Month',
+  filter: 'Filter',
+  cleanFilters: 'Clear filters',
+  generalStats: 'General statistics',
+  activityReservations12Months: 'Activity bookings last 12 months',
+  incomeForType: 'Revenue by type',
+  activityInscriptions: 'Bookings by activity',
+  pavilionUses: 'Use of halls',
 
   /* Contacto */
   contactTitle: "Sports Center Contact",

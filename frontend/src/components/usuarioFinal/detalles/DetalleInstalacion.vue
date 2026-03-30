@@ -7,80 +7,129 @@
         <h1 class="fw-semibold text-primary mb-0" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.2);">
           <i class="bi bi-building me-2"></i>{{ instalacion.nombre }}
         </h1>
+
+        <button v-if="usuarioFinalStore.isLogged" class="btn btn-link p-0 text-warning" @click.stop="cambiarFavorito"
+          :title="usuarioFinalStore.facilityIsFavorite(instalacion.id) ? 'Quitar de favoritos' : 'Agregar a favoritos'">
+          <i :class="['bi', usuarioFinalStore.facilityIsFavorite(instalacion.id) ? 'bi-star-fill' : 'bi-star']"
+            class="fs-2"></i>
+        </button>
       </div>
 
-      <div class="row g-4">
+      <div class="card shadow-lg border-0 rounded-4 p-4"
+        style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(10px);">
 
-        <!-- DETALLES -->
-        <div class="col-lg-6">
-          <div class="rounded-3 shadow-sm p-4 h-100 card-hover"
-               style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(8px);">
-            <div class="d-flex justify-content-between align-items-start mb-3">
-              <h4 class="mb-3 d-flex align-items-center">
-                <i class="bi bi-info-circle-fill text-primary me-2"></i>
-                {{ t.facilityDetails }}
-              </h4>
+        <!-- NAV TABS -->
+        <ul class="nav nav-pills nav-fill mb-4">
+          <li class="nav-item">
+            <button class="nav-link active fw-bold" data-bs-toggle="pill" data-bs-target="#info">
+              {{ t.facilityDetails }}
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link fw-bold" data-bs-toggle="pill" data-bs-target="#horario">
+              {{ t.timetable }}
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link fw-bold" data-bs-toggle="pill" data-bs-target="#imagenes">
+              {{ t.images }}
+            </button>
+          </li>
+        </ul>
 
-              <button v-if="usuarioFinalStore.isLogged" class="btn btn-link p-0 text-warning"
-                      @click.stop="cambiarFavorito" :title="usuarioFinalStore.facilityIsFavorite(instalacion.id) ? 'Quitar de favoritos' : 'Agregar a favoritos'">
-                <i :class="[ 'bi', usuarioFinalStore.facilityIsFavorite(instalacion.id) ? 'bi-star-fill' : 'bi-star']" class="fs-2"></i>
-              </button>
-            </div>
+        <!-- CONTENIDO -->
+        <div class="tab-content">
 
+          <!-- TAB INFO -->
+          <div class="tab-pane fade show active" id="info">
             <div class="row g-3">
+
               <div class="col-12 col-sm-6">
-                <p><i class="bi bi-people-fill text-success me-1"></i><span class="fw-medium">{{ t.capacity }}:</span> {{ instalacion.aforoMaximo }}</p>
+                <p><i class="bi bi-people-fill text-success me-1"></i>
+                  <span class="fw-medium">{{ t.capacity }}:</span> {{ instalacion.aforoMaximo }}
+                </p>
               </div>
 
               <div class="col-12 col-sm-6">
-                <p><i class="bi bi-lightbulb-fill text-warning me-1"></i><span class="fw-medium">{{ t.light }}:</span> {{ instalacion.luz ? t.yes : "No" }}</p>
+                <p><i class="bi bi-lightbulb-fill text-warning me-1"></i>
+                  <span class="fw-medium">{{ t.light }}:</span> {{ instalacion.luz ? t.yes : "No" }}
+                </p>
               </div>
 
               <div class="col-12 col-sm-6">
-                <p><i class="bi bi-percent text-info me-1"></i><span class="fw-medium">{{ t.tdaPercent }}:</span> {{ instalacion.porcentajeTDA }} %</p>
+                <p><i class="bi bi-percent text-info me-1"></i>
+                  <span class="fw-medium">{{ t.tdaPercent }}:</span> {{ instalacion.porcentajeTDA }} %
+                </p>
               </div>
 
               <div class="col-12 col-sm-6" v-if="instalacion.pabellon">
                 <p>
                   <i class="bi bi-building text-primary me-1"></i>
-                  <span class="fw-medium">{{ t.pavilion }}: </span>
-                  <span class="text-primary fw-medium" style="cursor: pointer;" @click="pavilionDetail(instalacion.pabellon.id)">
+                  <span class="fw-medium">{{ t.pavilion }}:</span>
+                  <span class="text-primary fw-medium" style="cursor: pointer;"
+                    @click="pavilionDetail(instalacion.pabellon.id)">
                     {{ instalacion.pabellon.nombre }}
                   </span>
                 </p>
               </div>
 
               <div class="col-12 col-sm-6" v-if="instalacion.pabellon">
-                <p><i class="bi bi-geo-alt-fill text-danger me-1"></i><span class="fw-medium">{{ t.address }}:</span> {{ instalacion.pabellon.direccion }}</p>
+                <p><i class="bi bi-geo-alt-fill text-danger me-1"></i>
+                  <span class="fw-medium">{{ t.address }}:</span>
+                  {{ instalacion.pabellon.direccion }}
+                </p>
               </div>
 
               <div class="col-12 col-sm-6" v-if="instalacion.tipoInstalacion">
-                <p><i class="bi bi-door-open-fill text-primary me-1"></i><span class="fw-medium">{{ t.facilityType }}:</span> {{ instalacion.tipoInstalacion }}</p>
+                <p><i class="bi bi-door-open-fill text-primary me-1"></i>
+                  <span class="fw-medium">{{ t.facilityType }}:</span>
+                  {{ instalacion.tipoInstalacion }}
+                </p>
               </div>
 
-              <div class="col-12 col-sm-6" v-if="instalacion.horaApertura">
-                <p><i class="bi bi-clock-fill text-success me-1"></i><span class="fw-medium">{{ t.openHour }}:</span> {{ instalacion.horaApertura }}</p>
-              </div>
-
-              <div class="col-12 col-sm-6" v-if="instalacion.horaCierre">
-                <p><i class="bi bi-clock text-danger me-1"></i><span class="fw-medium">{{ t.closeHour }}:</span> {{ instalacion.horaCierre }}</p>
-              </div>
             </div>
           </div>
-        </div>
 
-        <!-- IMÁGENES -->
-        <div class="col-lg-6 d-flex flex-column gap-4">
-          <div class="card shadow-lg rounded-4 p-4"
-            style="background-color: rgba(255,255,255,0.75); backdrop-filter: blur(10px);">
+          <!-- TAB HORARIO -->
+          <div class="tab-pane fade" id="horario">
+            <div class="row g-3">
+              <div class="col-md-6 col-lg-4" v-for="dia in agenda" :key="dia.dia">
+                <div class="card border-1 border-light shadow-sm rounded-4 h-100">
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                      <strong class="fs-5">{{ dia.dia }}</strong>
+                      <span class="badge" :class="dia.abierto ? 'bg-success' : 'bg-danger'">
+                        {{ dia.abierto ? 'Abierto' : 'Cerrado' }}
+                      </span>
+                    </div>
 
-            <h4 class="mb-3 d-flex align-items-center gap-2">
-              <i class="bi bi-images text-primary"></i>
-              {{ t.images }}
-            </h4>
+                    <div v-if="dia.abierto">
+                      <div
+                        class="d-flex align-items-center justify-content-center gap-2 py-2 bg-white rounded border">
+                        <span class="fw-semibold text-primary">{{ dia.horaApertura?.slice(0, 5) }}</span>
+                        <span class="text-muted">-</span>
+                        <span class="fw-semibold text-primary">{{ dia.horaCierre?.slice(0, 5) }}</span>
+                      </div>
+                    </div>
 
-            <img :src="instalacion.imagenURL" class="img-fluid rounded mb-3 img-hover" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button class="btn btn-outline-primary mt-4" @click="descargarPDF">
+              <i class="bi bi-file-earmark-pdf"></i> {{ t.downloadTimetable }}
+            </button>
           </div>
+
+          <!-- TAB IMÁGENES -->
+          <div class="tab-pane fade" id="imagenes">
+            <div class="d-flex justify-content-center">
+              <img :src="instalacion.imagenURL" class="img-fluid rounded shadow"
+                style="max-height: 400px; object-fit: cover;" />
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -110,6 +159,7 @@ import { useUserStore } from '@/stores/usuarioFinal';
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
 import type { Language } from "@/useI18N";
 import { useI18n } from "@/useI18N";
+import { descargarHorario } from '@/services/crearRecursosService';
 
 const props = defineProps<{ id: string }>();
 
@@ -118,6 +168,8 @@ const t = useI18n(language);
 
 const router = useRouter();
 const usuarioFinalStore = useUserStore();
+const agenda = ref<any[]>([])
+const fechasEspeciales = ref<any[]>([])
 
 const instalacion = ref({
   id: 0,
@@ -130,10 +182,29 @@ const instalacion = ref({
   horaCierre: "",
   pabellon: { id: -1, nombre: "", direccion: "" },
   tipoInstalacion: "",
+  agenda: [] as any[],
 });
 
 const cambiarFavorito = () => {
   usuarioFinalStore.marcarInstalacionFavorita(instalacion.value.id)
+}
+
+async function descargarPDF() {
+  try {
+    const data = await descargarHorario(instalacion.value.id)
+
+    const blob = new Blob([data], { type: 'application/pdf' })
+
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = "horarios.pdf"
+    a.click()
+    window.URL.revokeObjectURL(url)
+
+  } catch (error) {
+    console.error("Error descargando PDF:", error)
+  }
 }
 
 const pavilionDetail = (id: number) => {
@@ -158,8 +229,16 @@ onMounted(async () => {
   const id = parseInt(props.id);
 
   try {
-    instalacion.value = await getInstalacionDetalle(id);
-  } catch(e) {
+    const data = await getInstalacionDetalle(id)
+
+    agenda.value = data.agenda.filter((a: any) => a.dia && !a.fecha)
+    fechasEspeciales.value = data.agenda.filter((a: any) => a.fecha)
+
+    instalacion.value = {
+      ...data,
+      agenda: agenda.value
+    }
+  } catch (e) {
     console.log("Error al obtener la informacion de instalaciones", e);
   }
 });

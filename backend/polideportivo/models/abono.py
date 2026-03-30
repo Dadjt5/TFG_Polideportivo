@@ -5,7 +5,7 @@ from django.db import transaction
 from django.utils import timezone
 from datetime import datetime
 
-from .constantes import EstadoReserva
+from .constantes import EstadoReserva, TipoPago
 
 
 class Abono(models.Model):
@@ -23,6 +23,7 @@ class AbonoDeportivo(Abono):
     descuentoPrimeraActividad = models.FloatField(default=0.0)
     descuentoRestoActividades = models.FloatField(default=0.0)
     descuentoActividadesExteriores = models.FloatField(default=0.0)
+    descuentoAlquileres = models.FloatField(default=0.0)
     precioTotalMensual = models.FloatField(default=0.0)
     precioPagoUnicoUAM = models.FloatField(default=0.0)
     precioFamiliar = models.FloatField(default=0.0)
@@ -63,13 +64,13 @@ class CompraAbono(models.Model):
         if self.abonoDeportivo:
             precio = self.abonoDeportivo.precioPagoUnicoOtros
 
-            if forma == "MENSUAL":
+            if forma == TipoPago.MENSUAL:
                 precio = self.abonoDeportivo.precioTotalMensualOtros
 
             if usuario.esUAM:
-                if forma == "MENSUAL":
+                if forma == TipoPago.MENSUAL:
                     precio = self.abonoDeportivo.precioTotalMensual
-                elif forma == "TOTAL":
+                elif forma == TipoPago.UNICO:
                     precio = self.abonoDeportivo.precioPagoUnicoUAM
 
             if familiar:

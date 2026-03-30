@@ -3,6 +3,8 @@ from django.utils.translation import gettext_lazy as _
 from django.db import transaction
 from django.contrib.auth import get_user_model
 from django.conf import settings
+from django.utils.timezone import now
+from datetime import timedelta
 
 from .user import generar_codigo
 from .usuario import Usuario
@@ -40,6 +42,20 @@ class UsuarioFinal(Usuario):
 
     def __str__(self):
         return f'Usuario: {self.id}, nacido el {self.fechaNacimiento}'
+    
+    def revisarActividades(self):
+        from .notificacion import Notificacion
+
+        fecha_actual = now()
+
+        for asistencia in self.asistencia.all():
+            sesion = asistencia.sesion
+
+            if 0 <= (sesion.horaInicio - fecha_actual).total_seconds() <= 3600:
+                existe = Notificacion.objects.filter(usuario=self.user, actividad=sesion.actividad, sesion=sesion).exists()
+
+                if not existe:
+                    Notificacion.notificarActividadUsuarioFinal(sesion.actividad, sesion)
     
     def comprobarAbono(self):
         if self.abono.exists():

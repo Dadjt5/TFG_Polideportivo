@@ -419,6 +419,7 @@ class ActividadSerializer(serializers.ModelSerializer):
             "horasSemanales",
             "dias",
             "tarifa",
+            "inscripcion",
             "instalacion",
             "deportes",
             "monitor",

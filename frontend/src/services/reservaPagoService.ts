@@ -71,3 +71,8 @@ export const intentarPago = async (id: number) => {
 export const confirmarPago = async (id: number) => {
   await api.post(`api/v1/pagos/${id}/confirmar/`)
 }
+
+/* Función para cancelar un pago */
+export const cancelarIntentoPago = async (id: number) => {
+  await api.post(`api/v1/pagos/${id}/cancelar/`)
+}

@@ -123,13 +123,20 @@
                   :class="{ 'is-invalid': errores.descuentoActividadesExteriores }" />
               </div>
 
+              <div class="col-12">
+                <span class="fw-medium">{{ t.rentDiscount }} (%):</span>
+                <p v-if="!editando">{{ abono.descuentoAlquileres }}</p>
+                <input v-else type="number" step="0.1" min="0" class="form-control"
+                  v-model.number="abono.descuentoAlquileres"
+                  :class="{ 'is-invalid': errores.descuentoAlquileres }" />
+              </div>
             </div>
           </div>
         </div>
 
       </div>
 
-      <div v-if="mostrarMensaje" class="text-center mb-3">
+      <div v-if="mostrarMensaje" class="text-center mt-3 mb-3">
         <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
           {{ mensajeEditar }}
         </div>
@@ -248,7 +255,8 @@ const errores = ref({
   precioPagoUnicoOtros: false,
   descuentoPrimeraActividad: false,
   descuentoRestoActividades: false,
-  descuentoActividadesExteriores: false
+  descuentoActividadesExteriores: false,
+  descuentoAlquileres: false
 })
 
 function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
@@ -295,9 +303,18 @@ function validar() {
   errores.value.precioFamiliar = abono.value.precioFamiliar <= 0;
   errores.value.precioTotalMensualOtros = abono.value.precioTotalMensualOtros <= 0;
   errores.value.precioPagoUnicoOtros = abono.value.precioPagoUnicoOtros <= 0;
-  errores.value.descuentoPrimeraActividad = abono.value.descuentoPrimeraActividad <= 0;
-  errores.value.descuentoRestoActividades = abono.value.descuentoRestoActividades <= 0;
-  errores.value.descuentoActividadesExteriores = abono.value.descuentoActividadesExteriores <= 0;
+
+  errores.value.descuentoPrimeraActividad = 
+    abono.value.descuentoPrimeraActividad <= 0 || abono.value.descuentoPrimeraActividad > 100
+
+  errores.value.descuentoRestoActividades = 
+    abono.value.descuentoRestoActividades <= 0 || abono.value.descuentoRestoActividades > 100
+
+  errores.value.descuentoActividadesExteriores = 
+    abono.value.descuentoActividadesExteriores <= 0 || abono.value.descuentoActividadesExteriores > 100
+
+  errores.value.descuentoAlquileres = 
+    abono.value.descuentoAlquileres <= 0 || abono.value.descuentoAlquileres > 100
 
   for (const key in errores.value) {
     if (errores.value[key]) valido = false;

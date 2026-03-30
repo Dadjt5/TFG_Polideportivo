@@ -61,6 +61,7 @@ class Command(BaseCommand):
                 dias_minimo_cancelacion=1,
                 horas_alquiler_consecutivas=2,
                 porcentaje_maximo=100,
+                
                 titulo_cambios_cancelaciones="Aviso sobre cancelaciones",
                 titulo_avisos_actividades="Nueva actividad",
                 titulo_problemas_pago="Fallo en el pago",
@@ -68,13 +69,18 @@ class Command(BaseCommand):
                 titulo_ausencias="Aviso por falta de asistencia",
                 titulo_material_especial="Nuevo material especial necesario",
                 titulo_cambios_sesiones="Cambio en las sesiones",
+                titulo_avisos_sobre_actividades_usuarios="Actividad próxima",
+                titulo_avisos_sobre_actividades_monitores="Actividad próxima",
+                
                 texto_cambios_cancelaciones="Los tiempos mínimos de las cancelaciones han cambiado.",
                 texto_avisos_actividades="Hay una nueva actividad que podría interesarle.",
                 texto_problemas_pago="Si tiene problemas con el pago contacte con administración.",
                 texto_salida_lista_espera="Ha salido de la lista de espera.",
                 texto_ausencias="Recuerde justificar sus ausencias.",
                 texto_material_especial="Algunas actividades requieren nuevo material.",
-                texto_cambios_sesiones="Las sesiones de la actividad indicada han cambiado."
+                texto_cambios_sesiones="Las sesiones de la actividad indicada han cambiado.",
+                texto_avisos_sobre_actividades_usuarios="Una actividad en la que esta inscrito comienza en poco tiempo",
+                texto_avisos_sobre_actividades_monitores="Una actividad que dirige comienza en poco tiempo",
             )
 
             self.stdout.write(self.style.SUCCESS("Configuración global creada"))

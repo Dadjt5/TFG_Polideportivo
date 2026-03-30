@@ -24,6 +24,7 @@ class Actividad(models.Model):
     nivel = models.CharField(max_length=64, blank=True)
     material = models.CharField(max_length=1024, blank=True)
     exterior = models.BooleanField(default=False)
+    inscripcion = models.BooleanField(default=True)
 
     deportes = models.ForeignKey('Deporte', on_delete=models.RESTRICT, related_name="actividades", null=True, blank=True)
     instalacion = models.ForeignKey('Instalacion', on_delete=models.RESTRICT, related_name="actividad")
@@ -33,14 +34,14 @@ class Actividad(models.Model):
     tipoActividad = models.CharField(default=TipoActividad.OTROS, choices=TipoActividad.choices)
     tipoReserva = models.CharField(default=FormaReserva.NINGUNA, choices=FormaReserva.choices)
     terreno = models.CharField(default=Terreno.PISTA, choices=Terreno.choices)
-    estado = models.CharField(default=Estado.INDEFINIDO, choices=Estado.choices)
+    estado = models.CharField(default=Estado.EN_PROGRESO, choices=Estado.choices)
     periodo = models.CharField(default=Periodo.ANUAL, choices=Periodo.choices)
 
     def __str__(self):
         return f'{self.nombre}, en la instalacion {self.instalacion}'
 
     def activarAsistencia(self, usuario):
-        for sesion in self.sesiones:
+        for sesion in self.sesiones.all():
             Asistencia.objects.get_or_create(sesion=sesion, usuarioFinal=usuario)
 
     def obtener_precios(self):
@@ -233,10 +234,10 @@ class Actividad(models.Model):
             res = res.filter(tipoActividad__in=tipo)
 
         if horaInicio:
-            res = res.filter(sesiones__horario__horaInicio__lte=horaInicio)
+            res = res.filter(sesiones__horaInicio__lte=horaInicio)
 
         if horaFin:
-            res = res.filter(sesiones__horario__horaFin__gte=horaFin)
+            res = res.filter(sesiones__horaFin__gte=horaFin)
 
         if dias:
             res = res.filter(sesiones__dia__in=dias)
@@ -318,7 +319,7 @@ class Asistencia(models.Model):
 
     presente = models.BooleanField(default=False)
 
-    usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.CASCADE)
+    usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.CASCADE, related_name="asistencias")
     sesion = models.ForeignKey(Sesion, on_delete=models.CASCADE, related_name="asistencias")
 
     class Meta:

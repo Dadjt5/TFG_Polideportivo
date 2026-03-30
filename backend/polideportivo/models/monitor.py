@@ -3,12 +3,27 @@ from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from django.db import transaction
 from django.contrib.auth import get_user_model
+from django.utils.timezone import now
+from datetime import timedelta
 
 from .usuario import Usuario
 
 class Monitor(Usuario):
     """Modelo para representar al monitor"""
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="monitor")
+
+    def revisarActividades(self):
+        from .notificacion import Notificacion
+
+        fecha_actual = now()
+
+        for actividad in self.actividades.all():
+            for sesion in actividad.sesiones.all():
+                if 0 <= (sesion.horaInicio - fecha_actual).total_seconds() <= 3600:
+                    existe = Notificacion.objects.filter(usuario=self.user, actividad=sesion.actividad, sesion=sesion).exists()
+
+                    if not existe:
+                        Notificacion.notificarActividadMonitor(sesion.actividad, sesion)
 
     @classmethod
     def registrar_monitor(cls, *, nombre, apellidos, dni, email, password):

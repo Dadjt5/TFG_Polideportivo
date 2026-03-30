@@ -9,10 +9,10 @@ from django.conf import settings
 
 from .abono import CompraAbono
 from .bono import CompraBono
-from .reserva import ReservaActividad
+from .reserva import ReservaActividad, Alquiler
 from .tda import TDA
 from .configuracion import Configuracion
-from .constantes import EstadoPago, TipoPago
+from .constantes import EstadoPago, TipoPago, Periodo
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -33,6 +33,8 @@ class Pago(models.Model):
     stripe_payment_intent = models.CharField(max_length=255, null=True, blank=True)
     stripe_price_id = models.CharField(max_length=255, null=True, blank=True)
     stripe_subscription_id = models.CharField(max_length=255, null=True, blank=True)
+
+    descripcionPorcentajes = models.JSONField(default=dict, blank=True)
 
     # Relacion generica
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, related_name="pago")
@@ -70,8 +72,12 @@ class Pago(models.Model):
     @classmethod
     def nuevoPago(cls, concepto, usuario, tipo, objeto, complementos=None):
         porcentaje = 0
+        descripcionPorcentajes = {}
+
         if not isinstance(objeto, (CompraBono, CompraAbono, TDA)):
             porcentaje = objeto.calcularDescuento()
+            if porcentaje > 0.0:
+                descripcionPorcentajes["Descuento especial"] = porcentaje
 
         if isinstance(objeto, CompraAbono):
             coste = objeto.calcular_precio(
@@ -82,18 +88,44 @@ class Pago(models.Model):
 
         elif isinstance(objeto, ReservaActividad):
             coste = objeto.calcular_precio()
+            porcentajeExtra = 0.0
 
             if usuario.tieneAbono:
                 compraAbono = usuario.abono.filter(abonoVerano=None).first()
 
                 if compraAbono and compraAbono.abonoDeportivo:
+                    descripcionPorcentajes["Descuento por abono deportivo"] = {}
                     if usuario.actividadesRealizadas == 0:
-                        porcentaje += compraAbono.abonoDeportivo.descuentoPrimeraActividad
+                        porcentajeExtra += compraAbono.abonoDeportivo.descuentoPrimeraActividad
+                        if porcentajeExtra > 0.0:
+                            descripcionPorcentajes["Descuento por abono deportivo"]["Primera actividad"] = porcentajeExtra
                     else:
-                        porcentaje += compraAbono.abonoDeportivo.descuentoRestoActividades
-                    
+                        porcentajeExtra += compraAbono.abonoDeportivo.descuentoRestoActividades
+                        if porcentajeExtra > 0.0:
+                            descripcionPorcentajes["Descuento por abono deportivo"]["Inscripcion en actividad"] = porcentajeExtra
+
                     if objeto.actividad.exterior:
-                        porcentaje += compraAbono.abonoDeportivo.descuentoActividadesExteriores
+                        porcentajeExtra += compraAbono.abonoDeportivo.descuentoActividadesExteriores
+                        if porcentajeExtra > 0.0:
+                            descripcionPorcentajes["Descuento por abono deportivo"]["Actividad en exteriores"] = porcentajeExtra
+            
+            porcentaje += porcentajeExtra
+
+        elif isinstance(objeto, Alquiler):
+            coste = objeto.calcular_precio()
+            porcentajeExtra = 0.0
+
+            if usuario.tieneAbono:
+                compraAbono = usuario.abono.filter(abonoVerano=None).first()
+
+                if compraAbono and compraAbono.abonoDeportivo:
+                    descripcionPorcentajes["Descuento por abono deportivo"] = {}
+
+                    porcentajeExtra += compraAbono.abonoDeportivo.descuentoAlquileres
+                    if porcentajeExtra > 0.0:
+                            descripcionPorcentajes["Descuento por abono deportivo"]["Alquiler instalaciones"] = porcentajeExtra
+                
+            porcentaje += porcentajeExtra
 
         else:
             coste = objeto.calcular_precio()
@@ -113,7 +145,8 @@ class Pago(models.Model):
             content_type=content_type,
             object_id=objeto.id,
             tipoPago=tipo,
-            usuarioFinal=usuario
+            usuarioFinal=usuario,
+            descripcionPorcentajes=descripcionPorcentajes
         )
     
     def comprobarPago(self):
@@ -147,12 +180,33 @@ class Pago(models.Model):
 
     def aplicarSubscripcion(self, usuario):
         hoy = datetime.now(timezone.utc)
-        if hoy.month == 12:
-            primer_dia_mes = datetime(hoy.year + 1, 1, 1, tzinfo=timezone.utc)
-        else:
-            primer_dia_mes = datetime(hoy.year, hoy.month + 1, 1, tzinfo=timezone.utc)
 
-        primer_dia_mes_timestamp = int(primer_dia_mes.timestamp())
+        if isinstance(self.objeto, ReservaActividad):
+            año = hoy.year
+
+            # Los pagos de actividades comienzan y finalizan mientras se desarrolla la actividad
+            if self.objeto.actividad.periodo == Periodo.PRIMER_CUATRIMESTRE:
+                inicio = datetime(año, 9, 1, tzinfo=timezone.utc)
+                fin = datetime(año + 1, 1, 31, tzinfo=timezone.utc)
+            elif self.objeto.actividad.periodo == Periodo.SEGUNDO_CUATRIMESTRE:
+                inicio = datetime(año, 2, 1, tzinfo=timezone.utc)
+                fin = datetime(año, 5, 31, tzinfo=timezone.utc)
+            elif self.objeto.actividad.periodo == Periodo.TERCER_CUATRIMESTRE:
+                inicio = datetime(año, 6, 1, tzinfo=timezone.utc)
+                fin = datetime(año, 8, 31, tzinfo=timezone.utc)
+            elif self.objeto.actividad.periodo == Periodo.ANUAL:
+                inicio = datetime(año, 1, 1, tzinfo=timezone.utc)
+                fin = datetime(año, 12, 31, tzinfo=timezone.utc)
+        else:
+            # Si no es actividad empieza día 1 del mes siguiente al actual
+            if hoy.month == 12:
+                inicio = datetime(hoy.year + 1, 1, 1, tzinfo=timezone.utc)
+            else:
+                inicio = datetime(hoy.year, hoy.month + 1, 1, tzinfo=timezone.utc)
+
+            fin = None
+
+        inicio_ts = int(inicio.timestamp())
 
         if self.tipoPago == TipoPago.MENSUAL:
             tipo = "month"
@@ -166,40 +220,39 @@ class Pago(models.Model):
         else:
             return None
 
-        # Crear customer
         if not usuario.stripe_customer_id:
-            customer = stripe.Customer.create(
-                email=usuario.user.email
-            )
+            customer = stripe.Customer.create(email=usuario.user.email)
             usuario.stripe_customer_id = customer.id
             usuario.save()
 
-        # Crear precio
         if not self.stripe_price_id:
             precio = stripe.Price.create(
                 unit_amount=int(self.costeFinal * 100),
                 currency="eur",
                 recurring={"interval": tipo, "interval_count": intervalo},
-                product_data={
-                    "name": self.concepto
-                }
+                product_data={"name": self.concepto}
             )
             self.stripe_price_id = precio.id
             self.save()
 
-        # Crear suscripción
-        subscription = stripe.Subscription.create(
-            customer=usuario.stripe_customer_id,
-            items=[{
-                "price": self.stripe_price_id
-            }],
-            payment_behavior="default_incomplete",
-            collection_method="charge_automatically",
-            payment_settings={
+        subscription_data = {
+            "customer": usuario.stripe_customer_id,
+            "items": [{"price": self.stripe_price_id}],
+            "payment_behavior": "default_incomplete",
+            "collection_method": "charge_automatically",
+            "payment_settings": {
                 "save_default_payment_method": "on_subscription"
             },
-            expand=["latest_invoice.confirmation_secret"],
-        )
+            "billing_cycle_anchor": inicio_ts,
+            "trial_end": inicio_ts,
+            "proration_behavior": "none",
+            "expand": ["latest_invoice.confirmation_secret"],
+        }
+
+        if fin:
+            subscription_data["cancel_at"] = int(fin.timestamp())
+
+        subscription = stripe.Subscription.create(**subscription_data)
 
         self.stripe_subscription_id = subscription.id
         self.save()

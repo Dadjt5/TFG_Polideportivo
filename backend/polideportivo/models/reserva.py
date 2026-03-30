@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from django.db import transaction
+from datetime import time
 
 from .constantes import EstadoReserva
 from .descuento import Descuento
@@ -150,6 +151,7 @@ class Alquiler(Reserva):
     horaInicio = models.TimeField()
     horaFin = models.TimeField()
     numeroHoras = models.FloatField(default=0.0)
+    luz = models.BooleanField(default=False)
 
     usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.CASCADE, related_name="alquileres")
     instalacion = models.ForeignKey('Instalacion', on_delete=models.CASCADE)
@@ -168,7 +170,14 @@ class Alquiler(Reserva):
 
     def calcular_precio(self):
         """Calcula el precio final de la reserva usando la instalacion"""
-        return self.instalacion._calcular_precio_base(usuario=self.usuarioFinal)*self.numeroHoras
+        precio = 0.0
+
+        if self.horaFin >= time(9, 0):
+            self.luz = True
+            precio += self.instalacion.tarifa.costeIluminacion
+
+        precio += self.instalacion._calcular_precio_base(usuario=self.usuarioFinal)*self.numeroHoras
+        return precio
 
     def confirmarCompra(self):
         self.estado = EstadoReserva.CONFIRMADA
@@ -183,7 +192,7 @@ class Alquiler(Reserva):
         return cls.objects.count()
     
     @classmethod
-    def nuevaReserva(cls, usuario, instalacion, fecha, horaInicio, horaFin, calle=None):
+    def nuevaReserva(cls, usuario, instalacion, fecha, horaInicio, horaFin, luz, calle=None):
         with transaction.atomic():
             instalacion.refresh_from_db()
 
@@ -218,6 +227,7 @@ class Alquiler(Reserva):
                 fecha=fecha,
                 horaInicio=horaInicio,
                 horaFin=horaFin,
+                luz=luz,
                 estado=EstadoReserva.PENDIENTE
             )
 

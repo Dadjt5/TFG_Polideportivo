@@ -166,6 +166,15 @@
               </label>
             </div>
           </div>
+
+          <div class="col-md-12">
+            <div class="form-check form-switch mt-2">
+              <input class="form-check-input" type="checkbox" v-model="actividad.inscripcion" />
+              <label class="form-check-label fw-semibold">
+                {{ t.userCanBook }}
+              </label>
+            </div>
+          </div>
         </div>
 
 
@@ -469,6 +478,7 @@ const actividad = ref({
   nivel: "",
   material: "",
   exterior: false,
+  inscripcion: true,
   instalacion: null,
   monitor: null,
   tipoActividad: "Otros",
@@ -539,6 +549,8 @@ function esActividadValida(intervalo: any, dia: any) {
     periodoActual = "Desde septiembre hasta enero"
   } else if (mes >= 2 && mes <= 5) {
     periodoActual = "Desde febrero hasta mayo"
+  } else if (mes >= 6 && mes <= 8) {
+    periodoActual = "Meses de verano"
   } else {
     periodoActual = "Todo el año"
   }

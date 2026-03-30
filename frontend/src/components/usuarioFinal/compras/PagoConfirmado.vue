@@ -78,6 +78,7 @@ import { ref, onMounted, inject, type Ref } from "vue"
 import { useRouter } from "vue-router"
 
 import { confirmarPago, getPago } from "@/services/reservaPagoService";
+import { useUserStore } from "@/stores/usuarioFinal";
 
 import type { Language } from "@/useI18N"
 import { useI18n } from "@/useI18N"
@@ -87,7 +88,8 @@ const props = defineProps<{id: string}>();
 const language = inject<Ref<Language>>("language")!
 const t = useI18n(language)
 
-const router = useRouter()
+const router = useRouter();
+const usuarioFinalStore = useUserStore();
 
 const pago = ref()
 
@@ -97,8 +99,9 @@ onMounted(async () => {
   try {
     await confirmarPago(id)
     pago.value = await getPago(id)
+    usuarioFinalStore.fetchUser(usuarioFinalStore.usuarioFinal.id)
   } catch(e) {
-    console.log("Error al obtener el pago", e)
+    console.log("Error al confirmar el pago", e)
   }
 })
 </script>

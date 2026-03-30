@@ -104,3 +104,10 @@ export const nuevoBono = async (payload: Payload): Promise<any> => {
   const response = await api.post("api/v1/bonos/", payload)
   return response.data
 }
+
+
+/* Función para descargar el horario de una instalación en PDF */
+export const descargarHorario = async (id: number) => {
+  const response = await api.get(`api/v1/instalaciones/${id}/descargar/horario/`, { responseType: 'blob' })
+  return response.data
+}

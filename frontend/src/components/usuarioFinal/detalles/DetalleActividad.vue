@@ -74,7 +74,7 @@
                 <p>
                   <i class="bi bi-building text-primary me-1"></i>
                   <span class="fw-medium">{{ t.facility }}: </span>
-                  <span class="text-primary fw-medium" style="cursor: pointer;" @click="facilityDetail(actividad.instalacion)">
+                  <span class="text-primary fw-medium" style="cursor: pointer;" @click="facilityDetail(actividad.instalacion.id)">
                     {{ actividad.nombreInstalacion }}
                   </span>
                 </p>
@@ -130,13 +130,13 @@
       </div>
 
       <div class="text-center mt-4"
-        v-if="usuarioFinalStore.isLogged && actividad.tipoReserva !== 'Permite la reserva solo online' && actividad.tipoReserva !== 'Permite ambos tipos de reserva'">
+        v-if="!puedeReservar">
         <p>{{ t.cantBooking }}</p>
       </div>
 
       <!-- Reserva y Volver -->
       <div class="d-flex justify-content-center mt-5">
-        <button v-if="usuarioFinalStore.isLogged && (actividad.tipoReserva === 'Permite la reserva solo online' || actividad.tipoReserva === 'Permite ambos tipos de reserva')" class="btn btn-success btn-lg px-5 me-4" @click="reservar">
+        <button v-if="puedeReservar" class="btn btn-success btn-lg px-5 me-4" @click="reservar">
           {{ t.booking }}
         </button>
 
@@ -150,7 +150,7 @@
 
 
 <script setup lang="ts">
-import { inject, type Ref, ref, onMounted } from 'vue';
+import { inject, type Ref, ref, onMounted, computed } from 'vue';
 import { useRouter } from "vue-router";
 
 /* Importamos la comunicacion para recuperar la informacion de actividades del backend y el usuario*/
@@ -187,6 +187,7 @@ const actividad = ref({
   nivel: "",
   material: "",
   exterior: false,
+  inscripcion: false,
   tipoReserva: "",
   terreno: "",
   periodo: "",
@@ -202,6 +203,22 @@ const actividad = ref({
   } as Generic,
   sesiones: [] as any[]
 });
+
+const puedeReservar = computed(() => {
+  if (!usuarioFinalStore.isLogged) {
+    return false
+  }
+  
+  if (actividad.value.tipoReserva !== 'Permite la reserva solo online' && actividad.value.tipoReserva !== 'Permite ambos tipos de reserva') {
+    return false
+  }
+
+  if (!actividad.value.inscripcion) {
+    return false
+  }
+
+  return true
+})
 
 const cambiarFavorito = () => {
   usuarioFinalStore.marcarActividadFavorita(actividad.value.id)

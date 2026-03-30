@@ -73,12 +73,19 @@
                   v-model.number="tarifa.precioOtros" :class="{ 'is-invalid': errores.precioOtros }" />
               </div>
 
+              <!-- COSTE ILUMINACION -->
+              <div class="col-12 col-sm-6">
+                <span class="fw-medium">{{ t.lightCost }}:</span>
+                <p v-if="!editando" class="fs-5 fw-semibold">{{ tarifa.costeIluminacion }} €</p>
+                <input v-else type="number" min="0" step="0.01" class="form-control form-control-lg"
+                  v-model.number="tarifa.costeIluminacion" :class="{ 'is-invalid': errores.costeIluminacion }" />
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div v-if="mostrarMensaje" class="text-center mb-3">
+      <div v-if="mostrarMensaje" class="text-center mt-3 mb-3">
         <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
           {{ mensajeEditar }}
         </div>
@@ -187,7 +194,8 @@ const tarifa = ref({
   precioAbonado: 0,
   precioUAM: 0,
   precioTDA: 0,
-  precioOtros: 0
+  precioOtros: 0,
+  costeIluminacion: 0,
 });
 
 const errores = ref({
@@ -195,7 +203,8 @@ const errores = ref({
   precioAbonado: false,
   precioUAM: false,
   precioTDA: false,
-  precioOtros: false
+  precioOtros: false,
+  costeIluminacion: false
 });
 
 const tarifaOriginal = ref<any>(null);
@@ -218,6 +227,7 @@ function validarFormulario() {
   errores.value.precioUAM = tarifa.value.precioUAM <= 0;
   errores.value.precioTDA = tarifa.value.precioTDA <= 0;
   errores.value.precioOtros = tarifa.value.precioOtros <= 0;
+  errores.value.costeIluminacion = tarifa.value.costeIluminacion <= 0;
 
   for (const key in errores.value) {
     if (errores.value[key]) valido = false;
@@ -260,14 +270,14 @@ const guardarCambios = async () => {
     if (Object.keys(data).length > 0) {
       await modificarTarifaInstalacion(tarifa.value.id, data);
       tarifaOriginal.value = JSON.parse(JSON.stringify(tarifa.value));
-    
+
       lanzarMensaje(t.value.correctlyUpdate, "success")
     } else {
       lanzarMensaje(t.value.noChanges, "success")
     }
 
     editando.value = false
-  } catch(e) {
+  } catch (e) {
     lanzarMensaje(t.value.noModify, "error")
     console.error("Error al modificar la tarifa de instalacion", e)
   }

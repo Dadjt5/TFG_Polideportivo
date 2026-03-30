@@ -21,6 +21,7 @@ class Notificacion(models.Model):
     debeMarcar = models.BooleanField(default=False)
 
     actividad = models.ForeignKey('Actividad', on_delete=models.SET_NULL, blank=True, null=True)
+    sesion = models.ForeignKey('Sesion', on_delete=models.SET_NULL, blank=True, null=True)
     instalacion = models.ForeignKey('Instalacion', on_delete=models.SET_NULL, blank=True, null=True)
     pabellon = models.ForeignKey('Pabellon', on_delete=models.SET_NULL, blank=True, null=True)
     usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -82,6 +83,35 @@ class Notificacion(models.Model):
         ]
 
         cls.objects.bulk_create(notificaciones)
+
+    @classmethod
+    def notificarActividadUsuarioFinal(cls, actividad, sesion):
+        configuracion = Configuracion.objects.all().first()
+
+        usuarios = UsuarioFinal.objects.filter(reservas_actividad__actividad=actividad).distinct()
+
+        for usuario in usuarios:
+            cls.objects.create(
+                titulo=configuracion.titulo_avisos_sobre_actividades_usuarios,
+                descripcion=configuracion.texto_avisos_sobre_actividades_usuarios,
+                usuario=usuario.user,
+                actividad=actividad,
+                sesion=sesion
+            )
+
+    @classmethod
+    def notificarActividadMonitor(cls, actividad, sesion):
+        configuracion = Configuracion.objects.all().first()
+
+        monitor = actividad.monitor
+
+        cls.objects.create(
+            titulo=configuracion.titulo_avisos_sobre_actividades_monitores,
+            descripcion=configuracion.texto_avisos_sobre_actividades_monitores,
+            usuario=monitor.user,
+            actividad=actividad,
+            sesion=sesion
+        )
 
     @classmethod
     def notificarNuevaActividad(cls, actividad):

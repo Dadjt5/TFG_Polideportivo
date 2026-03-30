@@ -367,7 +367,9 @@ const facilityDetail = (id: number) => {
 const textoBusqueda = ref("")
 
 onMounted(async () => {
-  textoBusqueda.value = String(route.query.busqueda)
+  if (route.query.busqueda) {
+    textoBusqueda.value = String(route.query.busqueda)
+  }
 
   selectedDays.value = transformQueryArray(route.query.dias)
   selectedActivityTypes.value = transformQueryArray(route.query.tiposActividad)

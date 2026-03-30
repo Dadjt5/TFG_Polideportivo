@@ -45,6 +45,13 @@
             <input type="number" step="0.01" class="form-control form-control-lg"
                    :class="{ 'is-invalid': errores.precioOtros }" v-model.number="tarifa.precioOtros" />
           </div>
+
+          <!-- COSTE ILUMINACION -->
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">{{ t.lightCost }}</label>
+            <input type="number" step="0.01" class="form-control form-control-lg"
+                   :class="{ 'is-invalid': errores.costeIluminacion }" v-model.number="tarifa.costeIluminacion" />
+          </div>
         </div>
 
         <div v-if="mostrarMensaje" class="text-center mb-3">
@@ -93,7 +100,8 @@ const tarifa = ref({
   precioAbonado: 0,
   precioUAM: 0,
   precioTDA: 0,
-  precioOtros: 0
+  precioOtros: 0,
+  costeIluminacion: 0
 })
 
 const errores = ref({
@@ -101,7 +109,8 @@ const errores = ref({
   precioAbonado: false,
   precioUAM: false,
   precioTDA: false,
-  precioOtros: false
+  precioOtros: false,
+  costeIluminacion: false
 })
 
 function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
@@ -122,6 +131,7 @@ function validarFormulario() {
   errores.value.precioUAM = tarifa.value.precioUAM <= 0
   errores.value.precioTDA = tarifa.value.precioTDA <= 0
   errores.value.precioOtros = tarifa.value.precioOtros <= 0
+  errores.value.costeIluminacion = tarifa.value.costeIluminacion <= 0
 
   for (const key in errores.value) {
     if (errores.value[key]) valido = false

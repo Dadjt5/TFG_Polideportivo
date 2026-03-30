@@ -24,13 +24,13 @@
       <form v-if="activeTab === 'params'" @submit.prevent="guardarConfiguracion">
         <div class="row g-4">
 
-          <!-- MAX DEPORTES POR USUARIO -->
+          <!-- DIAS MINIMO CANCELACION -->
           <div class="col-md-4">
             <div class="card h-100 shadow-lg rounded-4"
                  style="background-color: rgba(180,220,255,0.6); backdrop-filter: blur(10px);">
               <div class="card-body">
-                <h5 class="card-title">{{ t.sportsMaxNumber }}</h5>
-                <input type="number" class="form-control" v-model.number="configuracionStore.max_deportes_por_usuario" />
+                <h5 class="card-title">{{ t.minCancellationDays }}</h5>
+                <input type="number" class="form-control" v-model.number="configuracionStore.dias_minimo_cancelacion" />
               </div>
             </div>
           </div>
@@ -68,13 +68,13 @@
             </div>
           </div>
 
-          <!-- DIAS MINIMO CANCELACION -->
+          <!-- MAX DEPORTES POR USUARIO -->
           <div class="col-md-4">
             <div class="card h-100 shadow-lg rounded-4"
                  style="background-color: rgba(180,220,255,0.6); backdrop-filter: blur(10px);">
               <div class="card-body">
-                <h5 class="card-title">{{ t.minCancellationDays }}</h5>
-                <input type="number" class="form-control" v-model.number="configuracionStore.dias_minimo_cancelacion" />
+                <h5 class="card-title">{{ t.sportsUserMaxNumber }}</h5>
+                <input type="number" class="form-control" v-model.number="configuracionStore.max_deportes_por_usuario" />
               </div>
             </div>
           </div>
@@ -111,7 +111,29 @@
               v-model="configuracionStore.texto_cambios_cancelaciones" />
           </div>
 
-          <!-- AVISOS ACTIVIDADES -->
+          <!-- AVISOS SOBRE ACTIVIDAD USUARIOS FINALES -->
+          <div class="mb-4">
+            <label class="form-label fw-semibold">{{ t.title }} - {{ t.textActivityAdviceFinalUsers }}</label>
+            <input type="text" class="form-control mb-2"
+              v-model="configuracionStore.titulo_avisos_sobre_actividades_usuarios" />
+
+            <label class="form-label fw-semibold">{{ t.textActivityAdviceFinalUsers }}</label>
+            <textarea class="form-control" rows="3"
+              v-model="configuracionStore.texto_avisos_sobre_actividades_usuarios" />
+          </div>
+
+          <!-- AVISOS SOBRE ACTIVIDAD MONITORES -->
+          <div class="mb-4">
+            <label class="form-label fw-semibold">{{ t.title }} - {{ t.textActivityAdviceMonitors }}</label>
+            <input type="text" class="form-control mb-2"
+              v-model="configuracionStore.titulo_avisos_sobre_actividades_monitores" />
+
+            <label class="form-label fw-semibold">{{ t.textActivityAdviceMonitors }}</label>
+            <textarea class="form-control" rows="3"
+              v-model="configuracionStore.texto_avisos_sobre_actividades_monitores" />
+          </div>
+
+          <!-- AVISOS NUEVA ACTIVIDAD -->
           <div class="mb-4">
             <label class="form-label fw-semibold">{{ t.title }} - {{ t.textActivityNotices }}</label>
             <input type="text" class="form-control mb-2"
