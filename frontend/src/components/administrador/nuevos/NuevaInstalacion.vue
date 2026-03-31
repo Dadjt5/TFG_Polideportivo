@@ -209,7 +209,7 @@
 
         </div>
 
-        <div v-if="mostrarMensaje" class="text-center mb-3">
+        <div v-if="mostrarMensaje" class="text-center mt-3 mb-3">
           <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
             {{ mensajeEditar }}
           </div>
@@ -260,6 +260,7 @@ const instalacion = ref({
   nombre: "",
   aforoMaximo: 50,
   luz: false,
+  validacion: false,
   porcentajeTDA: 0,
   tarifa: null,
   pabellon: null,

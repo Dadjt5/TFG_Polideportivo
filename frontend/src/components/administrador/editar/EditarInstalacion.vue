@@ -127,38 +127,43 @@
           <!-- TAB 2: HORARIO -->
           <div class="tab-pane fade" id="horario">
             <div class="row g-3">
-              <div class="col-md-6 col-lg-4" v-for="dia in agenda" :key="dia.dia">
-                <div class="card border-1 border-light shadow-sm rounded-4 h-100" :class="{ 'bg-light': !editando }">
-                  <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                      <strong class="fs-5">{{ dia.dia }}</strong>
-                      <div class="form-check form-switch" v-if="editando">
-                        <input class="form-check-input" type="checkbox" v-model="dia.abierto" />
-                      </div>
-                      <span v-else class="badge" :class="dia.abierto ? 'bg-success' : 'bg-danger'">
-                        {{ dia.abierto ? 'Abierto' : 'Cerrado' }}
-                      </span>
-                    </div>
+              <div v-if="agenda.length" class="card border-0 shadow-sm rounded-4 p-4 bg-light">
+                <h5 class="fw-bold mb-3">
+                  {{ t.timetable }}
+                </h5>
 
-                    <div v-if="dia.abierto">
-                      <div v-if="editando" class="row g-2">
-                        <div class="col-6">
-                          <label class="small text-muted fw-bold">{{ t.openHour }}</label>
-                          <input type="time" class="form-control form-control-sm" v-model="dia.horaApertura" />
-                        </div>
-                        <div class="col-6">
-                          <label class="small text-muted fw-bold">{{ t.closeHour }}</label>
-                          <input type="time" class="form-control form-control-sm" v-model="dia.horaCierre" />
-                        </div>
-                      </div>
-                      <div v-else
-                        class="d-flex align-items-center justify-content-center gap-2 py-2 bg-white rounded border">
-                        <span class="fw-semibold text-primary">{{ dia.horaApertura?.slice(0, 5) }}</span>
-                        <span class="text-muted">-</span>
-                        <span class="fw-semibold text-primary">{{ dia.horaCierre?.slice(0, 5) }}</span>
-                      </div>
-                    </div>
+                <!-- LEYENDA -->
+                <div class="mt-4">
+                  <span class="badge bg-success me-2">{{ t.free }}</span>
+                  <span class="badge bg-danger me-2">{{ t.rented }}</span>
+                  <span class="badge bg-warning text-dark me-2">{{ t.rentedNoPay }}</span>
+                  <span class="badge bg-primary">{{ t.activity }}</span>
+                </div>
 
+                <div class="row">
+                  <div v-for="dia in agenda" :key="dia.id" class="col-md-6 mb-3">
+                    <div class="p-3 rounded-3 bg-white border">
+
+                      <!-- Nombre del día -->
+                      <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="fw-semibold">{{ dia.dia }}</span>
+                        <span v-if="!dia.abierto" class="text-danger fw-semibold">{{ t.close }}</span>
+                      </div>
+
+                      <!-- Intervalos -->
+                      <div v-if="dia.abierto">
+                        <div v-for="intervalo in dia.mapa_reservas" :key="intervalo.id"
+                          class="small mb-1 px-2 py-1 rounded text-white" :class="{
+                            'bg-success': intervalo.estado === 'Libre',
+                            'bg-primary': intervalo.estado === 'Reserva actividad',
+                            'bg-danger': intervalo.estado === 'Reserva usuario' && intervalo.pagada,
+                            'bg-warning text-dark': intervalo.estado === 'Reserva usuario' && !intervalo.pagada
+                          }">
+                          {{ intervalo.horaInicio.slice(0, 5) }} - {{ intervalo.horaFin.slice(0, 5) }}
+                        </div>
+                      </div>
+
+                    </div>
                   </div>
                 </div>
               </div>
@@ -246,7 +251,7 @@
         </div>
       </div>
 
-      <div v-if="mostrarMensaje" class="text-center mb-3">
+      <div v-if="mostrarMensaje" class="text-center mt-3 mb-3">
         <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
           {{ mensajeEditar }}
         </div>
@@ -267,8 +272,7 @@
           </button>
         </template>
 
-        <button v-if="!editando" class="btn btn-danger btn-lg rounded-pill"
-          @click="abrirConfirmacion">
+        <button v-if="!editando" class="btn btn-danger btn-lg rounded-pill" @click="abrirConfirmacion">
           <i class="bi bi-trash me-2"></i> {{ t.deleteFacility }}
         </button>
       </div>
@@ -368,6 +372,8 @@ const instalacion = ref({
   nombre: "",
   imagenURL: "",
   aforoMaximo: 50,
+  estado: "",
+  pagada: false,
   luz: false,
   porcentajeTDA: 0,
   pabellon: null,
@@ -375,6 +381,7 @@ const instalacion = ref({
   tipoInstalacion: "",
   numeroCalles: 0,
   agenda: [] as any[],
+  reservas_usuarios: [] as any[],
 });
 
 const errores = ref({
@@ -422,6 +429,50 @@ function validarFormulario() {
   }
 
   return valido
+}
+
+const diasSemana = [
+  "Lunes",
+  "Martes",
+  "Miercoles",
+  "Jueves",
+  "Viernes",
+  "Sabado",
+  "Domingo"
+];
+
+function mezclarReservas() {
+  instalacion.value.agenda.forEach((dia: any) => {
+    if (!dia.abierto) return;
+
+    dia.mapa_reservas.forEach((intervalo: any) => {
+
+      const reserva = instalacion.value.reservas_usuarios.find((r: any) => {
+        return (
+          r.diaSemana === diasSemana.indexOf(dia.dia) &&
+          estaDentro(intervalo, r)
+        );
+      });
+
+      if (reserva) {
+        intervalo.estado = 'Reserva usuario';
+        intervalo.pagada = reserva.pagada;
+      }
+    });
+  });
+}
+
+function estaDentro(intervalo: any, reserva: any) {
+  const inicioIntervalo = intervalo.horaInicio.slice(0,5);
+  const finIntervalo = intervalo.horaFin.slice(0,5);
+
+  const inicioReserva = reserva.horaInicio.slice(0,5);
+  const finReserva = reserva.horaFin.slice(0,5);
+
+  return (
+    inicioIntervalo >= inicioReserva &&
+    finIntervalo <= finReserva
+  );
 }
 
 function activarEdicion() {
@@ -563,6 +614,7 @@ onMounted(async () => {
     }
 
     instalacionOriginal.value = JSON.parse(JSON.stringify(instalacion.value))
+    mezclarReservas()
   } catch (e) {
     mensaje.value = t.value.unexpectedError
     console.log("Error al obtener la informacion de la instalacion", e);

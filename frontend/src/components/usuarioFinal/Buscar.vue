@@ -83,7 +83,6 @@
         description="Selecciona el horario de la instalación." :theme="'light'" />
 
 
-
       <!-- ORDEN -->
       <div class="d-flex justify-content-end mb-4">
         <select class="form-select order-select" v-model="orderBy">

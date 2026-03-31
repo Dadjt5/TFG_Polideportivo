@@ -111,3 +111,9 @@ export const descargarHorario = async (id: number) => {
   const response = await api.get(`api/v1/instalaciones/${id}/descargar/horario/`, { responseType: 'blob' })
   return response.data
 }
+
+/* Función para descargar el horario de una actividad en PDF */
+export const descargarHorarioSesiones = async (id: number) => {
+  const response = await api.get(`api/v1/actividades/${id}/descargar/horario/`, { responseType: 'blob' })
+  return response.data
+}

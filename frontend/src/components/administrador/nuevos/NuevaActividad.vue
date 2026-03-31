@@ -423,7 +423,7 @@
           <p v-if="mensaje" class="text-danger">{{ mensaje }}</p>
         </div>
 
-        <div v-if="mostrarMensaje" class="text-center mb-3">
+        <div v-if="mostrarMensaje" class="text-center mt-3 mb-3">
           <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
             {{ mensajeEditar }}
           </div>

@@ -3,13 +3,23 @@ from django.utils.translation import gettext_lazy as _
 from django.db import transaction
 from django.contrib.auth import get_user_model
 from django.conf import settings
-from django.utils.timezone import now
-from datetime import timedelta
+from django.utils.timezone import now, make_aware
+from datetime import datetime, timedelta
 
 from .user import generar_codigo
 from .usuario import Usuario
 from .favorito import Favorito
 from .constantes import Sexo, Rol
+
+DIA_MAP = {
+    "Lunes": 0,
+    "Martes": 1,
+    "Miercoles": 2,
+    "Jueves": 3,
+    "Viernes": 4,
+    "Sabado": 5,
+    "Domingo": 6
+}
 
 class UsuarioFinal(Usuario):
     """Modelo para representar al usuario final"""
@@ -48,11 +58,24 @@ class UsuarioFinal(Usuario):
 
         fecha_actual = now()
 
-        for asistencia in self.asistencia.all():
+        for asistencia in self.asistencias.all():
             sesion = asistencia.sesion
 
-            if 0 <= (sesion.horaInicio - fecha_actual).total_seconds() <= 3600:
-                existe = Notificacion.objects.filter(usuario=self.user, actividad=sesion.actividad, sesion=sesion).exists()
+            sesion.comprobarPeriodo(fecha_actual.month)
+
+            hoy = fecha_actual.date()
+            dia_actual = hoy.weekday()
+            dia_sesion = DIA_MAP.get(sesion.dia)
+
+            dias_hasta_sesion = (dia_sesion - dia_actual) % 7
+
+            fecha_sesion_date = hoy + timedelta(days=dias_hasta_sesion)
+
+            fecha_sesion = datetime.combine(fecha_sesion_date, sesion.horaInicio)
+            fecha_sesion = make_aware(fecha_sesion)
+
+            if 0 <= (fecha_sesion - fecha_actual).total_seconds() <= 3600:
+                existe = Notificacion.objects.filter(usuario=self.user, actividad=sesion.actividad, sesion=sesion, fecha=hoy).exists()
 
                 if not existe:
                     Notificacion.notificarActividadUsuarioFinal(sesion.actividad, sesion)

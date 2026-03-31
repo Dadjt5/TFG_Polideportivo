@@ -707,8 +707,8 @@ class BuscarView(APIView):
         actividades = Actividad.buscar(nombre, tiposActividad, horaInicioSesion, horaFinSesion, dias)
 
         data = {
-            "instalaciones": InstalacionSerializer(instalaciones, many=True).data,
-            "actividades": ActividadSerializer(actividades, many=True).data,
+            "instalaciones": InstalacionSimpleSerializer(instalaciones, many=True).data,
+            "actividades": ActividadSimpleSerializer(actividades, many=True).data,
         }
 
         return Response(data)
@@ -829,9 +829,9 @@ class GuardarNotificacionView(APIView):
     def get(self, request):
         user = request.user
 
-        if user.usuario_final:
+        if user.is_usuario_final:
             user.usuario_final.revisarActividades()
-        elif user.monitor:
+        elif user.is_monitor:
             user.monitor.revisarActividades()
 
         notificaciones = Notificacion.objects.filter(usuario=user)
@@ -2626,6 +2626,55 @@ class DescargarHorarioView(APIView):
             cierre = agenda.horaCierre.strftime("%H:%M") if agenda.abierto else "-"
 
             data.append([nombre, estado, apertura, cierre])
+
+        table = Table(data)
+
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#0d6efd")),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
+
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+        ]))
+
+        elements.append(table)
+
+        doc.build(elements)
+        return response
+    
+
+class DescargarHorarioSesionesView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, actividad_id):
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="horarios_actividad_{actividad_id}.pdf"'
+
+        doc = SimpleDocTemplate(response, pagesize=A4)
+        elements = []
+
+        styles = getSampleStyleSheet()
+
+        elements.append(Paragraph("Horario de la actividad", styles['Title']))
+        elements.append(Spacer(1, 12))
+
+        actividad = get_object_or_404(Actividad, id=actividad_id)
+        sesiones = actividad.sesiones.all()
+
+        data = [["Día", "Hora inicio", "Hora fin"]]
+
+        for sesion in sesiones:
+            nombre = sesion.dia
+
+            horaInicio = sesion.horaInicio.strftime("%H:%M")
+            horaFin = sesion.horaFin.strftime("%H:%M")
+
+            data.append([nombre, horaInicio, horaFin])
 
         table = Table(data)
 

@@ -90,7 +90,7 @@ const badgeClass = computed(() =>
         </div>
 
         <div v-if="instalacion.pabellon" class="d-flex justify-content-between">
-          <span>{{ t.pavilions }}</span>
+          <span>{{ t.pavilion }}</span>
           <strong>{{ instalacion.pabellon.nombre }}</strong>
         </div>
       </div>

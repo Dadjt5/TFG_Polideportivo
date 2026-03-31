@@ -30,7 +30,7 @@
         <div class="mb-3">
           <label class="form-label">{{ t.selectedDate }}</label>
           <input type="date" class="form-control" v-model="reserva.seleccion.fecha" :min="minFecha"
-            :max="maxFechaStr" />
+            :max="maxFecha" />
         </div>
 
         <div v-if="reserva.tarifa.numeroCalles > 0" class="mb-3">
@@ -224,9 +224,10 @@ function periodoPorFecha(fechaStr: string) {
   const fecha = new Date(fechaStr)
   const mes = fecha.getMonth() + 1
 
-  if (mes >= 9 || mes === 1) return "PRIMER_CUATRIMESTRE"
-  if (mes >= 2 && mes <= 5) return "SEGUNDO_CUATRIMESTRE"
-  return "ANUAL"
+  if (mes >= 9 || mes === 1) return "Desde septiembre hasta enero"
+  if (mes >= 2 && mes <= 5) return "Desde febrero hasta mayo"
+  if (mes >= 6 && mes <= 8) return "Meses de verano"
+  return "Todo el año"
 }
 
 function esActividadValida(intervalo: any, fecha: string) {
@@ -234,19 +235,17 @@ function esActividadValida(intervalo: any, fecha: string) {
 
   return (
     intervalo.estado === "Reserva actividad" &&
-    (intervalo.periodo === periodoActual || intervalo.periodo === "ANUAL")
+    (intervalo.periodo === periodoActual || intervalo.periodo === "Todo el año")
   )
 }
 
 const claseHora = (hora: any) => {
   if (esAlquilerUsuario(hora)) return "bg-danger text-white"
   if (esActividadValida(hora, reserva.value.seleccion.fecha)) return "bg-warning text-dark"
-  if (hora.estado === "Libre") {
-    return horasSeleccionadas.value.includes(hora.horaInicio)
-      ? "bg-primary text-white"
-      : "bg-success text-white"
-  }
-  return "bg-secondary text-white"
+  
+  return horasSeleccionadas.value.includes(hora.horaInicio)
+    ? "bg-primary text-white"
+    : "bg-success text-white"
 }
 
 // Se debe revisar si es una piscina o no, si lo es se deben mostrar las reservas por calle
@@ -270,20 +269,29 @@ const minFecha = computed(() => {
   return fecha.toISOString().slice(0, 10)
 })
 
-const maxFecha = new Date()
-maxFecha.setDate(maxFecha.getDate() + (configuracionStore.dias_maximo_alquiler || 7))
-const maxFechaStr = maxFecha.toISOString().slice(0, 10)
+const maxFecha = computed(() => {
+  const fecha = new Date()
+  const dias = configuracionStore.dias_maximo_alquiler || 7
 
-// Funciones para horas
+  fecha.setDate(fecha.getDate() + dias)
+
+  if (isNaN(fecha.getTime())) return ''
+
+  return fecha.toISOString().slice(0, 10)
+})
+
 const estaBloqueada = (hora: any) => {
+  if (!reserva.value.seleccion.fecha) return true
+
   if (esAlquilerUsuario(hora)) return true
-  if (hora.estado !== "Libre") return true
+  if (esActividadValida(hora, reserva.value.seleccion.fecha)) return true
 
   const hoy = new Date()
+
   const fechaSeleccionada = new Date(reserva.value.seleccion.fecha)
   const esHoy = hoy.toISOString().slice(0, 10) === fechaSeleccionada.toISOString().slice(0, 10)
 
-  if (fechaSeleccionada < new Date(minFecha.value) || fechaSeleccionada > new Date(maxFecha)) {
+  if (fechaSeleccionada < new Date(minFecha.value) || fechaSeleccionada > new Date(maxFecha.value)) {
     return true
   }
 
@@ -312,6 +320,7 @@ const toggleHora = (intervalo: any) => {
   fechaSeleccionada.setHours(0, 0, 0, 0)
 
   const fechaMin = new Date()
+
   fechaMin.setDate(fechaMin.getDate() + (configuracionStore.dias_minimo_alquiler))
   fechaMin.setHours(0, 0, 0, 0)
 
@@ -320,7 +329,6 @@ const toggleHora = (intervalo: any) => {
   fechaMax.setHours(0, 0, 0, 0)
 
   if (fechaSeleccionada < fechaMin || fechaSeleccionada > fechaMax) return
-  if (intervalo.estado !== 'Libre') return
 
   const key = intervalo.horaInicio
   if (horasSeleccionadas.value.includes(key)) {
@@ -420,7 +428,7 @@ watch(
       reserva.value.tarifa = data.tarifa
       reserva.value.descuento = data.descuento
     } catch (e: any) {
-      mensaje.value = e.response?.data?.respuesta
+      lanzarMensaje(t.value.unexpectedError, "error")
       console.error("Error al actualizar la fecha:", e);
     }
   }

@@ -32,7 +32,7 @@
 
                 <p>
                   <strong>{{ t.remainingUses }}:</strong>
-                  {{ b.usosRestantes }} / {{ b.bono.usos }}
+                  {{ b.vecesUsado }} / {{ b.bono.usos }}
                 </p>
 
                 <div class="progress mb-3" style="height: 8px;">
@@ -77,17 +77,17 @@
                 </h3>
 
                 <p><strong>{{ t.startDate }}:</strong> {{ fechaInicio(a) }}</p>
-                <p><strong>{{ t.endDate }}:</strong> {{ fechaFin(a) }}</p>
+                <p><strong>{{ t.endDate }}:</strong> {{ formatearFecha(a.fechaExpiracion) }}</p>
 
-                <p><strong>{{ t.remainingDays }}:</strong> {{ diasRestantes(a) }}</p>
+                <p><strong>{{ t.remainingDays }}:</strong> {{ a.diasRestantes }}</p>
 
-                <span class="badge" :class="esValido(a) ? 'bg-success' : 'bg-secondary'">
-                  {{ esValido(a) ? t.active : t.expires }}
+                <span class="badge" :class="a.valido ? 'bg-success' : 'bg-secondary'">
+                  {{ a.valido ? t.active : t.inactive }}
                 </span>
               </div>
             </div>
 
-            <div class="mt-3 text-end" v-if="esValido(a)">
+            <div class="mt-3 text-end" v-if="a.valido">
               <button class="btn btn-outline-danger btn-sm" @click="abrirConfirmacion(a.id, 'abono')">
                 <i class="bi bi-x-circle me-1"></i>
                 {{ t.cancel }}
@@ -198,7 +198,7 @@ type BonoComprado = {
     nombreDeporte: string
   }
   fechaExpiracion: string
-  usosRestantes: number
+  vecesUsado: number
   valido: boolean
   fecha: string
   pago: number
@@ -207,12 +207,15 @@ type BonoComprado = {
 const bonos = ref<BonoComprado[]>([])
 
 const porcentajeUso = (b: BonoComprado) =>
-  (b.usosRestantes / b.bono.usos) * 100
+  (b.vecesUsado / b.bono.usos) * 100
 
 type AbonoActivo = {
   id: number
   fecha: string
   estado: string
+  fechaExpiracion: string
+  diasRestantes: number
+  valido: boolean
   abonoDeportivo: {
     id: number,
     meses: number
@@ -228,6 +231,27 @@ type AbonoActivo = {
   abonoVerano: number
 }
 
+const getInicioVerano = () => {
+  const year = new Date().getFullYear()
+  return new Date(year, 5, 1)
+}
+
+const fechaInicio = (a: AbonoActivo) => {
+  if (a.abonoVerano) {
+    return formatearFecha(getInicioVerano())
+  }
+
+  return formatearFecha(a.fecha)
+}
+
+const formatearFecha = (fecha: any) => {
+  return new Date(fecha).toLocaleDateString('es-ES', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  })
+}
+
 const abonos = ref<AbonoActivo[]>([])
 const mensaje = ref("")
 const eliminado = ref(false)
@@ -235,52 +259,6 @@ const eliminado = ref(false)
 let confirmModalAbono: Modal
 let confirmModalBono: Modal
 let successModal: Modal
-
-const getInicioVerano = () => {
-  const year = new Date().getFullYear()
-  return new Date(year, 5, 1)
-}
-
-const getFinVerano = () => {
-  const year = new Date().getFullYear()
-  return new Date(year, 7, 31)
-}
-
-const fechaInicio = (a: AbonoActivo) => {
-  if (a.abonoVerano) {
-    return getInicioVerano().toLocaleDateString()
-  }
-
-  return new Date(a.fecha).toLocaleDateString()
-}
-
-const diasRestantes = (a: AbonoActivo) => {
-  if (a.abonoVerano) {
-    const hoy = new Date()
-    const fin = getFinVerano()
-
-    const diff = fin.getTime() - hoy.getTime()
-    return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)))
-  }
-
-  return a.diasRestantes
-}
-
-const fechaFin = (a: AbonoActivo) => {
-  if (a.abonoVerano) {
-    return getFinVerano().toLocaleDateString()
-  }
-
-  return new Date(a.fechaExpiracion).toLocaleDateString()
-}
-
-const esValido = (a: AbonoActivo) => {
-  if (a.abonoVerano) {
-    return new Date() <= getFinVerano()
-  }
-
-  return a.valido
-}
 
 const id_objeto = ref()
 

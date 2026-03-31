@@ -74,7 +74,7 @@
                 <p>
                   <i class="bi bi-building text-primary me-1"></i>
                   <span class="fw-medium">{{ t.facility }}: </span>
-                  <span class="text-primary fw-medium" style="cursor: pointer;" @click="facilityDetail(actividad.instalacion.id)">
+                  <span class="text-primary fw-medium" style="cursor: pointer;" @click="facilityDetail(actividad.instalacion)">
                     {{ actividad.nombreInstalacion }}
                   </span>
                 </p>
@@ -125,13 +125,12 @@
                 <div class="text-muted">{{ s.horaInicio }} - {{ s.horaFin }}</div>
               </div>
             </div>
+
+            <button class="btn btn-outline-primary mt-4" @click="descargarPDF">
+              <i class="bi bi-file-earmark-pdf"></i> {{ t.downloadTimetable }}
+            </button>
           </div>
         </div>
-      </div>
-
-      <div class="text-center mt-4"
-        v-if="!puedeReservar">
-        <p>{{ t.cantBooking }}</p>
       </div>
 
       <!-- Reserva y Volver -->
@@ -156,6 +155,7 @@ import { useRouter } from "vue-router";
 /* Importamos la comunicacion para recuperar la informacion de actividades del backend y el usuario*/
 import { getActividadDetalle } from "@/services/detalleService";
 import { useUserStore } from '@/stores/usuarioFinal';
+import { descargarHorarioSesiones } from '@/services/crearRecursosService';
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
 import type { Language } from "@/useI18N";
@@ -197,10 +197,7 @@ const actividad = ref({
   nombreDeporte: "",
   nombreInstalacion: "",
   horasSemanales: "",
-  instalacion: {
-    id: 0,
-    nombre: ""
-  } as Generic,
+  instalacion: 0,
   sesiones: [] as any[]
 });
 
@@ -222,6 +219,24 @@ const puedeReservar = computed(() => {
 
 const cambiarFavorito = () => {
   usuarioFinalStore.marcarActividadFavorita(actividad.value.id)
+}
+
+async function descargarPDF() {
+  try {
+    const data = await descargarHorarioSesiones(actividad.value.id)
+
+    const blob = new Blob([data], { type: 'application/pdf' })
+
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = "horarios.pdf"
+    a.click()
+    window.URL.revokeObjectURL(url)
+
+  } catch (error) {
+    console.error("Error descargando PDF:", error)
+  }
 }
 
 const facilityDetail = (id: number) => {

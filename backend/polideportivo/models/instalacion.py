@@ -90,7 +90,6 @@ class Instalacion(models.Model):
         return True
 
     def actualizarMapa(self, sesiones):
-        print(sesiones)
         for sesion in sesiones:
             dia = sesion.get('dia')
             hora_inicio = sesion.get('horaInicio')
@@ -99,7 +98,6 @@ class Instalacion(models.Model):
 
             agenda = Agenda.objects.filter(dia__iexact=dia).first()
 
-            print(agenda, dia, hora_inicio, hora_fin)
 
             if agenda:
                 if isinstance(hora_inicio, str):
@@ -120,10 +118,8 @@ class Instalacion(models.Model):
                         calle=calle_num
                     ).first()
 
-                    print(mapa)
 
                     if mapa:
-                        print(mapa.estado)
                         mapa.estado = TipoReserva.ACTIVIDAD
                         mapa.save()
 

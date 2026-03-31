@@ -36,6 +36,8 @@ export default {
   lightCost: "Coste iluminación",
   rentDiscount: "Descuento para alquileres",
   discountDetails: "Desglose del descuento",
+  rented: "Alquilado",
+  rentedNoPay: "Alquilado sin pagar",
 
   /* Eliminaciones */
   confirmDelete: "Confirmar eliminación",
@@ -276,6 +278,7 @@ export default {
   /* Detalle instalacion */
   capacity: "Capacidad",
   light: "Luz",
+  facilityValidity: "Necesita validación",
   tdaPercent: "Porcentaje de TDA",
   yes: "Si",
   openHour: "Hora de apertura",

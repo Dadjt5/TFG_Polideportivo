@@ -1,6 +1,9 @@
 from rest_framework import serializers
 from django.utils import timezone
+from django.utils.timezone import now, make_aware, is_naive
 from django.contrib.auth import get_user_model
+from datetime import date, timedelta
+from datetime import datetime
 import json
 
 from polideportivo.models import (
@@ -10,7 +13,7 @@ from polideportivo.models import (
     TarifaInstalacion, TDA, UsuarioFinal, AbonoDeportivo, AbonoVerano, Pabellon, 
     ReservaActividad, Alquiler, Administrador, CompraBono, CompraAbono, Sesion,
     Mensaje, MapaReservas, GrupoReducido, ActividadComun, Fisioterapia, TipoInstalacion,
-    Feedback, Calle
+    Feedback, Calle, EstadoReserva
 )
 
 
@@ -249,6 +252,10 @@ class CompraAbonoSerializer(serializers.ModelSerializer):
     abonoDeportivo = AbonoDeportivoSerializer(read_only=True)
     abonoVerano = AbonoVeranoSerializer(read_only=True)
 
+    fechaExpiracion = serializers.SerializerMethodField()
+    diasRestantes = serializers.SerializerMethodField()
+    valido = serializers.SerializerMethodField()
+
     class Meta:
         model = CompraAbono
         fields = (
@@ -257,8 +264,56 @@ class CompraAbonoSerializer(serializers.ModelSerializer):
             "estado",
             "abonoDeportivo",
             "abonoVerano",
+            "fechaExpiracion",
+            "diasRestantes",
+            "valido"
         )
 
+    def get_fechaExpiracion(self, obj):
+        if obj.abonoVerano:
+            year = now().year
+            return f"{year}-08-31"
+        
+        if obj.abonoDeportivo:
+            return obj.fecha + timedelta(days=30 * obj.abonoDeportivo.meses)
+
+        return None
+
+    def get_diasRestantes(self, obj):
+        fecha_exp = self.get_fechaExpiracion(obj)
+        if not fecha_exp:
+            return 0
+
+        if isinstance(fecha_exp, str):
+            fecha_exp = datetime.fromisoformat(fecha_exp)
+
+        if is_naive(fecha_exp):
+            fecha_exp = make_aware(fecha_exp)
+    
+        diff = fecha_exp - now()
+        return max(0, diff.days)
+
+    def get_valido(self, obj):
+        if obj.abonoVerano:
+            year = now().year
+            
+            inicio_verano = make_aware(datetime(year, 6, 1))
+            fin_verano = make_aware(datetime(year, 8, 31))
+            
+            return inicio_verano <= now() <= fin_verano
+        
+        if obj.abonoDeportivo:
+            fecha_exp = self.get_fechaExpiracion(obj)
+            if not fecha_exp:
+                return False
+
+            if isinstance(fecha_exp, str):
+                fecha_exp = datetime.fromisoformat(fecha_exp)
+
+            if is_naive(fecha_exp):
+                fecha_exp = make_aware(fecha_exp)
+
+            return now() <= fecha_exp
 
 # --------------------
 # Agenda
@@ -323,16 +378,18 @@ class PabellonSerializer(serializers.ModelSerializer):
 class InstalacionSimpleSerializer(serializers.ModelSerializer):
     agenda = AgendaSerializer(many=True, read_only=True)
     calles = CalleSerializer(many=True, read_only=True)
+    pabellon = PabellonSimpleSerializer(read_only=True)
 
     class Meta:
         model = Instalacion
-        fields = ("id", "nombre", "agenda", "calles", "numeroCalles", "tipoInstalacion")
+        fields = ("id", "nombre", "agenda", "calles", "numeroCalles", "tipoInstalacion", "pabellon")
 
 
 class InstalacionSerializer(serializers.ModelSerializer):
     agenda = AgendaSerializer(many=True, read_only=True)
     calles = CalleSerializer(many=True, read_only=True)
     pabellon = PabellonSimpleSerializer(read_only=True)
+    reservas_usuarios = serializers.SerializerMethodField()
 
     class Meta:
         model = Instalacion
@@ -348,8 +405,30 @@ class InstalacionSerializer(serializers.ModelSerializer):
             "agenda",
             "tarifa",
             "numeroCalles",
-            "calles"
+            "calles",
+            "reservas_usuarios"
         )
+
+    def get_reservas_usuarios(self, obj):
+        hoy = date.today()
+
+        inicio_semana = hoy - timedelta(days=hoy.weekday())
+        fin_semana = inicio_semana + timedelta(days=6)
+
+        reservas = obj.reservas.filter(fecha__range=(inicio_semana, fin_semana))
+
+        return [
+            {
+                "id": r.id,
+                "horaInicio": r.horaInicio.isoformat(),
+                "horaFin": r.horaFin.isoformat(),
+                "diaSemana": r.fecha.weekday(),
+                "pagada": r.estado == EstadoReserva.CONFIRMADA,
+                "usuario": r.usuarioFinal.id,
+                "fecha": r.fecha.isoformat(),
+            }
+            for r in reservas
+        ]
 
 # --------------------
 # Actividades
@@ -377,7 +456,9 @@ class ActividadSimpleSerializer(serializers.ModelSerializer):
             "nombre",
             "horasSemanales",
             "dias",
-            "estado"
+            "estado",
+            "plazasReservadas",
+            "plazasMaximas",
         )
     
     def get_horasSemanales(self, obj):
@@ -426,7 +507,7 @@ class ActividadSerializer(serializers.ModelSerializer):
             "sesiones",
             "nombreDeporte",
             "nombreMonitor",
-            "nombreInstalacion"
+            "nombreInstalacion",
         )
 
     def get_horasSemanales(self, obj):

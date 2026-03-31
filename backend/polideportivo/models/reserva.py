@@ -154,7 +154,7 @@ class Alquiler(Reserva):
     luz = models.BooleanField(default=False)
 
     usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.CASCADE, related_name="alquileres")
-    instalacion = models.ForeignKey('Instalacion', on_delete=models.CASCADE)
+    instalacion = models.ForeignKey('Instalacion', on_delete=models.CASCADE, related_name="reservas")
     calle = models.ForeignKey('Calle', on_delete=models.SET_NULL, null=True, blank=True)
     
     class Meta:

@@ -275,6 +275,16 @@ class Sesion(models.Model):
     def __str__(self):
         return f'Sesion el {self.dia} de {self.actividad}'
     
+    def comprobarPeriodo(self, mes):
+        if self.actividad.periodo == Periodo.PRIMER_CUATRIMESTRE:
+            return mes in [9,10,11,12,1]
+        elif self.actividad.periodo == Periodo.SEGUNDO_CUATRIMESTRE:
+            return mes in [2,3,4,5]
+        elif self.actividad.periodo == Periodo.TERCER_CUATRIMESTRE:
+            return mes in [6,7,8]
+        
+        return True
+    
     def cambiarFalta(self, usuarioFinal, falta):
         try:
             asistencia = Asistencia.objects.get(usuarioFinal=usuarioFinal, sesion=self)

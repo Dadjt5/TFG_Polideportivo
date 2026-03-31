@@ -37,7 +37,7 @@
 
           <div class="row mb-2" v-if="pago.descuentoAplicado > 0">
             <div class="col-6 fw-semibold text-success">{{ t.discount }}:</div>
-            <div class="col-6 text-end text-success">- {{ pago.descuentoAplicado }} €</div>
+            <div class="col-6 text-end text-success">{{ pago.descuentoAplicado }} %</div>
           </div>
 
           <hr class="my-3">

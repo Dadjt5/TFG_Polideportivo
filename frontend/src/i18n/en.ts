@@ -36,6 +36,8 @@ export default {
   lightCost: "Lighting cost",
   rentDiscount: "Rent discount",
   discountDetails: "Discount details",
+  rented: "Rented",
+  rentedNoPay: "Rented without paying",
 
   /* Eliminaciones */
   confirmDelete: "Confirm deletion",
@@ -276,6 +278,7 @@ export default {
   /* Detalle instalacion */
   capacity: "Capacity",
   light: "Light",
+  facilityValidity: "Need validation",
   tdaPercent: "TDA percentage",
   yes: "Yes",
   openHour: "Opening time",

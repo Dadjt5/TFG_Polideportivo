@@ -9,6 +9,7 @@ from .monitor import Monitor
 from .administrador import Administrador
 
 
+
 class Notificacion(models.Model):
     """Modelo para representar una notificacion"""
 
