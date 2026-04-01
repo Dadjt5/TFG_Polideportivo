@@ -17,72 +17,91 @@
 
       <!-- LISTA DE RESERVAS -->
       <div v-else class="row g-4">
-        <div v-for="reserva in reservas" :key="reserva.id" class="col-md-6 col-lg-4">
-          <div class="rounded-3 shadow-sm p-4 h-100 card-hover"
-            style="background-color: rgba(255,255,255,0.9); backdrop-filter: blur(8px);">
+        <div v-for="reserva in reservas" :key="reserva.id" class="card-hover rounded-4 shadow-sm p-4 mb-4" :class="{
+          'border-start border-4 border-primary bg-primary-subtle': reserva.tipo === 'ALQUILER',
+          'border-start border-4 border-success bg-success-subtle': reserva.tipo === 'RESERVA',
+          'border-start border-4 border-warning bg-warning-subtle': reserva.tipo === 'LISTA_ESPERA'
+        }">
+          <!-- HEADER -->
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0 fw-semibold">
+              {{ reserva.actividad?.nombre || reserva.instalacion?.nombre }}
+            </h5>
 
-            <div class="d-flex flex-column justify-content-between h-100">
+            <span v-if="reserva.tipo === 'ALQUILER'" class="badge bg-primary">
+              {{ t.rent }}
+            </span>
+            <span v-else-if="reserva.tipo === 'RESERVA'" class="badge bg-success">
+              {{ t.booking }}
+            </span>
+            <span v-else-if="reserva.tipo === 'LISTA_ESPERA'" class="badge bg-warning text-dark">
+              {{ t.waitingList }}
+            </span>
+          </div>
 
-              <!-- INFO PRINCIPAL -->
-              <div>
-                <h5 class="fw-semibold mb-2 d-flex align-items-center">
-                  <i v-if="reserva.tipo === 'ALQUILER'" class="bi bi-building me-2 text-primary"></i>
-                  <i v-else class="bi bi-activity me-2 text-success"></i>
-                  {{ reserva.tipo === "ALQUILER"
-                    ? reserva.instalacion?.nombre
-                    : reserva.actividad?.nombre }}
-                </h5>
+          <!-- INFO DETALLADA -->
+          <div class="text-muted small mb-2">
 
-                <!-- ESTADO -->
-                <span class="badge rounded-pill mb-2"
-                  :class="reserva.tipo === 'ALQUILER'
-                    ? (reserva.estado === 'ACTIVO' ? 'bg-primary-subtle text-primary' : 'bg-secondary-subtle text-secondary')
-                    : (reserva.estado === 'ACTIVO' ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary')">
-                  {{ reserva.estado }}
+            <!-- ALQUILER -->
+            <template v-if="reserva.tipo === 'ALQUILER'">
+              <p class="mb-1"><i class="bi bi-calendar-event me-1 text-primary"></i>{{ t.date }}: {{ reserva.fecha }}
+              </p>
+              <p class="mb-1"><i class="bi bi-clock me-1 text-success"></i>{{ t.hours }}: {{ reserva.horaInicio }} - {{
+                reserva.horaFin }}</p>
+              <p class="mb-1"><i class="bi bi-building me-1 text-primary"></i>{{ t.facilityType }}: {{
+                reserva.instalacion?.tipo }}</p>
+            </template>
+
+            <!-- RESERVA -->
+            <template v-else-if="reserva.tipo === 'RESERVA'">
+              <p class="mb-1"><i class="bi bi-calendar-event me-1 text-success"></i>{{ t.days }}:</p>
+              <ul class="mb-1">
+                <li v-for="sesion in reserva.actividad?.dias" :key="sesion.dia">
+                  {{ sesion.dia }} ({{ sesion.horaInicio }} - {{ sesion.horaFin }})
+                </li>
+              </ul>
+              <p class="mb-1"><i class="bi bi-clock me-1 text-success"></i>{{ t.weekHours }}: {{
+                reserva.actividad?.horasSemanales }}</p>
+              <p v-if="reserva.descuentos?.length" class="mb-0">
+                <i class="bi bi-percent me-1 text-success"></i>{{ t.discounts }}:
+                <span v-for="d in reserva.descuentos" :key="d.id">{{ d.nombre }} ({{ d.porcentaje }}%)</span>
+              </p>
+            </template>
+
+            <!-- LISTA DE ESPERA -->
+            <template v-else-if="reserva.tipo === 'LISTA_ESPERA'">
+              <p class="mb-2">
+                <span class="badge bg-warning text-dark fs-6 px-3 py-2 shadow-sm">
+                  <i class="bi bi-trophy me-1"></i>
+                  {{ t.position }}: {{ reserva.posicion }}
                 </span>
+              </p>
 
-                <!-- INFO DETALLADA -->
-                <div class="text-muted small mb-2">
-                  <template v-if="reserva.tipo === 'ALQUILER'">
-                    <p class="mb-1"><i class="bi bi-calendar-event me-1"></i>{{ t.date }}: {{ reserva.fecha }}</p>
-                    <p class="mb-1"><i class="bi bi-clock me-1"></i>{{ t.hours }}: {{ reserva.horaInicio }}-{{
-                      reserva.horaFin }}</p>
-                    <p class="mb-1"><i class="bi bi-building me-1"></i>{{ t.facilityType }}: {{
-                      reserva.instalacion?.tipo }}</p>
-                  </template>
+              <p class="mb-1"><i class="bi bi-calendar-event me-1 text-warning"></i>{{ t.days }}:</p>
+              <ul class="mb-1">
+                <li v-for="sesion in reserva.actividad?.dias" :key="sesion.dia">
+                  {{ sesion.dia }} ({{ sesion.horaInicio }} - {{ sesion.horaFin }})
+                </li>
+              </ul>
 
-                  <template v-else>
-                    <p class="mb-1"><i class="bi bi-calendar-event me-1"></i>{{ t.days }}:</p>
-                    <ul class="mb-1">
-                      <li v-for="sesion in reserva.actividad?.dias" :key="sesion.dia">
-                        {{ sesion.dia }} ({{ sesion.horaInicio }} - {{ sesion.horaFin }})
-                      </li>
-                    </ul>
-                    <p class="mb-1"><i class="bi bi-clock me-1"></i>{{ t.weekHours }}: {{
-                      reserva.actividad?.horasSemanales }}</p>
-                    <p v-if="reserva.descuentos?.length" class="mb-0">
-                      <i class="bi bi-percent me-1"></i>{{ t.discounts }}:
-                      <span v-for="d in reserva.descuentos" :key="d.id">{{ d.nombre }} ({{ d.porcentaje }}%)</span>
-                    </p>
-                  </template>
-                </div>
+              <p class="mb-1"><i class="bi bi-clock me-1"></i>{{ t.weekHours }}: {{
+                reserva.actividad?.horasSemanales }}</p>
+              <p class="mb-0">
+                <i class="bi bi-info-circle me-1"></i>{{ t.waitingListInfo }}
+              </p>
+            </template>
 
-                <!-- MENSAJE SI NO PUEDE CANCELAR -->
-                <p v-if="!puedeCancelar(reserva)" class="mt-2 small text-muted">
-                  {{ t.cannotCancel }}
-                </p>
-              </div>
+          </div>
 
-              <!-- BOTON CANCELAR -->
-              <div class="mt-3 text-end">
-                <button class="btn btn-danger btn-sm rounded-pill px-3" :disabled="!puedeCancelar(reserva)"
-                  @click="abrirConfirmacion(reserva)">
-                  <i class="bi bi-x-circle me-1"></i>
-                  {{ t.cancel }}
-                </button>
-              </div>
+          <!-- ACCIONES -->
+          <div class="mt-3 d-flex gap-2">
+            <button v-if="reserva.puede_cancelar && reserva.tipo !== 'LISTA_ESPERA'" class="btn btn-outline-danger btn-sm" @click="abrirConfirmacion(reserva)">
+              {{ t.cancel }}
+            </button>
 
-            </div>
+            <button v-if="reserva.tipo === 'LISTA_ESPERA'" class="btn btn-outline-danger btn-sm" @click="abrirConfirmacionLista(reserva)">
+              {{ t.leaveWaitingList }}
+            </button>
           </div>
         </div>
       </div>
@@ -106,6 +125,32 @@
 
               <button class="btn btn-danger rounded-pill" @click="cancelarReserva">
                 {{ t.delete }}
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="modal fade" id="confirmDeleteModalLista" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content rounded-4">
+
+            <div class="modal-header">
+              <h5 class="modal-title">{{ t.confirmExit }}</h5>
+            </div>
+
+            <div class="modal-body text-center">
+              <p>{{ t.confirmLeaveListDelete }}</p>
+            </div>
+
+            <div class="modal-footer justify-content-center">
+              <button class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">
+                {{ t.cancel }}
+              </button>
+
+              <button class="btn btn-danger rounded-pill" @click="salirListaEspera">
+                {{ t.leave }}
               </button>
             </div>
 
@@ -145,7 +190,7 @@ import { ref, onMounted, inject, type Ref } from "vue"
 import { Modal } from 'bootstrap'
 
 import { getReservasRealizadas } from "@/services/usuarioFinalService"
-import { cancelarReservaActividad, cancelarAlquiler } from "@/services/cancelarService"
+import { cancelarReservaActividad, cancelarAlquiler, salirLista } from "@/services/cancelarService"
 import { useConfiguracionStore } from "@/stores/configuracion"
 
 import { useI18n } from "@/useI18N"
@@ -157,8 +202,9 @@ const t = useI18n(language)
 type Reserva = {
   id: number
   estado: string
-  tipo: "ALQUILER" | "RESERVA"
+  tipo: "ALQUILER" | "RESERVA" | "LISTA_ESPERA"
   puede_cancelar?: boolean
+  posicion: number
 
   actividad?: {
     id: number
@@ -197,6 +243,7 @@ const mensaje = ref("")
 const eliminado = ref(false)
 
 let confirmModal: Modal
+let confirmModalLista: Modal
 let successModal: Modal
 
 const puedeCancelar = (reserva: Reserva) => {
@@ -236,6 +283,11 @@ function abrirConfirmacion(reserva: Reserva) {
   confirmModal.show()
 }
 
+function abrirConfirmacionLista(reserva: Reserva) {
+  reservaElegida.value = reserva
+  confirmModalLista.show()
+}
+
 function finalizar() {
   successModal.hide()
 }
@@ -248,8 +300,10 @@ const cancelarReserva = async () => {
   try {
     if (reserva.tipo === "ALQUILER") {
       await cancelarAlquiler(reserva.id)
-    } else {
+    } else if (reserva.tipo === "RESERVA") {
       await cancelarReservaActividad(reserva.id)
+    } else {
+      return
     }
 
     confirmModal.hide()
@@ -270,8 +324,37 @@ const cancelarReserva = async () => {
   }
 }
 
+const salirListaEspera = async () => {
+  const reserva = reservaElegida.value
+
+  try {
+    if (reserva.tipo === "LISTA_ESPERA") {
+      await salirLista(reserva.id)
+    } else {
+      return
+    }
+
+    confirmModalLista.hide()
+    successModal.show()
+
+    mensaje.value = t.value.reservationDeleted
+    eliminado.value = true
+    reservas.value = reservas.value.filter(r => r.id !== reserva.id)
+    reservaElegida.value = null
+  } catch (e) {
+    confirmModalLista.hide()
+    successModal.show()
+
+    mensaje.value = t.value.reservationNoDeleted
+    eliminado.value = false
+    reservaElegida.value = null
+    console.error("Error cancelando reserva", e)
+  }
+}
+
 onMounted(async () => {
   confirmModal = new Modal(document.getElementById('confirmDeleteModal')!)
+  confirmModalLista = new Modal(document.getElementById('confirmDeleteModalLista')!)
   successModal = new Modal(document.getElementById('successDeleteModal')!)
 
   try {

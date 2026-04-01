@@ -167,14 +167,13 @@ onMounted(async () => {
   if (!administradorStore.administrador) {
     await administradorStore.fetchUser(userStore.user?.administrador_id);
   }
-  if (administradorStore.notificaciones.length === 0) {
-    await administradorStore.fetchNotificaciones();
-  }
-  administradorStore.comenzarIntervalo();
 
   if (!tiposStore.modificado) {
     tiposStore.obtenerTipos();
   }
+
+  await administradorStore.fetchNotificaciones();
+  administradorStore.comenzarIntervalo();
 });
 </script>
 

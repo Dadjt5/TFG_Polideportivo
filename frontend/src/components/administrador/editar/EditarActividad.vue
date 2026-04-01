@@ -186,30 +186,43 @@
           <div v-if="instalacionSeleccionada?.agenda?.length" class="card border-0 shadow-sm rounded-4 p-4 bg-light">
             <h5 class="fw-bold mb-3">{{ t.weekHours }}</h5>
 
-            <div class="mt-4">
+            <div class="mt-4 mb-2">
               <span class="badge bg-success me-2">{{ t.free }}</span>
               <span class="badge bg-primary me-2">{{ t.selected }}</span>
               <span class="badge bg-warning text-dark">{{ t.activity }}</span>
             </div>
 
             <div class="row">
-              <div v-for="dia in instalacionSeleccionada.agenda" :key="dia.id" class="col-md-6 mb-3">
-                <div class="p-3 rounded-3 bg-white border">
-                  <div class="d-flex justify-content-between align-items-center mb-2">
+              <div v-for="dia in instalacionSeleccionada.agenda" :key="dia.id" class="col-12 mb-3">
+                <div class="p-3 rounded-3 bg-white border shadow-sm">
+
+                  <!-- CABECERA CLICKABLE -->
+                  <div class="d-flex justify-content-between align-items-center cursor-pointer"
+                    @click="toggleDia(dia.id)">
                     <span class="fw-semibold">{{ dia.dia }}</span>
                     <span v-if="!dia.abierto" class="text-danger fw-semibold">{{ t.close }}</span>
+                    <span v-else>
+                      <i v-if="isOpen(dia.id)" class="bi bi-chevron-up"></i>
+                      <i v-else class="bi bi-chevron-down"></i>
+                    </span>
                   </div>
-                  <!-- Intervalos -->
-                  <div v-if="dia.abierto">
-                    <div v-for="intervalo in dia.mapa_reservas" :key="intervalo.id"
-                      class="small mb-1 px-2 py-1 rounded text-white" :class="{
-                        'bg-primary': esPropio(intervalo, dia),
-                        'bg-success': intervalo.estado === 'Libre' && !esPropio(intervalo, dia),
-                        'bg-warning text-dark': esActividadValida(intervalo, dia)
-                      }">
-                      {{ intervalo.horaInicio.slice(0, 5) }} - {{ intervalo.horaFin.slice(0, 5) }}
+
+                  <!-- DESPLEGABLE DE INTERVALOS -->
+                  <transition name="fade">
+                    <div v-if="dia.abierto && isOpen(dia.id)" class="mt-2">
+                      <div class="d-flex flex-wrap gap-2">
+                        <div v-for="intervalo in dia.mapa_reservas" :key="intervalo.id"
+                          class="small text-white text-center px-3 py-2 rounded" :class="{
+                            'bg-primary': esPropio(intervalo, dia),
+                            'bg-warning text-dark': !esPropio(intervalo, dia) && esOcupadoPorPeriodo(intervalo),
+                            'bg-success': !esPropio(intervalo, dia) && !esOcupadoPorPeriodo(intervalo)
+                          }">
+                          {{ intervalo.horaInicio.slice(0, 5) }} - {{ intervalo.horaFin.slice(0, 5) }}
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  </transition>
+
                 </div>
               </div>
             </div>
@@ -437,10 +450,10 @@
           </button>
 
           <template v-else>
-            <button class="btn btn-success btn-lg rounded-pill px-5" @click="guardarCambios">
+            <button class="btn btn-success btn-lg rounded-pill px-5" @click="comprobarAlquiler">
               {{ t.saveChanges }}
             </button>
-            <button class="btn btn-secondary btn-lg rounded-pill px-5" @click="cancelarEdicion">
+            <button class="btn btn-secondary btn-lg rounded-pill px-5" @click="cancelarEdicion(true)">
               {{ t.cancel }}
             </button>
           </template>
@@ -501,6 +514,32 @@
         </div>
       </div>
     </div>
+
+    <div class="modal fade" id="confirmCreateModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4">
+
+          <div class="modal-header">
+            <h5 class="modal-title">{{ t.confirmCreate }}</h5>
+          </div>
+
+          <div class="modal-body text-center">
+            <p>{{ mensajeRevisar }}</p>
+          </div>
+
+          <div class="modal-footer justify-content-center">
+            <button class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">
+              {{ t.cancel }}
+            </button>
+
+            <button class="btn btn-primary rounded-pill" @click="guardarCambios">
+              {{ t.continue }}
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -516,6 +555,7 @@ import { useTiposStore } from "@/stores/tipos"
 
 import type { Language } from "@/useI18N"
 import { useI18n } from "@/useI18N"
+import { revisarAlquiler } from "@/services/crearRecursosService"
 
 const props = defineProps<{ id: string }>()
 
@@ -582,25 +622,31 @@ function esPropio(intervalo: any, dia: any) {
   })
 }
 
-function esActividadValida(intervalo: any, dia: any) {
-  const mes = new Date().getMonth() + 1
+function esOcupadoPorPeriodo(intervalo: any) {
+  const periodos = intervalo.periodo || []
 
-  let periodoActual = ""
-  if (mes >= 9 || mes === 1) {
-    periodoActual = "Desde septiembre hasta enero"
-  } else if (mes >= 2 && mes <= 5) {
-    periodoActual = "Desde febrero hasta mayo"
-  } else if (mes >= 6 && mes <= 8) {
-    periodoActual = "Meses de verano"
-  } else {
-    periodoActual = "Todo el año"
+  if (actividad.value.periodo === "Todo el año") {
+    return periodos.length > 0
   }
 
   return (
-    intervalo.estado === "Reserva actividad" &&
-    (intervalo.periodo === periodoActual || intervalo.periodo === "Todo el año")
+    
+    periodos.includes(actividad.value.periodo) ||
+    periodos.includes("Todo el año")
   )
 }
+
+const openDias = ref([])
+
+const toggleDia = (id: any) => {
+  if (openDias.value.includes(id)) {
+    openDias.value = openDias.value.filter(i => i !== id)
+  } else {
+    openDias.value.push(id)
+  }
+}
+
+const isOpen = (id: any) => openDias.value.includes(id)
 
 const monitorSeleccionado = computed(() =>
   monitores.value.find(m => m.id === actividad.value.monitor)
@@ -636,9 +682,12 @@ function activarEdicion() {
   editando.value = true
 }
 
-function cancelarEdicion() {
+function cancelarEdicion(eliminarSesiones: boolean) {
+  if (eliminarSesiones) {
+    sesiones.value = JSON.parse(JSON.stringify(sesionesOriginal.value))
+  }
+
   actividadOriginal.value = JSON.parse(JSON.stringify(actividad.value))
-  sesiones.value = JSON.parse(JSON.stringify(sesionesOriginal.value))
   preview.value = null
   imagen.value = null
   editando.value = false
@@ -666,6 +715,55 @@ function eliminarSesion(id: number) {
   sesiones.value = sesiones.value.filter(s => s.id !== id)
 }
 
+const mensajeRevisar = ref("")
+
+const comprobarAlquiler = async () => {
+  if (!validarFormulario()) {
+    lanzarMensaje(t.value.missing, "error")
+    return
+  }
+
+  if (sesiones.value.length === 0) {
+    lanzarMensaje(t.value.noSessionWarning, "error")
+    return
+  }
+
+  if (!horasValidas()) {
+    lanzarMensaje(t.value.wrongTimetable, "error")
+    return
+  }
+
+  if (!horasEnPunto()) {
+    lanzarMensaje(t.value.onTheHourWarning, "error")
+    return
+  }
+
+  const formData = new FormData()
+
+  formData.append("sesiones", JSON.stringify(sesiones.value))
+  formData.append("periodo", actividad.value.periodo)
+
+  const respuesta = await revisarAlquiler(actividad.value.instalacion, formData)
+
+  if (!respuesta?.conflicto) {
+    mensajeRevisar.value = "No hay conflictos con alquileres existentes."
+    confirmCreationModal.show()
+    return
+  }
+
+  const usuarios = respuesta.usuarios_afectados
+  const alquileres = respuesta.alquileres_afectados
+  const dinero = respuesta.dinero_a_devolver
+
+  mensajeRevisar.value = `Esta acción afectará a ${alquileres} alquiler${alquileres !== 1 ? 'es' : ''} existente${alquileres !== 1 ? 's' : ''}:
+  de ${usuarios} usuario${usuarios !== 1 ? 's' : ''}
+  y se devolveran ${dinero} €
+  ¿Deseas continuar?`
+
+  confirmCreationModal.show()
+}
+
+let confirmCreationModal: Modal
 let confirmModal: Modal
 let successModal: Modal
 
@@ -786,6 +884,8 @@ function onFileChange(e: Event) {
 }
 
 async function guardarCambios() {
+  confirmCreationModal.hide()
+
   if (!validarFormulario()) {
     lanzarMensaje(t.value.missing, "error")
     return
@@ -825,7 +925,7 @@ async function guardarCambios() {
   try {
     await modificarActividad(parseInt(props.id), formData)
     lanzarMensaje(t.value.correctlyUpdate, "success")
-    cancelarEdicion()
+    cancelarEdicion(false)
   } catch (e) {
     lanzarMensaje(t.value.noModify, "error")
     console.error("No se ha podido editar la actividad", e)
@@ -835,6 +935,7 @@ async function guardarCambios() {
 onMounted(async () => {
   const id = parseInt(props.id);
 
+  confirmCreationModal = new Modal(document.getElementById('confirmCreateModal')!)
   confirmModal = new Modal(document.getElementById('confirmDeleteModal')!)
   successModal = new Modal(document.getElementById('successDeleteModal')!)
 

@@ -327,14 +327,13 @@ class MapaReservasSerializer(serializers.ModelSerializer):
         fields = ("id", "horaInicio", "horaFin", "estado", "periodo")
     
     def get_periodo(self, obj):
-        sesion = Sesion.objects.filter(
+        sesiones = Sesion.objects.filter(
             horaInicio__lte=obj.horaInicio,
-            horaFin__gt=obj.horaInicio
-        ).first()
+            horaFin__gt=obj.horaInicio,
+            dia=obj.agenda.dia,
+        ).values_list("actividad__periodo", flat=True).distinct()
 
-        if sesion and sesion.actividad:
-            return sesion.actividad.periodo
-        return None
+        return list(sesiones) if sesiones else []
 
 
 class AgendaSerializer(serializers.ModelSerializer):
@@ -799,6 +798,7 @@ class NotificacionSerializer(serializers.ModelSerializer):
             "fijado",
             "actividad",
             "instalacion",
+            "debeMarcar",
             "pabellon"
         )
 

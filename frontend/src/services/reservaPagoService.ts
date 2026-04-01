@@ -33,6 +33,12 @@ export const reservarActividad = async(id: number, personas: number, modalidad: 
   return response.data;
 }
 
+/* Funcion para pasar a la lista de espera */
+export const pasarAListaEspera = async (id: number) => {
+  const response = await api.post(`api/v1/actividades/${id}/esperar/`)
+  return response.data.posicion;
+}
+
 /* Función para alquilar una instalacion */
 export const alquilar = async(id: number, complementos: any) => {
   const response = await api.post(`api/v1/instalaciones/${id}/alquilar/`, complementos)

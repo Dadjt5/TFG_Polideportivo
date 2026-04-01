@@ -167,10 +167,8 @@ onMounted(async () => {
   if (!monitorStore.monitor) {
     await monitorStore.fetchUser(userStore.user?.monitor_id);
   }
-  if (monitorStore.notificaciones.length === 0) {
-    await monitorStore.fetchNotificaciones();
-  }
 
+  await monitorStore.fetchNotificaciones();
   monitorStore.comenzarIntervalo();
 });
 </script>

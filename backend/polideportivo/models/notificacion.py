@@ -9,7 +9,6 @@ from .monitor import Monitor
 from .administrador import Administrador
 
 
-
 class Notificacion(models.Model):
     """Modelo para representar una notificacion"""
 
@@ -84,6 +83,18 @@ class Notificacion(models.Model):
         ]
 
         cls.objects.bulk_create(notificaciones)
+
+    @classmethod
+    def notificarCancelacionYDevolucionDinero(cls, usuarios, instalacion):
+        configuracion = Configuracion.objects.all().first()
+
+        for usuario in usuarios:
+            cls.objects.create(
+                titulo=configuracion.titulo_aviso_devolucion_dinero_alquiler,
+                descripcion=configuracion.texto_aviso_devolucion_dinero_alquiler,
+                usuario=usuario.user,
+                instalacion=instalacion
+            )
 
     @classmethod
     def notificarActividadUsuarioFinal(cls, actividad, sesion):

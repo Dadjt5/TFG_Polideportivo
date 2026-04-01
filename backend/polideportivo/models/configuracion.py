@@ -22,6 +22,7 @@ class Configuracion(models.Model):
     titulo_cambios_sesiones = models.CharField(max_length=1024, blank=True)
     titulo_avisos_sobre_actividades_usuarios = models.CharField(max_length=1024, blank=True)
     titulo_avisos_sobre_actividades_monitores = models.CharField(max_length=1024, blank=True)
+    titulo_aviso_devolucion_dinero_alquiler = models.CharField(max_length=1024, blank=True)
 
     texto_cambios_cancelaciones = models.CharField(max_length=1024, blank=True)
     texto_avisos_actividades = models.CharField(max_length=1024, blank=True)
@@ -32,6 +33,7 @@ class Configuracion(models.Model):
     texto_cambios_sesiones = models.CharField(max_length=1024, blank=True)
     texto_avisos_sobre_actividades_usuarios = models.CharField(max_length=1024, blank=True)
     texto_avisos_sobre_actividades_monitores = models.CharField(max_length=1024, blank=True)
+    texto_aviso_devolucion_dinero_alquiler = models.CharField(max_length=1024, blank=True)
 
     def save(self, *args, **kwargs):
         """Obligamos a que solo haya una configuracion"""

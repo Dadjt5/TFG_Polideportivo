@@ -40,10 +40,33 @@ class Actividad(models.Model):
     def __str__(self):
         return f'{self.nombre}, en la instalacion {self.instalacion}'
 
+    # Función para activar la asistencia de un usuario a las sesiones de la actividad para la que se ha inscrito
     def activarAsistencia(self, usuario):
         for sesion in self.sesiones.all():
             Asistencia.objects.get_or_create(sesion=sesion, usuarioFinal=usuario)
+    
+    # Función para eliminar a un usuario de las asistencias de las sesiones
+    def eliminarAsistencia(self, usuario):
+        for sesion in self.sesiones.all():
+            Asistencia.objects.filter(sesion=sesion, usuarioFinal=usuario).delete()
 
+    # Función para pasar un usuario a la lista de espera siempre y cuando no este ya inscrito
+    def pasarAEspera(self, usuario):
+        if self.sesiones.filter(asistencias__usuarioFinal=usuario).exists():
+            return None
+
+        lista_espera = self.lista_espera
+        return lista_espera.nuevaEntrada(usuario)
+
+    # Función para que un usuario salga de la lista de espera
+    def salirListaEspera(self, usuario):
+        if self.sesiones.filter(asistencias__usuarioFinal=usuario).exists():
+            return None
+
+        lista_espera = self.lista_espera
+        return lista_espera.salirLista(usuario)
+
+    # Función para obtener los precios de la tarifa aplicada a la actividad dependiendo de su tipo
     def obtener_precios(self):
         if self.tipoActividad == TipoActividad.OTROS:
             return {
@@ -74,6 +97,7 @@ class Actividad(models.Model):
 
         raise Http404("Tipo de actividad no válido")
     
+    # Función de ayuda para calcular el precio base de la actividad basandose en la tarifa y el tipo de actividad
     def _calcular_precio_base(self, usuario, numeroHorasSemana=0, numeroPersonas=0, tipoPago='', tipoSesion=''):
         """Devuelve el precio base según tipo de actividad y parámetros"""
         if self.tipoActividad == TipoActividad.OTROS:

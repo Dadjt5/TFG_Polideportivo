@@ -38,6 +38,21 @@ export default {
   discountDetails: "Desglose del descuento",
   rented: "Alquilado",
   rentedNoPay: "Alquilado sin pagar",
+  confirmCreate: "Confirmar creación",
+  noRegister: "No se ha podido efectuar el registro",
+  goToList: "Pasar a la lista de espera",
+  noPlacesMessage: "No quedan plazas disponibles. Puedes apuntarte a la lista de espera.",
+  loginToBook: "Inicia sesión para reservar",
+  noPlacesAvailable: "No hay plazas disponibles",
+  placesAvailable: "Aún hay plazas disponibles",
+  waitingList: "Lista de espera",
+  position: "Posicion",
+  waitingListInfo: "Te avisaremos cuando haya una plaza disponible",
+  leaveWaitingList: "Salir de la lista",
+  leave: "Salir de la lista",
+  confirmExit: "Confirmar salida",
+  confirmLeaveListDelete: "Confirmar salida de la lista de espera",
+  listNotifMessage: "Al pulsar en 'Confirmar', se redirigirá a la compra. Este mensaje será eliminado automáticamente. Sino termina la compra, perderá la opción.",
 
   /* Eliminaciones */
   confirmDelete: "Confirmar eliminación",
@@ -119,6 +134,8 @@ export default {
   noPermissions: "No tienes permisos para realizar esta acción",
   expiredPay: "Se ha cancelado la reserva por tiempo agotado",
   payError: 'Error al efectuar el pago',
+  successWaitingList: "Has entrado en la lista de espera, te llegará una notificación cuando haya una plaza disponible. Posición en la lista: ",
+  errorWaitingList: "Ya estas inscrito en esta lista de espera o en la actividad",
 
   /* Perfil */
   role: "Rol",
@@ -166,6 +183,7 @@ export default {
   filterBy: "Filtrar por",
 
   activities: "Actividades",
+  rents: "Alquileres",
   facilities: "Instalaciones",
   activity: "Actividad",
   facility: "Instalación",
@@ -260,6 +278,7 @@ export default {
   sessions: "Sesiones",
   viewSesion: "Ver sesión",
   booking: "Reserva",
+  rent: "Alquiler",
   images: "Imágenes",
   period: "Periodo",
   status: "Estado",
@@ -623,6 +642,7 @@ export default {
   maxPercentage: "Porcentaje máximo aplicable a los descuentos",
   maxDaysFacilityReservation: "Días máximos para alquilar",
   consecutiveHours: "Cantidad de horas consecutivas máxima para alquilar",
+  textDevolutionNotice: "Aviso devolución de dinero y cancelación",
 
   /* Foro administrador */
   channelName: "Nombre del canal",

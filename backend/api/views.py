@@ -797,6 +797,33 @@ class RegistroAdministradorView(APIView):
 
         return Response(admin)
 
+
+# Reaccionar a la notificacion de la lista de espera
+class AccionNotificacionView(APIView):
+    permission_classes = [IsUsuarioFinal]
+
+    def post(self, request, notificacion_id):
+        notificacion = get_object_or_404(Notificacion, id=notificacion_id, usuario=request.user)
+        aceptar = request.data.get("aceptar", False)
+
+        notificacion.actividad.plazasReservadas -= 1
+        notificacion.actividad.save()
+
+        if not aceptar:
+            lista_espera = notificacion.actividad.lista_espera
+            while notificacion.actividad.plazasReservadas < notificacion.actividad.plazasMaximas:
+                entrada = lista_espera.siguienteUsuario()
+                if not entrada:
+                    break
+
+                notificacion.actividad.plazasReservadas += 1
+                notificacion.actividad.save()
+
+                Notificacion.notificarSalidaListaDeEspera(entrada.usuarioFinal, notificacion.actividad)
+
+        return Response({"respuesta": "Exito"},  status=status.HTTP_200_OK)
+
+
 # Crear nuevas notificaciones
 class NuevaNotificacionView(APIView):
     permission_classes = [IsAdministrador]
@@ -963,6 +990,7 @@ class ReservasView(APIView):
         )
 
         actividades = ReservaActividad.objects.filter(usuarioFinal__user=user, estado=EstadoReserva.CONFIRMADA)
+        listas_espera = EntradaListaEspera.objects.filter(usuarioFinal__user=user)
 
         for alquiler in alquileres:
             reservas.append({
@@ -1012,6 +1040,44 @@ class ReservasView(APIView):
                     {"id": d.id, "nombre": d.nombre, "porcentaje": d.porcentaje} 
                     for d in getattr(reserva_act, "descuentos", []).all()
                 ],
+            })
+        
+        for entrada in listas_espera:
+            actividad = entrada.listaEspera.actividad
+            sesiones = actividad.sesiones.all()
+
+            # Calcular posicion en la lista
+            posicion = list(actividad.lista_espera.registro.all()).index(entrada) + 1
+
+            reservas.append({
+                "id": entrada.id,
+                "tipo": "LISTA_ESPERA",
+                "estado": "En espera",
+                "puede_cancelar": True,
+
+                "actividad": {
+                    "id": actividad.id,
+                    "nombre": actividad.nombre,
+                    "dias": [
+                        {
+                            "dia": s.dia,
+                            "horaInicio": s.horaInicio.strftime("%H:%M"),
+                            "horaFin": s.horaFin.strftime("%H:%M"),
+                        }
+                        for s in sesiones
+                    ],
+                    "horasSemanales": getattr(actividad, "calcularHorasSemanales", lambda: None)(),
+                    "periodo": actividad.periodo,
+                },
+
+                "instalacion": None,
+                "fecha": str(entrada.fechaEntrada),
+                "horaInicio": entrada.horaEntrada,
+                "horaFin": None,
+
+                "posicion": posicion,
+
+                "descuentos": [],
             })
 
         return Response(reservas)
@@ -1348,7 +1414,7 @@ class EditarInstalacionView(APIView):
                 agenda_existente = agendas_existentes.get(dia)
 
                 if agenda_existente:
-                    # Validar conflicto antes
+                    # Validamos el conflicto
                     if not instalacion.controlarCambioHorario(dia, apertura, cierre, abierto):
                         return Response(
                             {"respuesta": f"No se puede modificar el día {dia} por conflictos existentes"},
@@ -1359,6 +1425,8 @@ class EditarInstalacionView(APIView):
                     agenda_existente.horaCierre = cierre
                     agenda_existente.abierto = abierto
                     agenda_existente.save()
+
+                    instalacion.sincronizarMapaReservas(agenda_existente)
                 else:
                     if not instalacion.nuevoHorario(dia, apertura, cierre, abierto):
                         return Response(
@@ -1425,7 +1493,7 @@ class NuevaActividadView(APIView):
 
     @transaction.atomic
     def post(self, request):
-        actividad_json = request.POST.get("actividad", "{}")
+        actividad_json = request.data.get("actividad", "{}")
         actividad_data = json.loads(actividad_json)
         imagen = request.FILES.get("imagenURL")
 
@@ -1437,8 +1505,11 @@ class NuevaActividadView(APIView):
         instalacion = get_object_or_404(Instalacion, id=instalacion_id)
         monitor = get_object_or_404(Monitor, id=monitor_id)
 
-        sesiones_json = request.POST.get("sesiones", "[]")
+        sesiones_json = request.data.get("sesiones", "[]")
+        periodo = request.data.get("periodo")
         sesiones = json.loads(sesiones_json)
+
+        instalacion.revisarAlquileres(sesiones, periodo, True)
 
         # Validar horarios primero
         for sesion in sesiones:
@@ -1522,6 +1593,9 @@ class EditarActividadView(APIView):
             
             sesiones_json = request.POST.get("sesiones", "[]")
             sesiones_recibidas = json.loads(sesiones_json)
+            periodo = request.data.get("periodo")
+    
+            instalacion.revisarAlquileres(sesiones_recibidas, periodo, True)
 
             sesiones_bd = actividad.sesiones.all()
             ids_recibidos = []
@@ -1587,6 +1661,32 @@ class EditarActividadView(APIView):
 
         except Exception as e:
             return Response({"respuesta": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ComprobarAlquileresView(APIView):
+    permission_classes = [IsAdministradorEspacios]
+
+    def post(self, request, instalacion_id):
+        instalacion = get_object_or_404(Instalacion, id=instalacion_id)
+
+        sesiones_json = request.data.get("sesiones", "[]")
+        periodo = request.data.get("periodo")
+        sesiones = json.loads(sesiones_json)
+
+        resultado = instalacion.revisarAlquileres(sesiones, periodo, False)
+
+        if not resultado or resultado["alquileres"] == 0:
+            return Response({
+                "conflicto": False,
+                "mensaje": "No hay conflictos con alquileres"
+            }, status=status.HTTP_200_OK)
+
+        return Response({
+            "conflicto": True,
+            "alquileres_afectados": resultado["alquileres"],
+            "usuarios_afectados": resultado["usuarios"],
+            "dinero_a_devolver": resultado["dinero"]
+        }, status=status.HTTP_200_OK)
 
 
 class TarifaActividadView(APIView):
@@ -1811,6 +1911,30 @@ class ObtenerConfiguracionView(APIView):
             return Response({"respuesta": "Resultados cambiados correctamente"}, status=status.HTTP_200_OK)
         
         return Response({"respuesta": "Error al modificar la configuracion"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class PasarListaEsperaView(APIView):
+    permission_classes = [IsUsuarioFinal]
+
+    def post(self, request, actividad_id):
+        actividad = get_object_or_404(Actividad, id=actividad_id)
+
+        posicion = actividad.pasarAEspera(request.user.usuario_final)
+
+        if not posicion:
+            return Response({"respuesta": "El usuario ya esta inscrito en la lista de espera"}, status=status.HTTP_404_NOT_FOUND)
+        
+        return Response({"respuesta": "Entrada correcta en la lista de espera", "posicion": posicion}, status=status.HTTP_200_OK)
+    
+    def delete(self, request, actividad_id):
+        actividad = get_object_or_404(Actividad, id=actividad_id)
+
+        respuesta = actividad.salirListaEspera(request.user.usuario_final)
+
+        if not respuesta:
+            return Response({"respuesta": "Error, no se ha podido salir de la lista"}, status=status.HTTP_404_NOT_FOUND)
+        
+        return Response({"respuesta": "Salida correcta de la lista de espera"}, status=status.HTTP_200_OK)
 
 
 class ReservarActividadView(APIView):
@@ -2129,7 +2253,7 @@ class CancelarPagoView(APIView):
         pago = get_object_or_404(Pago, id=pago_id)
 
         if pago.estadoPago != EstadoPago.CANCELADO:
-            pago.cancelarPago()
+            pago.cancelarPago("")
 
         return Response({"respuesta": "Pago cancelado correctamente"}, status=status.HTTP_200_OK)
 
@@ -2162,10 +2286,7 @@ class CancelarReservaActividadView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        if pago.stripe_subscription_id:
-            stripe.Subscription.delete(pago.stripe_subscription_id)
-
-        reserva.cancelarCompra()
+        pago.cancelarPago("subscripcion")
         reserva.delete()
 
         return Response({"respuesta": "Reserva cancelada correctamente"}, status=200)
@@ -2194,23 +2315,14 @@ class CancelarAlquilerView(APIView):
 
         if pago.estadoPago == EstadoPago.PAGADO:
             try:
-                refund = stripe.Refund.create(
-                    payment_intent=pago.stripe_payment_intent
-                )
-
-                print("Refund creado:", refund.id, refund.status)
-
-                pago.estadoPago = EstadoPago.CANCELADO
-                pago.save()
+                pago.cancelarPago("unico")
+                alquiler.delete()
             except stripe.error.StripeError as e:
                 print("Error en el refund:", str(e))
                 return Response(
                     {"error": "No se pudo procesar el reembolso"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
-
-        alquiler.cancelarCompra()
-        alquiler.delete()
         
         return Response({"respuesta": "Alquiler eliminado"}, status=status.HTTP_200_OK)
 
@@ -2225,10 +2337,7 @@ class CancelarAbonoView(APIView):
         compra_ct = ContentType.objects.get_for_model(CompraAbono)
         pago = Pago.objects.get(content_type=compra_ct, object_id=compra.id)
 
-        if pago.stripe_subscription_id:
-            stripe.Subscription.delete(pago.stripe_subscription_id)
-
-        compra.cancelarCompra()
+        pago.cancelarPago("subscripcion")
         compra.delete()
 
         return Response({"respuesta": "Compra de abono eliminada"}, status=200)
@@ -2245,13 +2354,8 @@ class CancelarBonoView(APIView):
         pago = Pago.objects.get(content_type=compra_ct, object_id=compra.id)
 
         if pago.estadoPago == EstadoPago.PAGADO and compra.vecesUsado == 0:
-            stripe.Refund.create(payment_intent=pago.stripe_payment_intent)
-
-            pago.estadoPago = EstadoPago.CANCELADO
-            pago.save()
-
-        compra.cancelarCompra()
-        compra.delete()
+            pago.cancelarPago("unico")
+            compra.delete()
 
         return Response({"respuesta": "Compra de bono eliminada"}, status=status.HTTP_200_OK)
 
@@ -2280,10 +2384,7 @@ class StripeWebhookView(APIView):
                 pago = Pago.objects.get(stripe_subscription_id=subscription_id)
                 Notificacion.notificarProblemasPago(pago.usuarioFinal)
 
-                if pago.stripe_subscription_id:
-                    stripe.Subscription.delete(pago.stripe_subscription_id)
-
-                pago.cancelarPago()
+                pago.cancelarPago("subscripcion")
             except Pago.DoesNotExist:
                 pass
 

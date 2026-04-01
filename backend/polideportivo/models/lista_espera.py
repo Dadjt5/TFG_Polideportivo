@@ -10,9 +10,17 @@ class ListaEspera(models.Model):
     def __str__(self):
         return f'Lista de espera para {self.actividad}'
 
+    def nuevaEntrada(self, usuario):
+        if self.registro.filter(usuarioFinal=usuario).exists():
+            return None
+
+        EntradaListaEspera.objects.create(usuarioFinal=usuario, listaEspera=self)
+        return self.registro.count()
+
     def salirLista(self, usuario):
-        self.registro.filter(usuarioFinal=usuario).delete()
-        
+        if self.registro.filter(usuarioFinal=usuario).exists():
+            self.registro.filter(usuarioFinal=usuario).delete()
+
     def siguienteUsuario(self):
         return self.registro.order_by('fechaEntrada', 'horaEntrada').first()
 
@@ -20,8 +28,8 @@ class ListaEspera(models.Model):
 class EntradaListaEspera(models.Model):
     """Modelo para representar una entrada a la lista de espera"""
 
-    fechaEntrada = models.DateField(auto_now=True)
-    horaEntrada = models.TimeField(auto_now=True)
+    fechaEntrada = models.DateField(auto_now_add=True)
+    horaEntrada = models.TimeField(auto_now_add=True)
 
     listaEspera = models.ForeignKey(ListaEspera, on_delete=models.CASCADE, related_name="registro")
     usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.CASCADE, related_name="lista_espera")
@@ -35,3 +43,4 @@ class EntradaListaEspera(models.Model):
 
     class Meta:
         unique_together = ('listaEspera', 'usuarioFinal')
+        ordering = ['fechaEntrada', 'horaEntrada']

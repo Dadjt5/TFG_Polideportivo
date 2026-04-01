@@ -11,6 +11,7 @@ export const useConfiguracionStore = defineStore("configuracion", {
 		dias_minimo_cancelacion: 0,
 		horas_alquiler_consecutivas: 0,
 		porcentaje_maximo: 0,
+
 		titulo_cambios_cancelaciones: '',
 		titulo_avisos_actividades: '',
 		titulo_problemas_pago: '',
@@ -20,6 +21,8 @@ export const useConfiguracionStore = defineStore("configuracion", {
 		titulo_cambios_sesiones: '',
 		titulo_avisos_sobre_actividades_usuarios: '',
 		titulo_avisos_sobre_actividades_monitores: '',
+		titulo_aviso_devolucion_dinero_alquiler: '',
+
 		texto_cambios_cancelaciones: '',
 		texto_avisos_actividades: '',
 		texto_problemas_pago: '',
@@ -29,6 +32,8 @@ export const useConfiguracionStore = defineStore("configuracion", {
 		texto_cambios_sesiones: '',
 		texto_avisos_sobre_actividades_usuarios: '',
 		texto_avisos_sobre_actividades_monitores: '',
+		texto_aviso_devolucion_dinero_alquiler: '',
+
 		modificado: false
 	}),
 
@@ -54,6 +59,7 @@ export const useConfiguracionStore = defineStore("configuracion", {
 				this.titulo_cambios_sesiones = data.titulo_cambios_sesiones;
 				this.titulo_avisos_sobre_actividades_usuarios = data.titulo_avisos_sobre_actividades_usuarios;
 				this.titulo_avisos_sobre_actividades_monitores = data.titulo_avisos_sobre_actividades_monitores;
+				this.titulo_aviso_devolucion_dinero_alquiler = data.titulo_aviso_devolucion_dinero_alquiler;
 
 				this.texto_cambios_cancelaciones = data.texto_cambios_cancelaciones;
 				this.texto_avisos_actividades = data.texto_avisos_actividades;
@@ -64,6 +70,7 @@ export const useConfiguracionStore = defineStore("configuracion", {
 				this.texto_cambios_sesiones = data.texto_cambios_sesiones;
 				this.texto_avisos_sobre_actividades_usuarios = data.texto_avisos_sobre_actividades_usuarios;
 				this.texto_avisos_sobre_actividades_monitores = data.texto_avisos_sobre_actividades_monitores;
+				this.texto_aviso_devolucion_dinero_alquiler = data.texto_aviso_devolucion_dinero_alquiler;
 
 				this.guardarEnLocalStorage();
 
@@ -92,6 +99,7 @@ export const useConfiguracionStore = defineStore("configuracion", {
 					titulo_cambios_sesiones: this.titulo_cambios_sesiones,
 					titulo_avisos_sobre_actividades_usuarios: this.titulo_avisos_sobre_actividades_usuarios,
 					titulo_avisos_sobre_actividades_monitores: this.titulo_avisos_sobre_actividades_monitores,
+					titulo_aviso_devolucion_dinero_alquiler: this.titulo_aviso_devolucion_dinero_alquiler,
 
 					texto_cambios_cancelaciones: this.texto_cambios_cancelaciones,
 					texto_avisos_actividades: this.texto_avisos_actividades,
@@ -102,6 +110,7 @@ export const useConfiguracionStore = defineStore("configuracion", {
 					texto_cambios_sesiones: this.texto_cambios_sesiones,
 					texto_avisos_sobre_actividades_usuarios: this.texto_avisos_sobre_actividades_usuarios,
 					texto_avisos_sobre_actividades_monitores: this.texto_avisos_sobre_actividades_monitores,
+					texto_aviso_devolucion_dinero_alquiler: this.texto_aviso_devolucion_dinero_alquiler,
 				};
 
 				const data = await editarConfiguracion(payload);
@@ -136,6 +145,7 @@ export const useConfiguracionStore = defineStore("configuracion", {
 				titulo_cambios_sesiones: this.titulo_cambios_sesiones,
 				titulo_avisos_sobre_actividades_usuarios: this.titulo_avisos_sobre_actividades_usuarios,
 				titulo_avisos_sobre_actividades_monitores: this.titulo_avisos_sobre_actividades_monitores,
+				titulo_aviso_devolucion_dinero_alquiler: this.titulo_aviso_devolucion_dinero_alquiler,
 
 				texto_cambios_cancelaciones: this.texto_cambios_cancelaciones,
 				texto_avisos_actividades: this.texto_avisos_actividades,
@@ -146,6 +156,7 @@ export const useConfiguracionStore = defineStore("configuracion", {
 				texto_cambios_sesiones: this.texto_cambios_sesiones,
 				texto_avisos_sobre_actividades_usuarios: this.texto_avisos_sobre_actividades_usuarios,
 				texto_avisos_sobre_actividades_monitores: this.texto_avisos_sobre_actividades_monitores,
+				texto_aviso_devolucion_dinero_alquiler: this.texto_aviso_devolucion_dinero_alquiler,
 			}));
 		}
 	}

@@ -45,7 +45,7 @@ class ReservaActividad(Reserva):
 
     def __str__(self):
         return f'Reserva de {self.actividad}'
-    
+
     def calcular_precio(self):
         """Calcula el precio final de la reserva usando la actividad"""
         return self.actividad._calcular_precio_base(
@@ -64,16 +64,16 @@ class ReservaActividad(Reserva):
             self.estado = EstadoReserva.CONFIRMADA
             self.save()
 
+    # Función para cancelar una reserva de una actividad y notificar al siguiente usuario de la lista de espera
     def cancelarCompra(self):
-        self.actividad.lista_espera.salirLista(self.usuarioFinal)
+        if self.estado == EstadoReserva.CONFIRMADA:
+            self.usuarioFinal.actividadesRealizadas -= 1
+            self.actividad.eliminarAsistencia(self.usuarioFinal)
+            self.usuarioFinal.save()
 
         self.actividad.plazasReservadas -= 1
         self.estado = EstadoReserva.CANCELADO
         self.save()
-
-        if self.estado == EstadoReserva.CONFIRMADA:
-            self.usuarioFinal.actividadesRealizadas -= 1
-            self.usuarioFinal.save()
 
         lista_espera = self.actividad.lista_espera
         while self.actividad.plazasReservadas < self.actividad.plazasMaximas:
@@ -81,22 +81,12 @@ class ReservaActividad(Reserva):
             if not entrada:
                 break
 
-            descuentos = Descuento.obtener_descuentos(actividad=self.actividad)
-            if descuentos:
-                self.descuentos.set(descuentos["descuento"]["aplicados"])
-
-            ReservaActividad.objects.get_or_create(
-                usuarioFinal=entrada.usuarioFinal,
-                actividad=self.actividad,
-                estado=EstadoReserva.PENDIENTE
-            )
+            self.actividad.plazasReservadas += 1
+            self.actividad.save()
 
             Notificacion.notificarSalidaListaDeEspera(entrada.usuarioFinal, self.actividad)
 
             entrada.delete()
-
-            self.actividad.plazasReservadas += 1
-            self.actividad.save()
 
     @classmethod
     def contar(cls):
@@ -120,8 +110,7 @@ class ReservaActividad(Reserva):
 
             # Lista de espera
             if actividad.plazasReservadas >= actividad.plazasMaximas and not lista:
-                lista_espera = ListaEspera.objects.filter(actividad=actividad).first()
-                EntradaListaEspera.objects.create(usuarioFinal=usuario, listaEspera=lista_espera)
+                return None
 
             reservasPrevias = cls.objects.filter(usuarioFinal=usuario, actividad=actividad, estado=EstadoReserva.PENDIENTE)
 

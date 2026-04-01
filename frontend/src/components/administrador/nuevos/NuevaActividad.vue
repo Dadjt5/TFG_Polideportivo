@@ -157,6 +157,7 @@
             </select>
           </div>
 
+
           <!-- EXTERIOR -->
           <div class="col-md-12">
             <div class="form-check form-switch mt-2">
@@ -209,34 +210,42 @@
             </h5>
 
             <!-- LEYENDA -->
-            <div class="mt-4">
+            <div class="mt-4 mb-2">
               <span class="badge bg-success me-2">{{ t.free }}</span>
               <span class="badge bg-primary me-2">{{ t.selected }}</span>
               <span class="badge bg-warning text-dark">{{ t.activity }}</span>
             </div>
 
             <div class="row">
-              <div v-for="dia in instalacionSeleccionada.agenda" :key="dia.id" class="col-md-6 mb-3">
-                <div class="p-3 rounded-3 bg-white border">
+              <div v-for="dia in instalacionSeleccionada.agenda" :key="dia.id" class="col-12 mb-3">
+                <div class="p-3 rounded-3 bg-white border shadow-sm">
 
-                  <!-- Nombre del día -->
-                  <div class="d-flex justify-content-between align-items-center mb-2">
+                  <!-- CABECERA CLICKABLE -->
+                  <div class="d-flex justify-content-between align-items-center cursor-pointer"
+                    @click="toggleDia(dia.id)">
                     <span class="fw-semibold">{{ dia.dia }}</span>
                     <span v-if="!dia.abierto" class="text-danger fw-semibold">{{ t.close }}</span>
+                    <span v-else>
+                      <i v-if="isOpen(dia.id)" class="bi bi-chevron-up"></i>
+                      <i v-else class="bi bi-chevron-down"></i>
+                    </span>
                   </div>
 
-                  <!-- Intervalos -->
-                  <div v-if="dia.abierto">
-                    <div v-for="intervalo in dia.mapa_reservas" :key="intervalo.id"
-                      class="small mb-1 px-2 py-1 rounded text-white" :class="{
-                        'bg-primary': esPropio(intervalo, dia),
-                        'bg-success': intervalo.estado === 'Libre' && !esPropio(intervalo, dia),
-                        'bg-warning text-dark': esActividadValida(intervalo, dia)
-                      }">
-                      {{ intervalo.horaInicio.slice(0, 5) }} - {{ intervalo.horaFin.slice(0, 5) }}
+                  <!-- DESPLEGABLE DE INTERVALOS -->
+                  <transition name="fade">
+                    <div v-if="dia.abierto && isOpen(dia.id)" class="mt-2">
+                      <div class="d-flex flex-wrap gap-2">
+                        <div v-for="intervalo in dia.mapa_reservas" :key="intervalo.id"
+                          class="small text-white text-center px-3 py-2 rounded" :class="{
+                            'bg-primary': esPropio(intervalo, dia),
+                            'bg-warning text-dark': !esPropio(intervalo, dia) && esOcupadoPorPeriodo(intervalo),
+                            'bg-success': !esPropio(intervalo, dia) && !esOcupadoPorPeriodo(intervalo)
+                          }">
+                          {{ intervalo.horaInicio.slice(0, 5) }} - {{ intervalo.horaFin.slice(0, 5) }}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-
+                  </transition>
                 </div>
               </div>
             </div>
@@ -431,24 +440,50 @@
 
         <!-- BOTONES -->
         <div class="d-flex justify-content-center gap-3 mt-4">
-          <button class="btn btn-success btn-lg px-5 rounded-pill shadow-sm" @click="crearActividad">
+          <button class="btn btn-success btn-lg px-5 rounded-pill shadow-sm" @click="comprobarAlquiler">
             {{ t.createActivity }}
           </button>
           <button class="btn btn-outline-secondary btn-lg px-5 rounded-pill shadow-sm" @click="volver">
             {{ t.return }}
           </button>
         </div>
-
       </div>
     </main>
+
+    <div class="modal fade" id="confirmCreateModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4">
+
+          <div class="modal-header">
+            <h5 class="modal-title">{{ t.confirmCreate }}</h5>
+          </div>
+
+          <div class="modal-body text-center">
+            <p>{{ mensajeRevisar }}</p>
+          </div>
+
+          <div class="modal-footer justify-content-center">
+            <button class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">
+              {{ t.cancel }}
+            </button>
+
+            <button class="btn btn-primary rounded-pill" @click="crearActividad">
+              {{ t.continue }}
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { watch, inject, type Ref, ref, onMounted, computed } from "vue"
 import { useRouter } from "vue-router"
+import { Modal } from 'bootstrap'
 
-import { nuevaActividad } from "@/services/crearRecursosService"
+import { nuevaActividad, revisarAlquiler } from "@/services/crearRecursosService"
 import { getInstalacionesSimples, getMonitoresSimples, getTarifasActividadComun, getTarifasFisioterapia, getTarifasGrupoReducido, getDeportes } from "@/services/listadoService"
 
 import { useTiposStore } from "@/stores/tipos"
@@ -486,7 +521,7 @@ const actividad = ref({
   tipoReserva: "",
   terreno: "",
   estado: "",
-  periodo: "",
+  periodo: "Todo el año",
 })
 
 const errores = ref({
@@ -507,6 +542,7 @@ const errores = ref({
 })
 
 const mensaje = ref("")
+const mensajeRevisar = ref("")
 const instalaciones = ref<any[]>([])
 const monitores = ref<any[]>([])
 const tarifas = ref<any[]>([])
@@ -530,6 +566,19 @@ const crearSesion = ref({
   horaFin: ""
 })
 
+function esOcupadoPorPeriodo(intervalo: any) {
+  const periodos = intervalo.periodo || []
+
+  if (actividad.value.periodo === "Todo el año") {
+    return periodos.length > 0
+  }
+
+  return (
+    periodos.includes(actividad.value.periodo) ||
+    periodos.includes("Todo el año")
+  )
+}
+
 function esPropio(intervalo: any, dia: any) {
   return sesiones.value.some(sesion => {
     return (
@@ -540,25 +589,10 @@ function esPropio(intervalo: any, dia: any) {
   })
 }
 
-
 function esActividadValida(intervalo: any, dia: any) {
-  const mes = new Date().getMonth() + 1
-
-  let periodoActual = ""
-  if (mes >= 9 || mes === 1) {
-    periodoActual = "Desde septiembre hasta enero"
-  } else if (mes >= 2 && mes <= 5) {
-    periodoActual = "Desde febrero hasta mayo"
-  } else if (mes >= 6 && mes <= 8) {
-    periodoActual = "Meses de verano"
-  } else {
-    periodoActual = "Todo el año"
-  }
-
-  return (
-    intervalo.estado === "Reserva actividad" &&
-    (intervalo.periodo === periodoActual || intervalo.periodo === "Todo el año")
-  )
+  if (actividad.value.periodo === "Todo el año") return true
+  return intervalo.estado === "Reserva actividad" &&
+    (intervalo.periodo.includes(actividad.value.periodo) || intervalo.periodo.includes("Todo el año"))
 }
 
 const monitorSeleccionado = computed(() =>
@@ -599,6 +633,54 @@ function agregarSesion() {
   calleSeleccionada.value = null
 }
 
+let confirmModal: Modal
+
+const comprobarAlquiler = async () => {
+  if (!validarFormulario()) {
+    lanzarMensaje(t.value.missing, "error")
+    return
+  }
+
+  if (sesiones.value.length === 0) {
+    lanzarMensaje(t.value.noSessionWarning, "error")
+    return
+  }
+
+  if (!horasValidas()) {
+    lanzarMensaje(t.value.wrongTimetable, "error")
+    return
+  }
+
+  if (!horasEnPunto()) {
+    lanzarMensaje(t.value.onTheHourWarning, "error")
+    return
+  }
+
+  const formData = new FormData()
+
+  formData.append("sesiones", JSON.stringify(sesiones.value))
+  formData.append("periodo", actividad.value.periodo)
+
+  const respuesta = await revisarAlquiler(actividad.value.instalacion, formData)
+
+  if (!respuesta?.conflicto) {
+    mensajeRevisar.value = "No hay conflictos con alquileres existentes."
+    confirmModal.show()
+    return
+  }
+
+  const usuarios = respuesta.usuarios_afectados
+  const alquileres = respuesta.alquileres_afectados
+  const dinero = respuesta.dinero_a_devolver
+
+  mensajeRevisar.value = `Esta acción afectará a ${alquileres} alquiler${alquileres !== 1 ? 'es' : ''} existente${alquileres !== 1 ? 's' : ''}:
+  de ${usuarios} usuario${usuarios !== 1 ? 's' : ''}
+  y se devolveran ${dinero} €
+  ¿Deseas continuar?`
+
+  confirmModal.show()
+}
+
 function validarFormulario() {
   let ok = true
 
@@ -628,6 +710,18 @@ function validarFormulario() {
 
   return ok
 }
+
+const openDias = ref([])
+
+const toggleDia = (id: any) => {
+  if (openDias.value.includes(id)) {
+    openDias.value = openDias.value.filter(i => i !== id)
+  } else {
+    openDias.value.push(id)
+  }
+}
+
+const isOpen = (id: any) => openDias.value.includes(id)
 
 function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
   mensajeEditar.value = texto
@@ -659,6 +753,8 @@ function horasEnPunto() {
 }
 
 const crearActividad = async () => {
+  confirmModal.hide()
+
   if (!validarFormulario()) {
     lanzarMensaje(t.value.missing, "error")
     return
@@ -683,6 +779,7 @@ const crearActividad = async () => {
 
   formData.append("actividad", JSON.stringify(actividad.value))
   formData.append("sesiones", JSON.stringify(sesiones.value))
+  formData.append("periodo", actividad.value.periodo)
 
   const deporteFinal =
     deporteSeleccionado.value === "nuevo"
@@ -736,6 +833,8 @@ watch(instalacionSeleccionada, (nuevaInstalacion) => {
 })
 
 onMounted(async () => {
+  confirmModal = new Modal(document.getElementById('confirmCreateModal')!)
+
   instalaciones.value = await getInstalacionesSimples()
   monitores.value = await getMonitoresSimples()
   tarifas.value = await getTarifasActividadComun()

@@ -23,3 +23,9 @@ export const cancelarAlquiler = async (id: number) => {
   const response = await api.delete(`api/v1/alquileres/${id}/cancelar/`)
   return response.data;
 }
+
+/* Función para salir de la lista de espera */
+export const salirLista = async (id: number) => {
+  const response = await api.delete(`api/v1/actividades/${id}/esperar/`)
+  return response.data;
+}

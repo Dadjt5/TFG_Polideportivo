@@ -2,11 +2,24 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from datetime import time, datetime, timedelta, date
 from django.db.models import Q
+from django.contrib.contenttypes.models import ContentType
 
 from .agenda import Agenda
 from .actividad import Sesion
-from .constantes import TipoInstalacion, Dia, TipoReserva, Periodo
+from .notificacion import Notificacion
+from .usuario_final import UsuarioFinal
+from .pago import Pago
+from .constantes import TipoInstalacion, Dia, TipoReserva, Periodo, EstadoReserva
 
+DIA_MAP = {
+    "Lunes": 0,
+    "Martes": 1,
+    "Miercoles": 2,
+    "Jueves": 3,
+    "Viernes": 4,
+    "Sabado": 5,
+    "Domingo": 6
+}
 
 class Pabellon(models.Model):
     """Modelo para representar un pabellon"""
@@ -98,7 +111,6 @@ class Instalacion(models.Model):
 
             agenda = Agenda.objects.filter(dia__iexact=dia).first()
 
-
             if agenda:
                 if isinstance(hora_inicio, str):
                     hora_inicio = datetime.strptime(hora_inicio, "%H:%M").time()
@@ -118,7 +130,6 @@ class Instalacion(models.Model):
                         calle=calle_num
                     ).first()
 
-
                     if mapa:
                         mapa.estado = TipoReserva.ACTIVIDAD
                         mapa.save()
@@ -130,8 +141,17 @@ class Instalacion(models.Model):
             agenda.mapa_reservas.all().delete()
             return True
 
-        inicio = datetime.combine(datetime.today(), agenda.horaApertura)
-        fin = datetime.combine(datetime.today(), agenda.horaCierre)
+        horaApertura = agenda.horaApertura
+        horaCierre = agenda.horaCierre
+
+        if isinstance(horaApertura, str):
+            horaApertura = time.fromisoformat(horaApertura)
+        
+        if isinstance(horaCierre, str):
+            horaCierre = time.fromisoformat(horaCierre)
+
+        inicio = datetime.combine(datetime.today(), horaApertura)
+        fin = datetime.combine(datetime.today(), horaCierre)
         slots_necesarios = []
         while inicio < fin:
             siguiente = inicio + timedelta(minutes=minutos)
@@ -141,7 +161,7 @@ class Instalacion(models.Model):
         slots_existentes = agenda.mapa_reservas.all()
 
         for reserva in slots_existentes:
-            if reserva.horaInicio < agenda.horaApertura or reserva.horaFin > agenda.horaCierre:
+            if reserva.horaInicio < horaApertura or reserva.horaFin > horaCierre:
                 reserva.delete()
 
         if self.tipoInstalacion != TipoInstalacion.PISCINA:
@@ -156,6 +176,7 @@ class Instalacion(models.Model):
 
         return True
 
+    # Función para actualizar el número de calles de una piscina
     def sincronizarCalles(self, numero_calles):
         if self.tipoInstalacion != TipoInstalacion.PISCINA:
             self.calles.all().delete()
@@ -173,6 +194,87 @@ class Instalacion(models.Model):
         self.numeroCalles = numero_calles
         self.save()
 
+    # Función para revisar la lista de alquileres realizados que coinciden con ciertas sesiones de una actividad
+    def revisarAlquileres(self, sesiones, periodo, confirmacion):
+        usuarios_ids = set()
+        alquileres_conflicto = set()
+        alquileres_pendientes = set()
+
+        alquileres = self.reservas.exclude(estado=EstadoReserva.CANCELADO)
+
+        for sesion in sesiones:
+            dia = sesion.get("dia")
+            hora_inicio_sesion = sesion.get("horaInicio")
+            hora_fin_sesion = sesion.get("horaFin")
+            calle_num = sesion.get("calle")
+
+            dia_sesion = DIA_MAP.get(dia)
+
+            # Convertir horas
+            if isinstance(hora_inicio_sesion, str):
+                hora_inicio_sesion = time.fromisoformat(hora_inicio_sesion)
+            if isinstance(hora_fin_sesion, str):
+                hora_fin_sesion = time.fromisoformat(hora_fin_sesion)
+
+            for alquiler in alquileres:
+                if alquiler.calle != calle_num:
+                    continue
+
+                if alquiler.fecha.weekday() != dia_sesion:
+                    continue
+
+                # Comprobamos el periodo de la actividad en relacion al alquiler
+                mes = alquiler.fecha.month
+                if periodo == Periodo.PRIMER_CUATRIMESTRE:
+                    if mes not in [9,10,11,12,1]:
+                        return None
+                elif periodo == Periodo.SEGUNDO_CUATRIMESTRE:
+                    if mes not in [2,3,4,5]:
+                        return None
+                elif periodo == Periodo.TERCER_CUATRIMESTRE:
+                    if mes not in [6,7,8]:
+                        return None
+
+                inicio = alquiler.horaInicio
+                fin = alquiler.horaFin
+
+                if not (hora_fin_sesion <= inicio or hora_inicio_sesion >= fin):
+                    if alquiler.estado == EstadoReserva.CONFIRMADA:
+                        usuarios_ids.add(alquiler.usuarioFinal.id)
+                        alquileres_conflicto.add(alquiler)
+                    elif alquiler.estado == EstadoReserva.PENDIENTE:
+                        alquileres_pendientes.add(alquiler)
+
+        if confirmacion:
+            usuarios = UsuarioFinal.objects.filter(id__in=usuarios_ids)
+
+            Notificacion.notificarCancelacionYDevolucionDinero(usuarios, self)
+
+            for alquiler in alquileres_pendientes:
+                alquiler.cancelarCompra()
+
+            for alquiler in alquileres_conflicto:
+                ct = ContentType.objects.get_for_model(alquiler)
+                pago = Pago.objects.filter(content_type=ct, object_id=alquiler.id).first()
+                if pago:
+                    pago.cancelarPago("unico")
+
+            return
+
+        dinero = 0
+        for alquiler in alquileres_conflicto:
+            ct = ContentType.objects.get_for_model(alquiler)
+            pago = Pago.objects.filter(content_type=ct, object_id=alquiler.id).first()
+            if pago:
+                dinero += pago.costeFinal
+
+        return {
+            "alquileres": len(alquileres_conflicto),
+            "usuarios": len(usuarios_ids),
+            "dinero": dinero
+        }
+
+    # Función para controlar los horarios de sesiones de una actividad para saber si coinciden con otras sesiones de otras actividades
     def controlarHorarioActividad(self, dia, hora_inicio, hora_fin, sesion_id=None, calle=None):
         if isinstance(hora_inicio, str):
             h, m = map(int, hora_inicio.split(":"))
@@ -197,10 +299,15 @@ class Instalacion(models.Model):
             periodo = Periodo.SEGUNDO_CUATRIMESTRE
         else:
             periodo = Periodo.ANUAL
+        
+        if periodo == Periodo.ANUAL:
+            periodos_a_revisar = [Periodo.PRIMER_CUATRIMESTRE, Periodo.SEGUNDO_CUATRIMESTRE, Periodo.ANUAL]
+        else:
+            periodos_a_revisar = [periodo, Periodo.ANUAL]
 
         conflictos = Sesion.objects.filter(
             actividad__instalacion=self,
-            actividad__periodo__in=[periodo, "ANUAL"],
+            actividad__periodo__in=periodos_a_revisar,
             dia__iexact=dia,
             horaInicio__lt=hora_fin,
             horaFin__gt=hora_inicio

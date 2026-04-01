@@ -127,46 +127,110 @@
           <!-- TAB 2: HORARIO -->
           <div class="tab-pane fade" id="horario">
             <div class="row g-3">
-              <div v-if="agenda.length" class="card border-0 shadow-sm rounded-4 p-4 bg-light">
+
+              <!-- VISTA NORMAL -->
+              <div v-if="agenda.length && !editando" class="card border-0 shadow-sm rounded-4 p-4 bg-light">
                 <h5 class="fw-bold mb-3">
                   {{ t.timetable }}
                 </h5>
 
-                <!-- LEYENDA -->
-                <div class="mt-4">
-                  <span class="badge bg-success me-2">{{ t.free }}</span>
-                  <span class="badge bg-danger me-2">{{ t.rented }}</span>
-                  <span class="badge bg-warning text-dark me-2">{{ t.rentedNoPay }}</span>
-                  <span class="badge bg-primary">{{ t.activity }}</span>
+                <label class="form-label fw-semibold mt-3">{{ t.reserveType }}</label>
+                <select class="form-select form-select-lg" v-model="tipoVista">
+                  <option value="actividades">{{ t.activities }}</option>
+                  <option value="alquileres">{{ t.rents }}</option>
+                </select>
+
+                <div class="mt-2" v-if="tipoVista === 'actividades'">
+                  <label class="form-label fw-semibold">{{ t.period }}</label>
+                  <select class="form-select form-select-lg" v-model="periodo">
+                    <option v-for="t in tiposStore.periodos" :key="t" :value="t">{{ t }}</option>
+                  </select>
                 </div>
 
-                <div class="row">
-                  <div v-for="dia in agenda" :key="dia.id" class="col-md-6 mb-3">
-                    <div class="p-3 rounded-3 bg-white border">
+                <!-- LEYENDA -->
+                <div class="mt-4 mb-2">
+                  <span class="badge bg-success me-2">{{ t.free }}</span>
 
-                      <!-- Nombre del día -->
-                      <div class="d-flex justify-content-between align-items-center mb-2">
+                  <template v-if="tipoVista === 'actividades'">
+                    <span class="badge bg-primary">{{ t.activity }}</span>
+                  </template>
+
+                  <template v-else>
+                    <span class="badge bg-danger me-2">{{ t.rented }}</span>
+                    <span class="badge bg-warning text-dark me-2">{{ t.rentedNoPay }}</span>
+                  </template>
+                </div>
+
+                <div class="row" :key="periodo">
+                  <div v-for="dia in agenda" :key="dia.id" class="col-12 mb-3">
+                    <div class="p-3 rounded-3 bg-white border shadow-sm">
+
+                      <!-- CABECERA CLICKABLE -->
+                      <div class="d-flex justify-content-between align-items-center cursor-pointer"
+                        @click="toggleDia(dia.id)">
                         <span class="fw-semibold">{{ dia.dia }}</span>
                         <span v-if="!dia.abierto" class="text-danger fw-semibold">{{ t.close }}</span>
+                        <span v-else>
+                          <i v-if="isOpen(dia.id)" class="bi bi-chevron-up"></i>
+                          <i v-else class="bi bi-chevron-down"></i>
+                        </span>
                       </div>
 
-                      <!-- Intervalos -->
-                      <div v-if="dia.abierto">
-                        <div v-for="intervalo in dia.mapa_reservas" :key="intervalo.id"
-                          class="small mb-1 px-2 py-1 rounded text-white" :class="{
-                            'bg-success': intervalo.estado === 'Libre',
-                            'bg-primary': intervalo.estado === 'Reserva actividad',
-                            'bg-danger': intervalo.estado === 'Reserva usuario' && intervalo.pagada,
-                            'bg-warning text-dark': intervalo.estado === 'Reserva usuario' && !intervalo.pagada
-                          }">
-                          {{ intervalo.horaInicio.slice(0, 5) }} - {{ intervalo.horaFin.slice(0, 5) }}
+                      <!-- DESPLEGABLE -->
+                      <transition name="fade">
+                        <div v-if="dia.abierto && isOpen(dia.id)" class="mt-2">
+                          <div class="d-flex flex-wrap gap-2">
+                            <div v-for="intervalo in dia.mapa_reservas" :key="intervalo.id"
+                              class="small text-white text-center px-3 py-2 rounded"
+                              :class="getClaseIntervalo(intervalo)">
+                              {{ intervalo.horaInicio.slice(0, 5) }} - {{ intervalo.horaFin.slice(0, 5) }}
+                            </div>
+                          </div>
                         </div>
+                      </transition>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- VISTA EDICIÓN -->
+              <div v-else class="row">
+                <div class="col-md-6 col-lg-4" v-for="dia in agenda" :key="dia.dia">
+                  <div class="card border-1 border-light shadow-sm rounded-4 h-100">
+                    <div class="card-body">
+
+                      <!-- Cabecera -->
+                      <div class="d-flex justify-content-between align-items-center mb-3">
+                        <strong class="fs-5">{{ dia.dia }}</strong>
+
+                        <!-- Switch abierto/cerrado -->
+                        <div class="form-check form-switch">
+                          <input class="form-check-input" type="checkbox" v-model="dia.abierto">
+                        </div>
+                      </div>
+
+                      <!-- Horario editable -->
+                      <div v-if="dia.abierto">
+                        <div class="d-flex gap-2 align-items-center">
+                          <input type="time" class="form-control" v-model="dia.horaApertura" />
+
+                          <span class="text-muted">-</span>
+
+                          <input type="time" class="form-control" v-model="dia.horaCierre" />
+                        </div>
+                      </div>
+
+                      <!-- Mensaje si está cerrado -->
+                      <div v-else class="text-muted small text-center mt-2">
+                        {{ t.close }}
                       </div>
 
                     </div>
                   </div>
                 </div>
               </div>
+
             </div>
           </div>
 
@@ -366,6 +430,7 @@ const agenda = ref<any[]>([])
 const fechasEspeciales = ref<any[]>([])
 const pabellones = ref<any[]>([])
 const tarifas = ref<any[]>([])
+const periodo = ref("Todo el año")
 
 const instalacion = ref({
   id: 0,
@@ -395,6 +460,18 @@ const errores = ref({
   tipoInstalacion: false,
   numeroCalles: false
 })
+
+const openDias = ref([])
+
+const toggleDia = (id: any) => {
+  if (openDias.value.includes(id)) {
+    openDias.value = openDias.value.filter(i => i !== id)
+  } else {
+    openDias.value.push(id)
+  }
+}
+
+const isOpen = (id: any) => openDias.value.includes(id)
 
 const instalacionOriginal = ref<any>(null);
 
@@ -462,12 +539,44 @@ function mezclarReservas() {
   });
 }
 
-function estaDentro(intervalo: any, reserva: any) {
-  const inicioIntervalo = intervalo.horaInicio.slice(0,5);
-  const finIntervalo = intervalo.horaFin.slice(0,5);
+function esOcupadoPorPeriodo(intervalo: any) {
+  const periodos = intervalo.periodo || []
 
-  const inicioReserva = reserva.horaInicio.slice(0,5);
-  const finReserva = reserva.horaFin.slice(0,5);
+  if (periodo.value === "Todo el año") {
+    return periodos.length > 0
+  }
+
+  return (
+    periodos.includes(periodo.value) ||
+    periodos.includes("Todo el año")
+  )
+}
+
+const tipoVista = ref<'actividades' | 'alquileres'>('actividades')
+
+function getClaseIntervalo(intervalo: any) {
+  if (tipoVista.value === 'actividades') {
+    return {
+      'bg-success': intervalo.estado === 'Libre' || !esOcupadoPorPeriodo(intervalo) || (intervalo.estado === 'Reserva usuario' && !intervalo.pagada),
+      'bg-primary': intervalo.estado === 'Reserva actividad' && esOcupadoPorPeriodo(intervalo),
+      'bg-danger': intervalo.estado === 'Reserva usuario' && intervalo.pagada
+    }
+  }
+
+  // Alquileres
+  return {
+    'bg-success': intervalo.estado === 'Libre' || intervalo.estado === 'Reserva actividad',
+    'bg-danger': intervalo.estado === 'Reserva usuario' && intervalo.pagada,
+    'bg-warning text-dark': intervalo.estado === 'Reserva usuario' && !intervalo.pagada,
+  }
+}
+
+function estaDentro(intervalo: any, reserva: any) {
+  const inicioIntervalo = intervalo.horaInicio.slice(0, 5);
+  const finIntervalo = intervalo.horaFin.slice(0, 5);
+
+  const inicioReserva = reserva.horaInicio.slice(0, 5);
+  const finReserva = reserva.horaFin.slice(0, 5);
 
   return (
     inicioIntervalo >= inicioReserva &&
@@ -537,6 +646,19 @@ async function guardarCambios() {
   try {
     await modificarInstalacion(parseInt(props.id), formData)
     lanzarMensaje(t.value.correctlyUpdate, "success")
+    cancelarEdicion()
+
+    const data = await getInstalacionDetalle(parseInt(props.id))
+
+    agenda.value = data.agenda.filter((a: any) => a.dia && !a.fecha)
+    fechasEspeciales.value = data.agenda.filter((a: any) => a.fecha)
+
+    instalacion.value = {
+      ...data,
+      agenda: agenda.value
+    }
+
+    instalacionOriginal.value = JSON.parse(JSON.stringify(instalacion.value))
   } catch (e) {
     lanzarMensaje(t.value.noModify, "error")
     console.error("Error al modificar la instalacion", e)
@@ -593,6 +715,10 @@ watch(
     }
   }
 )
+
+watch(() => periodo, () => {
+  openDias.value = []
+})
 
 onMounted(async () => {
   const id = parseInt(props.id);

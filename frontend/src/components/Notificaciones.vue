@@ -76,7 +76,11 @@
                     </span>
                   </div>
 
-                  <div v-if="notif.debeMarcar" class="mt-2 d-flex gap-2">
+                  <div v-if="notif.debeMarcar"
+                    class="mt-2 d-flex flex-column gap-2 p-2 border rounded bg-warning bg-opacity-10">
+                    <p class="mb-1 text-dark small">
+                      {{ t.listNotifMessage }}
+                    </p>
                     <button class="btn btn-success btn-sm" @click="responderNotif(notif, true)">
                       {{ t.accept }}
                     </button>
@@ -95,8 +99,8 @@
               <div class="d-flex gap-1 ms-3">
                 <button class="btn btn-sm btn-light rounded-circle" @click="togglePin(notif.id)"
                   :title="notif.fijado ? t.unpin : t.pin">
-                  <i v-if="notif.fijado" class="bi bi-pin text-primary fs-4"></i>
-                  <i v-else class="bi bi-pin-fill text-primary fs-4"></i>
+                  <i v-if="notif.fijado" class="bi bi-pin-fill text-primary fs-4"></i>
+                  <i v-else class="bi bi-pin text-primary fs-4"></i>
                 </button>
 
                 <button class="btn btn-sm btn-light rounded-circle" @click="markRead(notif.id)"
@@ -165,8 +169,9 @@ const responderNotif = async (notif: any, aceptar: boolean) => {
   try {
     await responderListaEspera(notif.id, aceptar);
     activeStore.value.deleteNotificacion(notif.id);
+    activeStore.value.guardarCambios();
 
-    if(aceptar){
+    if (aceptar && notif.actividad) {
       router.push({ name: 'reservar-actividad', params: { id: notif.actividad.id } });
     }
   } catch (e) {

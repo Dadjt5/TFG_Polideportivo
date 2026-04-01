@@ -402,15 +402,12 @@ onMounted(async () => {
     await usuarioFinalStore.fetchUser(userStore.user?.usuario_final_id)
   }
 
-  if (usuarioFinalStore.notificaciones.length === 0) {
-    await usuarioFinalStore.fetchNotificaciones();
-  }
-
   resultados.value = await getActividadesInstalaciones({
     actividad_ids: usuarioFinalStore.favoritos.actividades,
     instalacion_ids: usuarioFinalStore.favoritos.instalaciones,
   });
 
+  await usuarioFinalStore.fetchNotificaciones();
   usuarioFinalStore.comenzarIntervalo();
 })
 </script>

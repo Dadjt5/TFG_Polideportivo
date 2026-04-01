@@ -50,7 +50,13 @@ class Pago(models.Model):
         self.save()
         return True
     
-    def cancelarPago(self):
+    def cancelarPago(self, tipo="unico"):
+        if tipo == "unico":
+            refund = stripe.Refund.create(payment_intent=self.stripe_payment_intent)
+        elif tipo == "subscripcion":
+            if self.stripe_subscription_id:
+                stripe.Subscription.delete(self.stripe_subscription_id)
+        
         self.objeto.cancelarCompra()
         self.estadoPago = EstadoPago.CANCELADO
         self.stripe_payment_intent = None

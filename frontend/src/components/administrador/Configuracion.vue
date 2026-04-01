@@ -144,6 +144,17 @@
               v-model="configuracionStore.texto_avisos_actividades" />
           </div>
 
+          <!-- AVISOS CANCELACION Y DEVOLUCION DE DINERO -->
+          <div class="mb-4">
+            <label class="form-label fw-semibold">{{ t.title }} - {{ t.textDevolutionNotice }}</label>
+            <input type="text" class="form-control mb-2"
+              v-model="configuracionStore.titulo_aviso_devolucion_dinero_alquiler" />
+
+            <label class="form-label fw-semibold">{{ t.textDevolutionNotice }}</label>
+            <textarea class="form-control" rows="3"
+              v-model="configuracionStore.texto_aviso_devolucion_dinero_alquiler" />
+          </div>
+
           <!-- PROBLEMAS PAGO -->
           <div class="mb-4">
             <label class="form-label fw-semibold">{{ t.title }} - {{ t.textPaymentProblems }}</label>

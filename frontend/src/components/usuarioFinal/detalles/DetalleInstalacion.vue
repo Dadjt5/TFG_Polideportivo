@@ -134,12 +134,23 @@
       </div>
 
       <!-- Reserva y Volver -->
-      <div class="d-flex justify-content-center mt-5">
-        <button v-if="usuarioFinalStore.isLogged" class="btn btn-success btn-lg px-5 me-4" @click="reservar">
+      <div class="d-flex justify-content-center align-items-center mt-5 gap-3 flex-wrap">
+
+        <!-- RESERVAR -->
+        <button v-if="usuarioFinalStore.isLogged" class="btn btn-success btn-lg px-5 shadow-sm" @click="reservar">
+          <i class="bi bi-check-lg me-2"></i>
           {{ t.booking }}
         </button>
 
-        <button class="btn btn-secondary btn-lg px-5" @click="volver">
+        <!-- LOGIN REQUIRED -->
+        <div v-else class="text-muted">
+          <i class="bi bi-lock me-1"></i>
+          {{ t.loginToBook }}
+        </div>
+
+        <!-- VOLVER -->
+        <button class="btn btn-outline-secondary btn-lg px-5" @click="volver">
+          <i class="bi bi-arrow-left me-2"></i>
           {{ t.return }}
         </button>
       </div>

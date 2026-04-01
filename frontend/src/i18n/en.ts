@@ -38,6 +38,21 @@ export default {
   discountDetails: "Discount details",
   rented: "Rented",
   rentedNoPay: "Rented without paying",
+  confirmCreate: "Confirm creation",
+  noRegister: "The registration could not be completed",
+  goToList: "Join the waiting list",
+  noPlacesMessage: "There are no places available. You can join the waiting list.",
+  loginToBook: "Log in to book",
+  noPlacesAvailable: "No places available",
+  placesAvailable: "Places are still available",
+  waitingList: "Waiting list",
+  position: "Position",
+  waitingListInfo: "We'll let you know when a place becomes available",
+  leaveWaitingList: "Leave the list",
+  leave: "Leave waiting list",
+  confirmExit: "Confirm removal",
+  confirmLeaveListDelete: "Confirm removal from the waiting list",
+  listNotifMessage: "When you click 'Confirm', you will be redirected to the checkout. This message will disappear automatically. If you do not complete your purchase, you will lose your place in the queue.",
 
   /* Eliminaciones */
   confirmDelete: "Confirm deletion",
@@ -119,6 +134,8 @@ export default {
   noBonusBuy: 'You already have this voucher',
   expiredPay: "The booking has been cancelled due to the time limit expiring",
   payError: "Error during payment",
+  successWaitingList: "You have been added to the waiting list. You will receive a notification when a place becomes available. List position: ",
+  errorWaitingList: "You are already on this waiting list or have already signed up for the activity",
 
   /* Perfil */
   role: "Role",
@@ -166,6 +183,7 @@ export default {
   filterBy: "Filter by",
 
   activities: "Activities",
+  rents: "Rents",
   facilities: "Facilities",
   activity: "Activity",
   facility: "Facility",
@@ -260,6 +278,7 @@ export default {
   sessions: "Sessions",
   viewSesion: "View session",
   booking: "Booking",
+  rent: "Rent",
   images: "Images",
   period: "Period",
   status: "Status",
@@ -624,6 +643,7 @@ export default {
   maxPercentage: "Maximum applicable percentage in a discount",
   maxDaysFacilityReservation: "Maximum number of days to rent the facility",
   consecutiveHours: "Maximum consecutive hours for hire",
+  textDevolutionNotice: "Refund and cancellation advice",
 
   /* Nueva notificacion */
   newNotification: "New notification",

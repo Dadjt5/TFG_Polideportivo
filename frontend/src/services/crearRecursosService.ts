@@ -41,6 +41,12 @@ export const nuevaInstalacion = async (payload: FormData): Promise<any> => {
   return response.data
 }
 
+/* Función para comprobar el aqluiler */
+export const revisarAlquiler = async (id: any, payload: any) => {
+  const response = await api.post(`/api/v1/instalaciones/${id}/comprobar/alquiler/`, payload)
+  return response.data
+}
+
 /* Función para crear una actividad */
 export const nuevaActividad = async (payload: FormData): Promise<any> => {
   const response = await api.post("/api/v1/actividades/crear/", payload, {

@@ -230,12 +230,14 @@ function periodoPorFecha(fechaStr: string) {
   return "Todo el año"
 }
 
+
+
 function esActividadValida(intervalo: any, fecha: string) {
   const periodoActual = periodoPorFecha(fecha)
 
   return (
     intervalo.estado === "Reserva actividad" &&
-    (intervalo.periodo === periodoActual || intervalo.periodo === "Todo el año")
+    (intervalo.periodo.includes(periodoActual) || intervalo.periodo.includes("Todo el año"))
   )
 }
 

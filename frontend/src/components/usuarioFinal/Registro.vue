@@ -23,6 +23,13 @@
                 :placeholder=t.surnames v-model="formData.apellidos">
             </div>
 
+            <div class="col-md-6">
+              <div class="form-check mb-2">
+                <input type="checkbox" class="form-check-input" id="esUAM" v-model="formData.esUAM">
+                <label class="form-check-label" for="esUAM">{{ t.UAMmember }}</label>
+              </div>
+            </div>
+
             <div class="col-12">
               <label class="form-label text-primary">{{ t.sex }}</label>
               <select class="form-select" :class="{ 'is-invalid': errores.sexo }" v-model="formData.sexo">
@@ -168,6 +175,7 @@ const formData = reactive({
   sexo: '',
   fechaNacimiento: '',
   esMenor: false,
+  esUAM: false,
   dni: '',
   telefono: '',
   email: '',
@@ -350,7 +358,7 @@ const handleFinish = async () => {
     mensaje.value = data.mensaje;
 
   } catch (e) {
-    lanzarMensaje(t.value.noModify, "error")
+    lanzarMensaje(t.value.noRegister, "error")
     console.error("Error al reguistrarse", e)
   }
 }
