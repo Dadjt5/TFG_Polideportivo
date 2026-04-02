@@ -134,7 +134,7 @@
               <label class="form-check-label fw-semibold">{{ t.outdoor }}</label>
             </div>
           </div>
-          
+
           <div class="col-md-12">
             <div class="form-check form-switch mt-2">
               <input class="form-check-input" type="checkbox" v-model="actividad.inscripcion" :disabled="!editando" />
@@ -173,12 +173,11 @@
             </select>
           </div>
 
-          <div class="col-md-4" v-if="callesDisponibles.length > 0">
+          <div class="col-md-4 mb-3" v-if="instalacionSeleccionada.tipoInstalacion === 'Piscina'">
             <label class="form-label fw-semibold">{{ t.poolStreets }}</label>
-            <select class="form-select" v-model="calleSeleccionada" :disabled="!editando">
-              <option value="" disabled>--</option>
-              <option v-for="c in callesDisponibles" :key="c.id" :value="c.numero">
-                {{ t.poolStreet }} {{ c.numero }}
+            <select class="form-select form-select-lg" v-model="calleSeleccionada">
+              <option v-for="c in instalacionSeleccionada.calles" :key="c.id" :value="c.id">
+                {{ t.street }} {{ c.numero || c.id }}
               </option>
             </select>
           </div>
@@ -211,7 +210,7 @@
                   <transition name="fade">
                     <div v-if="dia.abierto && isOpen(dia.id)" class="mt-2">
                       <div class="d-flex flex-wrap gap-2">
-                        <div v-for="intervalo in dia.mapa_reservas" :key="intervalo.id"
+                        <div v-for="intervalo in filtrarIntervalos(dia.mapa_reservas)" :key="intervalo.id"
                           class="small text-white text-center px-3 py-2 rounded" :class="{
                             'bg-primary': esPropio(intervalo, dia),
                             'bg-warning text-dark': !esPropio(intervalo, dia) && esOcupadoPorPeriodo(intervalo),
@@ -354,9 +353,18 @@
 
         <!-- TAB 5: SESIONES -->
         <div v-if="tab === 5">
-
           <!-- CREAR SESIÓN -->
           <div v-if="editando" class="row g-3 align-items-end mb-4">
+            <div class="col-md-2" v-if="instalacionSeleccionada.tipoInstalacion === 'Piscina'">
+              <label class="form-label fw-semibold">{{ t.poolStreets }}</label>
+              <select class="form-select" v-model="crearSesion.calle">
+                <option value="">--</option>
+                <option v-for="c in instalacionSeleccionada.calles" :key="c.id" :value="c.id">
+                  {{ t.street }} {{ c.numero || c.id }}
+                </option>
+              </select>
+            </div>
+
             <div class="col-md-4">
               <label class="form-label fw-semibold">{{ t.day }}</label>
               <select class="form-select" v-model="crearSesion.dia">
@@ -410,6 +418,13 @@
                       <!-- HORA FIN -->
                       <input type="time" class="form-control form-control-sm" v-model="sesion.horaFin"
                         style="width: 120px;" />
+
+                      <select v-if="instalacionSeleccionada.tipoInstalacion === 'Piscina'"
+                        class="form-select form-select-sm" v-model="sesion.calle" style="width: 100px;">
+                        <option v-for="c in instalacionSeleccionada.calles" :key="c.id" :value="c.id">
+                          {{ c.numero || c.id }}
+                        </option>
+                      </select>
                     </div>
                   </template>
 
@@ -418,6 +433,7 @@
                     <div>
                       <strong>{{ sesion.dia }}</strong> |
                       {{ sesion.horaInicio }} - {{ sesion.horaFin }}
+                      <span v-if="instalacionSeleccionada?.tipoInstalacion === 'Piscina'">{{ t.street }} {{ sesion.calle }}</span>
                     </div>
                   </template>
 
@@ -596,7 +612,7 @@ const imagen = ref<File | null>(null)
 const preview = ref<string | null>(null)
 const actividadOriginal = ref<any>(null);
 const sesiones = ref<any[]>([])
-const crearSesion = ref({ id: -1, dia: "", horaInicio: "", horaFin: "" })
+const crearSesion = ref({ id: -1, dia: "", horaInicio: "", horaFin: "", calle: null })
 const mensaje = ref("")
 const mensajeEditar = ref('')
 const tipoMensaje = ref<'success' | 'error' | ''>('')
@@ -615,11 +631,20 @@ const errores = ref<any>({
 function esPropio(intervalo: any, dia: any) {
   return sesiones.value.some(sesion => {
     return (
+      sesion.calle === intervalo.calle &&
       sesion.dia === dia.dia &&
       intervalo.horaInicio >= sesion.horaInicio &&
       intervalo.horaFin <= sesion.horaFin
     )
   })
+}
+
+function filtrarIntervalos(intervalos: any) {
+  if (instalacionSeleccionada.value.tipoInstalacion !== 'Piscina') {
+    return intervalos
+  }
+
+  return intervalos.filter(i => i.calle === calleSeleccionada.value)
 }
 
 function esOcupadoPorPeriodo(intervalo: any) {
@@ -630,7 +655,6 @@ function esOcupadoPorPeriodo(intervalo: any) {
   }
 
   return (
-    
     periodos.includes(actividad.value.periodo) ||
     periodos.includes("Todo el año")
   )
@@ -668,10 +692,10 @@ const instalacionesFiltradas = computed(() => {
   if (!actividad.value.instalacion) return instalaciones.value
   const instalacionActual = instalaciones.value.find(i => i.id === actividad.value.instalacion)
   if (!instalacionActual) return instalaciones.value
-  if (instalacionActual.tipoInstalacion === "PISCINA") {
-    return instalaciones.value.filter(i => i.tipoInstalacion === "PISCINA")
+  if (instalacionActual.tipoInstalacion === "Piscina") {
+    return instalaciones.value.filter(i => i.tipoInstalacion === "Piscina")
   } else {
-    return instalaciones.value.filter(i => i.tipoInstalacion !== "PISCINA")
+    return instalaciones.value.filter(i => i.tipoInstalacion !== "Piscina")
   }
 })
 
@@ -697,18 +721,14 @@ function agregarSesion() {
   if (!crearSesion.value.dia ||
     !crearSesion.value.horaInicio ||
     !crearSesion.value.horaFin ||
-    (callesDisponibles.value.length > 0 && !calleSeleccionada.value)) {
-    mensaje.value = t.value.selectLane
+    (instalacionSeleccionada.value.tipoInstalacion === 'Piscina' && !crearSesion.value.calle)) {
+    lanzarMensaje(t.value.missing, "error")
     return
   }
 
-  sesiones.value.push({
-    ...crearSesion.value,
-    calle: calleSeleccionada.value || null
-  })
+  sesiones.value.push({ ...crearSesion.value })
 
-  crearSesion.value = { id: -1, dia: "", horaInicio: "", horaFin: "" }
-  calleSeleccionada.value = null
+  crearSesion.value = { id: -1, dia: "", horaInicio: "", horaFin: "", calle: null }
 }
 
 function eliminarSesion(id: number) {
@@ -720,6 +740,11 @@ const mensajeRevisar = ref("")
 const comprobarAlquiler = async () => {
   if (!validarFormulario()) {
     lanzarMensaje(t.value.missing, "error")
+    return
+  }
+
+  if (actividad.value.plazasMaximas > instalacionSeleccionada.value.aforoMaximo) {
+    lanzarMensaje(t.value.errorPlaces, "error")
     return
   }
 
@@ -854,11 +879,11 @@ function validarTipoInstalacion() {
   if (!instOriginal) return false
 
   // Si el tipo es piscina no puede ser otro y viceversa
-  if (inst.tipoInstalacion == "PISCINA" && instOriginal.tipoInstalacion != "PISCINA") {
+  if (inst.tipoInstalacion == "Piscina" && instOriginal.tipoInstalacion != "Piscina") {
     return false;
   }
 
-  if (inst.tipoInstalacion != "PISCINA" && instOriginal.tipoInstalacion == "PISCINA") {
+  if (inst.tipoInstalacion != "Piscina" && instOriginal.tipoInstalacion == "Piscina") {
     return false
   }
 
@@ -888,6 +913,11 @@ async function guardarCambios() {
 
   if (!validarFormulario()) {
     lanzarMensaje(t.value.missing, "error")
+    return
+  }
+
+  if (actividad.value.plazasMaximas > instalacionSeleccionada.value.aforoMaximo) {
+    lanzarMensaje(t.value.errorPlaces, "error")
     return
   }
 

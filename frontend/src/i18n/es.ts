@@ -53,6 +53,7 @@ export default {
   confirmExit: "Confirmar salida",
   confirmLeaveListDelete: "Confirmar salida de la lista de espera",
   listNotifMessage: "Al pulsar en 'Confirmar', se redirigirá a la compra. Este mensaje será eliminado automáticamente. Sino termina la compra, perderá la opción.",
+  street: "Calle",
 
   /* Eliminaciones */
   confirmDelete: "Confirmar eliminación",
@@ -136,6 +137,8 @@ export default {
   payError: 'Error al efectuar el pago',
   successWaitingList: "Has entrado en la lista de espera, te llegará una notificación cuando haya una plaza disponible. Posición en la lista: ",
   errorWaitingList: "Ya estas inscrito en esta lista de espera o en la actividad",
+  errorPlaces: "La cantidad de plazas en la actividad no puede superar el aforo de la instalación",
+  errorPlaces2: "Alguna de las actividades que se desarrollan en esta instalacion tienen un número de plazas mayor al aforo máximo",
 
   /* Perfil */
   role: "Rol",

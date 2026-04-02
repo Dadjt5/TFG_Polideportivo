@@ -134,17 +134,37 @@
                   {{ t.timetable }}
                 </h5>
 
-                <label class="form-label fw-semibold mt-3">{{ t.reserveType }}</label>
-                <select class="form-select form-select-lg" v-model="tipoVista">
-                  <option value="actividades">{{ t.activities }}</option>
-                  <option value="alquileres">{{ t.rents }}</option>
-                </select>
+                <div class="card border-0 shadow-sm rounded-4 p-3 bg-light mb-3">
+                  <div class="row g-3 align-items-end">
 
-                <div class="mt-2" v-if="tipoVista === 'actividades'">
-                  <label class="form-label fw-semibold">{{ t.period }}</label>
-                  <select class="form-select form-select-lg" v-model="periodo">
-                    <option v-for="t in tiposStore.periodos" :key="t" :value="t">{{ t }}</option>
-                  </select>
+                    <!-- Tipo de reserva -->
+                    <div class="col-md-4">
+                      <label class="form-label fw-semibold">{{ t.reserveType }}</label>
+                      <select class="form-select form-select-lg" v-model="tipoVista">
+                        <option value="actividades">{{ t.activities }}</option>
+                        <option value="alquileres">{{ t.rents }}</option>
+                      </select>
+                    </div>
+
+                    <!-- Periodo (solo reservas de actividades) -->
+                    <div class="col-md-4" v-if="tipoVista === 'actividades'">
+                      <label class="form-label fw-semibold">{{ t.period }}</label>
+                      <select class="form-select form-select-lg" v-model="periodo">
+                        <option v-for="p in tiposStore.periodos" :key="p" :value="p">{{ p }}</option>
+                      </select>
+                    </div>
+
+                    <!-- Calle (solo piscina) -->
+                    <div class="col-md-4" v-if="instalacion.tipoInstalacion === 'Piscina'">
+                      <label class="form-label fw-semibold">{{ t.poolStreet }}</label>
+                      <select class="form-select form-select-lg" v-model="calleSeleccionada">
+                        <option v-for="c in instalacion.calles" :key="c.id" :value="c.id">
+                          {{ t.street }} {{ c.numero || c.id }}
+                        </option>
+                      </select>
+                    </div>
+
+                  </div>
                 </div>
 
                 <!-- LEYENDA -->
@@ -161,7 +181,7 @@
                   </template>
                 </div>
 
-                <div class="row" :key="periodo">
+                <div class="row" :key="`${tipoVista}-${periodo}-${calleSeleccionada}`">
                   <div v-for="dia in agenda" :key="dia.id" class="col-12 mb-3">
                     <div class="p-3 rounded-3 bg-white border shadow-sm">
 
@@ -180,7 +200,7 @@
                       <transition name="fade">
                         <div v-if="dia.abierto && isOpen(dia.id)" class="mt-2">
                           <div class="d-flex flex-wrap gap-2">
-                            <div v-for="intervalo in dia.mapa_reservas" :key="intervalo.id"
+                            <div v-for="intervalo in filtrarIntervalos(dia.mapa_reservas)" :key="intervalo.id"
                               class="small text-white text-center px-3 py-2 rounded"
                               :class="getClaseIntervalo(intervalo)">
                               {{ intervalo.horaInicio.slice(0, 5) }} - {{ intervalo.horaFin.slice(0, 5) }}
@@ -431,6 +451,7 @@ const fechasEspeciales = ref<any[]>([])
 const pabellones = ref<any[]>([])
 const tarifas = ref<any[]>([])
 const periodo = ref("Todo el año")
+const calleSeleccionada = ref()
 
 const instalacion = ref({
   id: 0,
@@ -441,8 +462,10 @@ const instalacion = ref({
   pagada: false,
   luz: false,
   porcentajeTDA: 0,
+  plazasMinimas: 0,
   pabellon: null,
   tarifa: null,
+  calles: null,
   tipoInstalacion: "",
   numeroCalles: 0,
   agenda: [] as any[],
@@ -523,7 +546,6 @@ function mezclarReservas() {
     if (!dia.abierto) return;
 
     dia.mapa_reservas.forEach((intervalo: any) => {
-
       const reserva = instalacion.value.reservas_usuarios.find((r: any) => {
         return (
           r.diaSemana === diasSemana.indexOf(dia.dia) &&
@@ -550,6 +572,14 @@ function esOcupadoPorPeriodo(intervalo: any) {
     periodos.includes(periodo.value) ||
     periodos.includes("Todo el año")
   )
+}
+
+function filtrarIntervalos(intervalos: any) {
+  if (instalacion.value.tipoInstalacion !== 'Piscina') {
+    return intervalos
+  }
+
+  return intervalos.filter(i => i.calle === calleSeleccionada.value)
 }
 
 const tipoVista = ref<'actividades' | 'alquileres'>('actividades')
@@ -625,6 +655,11 @@ function onFileChange(e: Event) {
 async function guardarCambios() {
   if (!validarFormulario()) {
     lanzarMensaje(t.value.missing, "error")
+    return
+  }
+
+  if (instalacion.value.aforoMaximo < instalacion.value.plazasMinimas){
+    lanzarMensaje(t.value.errorPlaces2, "error")
     return
   }
 
@@ -733,6 +768,7 @@ onMounted(async () => {
 
     agenda.value = data.agenda.filter((a: any) => a.dia && !a.fecha)
     fechasEspeciales.value = data.agenda.filter((a: any) => a.fecha)
+    calleSeleccionada.value = data.calles?.[0]?.id
 
     instalacion.value = {
       ...data,

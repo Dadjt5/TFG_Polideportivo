@@ -193,12 +193,11 @@
             </select>
           </div>
 
-          <div class="col-md-4" v-if="callesDisponibles.length > 0">
+          <div class="col-md-4 mb-3" v-if="callesDisponibles.length > 0">
             <label class="form-label fw-semibold">{{ t.poolStreets }}</label>
-            <select class="form-select" v-model="calleSeleccionada">
-              <option value="" disabled>--</option>
-              <option v-for="c in callesDisponibles" :key="c.id" :value="c.numero">
-                {{ t.poolStreet }} {{ c.numero }}
+            <select class="form-select form-select-lg" v-model="calleSeleccionada">
+              <option v-for="c in callesDisponibles" :key="c.id" :value="c.id">
+                {{ t.street }} {{ c.numero || c.id }}
               </option>
             </select>
           </div>
@@ -235,7 +234,7 @@
                   <transition name="fade">
                     <div v-if="dia.abierto && isOpen(dia.id)" class="mt-2">
                       <div class="d-flex flex-wrap gap-2">
-                        <div v-for="intervalo in dia.mapa_reservas" :key="intervalo.id"
+                        <div v-for="intervalo in filtrarIntervalos(dia.mapa_reservas)" :key="intervalo.id"
                           class="small text-white text-center px-3 py-2 rounded" :class="{
                             'bg-primary': esPropio(intervalo, dia),
                             'bg-warning text-dark': !esPropio(intervalo, dia) && esOcupadoPorPeriodo(intervalo),
@@ -382,8 +381,16 @@
 
         <!-- TAB 4 SESIONES -->
         <div v-if="tab === 4">
-
           <div class="row g-3 align-items-end mb-4">
+            <div class="col-md-2" v-if="callesDisponibles.length > 0">
+              <label class="form-label fw-semibold">{{ t.poolStreets }}</label>
+              <select class="form-select form-select-lg" v-model="calleSeleccionada">
+                <option value="">--</option>
+                <option v-for="c in callesDisponibles" :key="c.id" :value="c.id">
+                  {{ t.street }} {{ c.numero || c.id }}
+                </option>
+              </select>
+            </div>
 
             <div class="col-md-4">
               <label class="form-label fw-semibold">{{ t.day }}</label>
@@ -419,7 +426,8 @@
               class="d-flex justify-content-between align-items-center mb-2">
 
               <span>
-                {{ s.dia }} | {{ s.horaInicio }} - {{ s.horaFin }}
+                {{ s.dia }} | {{ s.horaInicio }} - {{ s.horaFin }} <span
+                  v-if="instalacionSeleccionada.tipoInstalacion === 'Piscina'">{{ t.street }} {{ s.calle }}</span>
               </span>
 
               <button type="button" class="btn btn-sm btn-danger" @click="sesiones.splice(index, 1)">
@@ -560,11 +568,7 @@ const tipoMensaje = ref<'success' | 'error' | ''>('')
 const mostrarMensaje = ref(false)
 
 const sesiones = ref<any[]>([])
-const crearSesion = ref({
-  dia: "",
-  horaInicio: "",
-  horaFin: ""
-})
+const crearSesion = ref({ id: -1, dia: "", horaInicio: "", horaFin: "", calle: null })
 
 function esOcupadoPorPeriodo(intervalo: any) {
   const periodos = intervalo.periodo || []
@@ -582,6 +586,7 @@ function esOcupadoPorPeriodo(intervalo: any) {
 function esPropio(intervalo: any, dia: any) {
   return sesiones.value.some(sesion => {
     return (
+      sesion.calle === intervalo.calle &&
       sesion.dia === dia.dia &&
       intervalo.horaInicio >= sesion.horaInicio &&
       intervalo.horaFin <= sesion.horaFin
@@ -589,10 +594,12 @@ function esPropio(intervalo: any, dia: any) {
   })
 }
 
-function esActividadValida(intervalo: any, dia: any) {
-  if (actividad.value.periodo === "Todo el año") return true
-  return intervalo.estado === "Reserva actividad" &&
-    (intervalo.periodo.includes(actividad.value.periodo) || intervalo.periodo.includes("Todo el año"))
+function filtrarIntervalos(intervalos: any) {
+  if (instalacionSeleccionada.value.tipoInstalacion !== 'Piscina') {
+    return intervalos
+  }
+
+  return intervalos.filter(i => i.calle === calleSeleccionada.value)
 }
 
 const monitorSeleccionado = computed(() =>
@@ -619,18 +626,14 @@ function agregarSesion() {
   if (!crearSesion.value.dia ||
     !crearSesion.value.horaInicio ||
     !crearSesion.value.horaFin ||
-    (callesDisponibles.value.length > 0 && !calleSeleccionada.value)) {
-    mensaje.value = t.value.selectLane
+    (instalacionSeleccionada.value.tipoInstalacion === 'Piscina' && !crearSesion.value.calle)) {
+    lanzarMensaje(t.value.missing, "error")
     return
   }
 
-  sesiones.value.push({
-    ...crearSesion.value,
-    calle: calleSeleccionada.value || null
-  })
+  sesiones.value.push({ ...crearSesion.value })
 
-  crearSesion.value = { dia: "", horaInicio: "", horaFin: "" }
-  calleSeleccionada.value = null
+  crearSesion.value = { id: -1, dia: "", horaInicio: "", horaFin: "", calle: null }
 }
 
 let confirmModal: Modal
@@ -757,6 +760,11 @@ const crearActividad = async () => {
 
   if (!validarFormulario()) {
     lanzarMensaje(t.value.missing, "error")
+    return
+  }
+
+  if (actividad.value.plazasMaximas > instalacionSeleccionada.value.aforoMaximo) {
+    lanzarMensaje(t.value.errorPlaces, "error")
     return
   }
 

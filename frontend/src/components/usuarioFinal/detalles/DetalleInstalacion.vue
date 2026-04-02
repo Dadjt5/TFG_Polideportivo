@@ -3,9 +3,9 @@
     <main class="container-fluid mt-2 px-5 py-4">
 
       <!-- Cabecera -->
-      <div class="text-center mt-4 mb-5">
+      <div class="d-flex justify-content-center align-items-center mt-4 mb-5 gap-2">
         <h1 class="fw-semibold text-primary mb-0" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.2);">
-          <i class="bi bi-building me-2"></i>{{ instalacion.nombre }}
+          <i class="bi bi-calendar2-event me-2"></i>{{ instalacion.nombre }}
         </h1>
 
         <button v-if="usuarioFinalStore.isLogged" class="btn btn-link p-0 text-warning" @click.stop="cambiarFavorito"
@@ -138,19 +138,16 @@
 
         <!-- RESERVAR -->
         <button v-if="usuarioFinalStore.isLogged" class="btn btn-success btn-lg px-5 shadow-sm" @click="reservar">
-          <i class="bi bi-check-lg me-2"></i>
           {{ t.booking }}
         </button>
 
         <!-- LOGIN REQUIRED -->
         <div v-else class="text-muted">
-          <i class="bi bi-lock me-1"></i>
           {{ t.loginToBook }}
         </div>
 
         <!-- VOLVER -->
         <button class="btn btn-outline-secondary btn-lg px-5" @click="volver">
-          <i class="bi bi-arrow-left me-2"></i>
           {{ t.return }}
         </button>
       </div>

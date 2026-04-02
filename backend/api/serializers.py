@@ -324,7 +324,7 @@ class MapaReservasSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MapaReservas
-        fields = ("id", "horaInicio", "horaFin", "estado", "periodo")
+        fields = ("id", "horaInicio", "horaFin", "estado", "periodo", "calle")
     
     def get_periodo(self, obj):
         sesiones = Sesion.objects.filter(
@@ -381,7 +381,7 @@ class InstalacionSimpleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Instalacion
-        fields = ("id", "nombre", "agenda", "calles", "numeroCalles", "tipoInstalacion", "pabellon")
+        fields = ("id", "nombre", "agenda", "calles", "numeroCalles", "tipoInstalacion", "pabellon", "aforoMaximo")
 
 
 class InstalacionSerializer(serializers.ModelSerializer):
@@ -389,6 +389,7 @@ class InstalacionSerializer(serializers.ModelSerializer):
     calles = CalleSerializer(many=True, read_only=True)
     pabellon = PabellonSimpleSerializer(read_only=True)
     reservas_usuarios = serializers.SerializerMethodField()
+    plazasMinimas = serializers.SerializerMethodField()
 
     class Meta:
         model = Instalacion
@@ -405,8 +406,17 @@ class InstalacionSerializer(serializers.ModelSerializer):
             "tarifa",
             "numeroCalles",
             "calles",
-            "reservas_usuarios"
+            "reservas_usuarios",
+            "plazasMinimas"
         )
+
+    def get_plazasMinimas(self, obj):
+        actividades = obj.actividad.all()
+
+        if not actividades:
+            return -1
+
+        return min(act.plazasMaximas for act in actividades)
 
     def get_reservas_usuarios(self, obj):
         hoy = date.today()
@@ -440,7 +450,8 @@ class SesionSerializer(serializers.ModelSerializer):
             "id",
             "dia",
             "horaInicio",
-            "horaFin"
+            "horaFin",
+            "calle"
         )
 
 

@@ -260,7 +260,6 @@ const instalacion = ref({
   nombre: "",
   aforoMaximo: 50,
   luz: false,
-  validacion: false,
   porcentajeTDA: 0,
   tarifa: null,
   pabellon: null,

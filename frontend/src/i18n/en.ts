@@ -53,6 +53,7 @@ export default {
   confirmExit: "Confirm removal",
   confirmLeaveListDelete: "Confirm removal from the waiting list",
   listNotifMessage: "When you click 'Confirm', you will be redirected to the checkout. This message will disappear automatically. If you do not complete your purchase, you will lose your place in the queue.",
+  street: "Street",
 
   /* Eliminaciones */
   confirmDelete: "Confirm deletion",
@@ -136,6 +137,8 @@ export default {
   payError: "Error during payment",
   successWaitingList: "You have been added to the waiting list. You will receive a notification when a place becomes available. List position: ",
   errorWaitingList: "You are already on this waiting list or have already signed up for the activity",
+  errorPlaces: "The number of places for the activity cannot exceed the venue's capacity",
+  errorPlaces2: "Some of the activities taking place at this venue have a capacity exceeding the maximum allowed",
 
   /* Perfil */
   role: "Role",

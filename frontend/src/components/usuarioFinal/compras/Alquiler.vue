@@ -452,7 +452,6 @@ onMounted(async () => {
     configuracionStore.obtenerConfiguracion()
     reserva.value.tarifa = data.tarifa
     reserva.value.descuento = data.descuento
-    reserva.value.tarifa.calles = data.calles;
     console.log(data)
   } catch (e: any) {
     error.value = true

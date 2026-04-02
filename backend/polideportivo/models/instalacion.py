@@ -82,6 +82,13 @@ class Instalacion(models.Model):
 
         return precio
 
+    def comprobarAforo(self, instalacion_data):
+        for act in self.actividad.all():
+            if act.plazasMaximas > instalacion_data["aforoMaximo"]:
+                return False
+
+        return True
+
     def modificarInformacion(self, instalacion_data, pabellon, tarifa, imagen):
         campos_simples = [
             "nombre",
@@ -109,7 +116,11 @@ class Instalacion(models.Model):
             hora_fin = sesion.get('horaFin')
             calle_num = sesion.get('calle')
 
-            agenda = Agenda.objects.filter(dia__iexact=dia).first()
+            calle = None
+            if self.tipoInstalacion == TipoInstalacion.PISCINA:
+                calle = self.calles.filter(numero=calle_num).first()
+
+            agenda = Agenda.objects.filter(instalacion=self, dia__iexact=dia).first()
 
             if agenda:
                 if isinstance(hora_inicio, str):
@@ -127,7 +138,7 @@ class Instalacion(models.Model):
                     mapa = agenda.mapa_reservas.filter(
                         horaInicio=hora_actual.time(),
                         horaFin=siguiente_hora.time(),
-                        calle=calle_num
+                        calle=calle
                     ).first()
 
                     if mapa:

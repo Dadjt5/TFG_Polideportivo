@@ -3,10 +3,16 @@
     <main class="container-fluid mt-2 px-5 py-4">
 
       <!-- Cabecera -->
-      <div class="text-center mt-4 mb-5">
+      <div class="d-flex justify-content-center align-items-center mt-4 mb-5 gap-2">
         <h1 class="fw-semibold text-primary mb-0" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.2);">
           <i class="bi bi-calendar2-event me-2"></i>{{ actividad.nombre }}
         </h1>
+
+        <button v-if="usuarioFinalStore.isLogged" class="btn btn-link p-0 text-warning" @click.stop="cambiarFavorito"
+          :title="usuarioFinalStore.activityIsFavorite(actividad.id) ? 'Quitar de favoritos' : 'Agregar a favoritos'">
+          <i :class="['bi', usuarioFinalStore.activityIsFavorite(actividad.id) ? 'bi-star-fill' : 'bi-star']"
+            class="fs-2"></i>
+        </button>
       </div>
 
       <div class="row g-4">
@@ -22,12 +28,6 @@
                 {{ t.activityDetails }}
               </h4>
 
-              <button v-if="usuarioFinalStore.isLogged" class="btn btn-link p-0 text-warning"
-                @click.stop="cambiarFavorito"
-                :title="usuarioFinalStore.activityIsFavorite(actividad.id) ? 'Quitar de favoritos' : 'Agregar a favoritos'">
-                <i :class="['bi', usuarioFinalStore.activityIsFavorite(actividad.id) ? 'bi-star-fill' : 'bi-star']"
-                  class="fs-2"></i>
-              </button>
             </div>
 
             <div class="row g-3">
@@ -48,7 +48,7 @@
 
               <div class="col-12 col-sm-4">
                 <p><i class="bi bi-people-fill text-success me-1"></i><span class="fw-medium">{{ t.availablePlaces
-                    }}:</span> {{ actividad.plazasMaximas }}</p>
+                }}:</span> {{ actividad.plazasMaximas }}</p>
               </div>
 
               <div class="col-12 col-sm-4" v-if="actividad.nivel">
@@ -68,17 +68,17 @@
 
               <div class="col-12 col-sm-4" v-if="actividad.terreno">
                 <p><i class="bi bi-signpost-split-fill text-secondary me-1"></i><span class="fw-medium">{{ t.terrainType
-                    }}:</span> {{ actividad.terreno }}</p>
+                }}:</span> {{ actividad.terreno }}</p>
               </div>
 
               <div class="col-12 col-sm-4">
                 <p><i class="bi bi-credit-card-2-front-fill text-success me-1"></i><span class="fw-medium">{{ t.credits
-                    }}:</span> {{ actividad.numeroCreditos }}</p>
+                }}:</span> {{ actividad.numeroCreditos }}</p>
               </div>
 
               <div class="col-12 col-sm-4" v-if="actividad.año">
                 <p><i class="bi bi-calendar-year text-info me-1"></i><span class="fw-medium">{{ t.academicYear
-                    }}:</span> {{ actividad.año }}</p>
+                }}:</span> {{ actividad.año }}</p>
               </div>
 
               <div class="col-12 col-sm-4" v-if="actividad.instalacion">
@@ -157,10 +157,10 @@
       </div>
 
       <div v-if="mostrarMensaje" class="text-center mb-3">
-          <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
-            {{ mensajeEditar }}
-          </div>
+        <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
+          {{ mensajeEditar }}
         </div>
+      </div>
 
       <!-- Reserva y Volver -->
       <div class="d-flex justify-content-center align-items-center mt-5 gap-3 flex-wrap">

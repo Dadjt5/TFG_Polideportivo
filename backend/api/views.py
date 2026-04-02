@@ -1356,6 +1356,17 @@ class NuevaInstalacionView(APIView):
             if not res:
                 raise Exception("Error al actualizar fechas especiales")
 
+        sesiones = Sesion.objects.filter(actividad__instalacion=instalacion)
+
+        sesiones_data = [{
+            "dia": s.dia,
+            "horaInicio": s.horaInicio.strftime("%H:%M"),
+            "horaFin": s.horaFin.strftime("%H:%M"),
+            "calle": s.calle
+        } for s in sesiones]
+
+        instalacion.actualizarMapa(sesiones_data)
+
         return Response(
             {"respuesta": "Instalación creada correctamente"},
             status=status.HTTP_201_CREATED
@@ -1384,6 +1395,9 @@ class EditarInstalacionView(APIView):
 
             pabellon = get_object_or_404(Pabellon, id=pabellon_id)
             tarifa = get_object_or_404(TarifaInstalacion, id=tarifa_id)
+
+            if not instalacion.comprobarAforo(instalacion_data):
+                return Response({"respuesta": "La instalación tiene una actividad con unas plazas máximas mayores que el aforo creado"}, status=status.HTTP_400_BAD_REQUEST)
 
             # Manejar la agenda y fechas especiales
             agenda_json = request.POST.get("agenda", "[]")
@@ -1481,6 +1495,17 @@ class EditarInstalacionView(APIView):
             instalacion.modificarInformacion(instalacion_data, pabellon, tarifa, imagen)
             if numero_calles is not None:
                 instalacion.sincronizarCalles(numero_calles)
+
+            sesiones = Sesion.objects.filter(actividad__instalacion=instalacion)
+
+            sesiones_data = [{
+                "dia": s.dia,
+                "horaInicio": s.horaInicio.strftime("%H:%M"),
+                "horaFin": s.horaFin.strftime("%H:%M"),
+                "calle": s.calle
+            } for s in sesiones]
+
+            instalacion.actualizarMapa(sesiones_data)
             
             return Response({"respuesta": "Exito al asignar la agenda a la instalacion"}, status=status.HTTP_200_OK)
 
@@ -1508,8 +1533,6 @@ class NuevaActividadView(APIView):
         sesiones_json = request.data.get("sesiones", "[]")
         periodo = request.data.get("periodo")
         sesiones = json.loads(sesiones_json)
-
-        instalacion.revisarAlquileres(sesiones, periodo, True)
 
         # Validar horarios primero
         for sesion in sesiones:
@@ -1540,10 +1563,18 @@ class NuevaActividadView(APIView):
             imagenURL=imagen
         )
 
+        instalacion.revisarAlquileres(sesiones, periodo, True)
+
         ListaEspera.objects.create(actividad=actividad)
 
         # Crear sesiones
         for sesion in sesiones:
+            calle_num = sesion.get('calle')
+
+            calle = None
+            if instalacion.tipoInstalacion == TipoInstalacion.PISCINA:
+                calle = instalacion.calles.filter(numero=calle_num).first()
+
             actividad.nuevaSesion(
                 sesion.get('dia'),
                 sesion.get('horaInicio'),
@@ -1590,13 +1621,11 @@ class EditarActividadView(APIView):
             tarifa = get_object_or_404(TarifaActividad, id=tarifa_id)
             instalacion = get_object_or_404(Instalacion, id=instalacion_id)
             monitor = get_object_or_404(Monitor, id=monitor_id)
-            
+
             sesiones_json = request.POST.get("sesiones", "[]")
             sesiones_recibidas = json.loads(sesiones_json)
             periodo = request.data.get("periodo")
     
-            instalacion.revisarAlquileres(sesiones_recibidas, periodo, True)
-
             sesiones_bd = actividad.sesiones.all()
             ids_recibidos = []
 
@@ -1621,7 +1650,7 @@ class EditarActividadView(APIView):
                     )
 
                 if not sesion_id or sesion_id == -1:
-                    nueva = actividad.nuevaSesion(dia, hora_inicio, hora_fin)
+                    nueva = actividad.nuevaSesion(dia, hora_inicio, hora_fin, calle)
                     ids_recibidos.append(nueva.id)
                     cambios = True
                 else:
@@ -1653,7 +1682,12 @@ class EditarActividadView(APIView):
             if actividad.deportes != deporte:
                 actividad.deportes = deporte
 
-            actividad.modificarInformacion(actividad_data, tarifa, instalacion, monitor, imagen)
+            resultado = actividad.modificarInformacion(actividad_data, tarifa, instalacion, monitor, imagen)
+            if not resultado:
+                return Response({"respuesta": "Error al tratar de modificar la informacion"}, status=status.HTTP_400_BAD_REQUEST)
+
+            instalacion.revisarAlquileres(sesiones_recibidas, periodo, True)
+
             if cambios:
                 Notificacion.notificarCambioSesiones(actividad)
 
@@ -1740,6 +1774,7 @@ class TarifaInstalacionView(APIView):
 
         agenda_fecha = Agenda.objects.filter(fecha=fecha).first()
 
+        # Obtenemos el día, directamente o derivandolo de la fecha dada
         if agenda_fecha:
             dia = agenda_fecha
         else:
@@ -1756,8 +1791,9 @@ class TarifaInstalacionView(APIView):
             }
 
             dia_modelo = mapa_dias[dia_semana]
-            dia = Agenda.objects.filter(dia__iexact=dia_modelo).first()
+            dia = Agenda.objects.filter(dia__iexact=dia_modelo, instalacion=instalacion).first()
 
+        # Y después obtenemos las reservas para ese dia del mapa, si es una piscina lo hacemos para cada una de las calles
         if dia:
             if instalacion.tipoInstalacion == TipoInstalacion.PISCINA:
                 calles = []
