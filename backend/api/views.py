@@ -733,7 +733,7 @@ class RegistroView(APIView):
         password = request.data.get('password')
         esUAM = request.data.get('esUAM')
 
-        respuesta = UsuarioFinal.registrar_usuario(
+        respuesta = UsuarioFinal.registrarUsuario(
             nombre=nombre, apellidos=apellidos, sexo=sexo, fechaNacimiento=fechaNacimiento,
             dni=dni, telefono=telefono, email=email, provincia=provincia,
             municipio=municipio, localidad=localidad, codigoPostal=codigoPostal,
@@ -760,7 +760,7 @@ class RegistroMonitorView(APIView):
         dni = request.data.get('dni')
         password = request.data.get('password')
 
-        respuesta = Monitor.registrar_monitor(
+        respuesta = Monitor.registrarMonitor(
             nombre=nombre, apellidos=apellidos, dni=dni, 
             email=email, password=password
         )
@@ -784,7 +784,7 @@ class RegistroAdministradorView(APIView):
         dni = request.data.get('DNI')
         password = request.data.get('password')
 
-        respuesta = Administrador.registrar_administrador(
+        respuesta = Administrador.registrarAdministrador(
             nombre=nombre, rol=rol, dni=dni, 
             email=email, password=password
         )
@@ -868,7 +868,7 @@ class GuardarNotificacionView(APIView):
         notificaciones = request.data.get('notificaciones', [])
 
         for n in notificaciones:
-            Notificacion.cambiar_estado(
+            Notificacion.cambiarEstado(
                 usuario=request.user,
                 id=n['id'],
                 leido=n['leido'],
@@ -1210,16 +1210,15 @@ class SesionesMonitorView(APIView):
         actividades = Actividad.objects.filter(monitor_id=monitor_id)
         
         for actividad in actividades:
-            if actividad.activa:
-                for sesion in actividad.sesiones.all():
-                    sesiones.append({
-                        "idActividad": actividad.id,
-                        "idSesion": sesion.id,
-                        "nombre": actividad.nombre,
-                        "dia": sesion.dia,
-                        "horaInicio": sesion.horaInicio,
-                        "horaFin": sesion.horaFin
-                    })
+            for sesion in actividad.sesiones.all():
+                sesiones.append({
+                    "idActividad": actividad.id,
+                    "idSesion": sesion.id,
+                    "nombre": actividad.nombre,
+                    "dia": sesion.dia,
+                    "horaInicio": sesion.horaInicio,
+                    "horaFin": sesion.horaFin
+                })
 
         return Response(sesiones)
 
@@ -1293,7 +1292,7 @@ class NuevaInstalacionView(APIView):
 
         instalacion_json = request.POST.get("instalacion", "{}")
         instalacion_data = json.loads(instalacion_json)
-        imagen = request.FILES.get("imagenURL")
+        imagen = request.FILES.get("imagen")
 
         pabellon_id = instalacion_data.pop("pabellon", None)
         tarifa_id = instalacion_data.pop("tarifa", None)
@@ -1312,7 +1311,7 @@ class NuevaInstalacionView(APIView):
             **instalacion_data,
             pabellon=pabellon,
             tarifa=tarifa,
-            imagenURL=imagen
+            imagen=imagen
         )
         
         if instalacion.tipoInstalacion == TipoInstalacion.PISCINA:
@@ -1385,7 +1384,7 @@ class EditarInstalacionView(APIView):
             instalacion_json = request.POST.get("instalacion", "{}")
             instalacion_data = json.loads(instalacion_json)
 
-            imagen = request.FILES.get("imagenURL")
+            imagen = request.FILES.get("imagen")
 
             pabellon_id = instalacion_data.pop("pabellon", None)
             if isinstance(pabellon_id, dict):
@@ -1520,7 +1519,7 @@ class NuevaActividadView(APIView):
     def post(self, request):
         actividad_json = request.data.get("actividad", "{}")
         actividad_data = json.loads(actividad_json)
-        imagen = request.FILES.get("imagenURL")
+        imagen = request.FILES.get("imagen")
 
         tarifa_id = actividad_data.pop("tarifa", None)
         instalacion_id = actividad_data.pop("instalacion", None)
@@ -1534,6 +1533,13 @@ class NuevaActividadView(APIView):
         periodo = request.data.get("periodo")
         sesiones = json.loads(sesiones_json)
 
+        if not monitor.comprobarDisponibilidad(sesiones):
+            return Response(
+                {"respuesta": "El monitor ya tiene una sesion en uno de los periodos propuestos"},
+                status=status.HTTP_400_BAD_REQUEST,
+                tipo="monitor"
+            )
+
         # Validar horarios primero
         for sesion in sesiones:
             dia = sesion.get('dia')
@@ -1546,12 +1552,13 @@ class NuevaActividadView(APIView):
                 calle = instalacion.calles.filter(numero=calleNum).first()
 
                 if not calle:
-                    return Response({"respuesta": "Calle no válida"}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({"respuesta": "Calle no válida"}, status=status.HTTP_400_BAD_REQUEST, tipo="calle")
 
             if not instalacion.controlarHorarioActividad(dia, horaInicio, horaFin, calle=calle):
                 return Response(
                     {"respuesta": "Una o más sesiones no se pueden realizar en esta instalación"},
-                    status=status.HTTP_400_BAD_REQUEST
+                    status=status.HTTP_400_BAD_REQUEST,
+                    tipo="sesiones"
                 )
 
         # Crear actividad
@@ -1560,7 +1567,7 @@ class NuevaActividadView(APIView):
             tarifa=tarifa,
             instalacion=instalacion,
             monitor=monitor,
-            imagenURL=imagen
+            imagen=imagen
         )
 
         instalacion.revisarAlquileres(sesiones, periodo, True)
@@ -1612,7 +1619,7 @@ class EditarActividadView(APIView):
 
             actividad_json = request.POST.get("actividad", "{}")
             actividad_data = json.loads(actividad_json)
-            imagen = request.FILES.get("imagenURL")
+            imagen = request.FILES.get("imagen")
 
             tarifa_id = actividad_data.pop("tarifa", None)
             instalacion_id = actividad_data.pop("instalacion", None)
@@ -1628,6 +1635,13 @@ class EditarActividadView(APIView):
     
             sesiones_bd = actividad.sesiones.all()
             ids_recibidos = []
+
+            if not monitor.comprobarDisponibilidad(sesiones_recibidas):
+                return Response(
+                    {"respuesta": "El monitor ya tiene una sesion en uno de los periodos propuestos"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                    tipo="monitor"
+                )
 
             cambios = False
             for sesion_data in sesiones_recibidas:
@@ -1646,7 +1660,8 @@ class EditarActividadView(APIView):
                 if not respuesta:
                     return Response(
                         {"respuesta": "Una o más sesiones no se pueden realizar en esta instalación en el horario elegido"},
-                        status=status.HTTP_400_BAD_REQUEST
+                        status=status.HTTP_400_BAD_REQUEST,
+                        tipo="sesiones"
                     )
 
                 if not sesion_id or sesion_id == -1:
@@ -1684,7 +1699,7 @@ class EditarActividadView(APIView):
 
             resultado = actividad.modificarInformacion(actividad_data, tarifa, instalacion, monitor, imagen)
             if not resultado:
-                return Response({"respuesta": "Error al tratar de modificar la informacion"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"respuesta": "Error al tratar de modificar la informacion"}, status=status.HTTP_400_BAD_REQUEST. tipo="actividad")
 
             instalacion.revisarAlquileres(sesiones_recibidas, periodo, True)
 
@@ -1729,7 +1744,7 @@ class TarifaActividadView(APIView):
     def get(self, request, actividad_id):
         actividad = get_object_or_404(Actividad, id=actividad_id)
 
-        precios = actividad.obtener_precios()
+        precios = actividad.obtenerPrecios()
         data = {
             "tarifa": {
                 "idActividad": actividad.id,
@@ -1764,7 +1779,7 @@ class TarifaInstalacionView(APIView):
     def get(self, request, instalacion_id):
         instalacion = get_object_or_404(Instalacion, id=instalacion_id)
 
-        precios = instalacion.obtener_precios()
+        precios = instalacion.obtenerPrecios()
 
         fecha_str = request.query_params.get('fecha')
         if fecha_str:

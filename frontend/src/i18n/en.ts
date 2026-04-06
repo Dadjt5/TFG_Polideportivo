@@ -117,9 +117,7 @@ export default {
   onTheHourWarning: "Sessions must begin and end on the hour",
   noPermissions: "You do not have permission to perform this action",
 
-  monitorNoCreated: 'The monitor already exists in the system',
-  finalUserNoCreated: 'The end user already exists in the system',
-  adminNoCreated: 'The administrator already exists in the system',
+  userNoCreated: 'There is already a user with that DNI or email address in the system',
   tariffNoCreated: 'The tariff could not be created',
   bonusNoCreated: 'The bonus could not be created',
   subscriptionNoCreated: 'The subscription could not be created',
@@ -139,6 +137,7 @@ export default {
   errorWaitingList: "You are already on this waiting list or have already signed up for the activity",
   errorPlaces: "The number of places for the activity cannot exceed the venue's capacity",
   errorPlaces2: "Some of the activities taking place at this venue have a capacity exceeding the maximum allowed",
+  dateError: "The expiry date cannot be earlier or equal than the start date",
 
   /* Perfil */
   role: "Role",
@@ -156,6 +155,7 @@ export default {
   correctlyUpdate: "Data updated correctly",
   passwordUpdate: "Data updated, you must log in again",
   noModify: "The data could not be modified",
+  noModifyActivity: 'One or more sessions cannot be held at that time',
   moreUserStats: "Check your statistics",
   bonusSubscriptionsOwn: "Own bonus and subscriptions",
   loginCode: "Identifier",

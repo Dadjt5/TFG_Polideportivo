@@ -14,8 +14,8 @@ class Descuento(models.Model):
     porcentaje = models.FloatField(default=0.0)
     combinable = models.BooleanField(default=False)
     prioritario = models.BooleanField(default=False)
-    fechaInicio = models.DateField(auto_now_add=True)
-    fechaFinValidez = models.DateField(auto_now_add=True)
+    fechaInicio = models.DateField()
+    fechaFinValidez = models.DateField()
 
     tiposInstalacion = MultiSelectField(choices=TipoInstalacion.choices, max_length=512)
 

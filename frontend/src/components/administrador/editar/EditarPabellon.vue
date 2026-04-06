@@ -64,7 +64,7 @@
               {{ t.images }}
             </h4>
 
-            <img :src="pabellon.imagenURL" class="img-fluid rounded mb-3 img-hover" />
+            <img :src="pabellon.imagen" class="img-fluid rounded mb-3 img-hover" />
 
             <input v-if="editando" type="file" class="form-control form-control-lg" @change="onFileChange" />
             <img v-if="preview" :src="preview" class="img-fluid rounded mb-3" />
@@ -178,7 +178,7 @@ const pabellon = ref({
   id: 0,
   nombre: "",
   descripcion: "",
-  imagenURL: "",
+  imagen: "",
   direccion: ""
 })
 
@@ -257,7 +257,7 @@ const guardarCambios = async () => {
   })
 
   if (imagen.value) {
-    formData.append("imagenURL", imagen.value)
+    formData.append("imagen", imagen.value)
   }
 
   if (formData.has("nombre") || formData.has("descripcion") || formData.has("direccion") || imagen.value) {

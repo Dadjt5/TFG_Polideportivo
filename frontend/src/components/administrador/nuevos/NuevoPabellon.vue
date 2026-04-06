@@ -146,7 +146,7 @@ const crearPabellon = async () => {
   formData.append("direccion", pabellon.value.direccion)
 
   if (imagen.value) {
-    formData.append("imagenURL", imagen.value)
+    formData.append("imagen", imagen.value)
   }
 
   try {

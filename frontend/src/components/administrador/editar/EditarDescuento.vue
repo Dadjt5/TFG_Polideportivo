@@ -98,11 +98,11 @@
               </div>
 
               <div v-else class="d-flex flex-wrap gap-3">
-                <div v-for="tipo in estadisticasStore.data.tiposInstalacion" :key="tipo[0]" class="form-check">
-                  <input type="checkbox" class="form-check-input" :value="tipo[0]"
+                <div v-for="tipo in estadisticasStore.data.tiposInstalacion" :key="tipo" class="form-check">
+                  <input type="checkbox" class="form-check-input" :value="tipo"
                     v-model="descuento.tiposInstalacion" />
                   <label class="form-check-label">
-                    {{ tipo[1] }}
+                    {{ tipo }}
                   </label>
                 </div>
               </div>
@@ -245,6 +245,7 @@ const descuento = ref<any>({
   fechaInicio: "",
   fechaFinValidez: "",
   tiposInstalacion: [],
+  deportes_ids: [],
   deportes: []
 })
 
@@ -261,9 +262,8 @@ const descuentoOriginal = ref<any>(null)
 const deportes = ref<any[]>([])
 
 const nombresDeportesSeleccionados = computed(() => {
-  return deportes.value
-    .filter(d => descuento.value.deportes.includes(d.id))
-    .map(d => d.nombre)
+  if (!descuento.value.deportes) return []
+  return descuento.value.deportes.map((d: any) => d.titulo)
 })
 
 function validarFormulario() {
@@ -328,17 +328,22 @@ const guardarCambios = async () => {
     return
   }
 
+  if (!fechasValidas()) {
+    lanzarMensaje(t.value.dateError, "error")
+    return
+  }
+
   try {
     const data = camposModificados()
     if (Object.keys(data).length > 0) {
       await modificarDescuento(descuento.value.id, data)
       lanzarMensaje(t.value.correctlyUpdate, "success")
     } else {
-      lanzarMensaje(t.value.noChanges, "success") 
+      lanzarMensaje(t.value.noChanges, "success")
     }
 
     editando.value = false
-  } catch(e) {
+  } catch (e) {
     lanzarMensaje(t.value.noModify, "error")
     console.error('Error al modificar el descuento', e)
   }
@@ -351,6 +356,22 @@ const eliminado = ref(false)
 
 function abrirConfirmacion() {
   confirmModal.show()
+}
+
+function fechasValidas() {
+  if (!descuento.value.fechaInicio || !descuento.value.fechaFinValidez) {
+    return false
+  }
+
+  const inicio = new Date(descuento.value.fechaInicio)
+  const fin = new Date(descuento.value.fechaFinValidez)
+  const hoy = new Date()
+
+  inicio.setHours(0,0,0,0)
+  fin.setHours(0,0,0,0)
+  hoy.setHours(0,0,0,0)
+
+  return fin > inicio && inicio >= hoy
 }
 
 async function confirmarEliminar() {
@@ -388,11 +409,13 @@ onMounted(async () => {
   successModal = new Modal(document.getElementById('successDeleteModal')!)
 
   try {
-    descuento.value = await getDescuentoDetalle(parseInt(props.id))
+    const detalles = await getDescuentoDetalle(parseInt(props.id))
+
+    descuento.value = detalles
     descuentoOriginal.value = JSON.parse(JSON.stringify(descuento.value))
     deportes.value = await getDeportes()
   } catch (e) {
-    mensaje.value = t.value.unexpectedError
+    lanzarMensaje(t.value.unexpectedError, "error")
     console.error("Error al obtener la informacion del descuento", e)
   }
 })

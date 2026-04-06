@@ -6,22 +6,22 @@
       </h1>
 
       <div class="card shadow-lg border-0 rounded-4 p-4"
-           style="background-color: rgba(180,220,255,0.6); backdrop-filter: blur(10px);">
+        style="background-color: rgba(180,220,255,0.6); backdrop-filter: blur(10px);">
 
         <div class="row g-4">
 
           <!-- NOMBRE -->
           <div class="col-md-6">
             <label class="form-label fw-semibold">{{ t.name }}</label>
-            <input type="text" class="form-control form-control-lg"
-                   :class="{ 'is-invalid': errores.nombre }" v-model="descuento.nombre" />
+            <input type="text" class="form-control form-control-lg" :class="{ 'is-invalid': errores.nombre }"
+              v-model="descuento.nombre" />
           </div>
 
           <!-- PORCENTAJE -->
           <div class="col-md-6">
             <label class="form-label fw-semibold">{{ t.percentage }}</label>
             <input type="number" min="0" max="100" class="form-control form-control-lg"
-                   :class="{ 'is-invalid': errores.porcentaje }" v-model="descuento.porcentaje" />
+              :class="{ 'is-invalid': errores.porcentaje }" v-model="descuento.porcentaje" />
           </div>
 
           <!-- DESCRIPCIÓN -->
@@ -65,8 +65,8 @@
             <div class="row g-3">
               <div v-for="tipo in estadisticasStore.data.tiposInstalacion" :key="tipo" class="col-md-4">
                 <div class="border rounded-3 p-3 h-100 cursor-pointer text-center"
-                     :class="{ 'border-primary bg-white shadow-sm': descuento.tiposInstalacion.includes(tipo) }"
-                     @click="toggleTipo(tipo)">
+                  :class="{ 'border-primary bg-white shadow-sm': descuento.tiposInstalacion.includes(tipo) }"
+                  @click="toggleTipo(tipo)">
                   {{ tipo }}
                 </div>
               </div>
@@ -82,8 +82,8 @@
             <div class="row g-3">
               <div v-for="deporte in deportes" :key="deporte.id" class="col-md-3">
                 <div class="border rounded-3 p-3 h-100 cursor-pointer text-center"
-                     :class="{ 'border-primary bg-white shadow-sm': descuento.deportes.includes(deporte.id) }"
-                     @click="toggleDeporte(deporte.id)">
+                  :class="{ 'border-primary bg-white shadow-sm': descuento.deportes_ids.includes(deporte.id) }"
+                  @click="toggleDeporte(deporte.id)">
                   {{ deporte.titulo }}
                 </div>
               </div>
@@ -141,7 +141,8 @@ const descuento = ref({
   fechaInicio: "",
   fechaFinValidez: "",
   tiposInstalacion: [] as string[],
-  deportes: [] as number[]
+  deportes_ids: [] as number[],
+  deportes: []
 })
 
 const errores = ref({
@@ -174,11 +175,11 @@ function validar() {
 }
 
 function toggleDeporte(id: number) {
-  const index = descuento.value.deportes.indexOf(id)
+  const index = descuento.value.deportes_ids.indexOf(id)
   if (index > -1) {
-    descuento.value.deportes.splice(index, 1)
+    descuento.value.deportes_ids.splice(index, 1)
   } else {
-    descuento.value.deportes.push(id)
+    descuento.value.deportes_ids.push(id)
   }
 }
 
@@ -192,14 +193,40 @@ function toggleTipo(valor: string) {
   }
 }
 
+function fechasValidas() {
+  if (!descuento.value.fechaInicio || !descuento.value.fechaFinValidez) {
+    return false
+  }
+
+  const inicio = new Date(descuento.value.fechaInicio)
+  const fin = new Date(descuento.value.fechaFinValidez)
+  const hoy = new Date()
+
+  inicio.setHours(0,0,0,0)
+  fin.setHours(0,0,0,0)
+  hoy.setHours(0,0,0,0)
+
+  return fin > inicio && inicio >= hoy
+}
+
 const crearDescuento = async () => {
   if (!validar()) {
     lanzarMensaje(t.value.missing, "error")
     return
   }
 
+  if (!fechasValidas()) {
+    lanzarMensaje(t.value.dateError, "error")
+    return
+  }
+
   try {
-    await nuevoDescuento(descuento.value)
+    const payload = {
+      ...descuento.value,
+      deportes: descuento.value.deportes_ids
+    }
+
+    await nuevoDescuento(payload)
     router.push({ name: "gestion-tarifas" })
   } catch (e) {
     lanzarMensaje(t.value.discountNoCreated, "error")

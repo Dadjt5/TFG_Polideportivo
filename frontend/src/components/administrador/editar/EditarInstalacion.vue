@@ -318,7 +318,7 @@
                   <i class="bi bi-images text-primary"></i> {{ t.images }}
                 </h5>
 
-                <img v-if="instalacion.imagenURL && !preview" :src="instalacion.imagenURL"
+                <img v-if="instalacion.imagen && !preview" :src="instalacion.imagen"
                   class="img-fluid rounded mb-3 shadow-sm" style="max-height: 300px; object-fit: cover;" />
 
                 <div v-if="editando" class="mt-2">
@@ -456,7 +456,7 @@ const calleSeleccionada = ref()
 const instalacion = ref({
   id: 0,
   nombre: "",
-  imagenURL: "",
+  imagen: "",
   aforoMaximo: 50,
   estado: "",
   pagada: false,
@@ -675,7 +675,7 @@ async function guardarCambios() {
   formData.append("fechasEspeciales", JSON.stringify(fechasEspeciales.value))
 
   if (imagen.value) {
-    formData.append("imagenURL", imagen.value)
+    formData.append("imagen", imagen.value)
   }
 
   try {

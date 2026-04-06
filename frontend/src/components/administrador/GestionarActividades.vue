@@ -74,6 +74,7 @@
                 <span class="fw-medium text-primary">
                   {{ a.nombre }}
                 </span>
+                <i class="bi bi-chevron-right text-muted"></i>
               </div>
             </div>
           </div>

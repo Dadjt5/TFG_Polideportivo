@@ -219,7 +219,7 @@ const crearMonitor = async () => {
     userIdentifier.value = data.codigo_usuario;
     showIdentifier.value = true;
   } catch (e) {
-    lanzarMensaje(t.value.monitorNoCreated, "error")
+    lanzarMensaje(t.value.userNoCreated, "error")
     console.error("Error al crear el nuevo monitor", e)
   }
 };

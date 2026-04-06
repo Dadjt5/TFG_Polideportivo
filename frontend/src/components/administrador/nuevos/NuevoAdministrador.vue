@@ -224,7 +224,7 @@ const crearAdministrador = async () => {
     userIdentifier.value = data.codigo_usuario;
     showIdentifier.value = true;
   } catch (e) {
-    lanzarMensaje(t.value.adminNoCreated, "error")
+    lanzarMensaje(t.value.userNoCreated, "error")
     console.error("Error al crear el administrador", e)
   }
 }

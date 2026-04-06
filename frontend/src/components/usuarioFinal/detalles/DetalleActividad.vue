@@ -122,7 +122,7 @@
               {{ t.images }}
             </h4>
 
-            <img :src="actividad.imagenURL" class="img-fluid rounded mb-3 img-hover" />
+            <img :src="actividad.imagen" class="img-fluid rounded mb-3 img-hover" />
           </div>
 
           <!-- SESIONES -->
@@ -169,11 +169,6 @@
         <button v-if="puedeReservar" class="btn btn-success btn-lg px-5 shadow-sm" @click="reservar">
           {{ t.booking }}
         </button>
-
-        <!-- LOGIN REQUIRED -->
-        <div v-else-if="!usuarioFinalStore.isLogged" class="text-muted">
-          {{ t.loginToBook }}
-        </div>
 
         <!-- LISTA DE ESPERA -->
         <button v-else-if="actividad.plazasReservadas >= actividad.plazasMaximas"
@@ -226,7 +221,7 @@ const actividad = ref({
   id: 0,
   nombre: "",
   tipoActividad: "",
-  imagenURL: "",
+  imagen: "",
   plazasMaximas: 0,
   plazasReservadas: 0,
   edadMinima: 0,

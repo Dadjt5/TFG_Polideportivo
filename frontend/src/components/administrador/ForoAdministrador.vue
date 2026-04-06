@@ -50,11 +50,6 @@
                 <i class="bi bi-pencil me-1"></i>
                 {{ t.modifyChannel }}
               </button>
-
-              <button class="btn btn-outline-danger rounded-pill px-3" @click="borrarCanal">
-                <i class="bi bi-trash me-1"></i>
-                {{ t.delete }}
-              </button>
             </div>
 
           </div>

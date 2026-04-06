@@ -49,6 +49,23 @@ class Monitor(Usuario):
                     if not existe:
                         Notificacion.notificarActividadMonitor(sesion.actividad, sesion)
 
+
+    # Función para revisar si un monitor no tiene otras sesiones programadas en los horarios de las nuevas sesiones
+    def comprobarDisponibilidad(self, sesiones):
+        for sesion_data in sesiones:
+            dia = sesion_data.get('dia')
+            horaInicio = sesion_data.get('horaInicio')
+            horaFin = sesion_data.get('horaFin')
+
+            actividades = self.actividad.all()
+            for act in actividades:
+                conflictos = act.sesiones.filter(dia__iexact=dia, horaInicio__lt=horaFin, horaFin__gt=horaInicio)
+
+                if conflictos.exists():
+                    return False
+        
+        return True
+
     # Función para registrar un nuevo monitor
     @classmethod
     def registrarMonitor(cls, *, nombre, apellidos, dni, email, password):

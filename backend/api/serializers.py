@@ -399,7 +399,7 @@ class InstalacionSerializer(serializers.ModelSerializer):
             "tipoInstalacion",
             "aforoMaximo",
             "luz",
-            "imagenURL",
+            "imagen",
             "porcentajeTDA",
             "pabellon",
             "agenda",
@@ -494,7 +494,7 @@ class ActividadSerializer(serializers.ModelSerializer):
             "nombre",
             "descripcion",
             "tipoActividad",
-            "imagenURL",
+            "imagen",
             "plazasMaximas",
             "plazasReservadas",
             "edadMinima",
@@ -657,11 +657,31 @@ class ConfiguracionSerializer(serializers.ModelSerializer):
 
 class DescuentoSerializer(serializers.ModelSerializer):
     tiposInstalacion = serializers.ListField(child=serializers.ChoiceField(choices=TipoInstalacion.choices))
+    deportes = DeporteSerializer(many=True, read_only=True)
+    deportes_ids = serializers.PrimaryKeyRelatedField(many=True, queryset=Deporte.objects.all(), write_only=True)
 
     class Meta:
         model = Descuento
         fields = '__all__'
+    
+    def create(self, validated_data):
+        deportes_ids = validated_data.pop('deportes_ids', [])
+        descuento = Descuento.objects.create(**validated_data)
+        descuento.deportes.set(deportes_ids)
         
+        return descuento
+
+    def update(self, instance, validated_data):
+        deportes_ids = validated_data.pop('deportes_ids', None)
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        if deportes_ids is not None:
+            instance.deportes.set(deportes_ids)
+        instance.save()
+
+        return instance
 
 class DescuentoSimpleSerializer(serializers.ModelSerializer):
     class Meta:

@@ -796,14 +796,14 @@ const crearActividad = async () => {
   formData.append("deportes", JSON.stringify(deporteFinal))
 
   if (imagen.value) {
-    formData.append("imagenURL", imagen.value)
+    formData.append("imagen", imagen.value)
   }
 
   try {
     await nuevaActividad(formData)
     router.push({ name: "gestion-actividades" })
   } catch (e) {
-    lanzarMensaje(t.value.activityNoCreated, "error")
+    lanzarMensaje(t.value.noModifyActivity, "error")
     console.log("Error al crear la actividad", e)
   }
 }

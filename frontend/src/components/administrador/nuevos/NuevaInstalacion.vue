@@ -368,7 +368,7 @@ const crearInstalacion = async () => {
   formData.append("fechasEspeciales", JSON.stringify(fechasEspeciales.value))
 
   if (imagen.value) {
-    formData.append("imagenURL", imagen.value)
+    formData.append("imagen", imagen.value)
   }
 
   try {

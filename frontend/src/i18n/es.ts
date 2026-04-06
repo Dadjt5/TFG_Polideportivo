@@ -84,9 +84,7 @@ export default {
   confirmReservationDelete: "¿Seguro que desea eliminar la reserva?",
   reservationDeleted: "La reserva ha sido eliminada",
 
-  monitorNoDeleted: "El monitor no puede ser eliminado porque esta dirigiendo una o mas actividades",
-  finalUserNoDeleted: "El usuario final no pudo ser eliminado debido a un problema desconocido",
-  adminNoDeleted: "No tienes los permisos suficientes para eliminar este administrador",
+  userNoCreated: 'Ya existe un usuario con ese DNI o correo en el sistema',
   tariffNoDeleted: "La tarifa no pudo ser eliminada debido a que esta siendo utilizada",
   bonusNoDeleted: "El bono no pudo ser eliminado porque uno o mas usuarios lo han comprado",
   subscriptionNoDeleted: "El abono no pudo ser eliminado porque ino o mas usuarios lo han comprado",
@@ -139,6 +137,7 @@ export default {
   errorWaitingList: "Ya estas inscrito en esta lista de espera o en la actividad",
   errorPlaces: "La cantidad de plazas en la actividad no puede superar el aforo de la instalación",
   errorPlaces2: "Alguna de las actividades que se desarrollan en esta instalacion tienen un número de plazas mayor al aforo máximo",
+  dateError: "La fecha de expiración no puede ser anterior o igual a la fecha de inicio",
 
   /* Perfil */
   role: "Rol",
@@ -156,6 +155,7 @@ export default {
   correctlyUpdate: "Datos actualizados correctamente",
   passwordUpdate: "Datos actualizados, debes volver a iniciar sesión",
   noModify: "Los datos no han podido ser modificados",
+  noModifyActivity: 'Una o mas sesiones no se pueden realizar en ese horario',
   moreUserStats: "Revisa tus estadísticas",
   bonusSubscriptionsOwn: "Bonos y abonos propios",
   loginCode: "Identificador",

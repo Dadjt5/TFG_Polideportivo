@@ -125,7 +125,7 @@
           <!-- TAB IMÁGENES -->
           <div class="tab-pane fade" id="imagenes">
             <div class="d-flex justify-content-center">
-              <img :src="instalacion.imagenURL" class="img-fluid rounded shadow"
+              <img :src="instalacion.imagen" class="img-fluid rounded shadow"
                 style="max-height: 400px; object-fit: cover;" />
             </div>
           </div>
@@ -140,11 +140,6 @@
         <button v-if="usuarioFinalStore.isLogged" class="btn btn-success btn-lg px-5 shadow-sm" @click="reservar">
           {{ t.booking }}
         </button>
-
-        <!-- LOGIN REQUIRED -->
-        <div v-else class="text-muted">
-          {{ t.loginToBook }}
-        </div>
 
         <!-- VOLVER -->
         <button class="btn btn-outline-secondary btn-lg px-5" @click="volver">
@@ -182,7 +177,7 @@ const fechasEspeciales = ref<any[]>([])
 const instalacion = ref({
   id: 0,
   nombre: "",
-  imagenURL: "",
+  imagen: "",
   aforoMaximo: 50,
   luz: false,
   porcentajeTDA: 0,

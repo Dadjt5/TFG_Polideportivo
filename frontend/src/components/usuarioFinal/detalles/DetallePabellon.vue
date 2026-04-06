@@ -64,7 +64,7 @@
               {{ t.images }}
             </h4>
 
-            <img :src="pabellon.imagenURL" class="img-fluid rounded mb-3 img-hover" />
+            <img :src="pabellon.imagen" class="img-fluid rounded mb-3 img-hover" />
           </div>
         </div>
 
@@ -108,7 +108,7 @@ const pabellon = ref({
   id: 0,
   nombre: "",
   descripcion: "",
-  imagenURL: "",
+  imagen: "",
   direccion: ""
 });
 

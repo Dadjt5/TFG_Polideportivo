@@ -152,8 +152,8 @@
               <i class="bi bi-images text-primary"></i> {{ t.images }}
             </h5>
 
-            <img :src="actividad.imagenURL" class="img-fluid rounded mb-3 img-hover"
-              v-if="actividad.imagenURL && !preview" style="max-height: 300px; object-fit: cover;" />
+            <img :src="actividad.imagen" class="img-fluid rounded mb-3 img-hover"
+              v-if="actividad.imagen && !preview" style="max-height: 300px; object-fit: cover;" />
 
             <input v-if="editando" type="file" class="form-control form-control-lg mt-2" @change="onFileChange" />
 
@@ -586,7 +586,7 @@ const añoActual = new Date().getFullYear()
 const actividad = ref<any>({
   nombre: "",
   descripcion: "",
-  imagenURL: "",
+  imagen: "",
   plazasMaximas: 0,
   plazasReservadas: 0,
   edadMinima: 0,
@@ -949,7 +949,7 @@ async function guardarCambios() {
   formData.append("deportes", JSON.stringify(actividad.value.nombreDeporte))
 
   if (imagen.value) {
-    formData.append("imagenURL", imagen.value)
+    formData.append("imagen", imagen.value)
   }
 
   try {
@@ -957,7 +957,7 @@ async function guardarCambios() {
     lanzarMensaje(t.value.correctlyUpdate, "success")
     cancelarEdicion(false)
   } catch (e) {
-    lanzarMensaje(t.value.noModify, "error")
+    lanzarMensaje(t.value.noModifyActivity, "error")
     console.error("No se ha podido editar la actividad", e)
   }
 }
