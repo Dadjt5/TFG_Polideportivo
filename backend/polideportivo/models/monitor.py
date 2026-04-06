@@ -22,6 +22,7 @@ class Monitor(Usuario):
     """Modelo para representar al monitor"""
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="monitor")
 
+    # Función para revisar las actividades y notificar las próximas
     def revisarActividades(self):
         from .notificacion import Notificacion
 
@@ -48,8 +49,9 @@ class Monitor(Usuario):
                     if not existe:
                         Notificacion.notificarActividadMonitor(sesion.actividad, sesion)
 
+    # Función para registrar un nuevo monitor
     @classmethod
-    def registrar_monitor(cls, *, nombre, apellidos, dni, email, password):
+    def registrarMonitor(cls, *, nombre, apellidos, dni, email, password):
 
         User = get_user_model()
 
@@ -84,10 +86,12 @@ class Monitor(Usuario):
             "error": False
         }
 
+    # Función para contarl la cantidad de monitores en el sistema
     @classmethod
     def contar(cls):
         return cls.objects.count()
 
+    # Función que sobreescribe a eliminar para borrar tambien el user de django
     def delete(self, *args, **kwargs):
         user = self.user
         super().delete(*args, **kwargs)

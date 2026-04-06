@@ -19,8 +19,9 @@ class Administrador(models.Model):
     def __str__(self):
         return f'{self.nombre}, rol: {self.rol}'
 
+    # Función para registrar un nuevo administrador
     @classmethod
-    def registrar_administrador(cls, *, nombre, dni, rol, email, password):
+    def registrarAdministrador(cls, *, nombre, dni, rol, email, password):
         User = get_user_model()
 
         if User.objects.filter(username=dni).exists():
@@ -68,6 +69,7 @@ class Administrador(models.Model):
             "error": False
         }
 
+    # Función para sobreescribir el eliminado y eliminar tambien el user de django
     def delete(self, *args, **kwargs):
         user = self.user
         super().delete(*args, **kwargs)

@@ -26,12 +26,13 @@ class Pabellon(models.Model):
 
     nombre = models.CharField(max_length=256, blank=True)
     descripcion = models.CharField(max_length=1024, blank=True)
-    imagenURL = models.ImageField(upload_to="pabellones/", blank=True, null=True)
+    imagen = models.ImageField(upload_to="pabellones/", blank=True, null=True)
     direccion = models.CharField(max_length=256, blank=True)
 
     def __str__(self):
         return f'{self.nombre}, localizado en {self.direccion}'
     
+    # Función para contar los pabellones del sistema
     @classmethod
     def contar(cls):
         return cls.objects.count()
@@ -41,7 +42,7 @@ class Instalacion(models.Model):
     """Modelo para representar una instalacion"""
 
     nombre = models.CharField(max_length=256, blank=True)
-    imagenURL = models.ImageField(upload_to="instalaciones/", blank=True, null=True)
+    imagen = models.ImageField(upload_to="instalaciones/", blank=True, null=True)
     aforoMaximo = models.PositiveIntegerField(default=50)
     luz = models.BooleanField(default=False)
     porcentajeTDA = models.FloatField(default=0.0)
@@ -55,14 +56,16 @@ class Instalacion(models.Model):
     def __str__(self):
         return f'{self.nombre}, ubicado en el {self.pabellon}'
     
-    def crear_calles(self):
+    # Función para crear nuevas calles en la piscina
+    def crearCalles(self):
         if self.tipoInstalacion != TipoInstalacion.PISCINA:
             return
 
         for i in range(1, self.numeroCalles + 1):
             Calle.objects.create(instalacion=self, numero=i)
     
-    def obtener_precios(self):
+    # Función para obtener los precios indicados por la tarifa de la isntalación
+    def obtenerPrecios(self):
         return {
             "precioAbonado": self.tarifa.precioAbonado,
             "precioUAM": self.tarifa.precioUAM,
@@ -71,6 +74,7 @@ class Instalacion(models.Model):
             "costeIluminacion": self.tarifa.costeIluminacion
         }
 
+    # Función auxiliar para obtener el precio base para el alquiler de la instalación
     def _calcular_precio_base(self, usuario):
         precio = self.tarifa.precioOtros
         if usuario.tieneAbono:
@@ -82,6 +86,7 @@ class Instalacion(models.Model):
 
         return precio
 
+    # Función para comprobar el aforo de la instalacion frente a las plazas máximas de la actividad
     def comprobarAforo(self, instalacion_data):
         for act in self.actividad.all():
             if act.plazasMaximas > instalacion_data["aforoMaximo"]:
@@ -89,6 +94,7 @@ class Instalacion(models.Model):
 
         return True
 
+    # Función para modificar la información de la instalación
     def modificarInformacion(self, instalacion_data, pabellon, tarifa, imagen):
         campos_simples = [
             "nombre",
@@ -109,6 +115,7 @@ class Instalacion(models.Model):
         self.save()
         return True
 
+    # Función para actualizar el mapa de reservas para marcar los slots indicados por las sesiones como reservados por actividad
     def actualizarMapa(self, sesiones):
         for sesion in sesiones:
             dia = sesion.get('dia')
@@ -147,6 +154,7 @@ class Instalacion(models.Model):
 
                     hora_actual = siguiente_hora
 
+    # FUnción para actualizar el mapa de reservas de acuerdo a los nuevos horarios de la instalación
     def sincronizarMapaReservas(self, agenda, minutos=60):
         if not agenda.abierto:
             agenda.mapa_reservas.all().delete()
@@ -286,21 +294,21 @@ class Instalacion(models.Model):
         }
 
     # Función para controlar los horarios de sesiones de una actividad para saber si coinciden con otras sesiones de otras actividades
-    def controlarHorarioActividad(self, dia, hora_inicio, hora_fin, sesion_id=None, calle=None):
-        if isinstance(hora_inicio, str):
-            h, m = map(int, hora_inicio.split(":"))
-            hora_inicio = time(h, m)
+    def controlarHorarioActividad(self, dia, horaInicio, horaFin, sesion_id=None, calle=None):
+        if isinstance(horaInicio, str):
+            h, m = map(int, horaInicio.split(":"))
+            horaInicio = time(h, m)
 
-        if isinstance(hora_fin, str):
-            h, m = map(int, hora_fin.split(":"))
-            hora_fin = time(h, m)
+        if isinstance(horaFin, str):
+            h, m = map(int, horaFin.split(":"))
+            horaFin = time(h, m)
 
         agenda = self.agenda.filter(dia__iexact=dia).first()
 
         if not agenda or not agenda.abierto:
             return False
 
-        if agenda.horaApertura > hora_inicio or agenda.horaCierre < hora_fin:
+        if agenda.horaApertura > horaInicio or agenda.horaCierre < horaFin:
             return False
 
         mes = date.today().month
@@ -320,8 +328,8 @@ class Instalacion(models.Model):
             actividad__instalacion=self,
             actividad__periodo__in=periodos_a_revisar,
             dia__iexact=dia,
-            horaInicio__lt=hora_fin,
-            horaFin__gt=hora_inicio
+            horaInicio__lt=horaFin,
+            horaFin__gt=horaInicio
         )
 
         if self.tipoInstalacion == TipoInstalacion.PISCINA:
@@ -334,7 +342,8 @@ class Instalacion(models.Model):
             return False
 
         return True
-    
+
+    # Función para controlar el cambio de horario de una sesion en la instalación
     def controlarCambioHorario(self, dia, horaInicio, horaFin, abierto):
         if not abierto:
             return not self.actividad.filter(sesiones__dia__iexact=dia).exists()
@@ -348,6 +357,7 @@ class Instalacion(models.Model):
 
         return not conflictos.exists()
 
+    # Función para controlar si se puede realizar un alquiler en el preiodo seleccionado
     def controlarAlquiler(self, dia, horaInicio, horaFin, calle=None):
         agenda = self.agenda.filter(fecha=dia).first()
 
@@ -376,6 +386,7 @@ class Instalacion(models.Model):
 
         return True
 
+    # Función para cambiar el horario de la instalación siempre y cuando no haya actividades programadas
     def nuevoHorario(self, dia, horaApertura, horaCierre, abierto):
         if isinstance(horaApertura, str):
             h, m = map(int, horaApertura.split(":")[:2])
@@ -417,6 +428,7 @@ class Instalacion(models.Model):
         self.sincronizarMapaReservas(agenda, minutos=60)
         return True
 
+    # Función para cambiar el horario especial de la instalación siempre y cuando no haya actividades programadas
     def nuevoHorarioEspecial(self, fecha, horaApertura, horaCierre, abierto):
         if isinstance(horaApertura, str):
             h, m = map(int, horaApertura.split(":")[:2])
@@ -438,7 +450,8 @@ class Instalacion(models.Model):
 
         return True
 
-    def get_horario(self, fecha):
+    # Función para devolver el horario de una isntalación en una fecha concreta
+    def getHorario(self, fecha):
         agenda = Agenda.objects.filter(instalacion=self, fecha=fecha).first()
 
         if agenda and agenda.abierto:
@@ -446,8 +459,8 @@ class Instalacion(models.Model):
 
         return None, None
 
-
-    def get_reservas(self, fecha):
+    # Función para obtener las reservas de una instalación en una fecha concreta
+    def getReservas(self, fecha):
         agenda = Agenda.objects.filter(instalacion=self, fecha=fecha, abierto=True).first()
 
         if not agenda:
@@ -483,10 +496,12 @@ class Instalacion(models.Model):
 
             return calles
 
+    # FUnción para contar el número de instalaciones en el sistema
     @classmethod
     def contar(cls):
         return cls.objects.count()
 
+    # Función para buscar en el sistema instalaciones que cumplan con los filtros y el texto
     @classmethod
     def buscar(cls, nombre=None, tipo=None, horaInicio=None, horaFin=None):
         res = cls.objects.all()

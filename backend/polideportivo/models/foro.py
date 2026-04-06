@@ -55,13 +55,16 @@ class Canal(models.Model):
     def __str__(self):
         return f'Canal para {self.titulo} con {self.numeroParticipantes} participantes'
     
+    # Función para contar el número de canales en el sistema
     @classmethod
     def contar(cls):
         return cls.objects.count()
     
+    # Función para obtener los mensajes del canal
     def getMensajes(self):
         return self.mensajes.all()
     
+    # Función para crear un nuevo mensaje en el canal
     def nuevoMensaje(self, usuario, texto):
         if not usuario:
             return False
@@ -83,6 +86,7 @@ class Canal(models.Model):
         Mensaje.objects.create(canal=self, usuario=usuario, texto=texto)
         return True
 
+    # Función para alterar el campo de expulsión de un usuario final del canal
     def cambiarExpulsionUsuario(self, usuarioFinal):
         try:
             relacion = UsuarioCanal.objects.get(usuarioFinal=usuarioFinal, canal=self)
@@ -101,6 +105,7 @@ class Canal(models.Model):
 
         return True
 
+    # Función para añadir un usuario al canal
     def añadirUsuario(self, usuarioFinal):
         with transaction.atomic():
             relacion, creada = UsuarioCanal.objects.get_or_create(
@@ -119,6 +124,7 @@ class Canal(models.Model):
 
         return True
 
+    # Función para alterar el campo de silencio de un usuario final del canal
     def cambiarSilencioUsuario(self, usuarioFinal):
         try:
             relacion = UsuarioCanal.objects.get(usuarioFinal=usuarioFinal, canal=self)

@@ -42,6 +42,7 @@ class UsuarioFinal(Usuario):
     sexo = models.CharField(default=Sexo.NINGUNO, choices=Sexo.choices)
     rol = models.CharField(default=Rol.EXTERNO, choices=Rol.choices)
 
+    # Función para sobreescribir el guardado y actualizar el rol
     def save(self, *args, **kwargs):
         if not self.esUAM:
             self.rol == Rol.EXTERNO
@@ -53,6 +54,7 @@ class UsuarioFinal(Usuario):
     def __str__(self):
         return f'Usuario: {self.id}, nacido el {self.fechaNacimiento}'
     
+    # Función para 
     def revisarActividades(self):
         from .notificacion import Notificacion
 
@@ -80,6 +82,7 @@ class UsuarioFinal(Usuario):
                 if not existe:
                     Notificacion.notificarActividadUsuarioFinal(sesion.actividad, sesion)
     
+    # Función para comprobar si un usuario tiene un abono y marcarlo
     def comprobarAbono(self):
         if self.abono.exists():
             self.tieneAbono = True
@@ -88,11 +91,13 @@ class UsuarioFinal(Usuario):
 
         self.save(update_fields=["tieneAbono"])
 
+    # Función para marcar que un usuario tiene un abono
     def marcarAbono(self, abono):
         if abono:
             self.tieneAbono = True
             self.save(update_fields=["tieneAbono"])
 
+    # Función para cambiar el estado de facorito de una actividad o instalación
     def cambiarFavorito(self, *, actividad=None, instalacion=None):
         if actividad and instalacion:
             raise ValueError("Solo puede haber actividad o instalación")
@@ -114,12 +119,14 @@ class UsuarioFinal(Usuario):
         )
         return True
 
+    # Función para contar el número de usuarios finales del sistema
     @classmethod
     def contar(cls):
         return cls.objects.count()
     
+    # Función para registrar un nuevo usuario en el sistema
     @classmethod
-    def registrar_usuario(cls, *, nombre, apellidos, sexo, fechaNacimiento,
+    def registrarUsuario(cls, *, nombre, apellidos, sexo, fechaNacimiento,
                           dni, telefono, email, provincia, municipio,
                           localidad, codigoPostal, password, esUAM):
 
@@ -174,6 +181,7 @@ class UsuarioFinal(Usuario):
             "error": False
         }
 
+    # Función que sobreescribe la eliminación de usuarios junto con el de Django
     def delete(self, *args, **kwargs):
         user = self.user
         super().delete(*args, **kwargs)

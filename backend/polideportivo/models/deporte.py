@@ -9,6 +9,7 @@ class Deporte(models.Model):
     def __str__(self):
         return f'{self.titulo}'
     
+    # Función para contar los deportes del sistema
     @classmethod
     def contar(cls):
         return cls.objects.count()

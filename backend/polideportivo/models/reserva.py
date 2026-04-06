@@ -22,7 +22,8 @@ class Reserva(models.Model):
 
     class Meta:
         abstract = True
-        
+    
+    # Función para calcular el descuentoa aplicado a la reserva
     def calcularDescuento(self):
         porcentaje = 0.0
 
@@ -46,9 +47,10 @@ class ReservaActividad(Reserva):
     def __str__(self):
         return f'Reserva de {self.actividad}'
 
-    def calcular_precio(self):
+    # Función para calcular el precio de la actividad
+    def calcularPrecio(self):
         """Calcula el precio final de la reserva usando la actividad"""
-        return self.actividad._calcular_precio_base(
+        return self.actividad._calcularPrecio_base(
             usuario=self.usuarioFinal,
             numeroHorasSemana=self.numeroHorasSemana,
             numeroPersonas=self.numeroPersonas,
@@ -56,6 +58,7 @@ class ReservaActividad(Reserva):
             tipoSesion=self.tipoSesion
         )
     
+    # Función para confirmar la reserva de la actividad
     def confirmarCompra(self):
         if self.estado != EstadoReserva.CONFIRMADA:
             self.usuarioFinal.actividadesRealizadas += 1
@@ -88,10 +91,12 @@ class ReservaActividad(Reserva):
 
             entrada.delete()
 
+    # Función para contar el número de reservas de actividades en el sistema
     @classmethod
     def contar(cls):
         return cls.objects.count()
-    
+
+    # Función para crear una nueva reserva de una actividad    
     @classmethod
     def nuevaReserva(cls, usuario, actividad, lista=False):
         if actividad.tipoReserva == FormaReserva.PRESENCIAL or actividad.tipoReserva == FormaReserva.NINGUNA:
@@ -103,7 +108,7 @@ class ReservaActividad(Reserva):
         with transaction.atomic():
             actividad.refresh_from_db()
 
-            descuentos = Descuento.obtener_descuentos(actividad=actividad)
+            descuentos = Descuento.obtenerDescuentos(actividad=actividad)
 
             if cls.objects.filter(usuarioFinal=usuario, actividad=actividad, estado=EstadoReserva.CONFIRMADA).exists():
                 return None
@@ -157,7 +162,8 @@ class Alquiler(Reserva):
     def __str__(self):
         return f'Alquiler de {self.instalacion}, en {self.fecha} de {self.horaInicio} a {self.horaFin}'
 
-    def calcular_precio(self):
+    # Función para calcular el precio del alquiler
+    def calcularPrecio(self):
         """Calcula el precio final de la reserva usando la instalacion"""
         precio = 0.0
 
@@ -165,27 +171,31 @@ class Alquiler(Reserva):
             self.luz = True
             precio += self.instalacion.tarifa.costeIluminacion
 
-        precio += self.instalacion._calcular_precio_base(usuario=self.usuarioFinal)*self.numeroHoras
+        precio += self.instalacion._calcularPrecio_base(usuario=self.usuarioFinal)*self.numeroHoras
         return precio
 
+    # FUnción para confirmar el alquiler
     def confirmarCompra(self):
         self.estado = EstadoReserva.CONFIRMADA
         self.save()
 
+    # Función para cancelar el alquiler
     def cancelarCompra(self):
         self.estado = EstadoReserva.CANCELADO
         self.save()
 
+    # Función para contar el número de alquileres en el sistema
     @classmethod
     def contar(cls):
         return cls.objects.count()
-    
+
+    # Función para crear un nuevo alquiler en la instalación indicada    
     @classmethod
     def nuevaReserva(cls, usuario, instalacion, fecha, horaInicio, horaFin, luz, calle=None):
         with transaction.atomic():
             instalacion.refresh_from_db()
 
-            descuentos = Descuento.obtener_descuentos(instalacion=instalacion)
+            descuentos = Descuento.obtenerDescuentos(instalacion=instalacion)
             
             conflictos = cls.objects.filter(
                 instalacion=instalacion,
@@ -225,6 +235,7 @@ class Alquiler(Reserva):
 
             return reserva
 
+    # Función para sobreescribir el guardado para guardar el número de horas
     def save(self, *args, **kwargs):
         t1 = self.horaInicio.hour*3600 + self.horaInicio.minute*60 + self.horaInicio.second
         t2 = self.horaFin.hour*3600 + self.horaFin.minute*60 + self.horaFin.second
@@ -232,14 +243,3 @@ class Alquiler(Reserva):
         self.numeroHoras = horas
         
         super().save(*args, **kwargs)
-
-    @property
-    def valido(self):
-        t1 = self.horaInicio.hour*3600 + self.horaInicio.minute*60 + self.horaInicio.second
-        t2 = self.horaFin.hour*3600 + self.horaFin.minute*60 + self.horaFin.second
-        
-        horas = (t1-t2)/3600
-        if horas > 2.0:
-            return False
-
-        return True

@@ -56,11 +56,13 @@ class CompraAbono(models.Model):
 
     estado = models.CharField(default=EstadoReserva.PENDIENTE, choices=EstadoReserva.choices)
 
+    # Función de la clase para contar el numero de compras de abonos
     @classmethod
     def contar(cls):
         return cls.objects.count()
-    
-    def calcular_precio(self, usuario, forma="", familiar=False):
+
+    # Función para calcular el precio del abono en funcion de su tarifa y de la forma de pago y el tipo de abono
+    def calcularPrecio(self, usuario, forma="", familiar=False):
         if self.abonoDeportivo:
             precio = self.abonoDeportivo.precioPagoUnicoOtros
 
@@ -84,7 +86,8 @@ class CompraAbono(models.Model):
                 precio = self.abonoVerano.precioTDA
 
         return precio
-    
+
+    # Función para confirmar la compra de un abono    
     def confirmarCompra(self):
         self.usuarioFinal.tieneAbono = True
         self.usuarioFinal.save()
@@ -92,6 +95,7 @@ class CompraAbono(models.Model):
         self.estado = EstadoReserva.CONFIRMADA
         self.save()
 
+    # Función para cancelar la compra de un abono
     def cancelarCompra(self):
         if self.estado == EstadoReserva.CONFIRMADA:
             usuario = self.usuarioFinal
@@ -105,6 +109,7 @@ class CompraAbono(models.Model):
         self.estado = EstadoReserva.CANCELADO
         self.save(update_fields=["estado"])
 
+    # Función de la clase para ejecutar la compra de un abono (aún sin pagar)
     @classmethod
     def compraAbono(cls, abono, usuario, tipoAbono):
         with transaction.atomic():
@@ -137,40 +142,3 @@ class CompraAbono(models.Model):
                 )
 
             return compra
-    
-    @property
-    def fechaInicio(self):
-        if self.abonoDeportivo:
-            return self.fecha
-
-        if self.abonoVerano:
-            year = timezone.now().year
-            return timezone.make_aware(datetime(year, 6, 1))
-
-        return None
-    
-    @property
-    def fechaExpiracion(self):
-        if self.abonoDeportivo:
-            return self.fechaInicio + relativedelta(
-                months=self.abonoDeportivo.meses
-            )
-
-        if self.abonoVerano:
-            year = timezone.now().year
-            return timezone.make_aware(datetime(year, 8, 31, 23, 59, 59))
-
-        return None
-
-    @property
-    def diasRestantes(self):
-        fechaExpiracion = self.fechaExpiracion
-        if not fechaExpiracion:
-            return 0
-
-        dias = (fechaExpiracion.date() - timezone.now().date()).days
-        return max(0, dias)
-    
-    @property
-    def valido(self):
-        return self.diasRestantes > 0

@@ -44,12 +44,14 @@ class Pago(models.Model):
     def __str__(self):
         return f'Pago {self.concepto}, de coste {self.coste} en estado {self.estadoPago}'
     
+    # Función para confirmar un pago
     def confirmarPago(self):
         self.objeto.confirmarCompra()
         self.estadoPago = EstadoPago.PAGADO
         self.save()
         return True
     
+    # Función para cancelar un pago
     def cancelarPago(self, tipo="unico"):
         if tipo == "unico":
             refund = stripe.Refund.create(payment_intent=self.stripe_payment_intent)
@@ -65,16 +67,19 @@ class Pago(models.Model):
         self.save()
         return True
 
+    # Función para contar el número de pagos del sistema
     @classmethod
     def contar(cls):
         return cls.objects.count()
 
+    # Función para contar el dinero total conseguido
     @classmethod
     def contarDinero(cls):
         return cls.objects.filter(
             estadoPago=EstadoPago.PAGADO
         ).aggregate(total=models.Sum('costeFinal'))['total'] or 0
 
+    # Función para crear nuevos pagos
     @classmethod
     def nuevoPago(cls, concepto, usuario, tipo, objeto, complementos=None):
         porcentaje = 0
@@ -86,14 +91,14 @@ class Pago(models.Model):
                 descripcionPorcentajes["Descuento especial"] = porcentaje
 
         if isinstance(objeto, CompraAbono):
-            coste = objeto.calcular_precio(
+            coste = objeto.calcularPrecio(
                 usuario,
                 forma=complementos["forma"],
                 familiar=complementos["familiar"]
             )
 
         elif isinstance(objeto, ReservaActividad):
-            coste = objeto.calcular_precio()
+            coste = objeto.calcularPrecio()
             porcentajeExtra = 0.0
 
             if usuario.tieneAbono:
@@ -118,7 +123,7 @@ class Pago(models.Model):
             porcentaje += porcentajeExtra
 
         elif isinstance(objeto, Alquiler):
-            coste = objeto.calcular_precio()
+            coste = objeto.calcularPrecio()
             porcentajeExtra = 0.0
 
             if usuario.tieneAbono:
@@ -134,7 +139,7 @@ class Pago(models.Model):
             porcentaje += porcentajeExtra
 
         else:
-            coste = objeto.calcular_precio()
+            coste = objeto.calcularPrecio()
 
         config = Configuracion.objects.first()
         porcentaje = min(porcentaje, config.porcentaje_maximo)
@@ -155,6 +160,7 @@ class Pago(models.Model):
             descripcionPorcentajes=descripcionPorcentajes
         )
     
+    # Función para comprobar si el pago se ha realizado en stripe
     def comprobarPago(self):
         if self.tipoPago == TipoPago.UNICO:
             intent = stripe.PaymentIntent.retrieve(self.stripe_payment_intent)
@@ -169,6 +175,7 @@ class Pago(models.Model):
         
         return False
 
+    # Función para aplicar un pago único en stripe
     def aplicarPagoUnico(self, usuario):
         intent = stripe.PaymentIntent.create(
             amount=int(self.costeFinal * 100), # En centimos
@@ -184,6 +191,7 @@ class Pago(models.Model):
 
         return intent
 
+    # Función para aplicar una subcscripción en stripe
     def aplicarSubscripcion(self, usuario):
         hoy = datetime.now(timezone.utc)
 

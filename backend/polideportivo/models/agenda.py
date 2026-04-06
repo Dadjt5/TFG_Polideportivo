@@ -27,6 +27,7 @@ class Agenda(models.Model):
             return f'Agenda para {self.dia} de {self.instalacion.nombre}'
         return f'Agenda para {self.fecha} de {self.instalacion.nombre}'
     
+    # Función para controlar si un slot de tiempo esta ocupado
     def estaOcupado(self, horaInicio, horaFin, calle=None, minutos=60):
         if not self.abierto:
             return True
@@ -64,10 +65,6 @@ class MapaReservas(models.Model):
 
     agenda = models.ForeignKey(Agenda, on_delete=models.CASCADE, related_name="mapa_reservas")
     calle = models.ForeignKey('Calle', on_delete=models.CASCADE, null=True, blank=True, related_name="mapas")
-
-    def clean(self):
-        if self.horaInicio >= self.horaFin:
-            raise ValidationError("La hora de inicio debe ser menor que la hora de fin")
 
     def __str__(self):
         return f'{self.agenda.dia} {self.horaInicio}-{self.horaFin}'

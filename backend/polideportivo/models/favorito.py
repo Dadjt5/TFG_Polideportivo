@@ -9,6 +9,7 @@ class Favorito(models.Model):
     actividad = models.ForeignKey('Actividad', on_delete=models.CASCADE, null=True)
     instalacion = models.ForeignKey('Instalacion', on_delete=models.CASCADE, null=True)
     
+    # Función para contar el número de favoritos
     @classmethod
     def contar(cls):
         return cls.objects.count()

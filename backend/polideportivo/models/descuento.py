@@ -24,12 +24,14 @@ class Descuento(models.Model):
     def __str__(self):
         return f'{self.nombre} del {self.porcentaje}% para {self.tiposInstalacion}'
 
+    # Función para contar el número de descuento en el sistema
     @classmethod
     def contar(cls):
         return cls.objects.count()
 
+    # Función para obtener todos los descuentos de una actividad o instalacion
     @classmethod
-    def obtener_descuentos(cls, actividad=None, instalacion=None):
+    def obtenerDescuentos(cls, actividad=None, instalacion=None):
         hoy = now().date()
 
         if actividad:
@@ -50,6 +52,7 @@ class Descuento(models.Model):
             
             return cls._filtrar_descuentos(descuentos)
 
+    # Función auxiliar para extraer los descuentos de unos dados atendiendo a campos como prioritario y combinable
     @staticmethod
     def _filtrar_descuentos(descuentos):
         if not descuentos.exists():
@@ -75,7 +78,7 @@ class Descuento(models.Model):
             "descuentos": list(combinables)
         }
 
-
+    # Función auxiliar para calcular el total del porcentaje dada una lista de porcentajes
     @staticmethod
     def _calcular_porcentaje(descuentos):
         porcentaje = 0

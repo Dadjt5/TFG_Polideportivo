@@ -32,14 +32,17 @@ class Notificacion(models.Model):
     def __str__(self):
         return f'{self.titulo}'
 
+    # Función para contar el número de notificaciones en el sistema
     @classmethod
     def contar(cls):
         return cls.objects.count()
 
+    # Función para cambiar el estado de leído de la notificación
     @classmethod
-    def cambiar_estado(cls, usuario, id, leido, fijado):
+    def cambiarEstado(cls, usuario, id, leido, fijado):
         cls.objects.filter(id=id, usuario=usuario).update(leido=leido, fijado=fijado)
 
+    # Función para crear una nueva notificación por parte del administrador
     @classmethod
     def nuevaNotificacion(cls, titulo, descripcion, tipoUsuarios, complemento):
         from django.contrib.auth import get_user_model
@@ -84,6 +87,7 @@ class Notificacion(models.Model):
 
         cls.objects.bulk_create(notificaciones)
 
+    # Función para notificar automaticamente por cancelación de alquiler y devolución de dinero
     @classmethod
     def notificarCancelacionYDevolucionDinero(cls, usuarios, instalacion):
         configuracion = Configuracion.objects.all().first()
@@ -96,6 +100,7 @@ class Notificacion(models.Model):
                 instalacion=instalacion
             )
 
+    # Función para notificar automaticamente a los usuarios finales que tiene una actividad próxima
     @classmethod
     def notificarActividadUsuarioFinal(cls, actividad, sesion):
         configuracion = Configuracion.objects.all().first()
@@ -111,6 +116,7 @@ class Notificacion(models.Model):
                 sesion=sesion
             )
 
+    # Función para notificar automaticamente a los monitores que tiene una actividad próxima
     @classmethod
     def notificarActividadMonitor(cls, actividad, sesion):
         configuracion = Configuracion.objects.all().first()
@@ -125,6 +131,7 @@ class Notificacion(models.Model):
             sesion=sesion
         )
 
+    # Función para notificar de una nueva actividad a los usuarios finales que lo tengan como favorito
     @classmethod
     def notificarNuevaActividad(cls, actividad):
         configuracion = Configuracion.objects.all().first()
@@ -144,6 +151,7 @@ class Notificacion(models.Model):
                 actividad=actividad
             )
 
+    # Función para notificar a los usuarios automaticamente al cambiar el material
     @classmethod
     def notificarNuevoMaterial(cls, actividad):
         configuracion = Configuracion.objects.all().first()
@@ -158,6 +166,7 @@ class Notificacion(models.Model):
                 actividad=actividad
             )
     
+    # Función para notificar automaticamente el cambio de sesiones
     @classmethod
     def notificarCambioSesiones(cls, actividad):
         configuracion = Configuracion.objects.all().first()
@@ -172,6 +181,7 @@ class Notificacion(models.Model):
                 actividad=actividad
             )
 
+    # Función para notificar automaticamente los cambios de cancelaciones
     @classmethod
     def notificarCambioCancelacion(cls):
         configuracion = Configuracion.objects.all().first()
@@ -185,6 +195,7 @@ class Notificacion(models.Model):
                 usuario=usuario.user
             )
     
+    # Función para notificar automaticamente al llevar muchas ausencias
     @classmethod
     def notificarAusencias(cls, usuario, actividad):
         configuracion = Configuracion.objects.all().first()
@@ -195,7 +206,8 @@ class Notificacion(models.Model):
             usuario=usuario.user,
             actividad=actividad
         )
-    
+
+    # Función para notificar automaticamente en caso de problemas de pago    
     @classmethod
     def notificarProblemasPago(cls, usuario):
         configuracion = Configuracion.objects.all().first()
@@ -206,6 +218,7 @@ class Notificacion(models.Model):
             usuario=usuario,
         )
 
+    # Función para notificar automaticamente la salida de la lista de espera c
     @classmethod
     def notificarSalidaListaDeEspera(cls, usuario, actividad):
         configuracion = Configuracion.objects.all().first()

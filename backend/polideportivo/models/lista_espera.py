@@ -10,6 +10,7 @@ class ListaEspera(models.Model):
     def __str__(self):
         return f'Lista de espera para {self.actividad}'
 
+    # Función para añadir un usuario a la lista de espere
     def nuevaEntrada(self, usuario):
         if self.registro.filter(usuarioFinal=usuario).exists():
             return None
@@ -17,10 +18,12 @@ class ListaEspera(models.Model):
         EntradaListaEspera.objects.create(usuarioFinal=usuario, listaEspera=self)
         return self.registro.count()
 
+    # Función para sacar a un usuario de la lista de espera
     def salirLista(self, usuario):
         if self.registro.filter(usuarioFinal=usuario).exists():
             self.registro.filter(usuarioFinal=usuario).delete()
 
+    # Función para obtener el usuario siguiente de la lista de espera
     def siguienteUsuario(self):
         return self.registro.order_by('fechaEntrada', 'horaEntrada').first()
 
@@ -37,6 +40,7 @@ class EntradaListaEspera(models.Model):
     def __str__(self):
         return f'Fecha: {self.fechaEntrada}, Hora: {self.horaEntrada}'
     
+    # Función para contar el número de entradas en todas las listas
     @classmethod
     def contar(cls):
         return cls.objects.count()

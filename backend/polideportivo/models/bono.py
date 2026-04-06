@@ -60,7 +60,7 @@ class CompraBono(models.Model):
 
             return compra
     
-    def calcular_precio(self):
+    def calcularPrecio(self):
         precio = self.bono.precioOtros
         if self.usuarioFinal.tieneAbono:
             precio = self.bono.precioAbono

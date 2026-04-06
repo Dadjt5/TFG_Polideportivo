@@ -169,8 +169,8 @@ class AgendaViewSet(viewsets.ModelViewSet):
         sesion = self.get_object()
 
         dia = sesion.dia
-        hora_inicio = sesion.horaInicio
-        hora_fin = sesion.horaFin
+        horaInicio = sesion.horaInicio
+        horaFin = sesion.horaFin
         calle = sesion.calle
 
         agenda = Agenda.objects.filter(dia__iexact=dia).first()
@@ -178,8 +178,8 @@ class AgendaViewSet(viewsets.ModelViewSet):
         if agenda:
             agenda.mapa_reservas.filter(
                 calle=calle,
-                horaInicio__gte=hora_inicio,
-                horaInicio__lt=hora_fin,
+                horaInicio__gte=horaInicio,
+                horaInicio__lt=horaFin,
                 estado=TipoReserva.ACTIVIDAD
             ).update(estado=TipoReserva.LIBRE)
 
@@ -929,14 +929,14 @@ class NuevaSesionView(APIView):
 
         for sesion in sesiones:
             dia = sesion.get('dia')
-            hora_inicio = sesion.get('horaInicio')
-            hora_fin = sesion.get('horaFin')
+            horaInicio = sesion.get('horaInicio')
+            horaFin = sesion.get('horaFin')
             
-            respuesta = instalacion.controlarHorarioActividad(dia, hora_inicio, hora_fin)
+            respuesta = instalacion.controlarHorarioActividad(dia, horaInicio, horaFin)
             if not respuesta:
                 return Response({"respuesta": "Una o más sesiones no se pueden realizar en esta instalación en el horario previsto"}, status=status.HTTP_400_BAD_REQUEST)
 
-            respuesta = actividad.nuevaSesion(dia, hora_inicio, hora_fin)
+            respuesta = actividad.nuevaSesion(dia, horaInicio, horaFin)
 
             if not respuesta:
                 return Response({"respuesta": "No se ha podido crear ninguna sesión"}, status=status.HTTP_400_BAD_REQUEST)
@@ -1537,18 +1537,18 @@ class NuevaActividadView(APIView):
         # Validar horarios primero
         for sesion in sesiones:
             dia = sesion.get('dia')
-            hora_inicio = sesion.get('horaInicio')
-            hora_fin = sesion.get('horaFin')
-            calle_num = sesion.get('calle')
+            horaInicio = sesion.get('horaInicio')
+            horaFin = sesion.get('horaFin')
+            calleNum = sesion.get('calle')
 
             calle = None
             if instalacion.tipoInstalacion == TipoInstalacion.PISCINA:
-                calle = instalacion.calles.filter(numero=calle_num).first()
+                calle = instalacion.calles.filter(numero=calleNum).first()
 
                 if not calle:
                     return Response({"respuesta": "Calle no válida"}, status=status.HTTP_400_BAD_REQUEST)
 
-            if not instalacion.controlarHorarioActividad(dia, hora_inicio, hora_fin, calle=calle):
+            if not instalacion.controlarHorarioActividad(dia, horaInicio, horaFin, calle=calle):
                 return Response(
                     {"respuesta": "Una o más sesiones no se pueden realizar en esta instalación"},
                     status=status.HTTP_400_BAD_REQUEST
@@ -1569,11 +1569,11 @@ class NuevaActividadView(APIView):
 
         # Crear sesiones
         for sesion in sesiones:
-            calle_num = sesion.get('calle')
+            calleNum = sesion.get('calle')
 
             calle = None
             if instalacion.tipoInstalacion == TipoInstalacion.PISCINA:
-                calle = instalacion.calles.filter(numero=calle_num).first()
+                calle = instalacion.calles.filter(numero=calleNum).first()
 
             actividad.nuevaSesion(
                 sesion.get('dia'),
@@ -1632,16 +1632,16 @@ class EditarActividadView(APIView):
             cambios = False
             for sesion_data in sesiones_recibidas:
                 dia = sesion_data.get('dia')
-                hora_inicio = sesion_data.get('horaInicio')
-                hora_fin = sesion_data.get('horaFin')
+                horaInicio = sesion_data.get('horaInicio')
+                horaFin = sesion_data.get('horaFin')
                 sesion_id = sesion_data.get('id')
-                calle_num = sesion_data.get('calle')
+                calleNum = sesion_data.get('calle')
                 
                 calle = None
                 if instalacion.tipoInstalacion == TipoInstalacion.PISCINA:
-                    calle = instalacion.calles.filter(numero=calle_num).first()
+                    calle = instalacion.calles.filter(numero=calleNum).first()
 
-                respuesta = instalacion.controlarHorarioActividad(dia, hora_inicio, hora_fin, sesion_id, calle)
+                respuesta = instalacion.controlarHorarioActividad(dia, horaInicio, horaFin, sesion_id, calle)
 
                 if not respuesta:
                     return Response(
@@ -1650,7 +1650,7 @@ class EditarActividadView(APIView):
                     )
 
                 if not sesion_id or sesion_id == -1:
-                    nueva = actividad.nuevaSesion(dia, hora_inicio, hora_fin, calle)
+                    nueva = actividad.nuevaSesion(dia, horaInicio, horaFin, calle)
                     ids_recibidos.append(nueva.id)
                     cambios = True
                 else:
@@ -1658,8 +1658,8 @@ class EditarActividadView(APIView):
 
                     if sesion_existente:
                         sesion_existente.dia = dia
-                        sesion_existente.horaInicio = hora_inicio
-                        sesion_existente.horaFin = hora_fin
+                        sesion_existente.horaInicio = horaInicio
+                        sesion_existente.horaFin = horaFin
                         sesion_existente.calle = calle
                         sesion_existente.save()
 
@@ -1745,7 +1745,7 @@ class TarifaActividadView(APIView):
             }
         }
 
-        descuentos = Descuento.obtener_descuentos(actividad=actividad)
+        descuentos = Descuento.obtenerDescuentos(actividad=actividad)
         if descuentos:
             data["descuento"]["porcentaje_total"] = descuentos["porcentaje_total"]
             for d in descuentos["descuentos"]:
@@ -1846,7 +1846,7 @@ class TarifaInstalacionView(APIView):
             }
         }
 
-        descuentos = Descuento.obtener_descuentos(instalacion=instalacion)
+        descuentos = Descuento.obtenerDescuentos(instalacion=instalacion)
         if descuentos:
             data["descuento"]["porcentaje_total"] = descuentos["porcentaje_total"]
             for d in descuentos["descuentos"]:
@@ -2043,14 +2043,14 @@ class ReservaInstalacionView(APIView):
             if (h2 - h1) != timedelta(hours=1):
                 return Response({"respuesta": "Las horas deben ser consecutivas"}, status=status.HTTP_400_BAD_REQUEST)
 
-        hora_inicio = datetime.strptime(horas[0], "%H:%M:%S").time()
+        horaInicio = datetime.strptime(horas[0], "%H:%M:%S").time()
         ultima = datetime.strptime(horas[-1], "%H:%M:%S")
-        hora_fin = (ultima + timedelta(hours=1)).time()
+        horaFin = (ultima + timedelta(hours=1)).time()
 
-        if fecha == timezone.localdate() and hora_inicio <= timezone.localtime().time():
+        if fecha == timezone.localdate() and horaInicio <= timezone.localtime().time():
             return Response({"respuesta": "No se puede reservar en horas anteriores a la actual"}, status=status.HTTP_400_BAD_REQUEST)
 
-        res = Alquiler.nuevaReserva(request.user.usuario_final, instalacion, fecha, hora_inicio, hora_fin, luz, calle_obj)
+        res = Alquiler.nuevaReserva(request.user.usuario_final, instalacion, fecha, horaInicio, horaFin, luz, calle_obj)
         if not res:
             return Response({"respuesta": "Error al alquilar, la instalacion esta ocupada"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -2341,9 +2341,9 @@ class CancelarAlquilerView(APIView):
         ahora = timezone.localtime()
 
         fecha_alquiler = alquiler.fecha
-        hora_inicio = alquiler.horaInicio
+        horaInicio = alquiler.horaInicio
 
-        inicio_alquiler = datetime.combine(fecha_alquiler, hora_inicio)
+        inicio_alquiler = datetime.combine(fecha_alquiler, horaInicio)
         inicio_alquiler = timezone.make_aware(inicio_alquiler)
 
         if inicio_alquiler <= ahora:

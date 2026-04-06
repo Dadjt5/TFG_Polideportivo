@@ -15,7 +15,7 @@ class Actividad(models.Model):
 
     nombre = models.CharField(max_length=256, blank=True)
     descripcion = models.CharField(max_length=2048, blank=True)
-    imagenURL = models.ImageField(upload_to="actividades/", blank=True, null=True)
+    imagen = models.ImageField(upload_to="actividades/", blank=True, null=True)
     edadMinima = models.PositiveIntegerField(default=18)
     plazasMaximas = models.PositiveIntegerField(default=50)
     plazasReservadas = models.PositiveIntegerField(default=0)
@@ -67,7 +67,7 @@ class Actividad(models.Model):
         return lista_espera.salirLista(usuario)
 
     # Función para obtener los precios de la tarifa aplicada a la actividad dependiendo de su tipo
-    def obtener_precios(self):
+    def obtenerPrecios(self):
         if self.tipoActividad == TipoActividad.OTROS:
             return {
                 "precioUAM": self.tarifa.actividadcomun.precioUAM,
@@ -151,21 +151,7 @@ class Actividad(models.Model):
 
         raise ValueError("Tipo de actividad no válido")
 
-    @property
-    def activa(self):
-        if self.periodo == Periodo.ANUAL:
-            return True
-
-        now = timezone.now()
-
-        if self.periodo == Periodo.PRIMER_CUATRIMESTRE:
-            return now.month in [9,10,11,12,1]
-
-        if self.periodo == Periodo.SEGUNDO_CUATRIMESTRE:
-            return now.month in [2,3,4,5]
-
-        return False
-
+    # Función para calcular las horas semanales que dura una actividad
     def calcularHorasSemanales(self):
         horas = 0.0
         for sesion in self.sesiones.all():
@@ -173,9 +159,11 @@ class Actividad(models.Model):
 
         return math.ceil(horas)
 
+    # Función para obtener como un array los días de la semana en los que se desarrolla la sesión
     def getDias(self):
         return ",".join(sesion.dia for sesion in self.sesiones.all()),
     
+    # Función para obtener los horarios para cada sesion de la actividad
     def getHorario(self):
         horario = []
         
@@ -188,6 +176,7 @@ class Actividad(models.Model):
         
         return horario
     
+    # Función para crear una nueva sesión en la actividad
     def nuevaSesion(self, dia, horaInicio, horaFin, calle=None):
         if isinstance(horaInicio, str):
             h, m = map(int, horaInicio.split(":"))
@@ -198,7 +187,8 @@ class Actividad(models.Model):
 
         sesion = Sesion.objects.create(dia=dia, horaInicio=horaInicio, horaFin=horaFin, actividad=self, calle=calle, numeroHoras=0.0)
         return sesion
-    
+
+    # Función para modificar la información de la actividad    
     def modificarInformacion(self, actividad_data, tarifa, instalacion, monitor, imagen):
         campos_simples = [
             "nombre",
@@ -237,15 +227,17 @@ class Actividad(models.Model):
         self.tarifa = tarifa
         self.instalacion = instalacion
         self.monitor = monitor
-        self.imagenURL = imagen
+        self.imagen = imagen
 
         self.save()
         return True
 
+    # Función de la clase para contar el número de actividades totales
     @classmethod
     def contar(cls):
         return cls.objects.count()
 
+    # Función de la clase para aplicar la busqueda dependiendo de los filtros aplicados y el nombre buscado
     @classmethod
     def buscar(cls, nombre=None, tipo=None, horaInicio=None, horaFin=None, dias=None):
         res = cls.objects.all()
@@ -299,6 +291,7 @@ class Sesion(models.Model):
     def __str__(self):
         return f'Sesion el {self.dia} de {self.actividad}'
     
+    # Función para comprobar el periodo de la función
     def comprobarPeriodo(self, mes):
         if self.actividad.periodo == Periodo.PRIMER_CUATRIMESTRE:
             return mes in [9,10,11,12,1]
@@ -309,6 +302,7 @@ class Sesion(models.Model):
         
         return True
     
+    # Función para cambiar el estado de la falta de un usuario en la sesión
     def cambiarFalta(self, usuarioFinal, falta):
         try:
             asistencia = Asistencia.objects.get(usuarioFinal=usuarioFinal, sesion=self)
@@ -322,7 +316,8 @@ class Sesion(models.Model):
             return True
         except:
             return False
-        
+
+    # Función de guardado sobreescrita        
     def save(self, *args, **kwargs):
         if isinstance(self.horaInicio, str):
             h, m = map(int, self.horaInicio.split(":"))

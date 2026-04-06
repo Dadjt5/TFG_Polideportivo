@@ -35,6 +35,7 @@ class Configuracion(models.Model):
     texto_avisos_sobre_actividades_monitores = models.CharField(max_length=1024, blank=True)
     texto_aviso_devolucion_dinero_alquiler = models.CharField(max_length=1024, blank=True)
 
+    # Función para sobreescribir el guardado y evitar crear mas de un objeto configuracion
     def save(self, *args, **kwargs):
         """Obligamos a que solo haya una configuracion"""
         if not self.pk and Configuracion.objects.exists():
@@ -44,6 +45,7 @@ class Configuracion(models.Model):
     def __str__(self):
         return "Configuración global de la aplicación"
 
+    # Función para editar los campos de la configuracion
     def editar(self, data):
         try:
             valor_original_cancelacion = self.dias_minimo_cancelacion

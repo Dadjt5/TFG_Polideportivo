@@ -14,7 +14,6 @@ class TDA(models.Model):
 
     fechaInicio = models.DateField(auto_now_add=True)
     fechaExpiracion = models.DateField(blank=True, null=True)
-    _codigo_secreto_hash = models.CharField(max_length=128, blank=True)
     codigo_secreto = models.CharField(max_length=128, blank=True)
 
     estado = models.CharField(default=EstadoReserva.PENDIENTE, choices=EstadoReserva.choices)
@@ -25,25 +24,15 @@ class TDA(models.Model):
     def __str__(self):
         return f'Tarjeta deportiva anual con fecha de inicio: {self.fechaInicio} y fecha de expiracion: {self.fechaExpiracion}'
 
-    def nuevo_codigo_secreto(self, codigo: str):
+    # Función apra generar un nuevo código secreto
+    def nuevoCodigoSecreto(self, codigo: str):
         self._codigo_secreto_hash = make_password(codigo)
 
-    def comprobar_codigo_secreto(self, codigo: str):
+    # FUnción para comprobar el codigo secreto
+    def comprobarCodigoSecreto(self, codigo: str):
         return check_password(codigo, self._codigo_secreto_hash)
 
-    def asignar_usuario(self, usuario_final):
-        if self.usuarioFinal:
-            return False
-
-        self.usuarioFinal = usuario_final
-        self._codigo_secreto_hash = ""
-        self.save()
-        
-        usuario_final.tieneTDA = True
-        usuario_final.save()
-
-        return True
-    
+    # Función para comprar una TDA    
     @classmethod
     def compraTDA(cls, usuario):
         with transaction.atomic():
@@ -71,13 +60,15 @@ class TDA(models.Model):
 
             return tda
     
-    def calcular_precio(self):
+    # Función para calcular el precio de compra basandose en la tarifa
+    def calcularPrecio(self):
         precio = self.tarifa.precioOtros
         if self.usuarioFinal.esUAM:
             precio = self.tarifa.precioUAM
 
         return precio
     
+    # Función para confirmar la compra de la TDA
     def confirmarCompra(self):
         self.usuarioFinal.tieneTDA = True
         self.usuarioFinal.save()
@@ -85,12 +76,14 @@ class TDA(models.Model):
         self.estado = EstadoReserva.CONFIRMADA
         self.save()
     
+    # Función para cancelar la compra de la TDA
     def cancelarCompra(self):
         self.usuarioFinal.tieneTDA = False
         self.usuarioFinal.save()
 
         self.delete()
 
+    # Función para contar el número de TDAs del sistema
     @classmethod
     def contar(cls):
         return cls.objects.count()
