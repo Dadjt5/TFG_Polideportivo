@@ -802,8 +802,12 @@ const crearActividad = async () => {
   try {
     await nuevaActividad(formData)
     router.push({ name: "gestion-actividades" })
-  } catch (e) {
-    lanzarMensaje(t.value.noModifyActivity, "error")
+  } catch (e: any) {
+    if (e.response.data.tipo == "sesiones") {
+      lanzarMensaje(t.value.noModifyActivity, "error")
+    } else if (e.response.data.tipo == "monitor") {
+      lanzarMensaje(t.value.noModifyActivityMonitor, "error")
+    }
     console.log("Error al crear la actividad", e)
   }
 }

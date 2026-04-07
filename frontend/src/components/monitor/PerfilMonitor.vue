@@ -49,10 +49,19 @@
           </h2>
 
           <form class="d-grid gap-3">
-            <!-- Foto -->
+
+            <!-- Nombre -->
             <div>
-              <label class="form-label fw-medium">{{ t.photo }}</label>
-              <input type="file" class="form-control" />
+              <label class="form-label fw-medium">{{ t.name }}</label>
+              <input type="text" class="form-control" :class="{ 'is-invalid': errores.nombre }"
+                :placeholder="monitorStore.monitor?.nombre" v-model="monitor.nombre" />
+            </div>
+
+            <!-- Apellidos -->
+            <div>
+              <label class="form-label fw-medium">{{ t.surnames }}</label>
+              <input type="text" class="form-control" :class="{ 'is-invalid': errores.apellidos }"
+                :placeholder="monitorStore.monitor?.apellidos" v-model="monitor.apellidos" />
             </div>
 
             <!-- Email -->
@@ -70,7 +79,7 @@
                   :class="{ 'is-invalid': errores.password }" v-model="monitor.password" />
                 <button type="button"
                   class="position-absolute end-0 me-3 border-0 bg-transparent d-flex align-items-center justify-content-center"
-                  style="height: 100%; top: 0;" @click="togglePassword">
+                  :style="{height: '100%', top: '0.08rem', right: errores.password ? '1.7rem' : '0.5rem'}" @click="togglePassword">
                   <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"
                     style="font-size: 1.2rem; color: #0072ff;"></i>
                 </button>
@@ -85,7 +94,7 @@
                   :class="{ 'is-invalid': errores.password }" v-model="monitor.confirmPassword" />
                 <button type="button"
                   class="position-absolute end-0 me-3 border-0 bg-transparent d-flex align-items-center justify-content-center"
-                  style="height: 100%; top: 0;" @click="toggleConfirmPassword">
+                  :style="{height: '100%', top: '0.08rem', right: errores.password ? '1.7rem' : '0.5rem'}" @click="toggleConfirmPassword">
                   <i :class="showConfirmPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"
                     style="font-size: 1.2rem; color: #0072ff;"></i>
                 </button>
@@ -147,12 +156,16 @@ const tipoMensaje = ref<'success' | 'error' | ''>('')
 const mostrarMensaje = ref(false)
 
 const monitor = ref({
+  nombre: '',
+  apellidos: '',
   email: '',
   password: '',
   confirmPassword: ''
 })
 
 const errores = ref({
+  nombre: false,
+  apellidos: false,
   email: false,
   password: false
 });
@@ -182,24 +195,35 @@ function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
 function camposModificados() {
   const data: any = {}
   continuar.value = true
-  errores.value.email = false
+  errores.value.nombre = false
+  errores.value.apellidos = false
   errores.value.password = false
 
-  if (monitor.value.email) {
-    if (monitor.value.email == '' || !emailRegex.test(monitor.value.email)) {
-      errores.value.email = true
-      continuar.value = false
-    }
-
-    data.email = monitor.value.email
+  if (!monitor.value.nombre) {
+    errores.value.nombre = true
+    continuar.value = false
+  } else {
+    data.nombre = monitor.value.nombre    
   }
 
-  if (monitor.value.password) {
-    if (monitor.value.password != monitor.value.confirmPassword) {
-      errores.value.password = true
-      continuar.value = false
-    }
+  if (!monitor.value.apellidos) {
+    errores.value.apellidos = true
+    continuar.value = false
+  } else {
+    data.apellidos = monitor.value.apellidos    
+  }
 
+  if (!monitor.value.email || !emailRegex.test(monitor.value.email)) {
+    errores.value.email = true
+    continuar.value = false
+  } else {
+    data.email = monitor.value.email    
+  }
+
+  if (!monitor.value.password || monitor.value.password != monitor.value.confirmPassword) {
+    errores.value.password = true
+    continuar.value = false
+  } else {
     data.password = monitor.value.password
   }
 
@@ -211,11 +235,12 @@ const guardarCambios = async () => {
     const data = camposModificados()
 
     if (!continuar.value) {
-      if (errores.value.password) {
+      if (monitor.value.password != monitor.value.confirmPassword) {
         lanzarMensaje(t.value.passwordNotMatch, "error")
       } else {
         lanzarMensaje(t.value.emptyFields, "error")
       }
+
       return
     }
 

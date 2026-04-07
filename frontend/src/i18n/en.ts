@@ -156,6 +156,7 @@ export default {
   passwordUpdate: "Data updated, you must log in again",
   noModify: "The data could not be modified",
   noModifyActivity: 'One or more sessions cannot be held at that time',
+  noModifyActivityMonitor: 'The monitor has one session at the same time',
   moreUserStats: "Check your statistics",
   bonusSubscriptionsOwn: "Own bonus and subscriptions",
   loginCode: "Identifier",

@@ -1533,11 +1533,10 @@ class NuevaActividadView(APIView):
         periodo = request.data.get("periodo")
         sesiones = json.loads(sesiones_json)
 
-        if not monitor.comprobarDisponibilidad(sesiones):
+        if not monitor.comprobarDisponibilidad(sesiones, periodo):
             return Response(
-                {"respuesta": "El monitor ya tiene una sesion en uno de los periodos propuestos"},
-                status=status.HTTP_400_BAD_REQUEST,
-                tipo="monitor"
+                {"respuesta": "El monitor ya tiene una sesion en uno de los periodos propuestos", "tipo": "monitor"},
+                status=status.HTTP_400_BAD_REQUEST
             )
 
         # Validar horarios primero
@@ -1556,9 +1555,8 @@ class NuevaActividadView(APIView):
 
             if not instalacion.controlarHorarioActividad(dia, horaInicio, horaFin, calle=calle):
                 return Response(
-                    {"respuesta": "Una o más sesiones no se pueden realizar en esta instalación"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                    tipo="sesiones"
+                    {"respuesta": "Una o más sesiones no se pueden realizar en esta instalación", "tipo": "sesiones"},
+                    status=status.HTTP_400_BAD_REQUEST
                 )
 
         # Crear actividad
@@ -1636,11 +1634,10 @@ class EditarActividadView(APIView):
             sesiones_bd = actividad.sesiones.all()
             ids_recibidos = []
 
-            if not monitor.comprobarDisponibilidad(sesiones_recibidas):
+            if not monitor.comprobarDisponibilidad(sesiones_recibidas, periodo):
                 return Response(
-                    {"respuesta": "El monitor ya tiene una sesion en uno de los periodos propuestos"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                    tipo="monitor"
+                    {"respuesta": "El monitor ya tiene una sesion en uno de los periodos propuestos", "tipo": "monitor"},
+                    status=status.HTTP_400_BAD_REQUEST
                 )
 
             cambios = False
@@ -1659,9 +1656,8 @@ class EditarActividadView(APIView):
 
                 if not respuesta:
                     return Response(
-                        {"respuesta": "Una o más sesiones no se pueden realizar en esta instalación en el horario elegido"},
-                        status=status.HTTP_400_BAD_REQUEST,
-                        tipo="sesiones"
+                        {"respuesta": "Una o más sesiones no se pueden realizar en esta instalación en el horario elegido", "tipo": "sesiones"},
+                        status=status.HTTP_400_BAD_REQUEST
                     )
 
                 if not sesion_id or sesion_id == -1:
@@ -1699,7 +1695,7 @@ class EditarActividadView(APIView):
 
             resultado = actividad.modificarInformacion(actividad_data, tarifa, instalacion, monitor, imagen)
             if not resultado:
-                return Response({"respuesta": "Error al tratar de modificar la informacion"}, status=status.HTTP_400_BAD_REQUEST. tipo="actividad")
+                return Response({"respuesta": "Error al tratar de modificar la informacion", "tipo": "actividad"}, status=status.HTTP_400_BAD_REQUEST)
 
             instalacion.revisarAlquileres(sesiones_recibidas, periodo, True)
 

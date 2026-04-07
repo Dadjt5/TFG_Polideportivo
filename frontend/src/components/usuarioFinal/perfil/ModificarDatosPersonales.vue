@@ -97,7 +97,7 @@
 
                 <button type="button"
                   class="position-absolute end-0 me-3 border-0 bg-transparent d-flex align-items-center justify-content-center"
-                  style="height: 100%; top: 0;" @click="togglePassword">
+                  :style="{height: '100%', top: '0.08rem', right: errores.password ? '1.7rem' : '0.5rem'}" @click="togglePassword">
                   <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"
                     style="font-size: 1.2rem; color: #6c757d;"></i>
                 </button>
@@ -112,7 +112,7 @@
 
                 <button type="button"
                   class="position-absolute end-0 me-3 border-0 bg-transparent d-flex align-items-center justify-content-center"
-                  style="height: 100%; top: 0;" @click="toggleConfirmPassword">
+                  :style="{height: '100%', top: '0.08rem', right: errores.password ? '1.7rem' : '0.5rem'}" @click="toggleConfirmPassword">
                   <i :class="showConfirmPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"
                     style="font-size: 1.2rem; color: #6c757d;"></i>
                 </button>

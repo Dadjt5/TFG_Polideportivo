@@ -7,6 +7,7 @@ from django.utils.timezone import now, make_aware
 from datetime import datetime, timedelta
 
 from .usuario import Usuario
+from .constantes import Periodo
 
 DIA_MAP = {
     "Lunes": 0,
@@ -51,13 +52,13 @@ class Monitor(Usuario):
 
 
     # Función para revisar si un monitor no tiene otras sesiones programadas en los horarios de las nuevas sesiones
-    def comprobarDisponibilidad(self, sesiones):
+    def comprobarDisponibilidad(self, sesiones, periodo):
         for sesion_data in sesiones:
             dia = sesion_data.get('dia')
             horaInicio = sesion_data.get('horaInicio')
             horaFin = sesion_data.get('horaFin')
 
-            actividades = self.actividad.all()
+            actividades = self.actividades.filter(periodo__in=[Periodo.ANUAL, periodo])
             for act in actividades:
                 conflictos = act.sesiones.filter(dia__iexact=dia, horaInicio__lt=horaFin, horaFin__gt=horaInicio)
 

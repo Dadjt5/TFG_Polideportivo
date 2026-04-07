@@ -43,46 +43,42 @@
 
           <form class="d-grid gap-4" @submit.prevent="guardarCambios">
 
-            <!-- FOTO -->
+            <!-- NOMBRE -->
             <div>
-              <label class="form-label fw-medium">{{ t.photo }}</label>
-              <input type="file" class="form-control rounded-3" />
+              <label class="form-label">{{ t.name }}</label>
+              <div class="position-relative d-flex align-items-center">
+                <input :type="'text'" class="form-control pe-5 rounded-3" :class="{ 'is-invalid': errores.nombre }"
+                  v-model="administrador.nombre" />
+              </div>
             </div>
+
 
             <!-- PASSWORD -->
             <div>
               <label class="form-label">{{ t.passwordPlaceholder }}</label>
-
               <div class="position-relative d-flex align-items-center">
-
                 <input :type="showPassword ? 'text' : 'password'" class="form-control pe-5 rounded-3"
                   :class="{ 'is-invalid': errores.password }" v-model="administrador.password" />
 
                 <button type="button"
-                  class="position-absolute end-0 me-3 border-0 bg-transparent d-flex align-items-center justify-content-center"
-                  style="height:100%; top:0;" @click="togglePassword">
-
+                  class="position-absolute d-flex align-items-center justify-content-center border-0 bg-transparent"
+                  :style="{height: '100%', top: '0.08rem', right: errores.password ? '1.7rem' : '0.5rem'}"@click="togglePassword">
+                  
                   <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"
                     style="font-size:1.2rem; color:#6c757d;"></i>
-
                 </button>
-
               </div>
             </div>
 
             <!-- CONFIRM PASSWORD -->
             <div>
               <label class="form-label">{{ t.passwordConfirm }}</label>
-
               <div class="position-relative d-flex align-items-center">
-
                 <input :type="showConfirmPassword ? 'text' : 'password'" class="form-control pe-5 rounded-3"
                   :class="{ 'is-invalid': errores.password }" v-model="administrador.confirmPassword" />
-
                 <button type="button"
-                  class="position-absolute end-0 me-3 border-0 bg-transparent d-flex align-items-center justify-content-center"
-                  style="height:100%; top:0;" @click="toggleConfirmPassword">
-
+                  class="position-absolute d-flex align-items-center justify-content-center border-0 bg-transparent"
+                  :style="{height: '100%', top: '0.08rem', right: errores.password ? '1.7rem' : '0.5rem'}" @click="togglePassword">
                   <i :class="showConfirmPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"
                     style="font-size:1.2rem; color:#6c757d;"></i>
                 </button>
@@ -151,11 +147,13 @@ const toggleConfirmPassword = () => {
 }
 
 const administrador = ref({
+  nombre: '',
   password: '',
   confirmPassword: ''
 })
 
 const errores = ref({
+  nombre: false,
   password: false
 });
 
@@ -174,14 +172,20 @@ function camposModificados() {
   const data: any = {}
   continuar.value = true
   errores.value.password = false
+  errores.value.nombre = false
 
-  if (administrador.value.password) {
-    if (administrador.value.password != administrador.value.confirmPassword) {
-      errores.value.password = true
-      continuar.value = false
-    }
-
+  if (!administrador.value.password || administrador.value.password != administrador.value.confirmPassword) {
+    errores.value.password = true
+    continuar.value = false
+  } else {
     data.password = administrador.value.password
+  }
+
+  if (!administrador.value.nombre) {
+    errores.value.nombre = true
+    continuar.value = false
+  } else {
+    data.nombre = administrador.value.nombre
   }
 
   return data
@@ -192,11 +196,12 @@ const guardarCambios = async () => {
     const data = camposModificados()
 
     if (!continuar.value) {
-      if (errores.value.password) {
+      if (administrador.value.password != administrador.value.confirmPassword) {
         lanzarMensaje(t.value.passwordNotMatch, "error")
       } else {
         lanzarMensaje(t.value.emptyFields, "error")
       }
+      
       return
     }
 

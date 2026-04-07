@@ -956,8 +956,12 @@ async function guardarCambios() {
     await modificarActividad(parseInt(props.id), formData)
     lanzarMensaje(t.value.correctlyUpdate, "success")
     cancelarEdicion(false)
-  } catch (e) {
-    lanzarMensaje(t.value.noModifyActivity, "error")
+  } catch (e: any) {
+    if (e.response.data.tipo == "sesiones") {
+      lanzarMensaje(t.value.noModifyActivity, "error")
+    } else if (e.response.data.tipo == "monitor") {
+      lanzarMensaje(t.value.noModifyActivityMonitor, "error")
+    }
     console.error("No se ha podido editar la actividad", e)
   }
 }

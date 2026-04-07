@@ -92,12 +92,13 @@
         <div v-if="step === 3">
           <h4 class="mb-3 text-primary">{{ t.credentials }}</h4>
           <div class="row g-3">
-            <div class="col-md-6 position-relative">
-              <input :type="showPassword ? 'text' : 'password'" class="form-control"
+            <div class="col-md-6">
+              <input :type="showPassword ? 'text' : 'password'" class="form-control pe-5"
                 :class="{ 'is-invalid': errores.password }" :placeholder=t.passwordPlaceholder
                 v-model="formData.password">
               <button type="button"
-                class="position-absolute top-50 end-0 translate-middle-y me-3 border-0 bg-transparent p-1"
+                class="position-absolute end-0 me-3 border-0 bg-transparent d-flex align-items-center justify-content-center"
+                :style="{height: '100%', top: '0.1rem', left: errores.password ? '28.5rem' : '31rem'}"
                 @click="togglePassword">
                 <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"
                   style="font-size: 1.2rem; color: #0072ff;"></i>
@@ -105,11 +106,12 @@
             </div>
 
             <div class="col-md-6 position-relative">
-              <input :type="showConfirmPassword ? 'text' : 'password'" class="form-control"
+              <input :type="showConfirmPassword ? 'text' : 'password'" class="form-control pe-5"
                 :class="{ 'is-invalid': errores.confirmPassword }" :placeholder=t.passwordConfirm
                 v-model="formData.confirmPassword">
               <button type="button"
-                class="position-absolute top-50 end-0 translate-middle-y me-3 border-0 bg-transparent p-1"
+                class="position-absolute end-0 me-3 border-0 bg-transparent d-flex align-items-center justify-content-center"
+                :style="{height: '100%', top: '0.1rem', left: errores.password ? '28.5rem' : '31rem'}"
                 @click="toggleConfirmPassword">
                 <i :class="showConfirmPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"
                   style="font-size: 1.2rem; color: #0072ff;"></i>
@@ -169,7 +171,7 @@ const showIdentifier = ref(false);
 const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);
 
-const formData = reactive({
+const formData = ref({
   nombre: '',
   apellidos: '',
   sexo: '',
@@ -226,77 +228,77 @@ const siguiente = () => {
   continuar.value = true
 
   if (step.value == 1) {
-    if (formData.nombre == '') {
+    if (formData.value.nombre == '') {
       errores.value.nombre = true
       continuar.value = false
     } else {
       errores.value.nombre = false
     }
 
-    if (formData.apellidos == '') {
+    if (formData.value.apellidos == '') {
       errores.value.apellidos = true
       continuar.value = false
     } else {
       errores.value.apellidos = false
     }
 
-    if (formData.sexo == '') {
+    if (formData.value.sexo == '') {
       errores.value.sexo = true
       continuar.value = false
     } else {
       errores.value.sexo = false
     }
 
-    if (formData.fechaNacimiento == '') {
+    if (formData.value.fechaNacimiento == '') {
       errores.value.fechaNacimiento = true
       continuar.value = false
     } else {
       errores.value.fechaNacimiento = false
     }
 
-    if ((formData.dni == '' || formData.dni.length != 9) && !formData.esMenor) {
+    if ((formData.value.dni == '' || formData.value.dni.length != 9) && !formData.value.esMenor) {
       errores.value.dni = true
       continuar.value = false
     } else {
       errores.value.dni = false
     }
   } else if (step.value == 2) {
-    if (formData.telefono == '') {
+    if (formData.value.telefono == '') {
       errores.value.telefono = true
       continuar.value = false
     } else {
       errores.value.telefono = false
     }
 
-    if (formData.email == '' || !emailRegex.test(formData.email)) {
+    if (formData.value.email == '' || !emailRegex.test(formData.value.email)) {
       errores.value.email = true
       continuar.value = false
     } else {
       errores.value.email = false
     }
 
-    if (formData.provincia == '') {
+    if (formData.value.provincia == '') {
       errores.value.provincia = true
       continuar.value = false
     } else {
       errores.value.provincia = false
     }
 
-    if (formData.municipio == '') {
+    if (formData.value.municipio == '') {
       errores.value.municipio = true
       continuar.value = false
     } else {
       errores.value.municipio = false
     }
 
-    if (formData.localidad == '') {
+    if (formData.value.localidad == '') {
       errores.value.localidad = true
       continuar.value = false
     } else {
       errores.value.localidad = false
     }
 
-    if (formData.codigoPostal == '') {
+    if (formData.value.codigoPostal == '') {
       errores.value.codigoPostal = true
       continuar.value = false
     } else {
@@ -304,7 +306,7 @@ const siguiente = () => {
     }
   }
 
-  if (continuar.value) {
+  if (continuar.value || true) {
     step.value += 1
   } else {
     lanzarMensaje(t.value.missing, "error")
@@ -323,29 +325,35 @@ const toggleConfirmPassword = () => {
 }
 
 const checkAge = () => {
-  if (!formData.fechaNacimiento) return
-  const birth = new Date(formData.fechaNacimiento)
+  if (!formData.value.fechaNacimiento) return
+  const birth = new Date(formData.value.fechaNacimiento)
   const now = new Date()
   let age = now.getFullYear() - birth.getFullYear()
   const m = now.getMonth() - birth.getMonth()
   if (m < 0 || (m === 0 && now.getDate() < birth.getDate())) age--
-  formData.esMenor = age < 18
+  formData.value.esMenor = age < 18
 }
 
 const handleFinish = async () => {
   /* Ultimas comprobaciones */
-  if (formData.password == '') {
+  if (formData.value.password == '') {
     errores.value.password = true
-    continuar.value = false
-    lanzarMensaje(t.value.emptyFields, "error")
+
+    if (formData.value.confirmPassword == '') {
+      errores.value.confirmPassword = true
+    }
+
+    lanzarMensaje(t.value.missing, "error")
+    return
   } else {
     errores.value.password = false
   }
 
-  if (formData.confirmPassword == '' || formData.password != formData.confirmPassword) {
+
+  if (formData.value.password != formData.value.confirmPassword) {
     errores.value.confirmPassword = true
-    continuar.value = false
     lanzarMensaje(t.value.passwordNotMatch, "error")
+    return
   } else {
     errores.value.confirmPassword = false
   }

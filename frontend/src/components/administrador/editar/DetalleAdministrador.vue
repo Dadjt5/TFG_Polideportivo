@@ -24,7 +24,7 @@
 
           <div class="flex-fill text-center text-md-start">
             <h3 class="fw-semibold mb-1">
-              {{ admin.nombre }} {{ admin.apellidos }}
+              {{ admin.nombre }}
             </h3>
             <p class="text-muted mb-0">{{ t.admin }}</p>
           </div>
@@ -40,16 +40,6 @@
                    :class="{ 'is-invalid': errores.nombre }" />
             <p v-else class="form-control-plaintext">
               {{ admin.nombre || '-' }}
-            </p>
-          </div>
-
-          <!-- APELLIDOS -->
-          <div class="col-md-4">
-            <label class="form-label">{{ t.surnames }}</label>
-            <input v-if="isEditing" class="form-control" v-model="admin.apellidos"
-                   :class="{ 'is-invalid': errores.apellidos }" />
-            <p v-else class="form-control-plaintext">
-              {{ admin.apellidos || '-' }}
             </p>
           </div>
 

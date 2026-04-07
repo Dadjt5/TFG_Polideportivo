@@ -156,6 +156,7 @@ export default {
   passwordUpdate: "Datos actualizados, debes volver a iniciar sesión",
   noModify: "Los datos no han podido ser modificados",
   noModifyActivity: 'Una o mas sesiones no se pueden realizar en ese horario',
+  noModifyActivityMonitor: 'El monitor ya tiene una sesión en el mismo horario',
   moreUserStats: "Revisa tus estadísticas",
   bonusSubscriptionsOwn: "Bonos y abonos propios",
   loginCode: "Identificador",
