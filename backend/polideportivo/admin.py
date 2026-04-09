@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from polideportivo.models import (
     Actividad, Agenda, Bono, Configuracion, Deporte, Descuento, Favorito,
-    Foro, Horario, Instalacion, ListaEspera, Asistencia, Canal, UsuarioCanal, 
+    Foro, Instalacion, ListaEspera, Asistencia, Canal, UsuarioCanal, 
     EntradaListaEspera, TarifaTDA, Monitor, Notificacion, Pago, TarifaActividad, 
     TarifaInstalacion, TDA, UsuarioFinal, AbonoDeportivo, AbonoVerano, Pabellon, 
     ReservaActividad, Alquiler, Administrador, CompraAbono, CompraBono, Sesion,
@@ -37,8 +37,6 @@ admin.site.register(Foro)
 admin.site.register(Canal)
 admin.site.register(UsuarioCanal)
 admin.site.register(Mensaje)
-
-admin.site.register(Horario)
 
 admin.site.register(Instalacion)
 admin.site.register(Pabellon)

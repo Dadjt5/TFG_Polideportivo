@@ -68,7 +68,7 @@ class Canal(models.Model):
     def nuevoMensaje(self, usuario, texto):
         if not usuario:
             return False
-        
+
         if usuario.is_administrador:
             Mensaje.objects.create(canal=self, usuario=usuario, texto=texto)
             return True

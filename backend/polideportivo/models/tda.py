@@ -37,6 +37,9 @@ class TDA(models.Model):
     def compraTDA(cls, usuario):
         with transaction.atomic():
             hoy = now().date()
+            if not TarifaTDA.objects.first():
+                return None
+
             if cls.objects.filter(usuarioFinal=usuario, estado=EstadoReserva.CONFIRMADA, fechaExpiracion__gte=hoy).exists():
                 return None
             

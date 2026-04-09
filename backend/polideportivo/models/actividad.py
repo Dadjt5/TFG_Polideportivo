@@ -4,11 +4,14 @@ import math
 from django.utils import timezone
 from datetime import time
 from django.http import Http404
-from datetime import time, datetime, timedelta
+from datetime import time, datetime, timedelta, date
 
 from .notificacion import Notificacion
 from .constantes import TipoActividad, FormaReserva, Terreno, Estado, Periodo, Dia
 
+
+def get_current_year():
+    return date.today().year
 
 class Actividad(models.Model):
     """Modelo para representar una actividad"""
@@ -19,7 +22,7 @@ class Actividad(models.Model):
     edadMinima = models.PositiveIntegerField(default=18)
     plazasMaximas = models.PositiveIntegerField(default=50)
     plazasReservadas = models.PositiveIntegerField(default=0)
-    año = models.PositiveIntegerField()
+    año = models.PositiveIntegerField(default=get_current_year)
     numeroCreditos = models.PositiveIntegerField(default=0)
     nivel = models.CharField(max_length=64, blank=True)
     material = models.CharField(max_length=1024, blank=True)
@@ -242,7 +245,6 @@ class Actividad(models.Model):
     def buscar(cls, nombre=None, tipo=None, horaInicio=None, horaFin=None, dias=None):
         res = cls.objects.all()
 
-        print(res, nombre, tipo, horaInicio, horaFin, dias)
         if nombre:
             res = res.filter(nombre__icontains=nombre)
 
@@ -258,7 +260,6 @@ class Actividad(models.Model):
         if dias:
             res = res.filter(sesiones__dia__in=dias)
 
-        print(res)
         return res.distinct()
 
 

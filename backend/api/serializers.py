@@ -8,7 +8,7 @@ import json
 
 from polideportivo.models import (
     Actividad, Agenda, Bono, Configuracion, Deporte, Descuento, Favorito,
-    Foro, Horario, Instalacion, ListaEspera, Asistencia, Canal, UsuarioCanal, 
+    Foro, Instalacion, ListaEspera, Asistencia, Canal, UsuarioCanal, 
     EntradaListaEspera, TarifaTDA, Monitor, Notificacion, Pago, TarifaActividad, 
     TarifaInstalacion, TDA, UsuarioFinal, AbonoDeportivo, AbonoVerano, Pabellon, 
     ReservaActividad, Alquiler, Administrador, CompraBono, CompraAbono, Sesion,
@@ -342,15 +342,6 @@ class AgendaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Agenda
         fields = ("id", "fecha", "dia", "horaApertura", "horaCierre", "abierto", "mapa_reservas")
-
-# --------------------
-# Horarios
-# --------------------
-
-class HorarioSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Horario
-        fields = '__all__'
 
 
 # --------------------

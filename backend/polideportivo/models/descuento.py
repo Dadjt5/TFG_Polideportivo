@@ -22,7 +22,7 @@ class Descuento(models.Model):
     deportes = models.ManyToManyField("Deporte", blank=True)
 
     def __str__(self):
-        return f'{self.nombre} del {self.porcentaje}% para {self.tiposInstalacion}'
+        return f'{self.nombre} del {self.porcentaje}%'
 
     # Función para contar el número de descuento en el sistema
     @classmethod

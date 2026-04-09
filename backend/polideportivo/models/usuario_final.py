@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 from django.conf import settings
 from django.utils.timezone import now, make_aware
 from datetime import datetime, timedelta
+from django.utils import timezone
 
 from .user import generar_codigo
 from .usuario import Usuario

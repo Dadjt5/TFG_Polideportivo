@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.db.models import Q, UniqueConstraint
 
 
 class Favorito(models.Model):
@@ -15,7 +16,19 @@ class Favorito(models.Model):
         return cls.objects.count()
 
     class Meta:
-        unique_together = ('usuarioFinal', 'actividad', 'instalacion')
+        constraints = [
+            UniqueConstraint(
+                fields=['usuarioFinal', 'actividad'],
+                condition=Q(actividad__isnull=False),
+                name='unique_usuario_actividad'
+            ),
+
+            UniqueConstraint(
+                fields=['usuarioFinal', 'instalacion'],
+                condition=Q(instalacion__isnull=False),
+                name='unique_usuario_instalacion'
+            )
+        ]
         
     def __str__(self):
         if self.actividad:

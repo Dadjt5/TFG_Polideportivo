@@ -60,6 +60,8 @@ class Instalacion(models.Model):
     def crearCalles(self):
         if self.tipoInstalacion != TipoInstalacion.PISCINA:
             return
+    
+        self.calles.all().delete()
 
         for i in range(1, self.numeroCalles + 1):
             Calle.objects.create(instalacion=self, numero=i)

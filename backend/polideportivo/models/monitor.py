@@ -5,6 +5,7 @@ from django.db import transaction
 from django.contrib.auth import get_user_model
 from django.utils.timezone import now, make_aware
 from datetime import datetime, timedelta
+from django.utils import timezone
 
 from .usuario import Usuario
 from .constantes import Periodo

@@ -31,8 +31,6 @@ router.register(r'descuentos', views.DescuentoViewSet, basename="descuento")
 
 router.register(r'favoritos', views.FavoritoViewSet, basename="favorito")
 
-router.register(r'horarios', views.HorarioViewSet, basename="horario")
-
 router.register(r'instalaciones', views.InstalacionViewSet, basename="instalacion")
 router.register(r'pabellones', views.PabellonViewSet, basename="pabellon")
 router.register(r'calles', views.CalleViewSet, basename="calle")

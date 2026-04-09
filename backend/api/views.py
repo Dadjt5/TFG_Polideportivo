@@ -35,7 +35,7 @@ from .serializers import (
     ActividadSerializer, AsistenciaSerializer, AgendaSerializer,
     ConfiguracionSerializer, DeporteSerializer, DescuentoSerializer,
     FavoritoSerializer, ForoSerializer, CanalUsuarioFinalSerializer,
-    HorarioSerializer, InstalacionSerializer, PabellonSerializer, ListaEsperaSerializer,
+    InstalacionSerializer, PabellonSerializer, ListaEsperaSerializer,
     EntradaListaEsperaSerializer, MonitorSerializer, NotificacionSerializer,
     PagoSerializer, ReservaActividadSerializer, AlquilerSerializer,
     TarifaTDASerializer, TarifaActividadSerializer, TarifaInstalacionSerializer,
@@ -52,7 +52,7 @@ from .serializers import (
 
 from polideportivo.models import (
     Actividad, Agenda, Bono, Configuracion, Deporte, Descuento, Favorito,
-    Foro, Horario, Instalacion, ListaEspera, Asistencia, Canal, UsuarioCanal, 
+    Foro, Instalacion, ListaEspera, Asistencia, Canal, UsuarioCanal, 
     EntradaListaEspera, TarifaTDA, Monitor, Notificacion, Pago, TarifaActividad, 
     TarifaInstalacion, TDA, UsuarioFinal, AbonoDeportivo, AbonoVerano, Pabellon, 
     ReservaActividad, Alquiler, Administrador, User, CompraBono, CompraAbono,
@@ -305,16 +305,6 @@ class FavoritoViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Favorito.objects.filter(usuarioFinal__user=self.request.user)
-
-
-# ----------------
-# Horario
-# ----------------
-
-class HorarioViewSet(viewsets.ModelViewSet):
-    queryset = Horario.objects.all()
-    serializer_class = HorarioSerializer
-    permission_classes = [AllowAny]
 
 
 # ----------------

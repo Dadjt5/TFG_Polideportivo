@@ -23,7 +23,7 @@ class Reserva(models.Model):
     class Meta:
         abstract = True
     
-    # Función para calcular el descuentoa aplicado a la reserva
+    # Función para calcular el descuento aplicado a la reserva
     def calcularDescuento(self):
         porcentaje = 0.0
 
