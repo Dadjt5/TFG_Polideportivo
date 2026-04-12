@@ -87,8 +87,7 @@
           <div class="col-md-12">
             <label class="form-label fw-semibold">{{ t.images }}</label>
 
-            <input type="file" class="form-control form-control-lg"
-              accept="image/*" @change="onFileChange" />
+            <input type="file" class="form-control form-control-lg" accept="image/*" @change="onFileChange" />
 
             <!-- preview -->
             <img v-if="preview" :src="preview" class="mt-3 rounded" style="max-width:250px" />
@@ -167,34 +166,21 @@
                 {{ t.specialDates }}
               </h5>
 
-              <input type="date" v-model="tempFecha" class="form-control mb-2" />
+              <!-- Selección de fecha -->
+              <input type="date" v-model="tempFecha" class="form-control mb-3" />
 
-              <div class="form-check mb-2">
-                <input type="checkbox" class="form-check-input" v-model="tempAbierto" />
-                <label class="form-check-label">
-                  {{ t.open }}
-                </label>
-              </div>
-
-              <div v-if="tempAbierto" class="d-flex gap-2 mb-3">
-                <input type="time" v-model="tempApertura" class="form-control form-control-sm" />
-                <span>-</span>
-                <input type="time" v-model="tempCierre" class="form-control form-control-sm" />
-              </div>
-
-              <button class="btn btn-success btn-sm mb-3" @click="handleAddFechaEspecial">
-                {{ t.newSpecialDate }}
+              <!-- Botón añadir -->
+              <button class="btn btn-danger btn-sm mb-3" @click="handleAddFechaEspecial">
+                {{ t.close }}
               </button>
 
+              <!-- Lista -->
               <div v-for="(f, index) in fechasEspeciales" :key="index"
                 class="d-flex justify-content-between align-items-center mb-2 p-2 border rounded">
 
                 <div>
                   <strong>{{ f.fecha }}</strong> -
-                  <span v-if="f.abierto">
-                    {{ f.apertura }} - {{ f.cierre }}
-                  </span>
-                  <span v-else>
+                  <span class="text-danger">
                     {{ t.close }}
                   </span>
                 </div>
@@ -295,11 +281,8 @@ const agenda = ref(diasSemana.map(d => ({
   abierto: true
 })));
 
-const fechasEspeciales = ref<{ fecha: string; abierto: boolean; apertura: string; cierre: string }[]>([]);
+const fechasEspeciales = ref<{ fecha: string}[]>([]);
 const tempFecha = ref("");
-const tempAbierto = ref(false);
-const tempApertura = ref("08:00");
-const tempCierre = ref("22:00");
 
 const imagen = ref<File | null>(null)
 const preview = ref<string | null>(null)
@@ -310,15 +293,9 @@ const tarifas = ref<any[]>([])
 function handleAddFechaEspecial() {
   if (!tempFecha.value) return;
   fechasEspeciales.value.push({
-    fecha: tempFecha.value,
-    abierto: tempAbierto.value,
-    apertura: tempApertura.value,
-    cierre: tempCierre.value
+    fecha: tempFecha.value
   });
   tempFecha.value = "";
-  tempAbierto.value = false;
-  tempApertura.value = "08:00";
-  tempCierre.value = "22:00";
 }
 
 function handleDeleteFechaEspecial(index: number) {

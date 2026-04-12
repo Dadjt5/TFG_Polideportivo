@@ -1337,9 +1337,6 @@ class NuevaInstalacionView(APIView):
         for fecha in fechasEspeciales:
             res = instalacion.nuevoHorarioEspecial(
                 fecha["fecha"],
-                fecha.get("apertura"),
-                fecha.get("cierre"),
-                fecha.get("abierto", True)
             )
 
             if not res:
@@ -1379,14 +1376,15 @@ class EditarInstalacionView(APIView):
             pabellon_id = instalacion_data.pop("pabellon", None)
             if isinstance(pabellon_id, dict):
                 pabellon_id = pabellon_id.get("id")
+
             tarifa_id = instalacion_data.pop("tarifa", None)
             numero_calles = instalacion_data.pop("numeroCalles", None)
 
             pabellon = get_object_or_404(Pabellon, id=pabellon_id)
             tarifa = get_object_or_404(TarifaInstalacion, id=tarifa_id)
 
-            if not instalacion.comprobarAforo(instalacion_data):
-                return Response({"respuesta": "La instalación tiene una actividad con unas plazas máximas mayores que el aforo creado"}, status=status.HTTP_400_BAD_REQUEST)
+            if not instalacion.comprobarAforo(instalacion_data["aforoMaximo"], numero_calles):
+                return Response({"respuesta": "La instalación tiene una actividad con unas plazas máximas mayores que el aforo creado", "tipo": "aforo"}, status=status.HTTP_400_BAD_REQUEST)
 
             # Manejar la agenda y fechas especiales
             agenda_json = request.POST.get("agenda", "[]")
@@ -1420,7 +1418,7 @@ class EditarInstalacionView(APIView):
                     # Validamos el conflicto
                     if not instalacion.controlarCambioHorario(dia, apertura, cierre, abierto):
                         return Response(
-                            {"respuesta": f"No se puede modificar el día {dia} por conflictos existentes"},
+                            {"respuesta": f"No se puede modificar el día {dia} por conflictos existentes", "tipo": "sesiones"},
                             status=status.HTTP_400_BAD_REQUEST
                         )
 
@@ -1433,11 +1431,11 @@ class EditarInstalacionView(APIView):
                 else:
                     if not instalacion.nuevoHorario(dia, apertura, cierre, abierto):
                         return Response(
-                            {"respuesta": f"Error creando horario para {dia}"},
+                            {"respuesta": f"Error creando horario para {dia}", "tipo": "otro"},
                             status=status.HTTP_400_BAD_REQUEST
                         )
 
-            # FECHAS ESPECIALES
+           # FECHAS ESPECIALES
             especiales_existentes = {
                 str(a.fecha): a
                 for a in Agenda.objects.filter(
@@ -1452,31 +1450,16 @@ class EditarInstalacionView(APIView):
                 fecha = item["fecha"]
                 fechas_recibidas.add(str(fecha))
 
-                apertura = item.get("horaApertura")
-                cierre = item.get("horaCierre")
-                abierto = item.get("abierto", True)
+                if str(fecha) not in especiales_existentes:
+                    res = instalacion.nuevoHorarioEspecial(fecha)
 
-                especial_existente = especiales_existentes.get(str(fecha))
+                if not res:
+                    return Response(
+                        {"respuesta": f"Error creando día cerrado {fecha}", "tipo": "otro"},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
 
-                if especial_existente:
-                    if not instalacion.controlarCambioHorario(fecha, apertura, cierre, abierto):
-                        return Response(
-                            {"respuesta": f"No se puede modificar la fecha {fecha} por conflictos existentes"},
-                            status=status.HTTP_400_BAD_REQUEST
-                        )
-
-                    especial_existente.horaApertura = apertura
-                    especial_existente.horaCierre = cierre
-                    especial_existente.abierto = abierto
-                    especial_existente.save()
-                else:
-                    if not instalacion.nuevoHorarioEspecial(fecha, apertura, cierre, abierto):
-                        return Response(
-                            {"respuesta": f"Error creando horario especial {fecha}"},
-                            status=status.HTTP_400_BAD_REQUEST
-                        )
-
-            # Eliminar especiales que ya no vienen
+            # Eliminar las que ya no existen
             for fecha, agenda in especiales_existentes.items():
                 if fecha not in fechas_recibidas:
                     agenda.delete()
@@ -1499,7 +1482,7 @@ class EditarInstalacionView(APIView):
             return Response({"respuesta": "Exito al asignar la agenda a la instalacion"}, status=status.HTTP_200_OK)
 
         except Exception as e:
-            return Response({"respuesta": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"respuesta": str(e), "tipo": "otro"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class NuevaActividadView(APIView):
@@ -1533,6 +1516,7 @@ class NuevaActividadView(APIView):
         for sesion in sesiones:
             dia = sesion.get('dia')
             horaInicio = sesion.get('horaInicio')
+
             horaFin = sesion.get('horaFin')
             calleNum = sesion.get('calle')
 
@@ -1543,7 +1527,7 @@ class NuevaActividadView(APIView):
                 if not calle:
                     return Response({"respuesta": "Calle no válida"}, status=status.HTTP_400_BAD_REQUEST, tipo="calle")
 
-            if not instalacion.controlarHorarioActividad(dia, horaInicio, horaFin, calle=calle):
+            if not instalacion.controlarHorarioActividad(dia, horaInicio, horaFin, periodo, calle=calle):
                 return Response(
                     {"respuesta": "Una o más sesiones no se pueden realizar en esta instalación", "tipo": "sesiones"},
                     status=status.HTTP_400_BAD_REQUEST
@@ -1624,7 +1608,7 @@ class EditarActividadView(APIView):
             sesiones_bd = actividad.sesiones.all()
             ids_recibidos = []
 
-            if not monitor.comprobarDisponibilidad(sesiones_recibidas, periodo):
+            if not monitor.comprobarDisponibilidad(sesiones_recibidas, periodo, actividad_data["id"]):
                 return Response(
                     {"respuesta": "El monitor ya tiene una sesion en uno de los periodos propuestos", "tipo": "monitor"},
                     status=status.HTTP_400_BAD_REQUEST
@@ -1642,7 +1626,7 @@ class EditarActividadView(APIView):
                 if instalacion.tipoInstalacion == TipoInstalacion.PISCINA:
                     calle = instalacion.calles.filter(numero=calleNum).first()
 
-                respuesta = instalacion.controlarHorarioActividad(dia, horaInicio, horaFin, sesion_id, calle)
+                respuesta = instalacion.controlarHorarioActividad(dia, horaInicio, horaFin, periodo, sesion_id, calle)
 
                 if not respuesta:
                     return Response(
@@ -1773,11 +1757,11 @@ class TarifaInstalacionView(APIView):
         else:
             fecha = date.today()
 
-        agenda_fecha = Agenda.objects.filter(fecha=fecha).first()
+        agenda_fecha = Agenda.objects.filter(fecha=fecha, instalacion=instalacion).first()
 
         # Obtenemos el día, directamente o derivandolo de la fecha dada
         if agenda_fecha:
-            dia = agenda_fecha
+            dia = None
         else:
             dia_semana = fecha.strftime("%A").upper()
 

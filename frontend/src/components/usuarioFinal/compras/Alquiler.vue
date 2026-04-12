@@ -121,7 +121,7 @@
           <span class="badge bg-warning text-dark">{{ t.activity }}</span>
         </div>
 
-        <div v-if="mostrarMensaje" class="text-center mb-3">
+        <div v-if="mostrarMensaje" class="text-center mb-3 mt-3">
           <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
             {{ mensaje }}
           </div>

@@ -8,96 +8,210 @@
           ← {{ t.return }}
         </button>
 
-        <h1 class="fw-semibold text-primary mb-2" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.2);">
+        <div class="text-center flex-grow-1">
+          <h1 class="fw-semibold text-primary mb-0" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.2);">
+            {{ t.tariffDetail }}
+          </h1>
+        </div>
 
-          <span v-if="!editando">{{ tarifa.titulo }}</span>
-
-          <input v-else v-model="tarifa.titulo" class="form-control form-control-lg text-center fw-semibold"
-            :class="{ 'is-invalid': errores.titulo }" />
-        </h1>
-
-        <div style="width:100px"></div>
+        <div style="width: 100px"></div>
       </div>
 
-      <!-- BLOQUES TARIFA -->
+      <!-- BLOQUES -->
       <div class="row g-4">
 
+        <!-- CARD PRINCIPAL CABECERA -->
+          <div class="col-12">
+            <div class="card shadow-lg rounded-4 p-4"
+              style="background-color: rgba(255,255,255,0.75); backdrop-filter: blur(10px);">
+
+              <h4 class="mb-3 d-flex align-items-center">
+                <i class="bi bi-currency-euro text-primary me-2"></i>
+                {{ t.tariffDetail }}
+              </h4>
+
+              <div class="row g-3">
+
+                <!-- TITULO -->
+                <div class="col-12 col-sm-6">
+                  <span class="fw-medium">{{ t.name }}:</span>
+
+                  <p v-if="!editando" class="fs-5 fw-semibold mb-0">
+                    {{ tarifa.titulo }}
+                  </p>
+
+                  <input v-else v-model="tarifa.titulo" class="form-control form-control-lg"
+                    :class="{ 'is-invalid': errores.titulo }" :placeholder="t.name" />
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+
         <!-- CONSULTA INDIVIDUAL -->
-        <div class="col-12 col-md-6">
+        <div class="col-12">
           <div class="card shadow-lg rounded-4 p-4"
             style="background-color: rgba(255,255,255,0.75); backdrop-filter: blur(10px);">
 
-            <h4 class="mb-4 d-flex align-items-center">
+            <h4 class="mb-3 d-flex align-items-center">
               <i class="bi bi-person-badge text-primary me-2"></i>
               {{ t.initialConsultation }}
             </h4>
 
             <div class="row g-3">
-              <PrecioField label="tdaPrice" v-model="tarifa.precioConsultaTDA" :editando="editando"
-                :error="errores.precioConsultaTDA" :t="t" />
 
-              <PrecioField label="uamPrice" v-model="tarifa.precioConsultaUAM" :editando="editando"
-                :error="errores.precioConsultaUAM" :t="t" />
+              <!-- TDA -->
+              <div class="col-12 col-sm-4">
+                <span class="fw-medium">{{ t.priceTDA }}:</span>
 
-              <PrecioField label="otherPrice" v-model="tarifa.precioConsultaOtros" :editando="editando"
-                :error="errores.precioConsultaOtros" :t="t" />
+                <p v-if="!editando" class="fs-5 fw-semibold">
+                  {{ tarifa.precioConsultaTDA }} €
+                </p>
+
+                <input v-else type="number" min="0" step="0.01" class="form-control form-control-lg"
+                  v-model.number="tarifa.precioConsultaTDA" :class="{ 'is-invalid': errores.precioConsultaTDA }" />
+              </div>
+
+              <!-- UAM -->
+              <div class="col-12 col-sm-4">
+                <span class="fw-medium">{{ t.priceUAM }}:</span>
+
+                <p v-if="!editando" class="fs-5 fw-semibold">
+                  {{ tarifa.precioConsultaUAM }} €
+                </p>
+
+                <input v-else type="number" min="0" step="0.01" class="form-control form-control-lg"
+                  v-model.number="tarifa.precioConsultaUAM" :class="{ 'is-invalid': errores.precioConsultaUAM }" />
+              </div>
+
+              <!-- OTROS -->
+              <div class="col-12 col-sm-4">
+                <span class="fw-medium">{{ t.priceOthers }}:</span>
+
+                <p v-if="!editando" class="fs-5 fw-semibold">
+                  {{ tarifa.precioConsultaOtros }} €
+                </p>
+
+                <input v-else type="number" min="0" step="0.01" class="form-control form-control-lg"
+                  v-model.number="tarifa.precioConsultaOtros" :class="{ 'is-invalid': errores.precioConsultaOtros }" />
+              </div>
+
             </div>
-
           </div>
         </div>
 
-
         <!-- BONO 1-5 -->
-        <div class="col-12 col-md-6">
+        <div class="col-12">
           <div class="card shadow-lg rounded-4 p-4"
             style="background-color: rgba(255,255,255,0.75); backdrop-filter: blur(10px);">
 
-            <h4 class="mb-4 d-flex align-items-center">
+            <h4 class="mb-3 d-flex align-items-center">
               <i class="bi bi-123 text-success me-2"></i>
               {{ t.sessions1to5 }}
             </h4>
 
             <div class="row g-3">
-              <PrecioField label="tdaPrice" v-model="tarifa.precioSesiones1_5TDA" :editando="editando"
-                :error="errores.precioSesiones1_5TDA" :t="t" />
 
-              <PrecioField label="uamPrice" v-model="tarifa.precioSesiones1_5UAM" :editando="editando"
-                :error="errores.precioSesiones1_5UAM" :t="t" />
+              <!-- TDA -->
+              <div class="col-12 col-sm-4">
+                <span class="fw-medium">{{ t.priceTDA }}:</span>
 
-              <PrecioField label="otherPrice" v-model="tarifa.precioSesiones1_5Otros" :editando="editando"
-                :error="errores.precioSesiones1_5Otros" :t="t" />
+                <p v-if="!editando" class="fs-5 fw-semibold">
+                  {{ tarifa.precioSesiones1_5TDA }} €
+                </p>
+
+                <input v-else type="number" min="0" step="0.01" class="form-control form-control-lg"
+                  v-model.number="tarifa.precioSesiones1_5TDA"
+                  :class="{ 'is-invalid': errores.precioSesiones1_5TDA }" />
+              </div>
+
+              <!-- UAM -->
+              <div class="col-12 col-sm-4">
+                <span class="fw-medium">{{ t.priceUAM }}:</span>
+
+                <p v-if="!editando" class="fs-5 fw-semibold">
+                  {{ tarifa.precioSesiones1_5UAM }} €
+                </p>
+
+                <input v-else type="number" min="0" step="0.01" class="form-control form-control-lg"
+                  v-model.number="tarifa.precioSesiones1_5UAM"
+                  :class="{ 'is-invalid': errores.precioSesiones1_5UAM }" />
+              </div>
+
+              <!-- OTROS -->
+              <div class="col-12 col-sm-4">
+                <span class="fw-medium">{{ t.priceOthers }}:</span>
+
+                <p v-if="!editando" class="fs-5 fw-semibold">
+                  {{ tarifa.precioSesiones1_5Otros }} €
+                </p>
+
+                <input v-else type="number" min="0" step="0.01" class="form-control form-control-lg"
+                  v-model.number="tarifa.precioSesiones1_5Otros"
+                  :class="{ 'is-invalid': errores.precioSesiones1_5Otros }" />
+              </div>
+
             </div>
-
           </div>
         </div>
 
-
         <!-- BONO 6+ -->
-        <div class="col-12 col-md-6 mx-auto">
+        <div class="col-12">
           <div class="card shadow-lg rounded-4 p-4"
             style="background-color: rgba(255,255,255,0.75); backdrop-filter: blur(10px);">
 
-            <h4 class="mb-4 d-flex align-items-center">
+            <h4 class="mb-3 d-flex align-items-center">
               <i class="bi bi-plus-circle text-warning me-2"></i>
               {{ t.sessions6plus }}
             </h4>
 
             <div class="row g-3">
-              <PrecioField label="tdaPrice" v-model="tarifa.precioSesiones6TDA" :editando="editando"
-                :error="errores.precioSesiones6TDA" :t="t" />
 
-              <PrecioField label="uamPrice" v-model="tarifa.precioSesiones6UAM" :editando="editando"
-                :error="errores.precioSesiones6UAM" :t="t" />
+              <!-- TDA -->
+              <div class="col-12 col-sm-4">
+                <span class="fw-medium">{{ t.priceTDA }}:</span>
 
-              <PrecioField label="otherPrice" v-model="tarifa.precioSesiones6Otros" :editando="editando"
-                :error="errores.precioSesiones6Otros" :t="t" />
+                <p v-if="!editando" class="fs-5 fw-semibold">
+                  {{ tarifa.precioSesiones6TDA }} €
+                </p>
+
+                <input v-else type="number" min="0" step="0.01" class="form-control form-control-lg"
+                  v-model.number="tarifa.precioSesiones6TDA" :class="{ 'is-invalid': errores.precioSesiones6TDA }" />
+              </div>
+
+              <!-- UAM -->
+              <div class="col-12 col-sm-4">
+                <span class="fw-medium">{{ t.priceUAM }}:</span>
+
+                <p v-if="!editando" class="fs-5 fw-semibold">
+                  {{ tarifa.precioSesiones6UAM }} €
+                </p>
+
+                <input v-else type="number" min="0" step="0.01" class="form-control form-control-lg"
+                  v-model.number="tarifa.precioSesiones6UAM" :class="{ 'is-invalid': errores.precioSesiones6UAM }" />
+              </div>
+
+              <!-- OTROS -->
+              <div class="col-12 col-sm-4">
+                <span class="fw-medium">{{ t.priceOthers }}:</span>
+
+                <p v-if="!editando" class="fs-5 fw-semibold">
+                  {{ tarifa.precioSesiones6Otros }} €
+                </p>
+
+                <input v-else type="number" min="0" step="0.01" class="form-control form-control-lg"
+                  v-model.number="tarifa.precioSesiones6Otros"
+                  :class="{ 'is-invalid': errores.precioSesiones6Otros }" />
+              </div>
+
             </div>
-
           </div>
         </div>
 
       </div>
 
+      <!-- MENSAJE -->
       <div v-if="mostrarMensaje" class="text-center mb-3">
         <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
           {{ mensajeEditar }}
@@ -108,35 +222,31 @@
       <div class="d-flex justify-content-center gap-3 mt-5">
 
         <button v-if="!editando" class="btn btn-primary btn-lg rounded-pill" @click="activarEdicion">
-
           <i class="bi bi-pencil me-2"></i>
           {{ t.modifyTariff }}
         </button>
 
         <template v-else>
-
           <button class="btn btn-success btn-lg rounded-pill" @click="guardarCambios">
-
             <i class="bi bi-check-lg me-2"></i>
             {{ t.saveChanges }}
           </button>
 
           <button class="btn btn-secondary btn-lg rounded-pill" @click="cancelarEdicion">
-
             {{ t.cancel }}
           </button>
-
         </template>
 
         <button v-if="!editando" class="btn btn-danger btn-lg rounded-pill" @click="abrirConfirmacion">
-
           <i class="bi bi-trash me-2"></i>
           {{ t.deleteTariff }}
         </button>
 
       </div>
+
     </main>
 
+    <!-- MODAL DELETE -->
     <div class="modal fade" id="confirmDeleteModal" tabindex="-1">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content rounded-4">
@@ -163,6 +273,7 @@
       </div>
     </div>
 
+    <!-- MODAL SUCCESS -->
     <div class="modal fade" id="successDeleteModal" tabindex="-1">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content rounded-4 text-center">
@@ -186,6 +297,7 @@
         </div>
       </div>
     </div>
+
   </div>
 </template>
 
@@ -275,14 +387,14 @@ const guardarCambios = async () => {
     if (Object.keys(data).length > 0) {
       await modificarTarifaFisioterapia(tarifa.value.id, data)
       tarifaOriginal.value = JSON.parse(JSON.stringify(tarifa.value))
-    
+
       lanzarMensaje(t.value.correctlyUpdate, "success")
     } else {
       lanzarMensaje(t.value.noChanges, "success")
     }
 
     editando.value = false
-  } catch(e) {
+  } catch (e) {
     lanzarMensaje(t.value.noModify, "error")
     console.error("Error al modificar la tarifa de fisioterapia", e)
   }

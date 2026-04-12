@@ -53,13 +53,16 @@ class Monitor(Usuario):
 
 
     # Función para revisar si un monitor no tiene otras sesiones programadas en los horarios de las nuevas sesiones
-    def comprobarDisponibilidad(self, sesiones, periodo):
+    def comprobarDisponibilidad(self, sesiones, periodo, actividad_id=None):
         for sesion_data in sesiones:
             dia = sesion_data.get('dia')
             horaInicio = sesion_data.get('horaInicio')
             horaFin = sesion_data.get('horaFin')
 
             actividades = self.actividades.filter(periodo__in=[Periodo.ANUAL, periodo])
+            if actividad_id:
+                actividades = actividades.exclude(id=actividad_id)
+
             for act in actividades:
                 conflictos = act.sesiones.filter(dia__iexact=dia, horaInicio__lt=horaFin, horaFin__gt=horaInicio)
 

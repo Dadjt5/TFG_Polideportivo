@@ -14,11 +14,11 @@
       </div>
 
       <div class="card shadow-sm rounded-4 p-4 p-md-5">
-        
+
         <!-- ADMIN AVATAR -->
         <div class="d-flex flex-column flex-md-row align-items-center gap-4 mb-4">
           <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center"
-               style="width:96px;height:96px">
+            style="width:96px;height:96px">
             <i class="bi bi-person-badge-fill text-primary fs-1"></i>
           </div>
 
@@ -37,25 +37,9 @@
           <div class="col-md-4">
             <label class="form-label">{{ t.name }}</label>
             <input v-if="isEditing" class="form-control" v-model="admin.nombre"
-                   :class="{ 'is-invalid': errores.nombre }" />
+              :class="{ 'is-invalid': errores.nombre }" />
             <p v-else class="form-control-plaintext">
               {{ admin.nombre || '-' }}
-            </p>
-          </div>
-
-          <!-- DNI -->
-          <div class="col-md-4">
-            <label class="form-label">DNI</label>
-            <p class="form-control-plaintext">
-              {{ admin.DNI || '-' }}
-            </p>
-          </div>
-
-          <!-- Codigo usuario -->
-          <div class="col-md-4">
-            <label class="form-label">{{ t.loginCode }}</label>
-            <p class="form-control-plaintext">
-              {{ admin.codigo_usuario || '-' }}
             </p>
           </div>
 
@@ -63,7 +47,7 @@
           <div class="col-md-4">
             <label class="form-label">{{ t.role }}</label>
             <select v-if="isEditing" class="form-select form-select-lg" :class="{ 'is-invalid': errores.rol }"
-                    v-model="admin.rol">
+              v-model="admin.rol">
               <option value="" disabled>{{ t.selectOption }}</option>
               <option value="Administrador raiz">{{ t.rootAdmin }}</option>
               <option value="Administrador de usuarios">{{ t.usersAdmin }}</option>
@@ -76,6 +60,14 @@
             </p>
           </div>
 
+          <!-- DNI -->
+          <div class="col-md-4">
+            <label class="form-label">DNI</label>
+            <p class="form-control-plaintext">
+              {{ admin.DNI || '-' }}
+            </p>
+          </div>
+
           <!-- Correo -->
           <div class="col-md-4">
             <label class="form-label">{{ t.email }}</label>
@@ -84,10 +76,18 @@
             </p>
           </div>
 
+          <!-- Codigo usuario -->
+          <div class="col-md-4">
+            <label class="form-label">{{ t.loginCode }}</label>
+            <p class="form-control-plaintext">
+              {{ admin.codigo_usuario || '-' }}
+            </p>
+          </div>
+
         </div>
 
         <!-- MENSAJE -->
-        <div v-if="mostrarMensaje" class="text-center mb-3">
+        <div v-if="mostrarMensaje" class="text-center mb-3 mt-3">
           <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
             {{ mensajeEditar }}
           </div>

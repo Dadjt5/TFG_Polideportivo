@@ -331,6 +331,8 @@ class MapaReservasSerializer(serializers.ModelSerializer):
             horaInicio__lte=obj.horaInicio,
             horaFin__gt=obj.horaInicio,
             dia=obj.agenda.dia,
+            actividad__instalacion=obj.agenda.instalacion,
+            calle=obj.calle
         ).values_list("actividad__periodo", flat=True).distinct()
 
         return list(sesiones) if sesiones else []

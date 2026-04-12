@@ -124,7 +124,7 @@
             </div>
           </div>
 
-          <div v-if="mostrarMensaje" class="text-center mb-3">
+          <div v-if="mostrarMensaje" class="text-center mb-3 mt-3">
             <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
               {{ mensajeEditar }}
             </div>
@@ -253,10 +253,14 @@ const checkAge = () => {
 function validarFormulario() {
   let valido = true
 
+  const hoy = new Date()
+  const fechaNacimiento = new Date(usuarioFinal.value.fechaNacimiento)
+
   errores.value.nombre = usuarioFinal.value.nombre === ''
   errores.value.apellidos = usuarioFinal.value.apellidos === ''
   errores.value.DNI = usuarioFinal.value.dni === '' && !esMenor.value
   errores.value.sexo = usuarioFinal.value.sexo === ''
+  errores.value.fechaNacimiento = usuarioFinal.value.fechaNacimiento === ''
   errores.value.telefono = usuarioFinal.value.telefono === ''
   errores.value.provincia = usuarioFinal.value.provincia === ''
   errores.value.municipio = usuarioFinal.value.municipio === ''
@@ -267,6 +271,8 @@ function validarFormulario() {
     !emailRegex.test(usuarioFinal.value.email)
   errores.value.password = usuarioFinal.value.password === ''
   errores.value.confirmPassword = usuarioFinal.value.password !== usuarioFinal.value.confirmPassword
+  errores.value.fechaNacimiento =
+    !usuarioFinal.value.fechaNacimiento || fechaNacimiento >= hoy
 
   for (const key in errores.value) {
     if (errores.value[key]) {

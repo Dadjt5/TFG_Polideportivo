@@ -45,15 +45,6 @@
                    :class="{ 'is-invalid': errores.precio }" v-model.number="tarifa.precio" />
           </div>
 
-          <!-- PRECIO CUATRIMESTRE -->
-          <div class="col-md-4">
-            <label class="form-label fw-semibold">
-              {{ t.quarterPrice }}
-            </label>
-            <input type="number" step="0.01" class="form-control form-control-lg"
-                   :class="{ 'is-invalid': errores.precioCuatrimestre }" v-model.number="tarifa.precioCuatrimestre" />
-          </div>
-
           <!-- PRECIO MENSUAL -->
           <div class="col-md-4">
             <label class="form-label fw-semibold">
@@ -62,9 +53,18 @@
             <input type="number" step="0.01" class="form-control form-control-lg"
                    :class="{ 'is-invalid': errores.precioMensual }" v-model.number="tarifa.precioMensual" />
           </div>
+
+          <!-- PRECIO CUATRIMESTRE -->
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">
+              {{ t.quarterPrice }}
+            </label>
+            <input type="number" step="0.01" class="form-control form-control-lg"
+                   :class="{ 'is-invalid': errores.precioCuatrimestre }" v-model.number="tarifa.precioCuatrimestre" />
+          </div>
         </div>
 
-        <div v-if="mostrarMensaje" class="text-center mb-3">
+        <div v-if="mostrarMensaje" class="text-center mb-3 mt-3">
           <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
             {{ mensajeEditar }}
           </div>

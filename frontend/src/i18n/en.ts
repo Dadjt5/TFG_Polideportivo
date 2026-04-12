@@ -138,6 +138,9 @@ export default {
   errorPlaces: "The number of places for the activity cannot exceed the venue's capacity",
   errorPlaces2: "Some of the activities taking place at this venue have a capacity exceeding the maximum allowed",
   dateError: "The expiry date cannot be earlier or equal than the start date",
+  dateError2: "The start date must be on or after today",
+  selectAtLeastOne: "Select at least one type of facility or sport",
+  selectFacilityFirst: "Select a facility first",
 
   /* Perfil */
   role: "Role",
@@ -300,6 +303,7 @@ export default {
 
   /* Detalle instalacion */
   capacity: "Capacity",
+  totalCapacity: "Total capacity",
   light: "Light",
   facilityValidity: "Need validation",
   tdaPercent: "TDA percentage",

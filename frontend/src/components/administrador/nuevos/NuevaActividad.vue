@@ -202,6 +202,10 @@
             </select>
           </div>
 
+          <div class="col-md-4 mb-3 fw-bold" v-if="instalacionSeleccionada">
+            {{ t.totalCapacity }}: {{ instalacionSeleccionada?.aforoMaximo }}
+          </div>
+
           <!-- HORARIO -->
           <div v-if="instalacionSeleccionada?.agenda?.length" class="card border-0 shadow-sm rounded-4 p-4 bg-light">
             <h5 class="fw-bold mb-3">
@@ -384,7 +388,7 @@
           <div class="row g-3 align-items-end mb-4">
             <div class="col-md-2" v-if="callesDisponibles.length > 0">
               <label class="form-label fw-semibold">{{ t.poolStreets }}</label>
-              <select class="form-select form-select-lg" v-model="calleSeleccionada">
+              <select class="form-select form-select-lg" v-model="crearSesion.calle">
                 <option value="">--</option>
                 <option v-for="c in callesDisponibles" :key="c.id" :value="c.id">
                   {{ t.street }} {{ c.numero || c.id }}
@@ -623,6 +627,11 @@ function onFileChange(e: Event) {
 }
 
 function agregarSesion() {
+  if (!instalacionSeleccionada) {
+    lanzarMensaje(t.value.selectFacilityFirst, "error")
+    return
+  }
+
   if (!crearSesion.value.dia ||
     !crearSesion.value.horaInicio ||
     !crearSesion.value.horaFin ||
@@ -768,6 +777,13 @@ const crearActividad = async () => {
     return
   }
 
+  if (instalacionSeleccionada.value.tipoInstalacion == "Piscina") {
+    if (actividad.value.plazasMaximas > instalacionSeleccionada.value.aforoMaximo/instalacionSeleccionada.value.numeroCalles) {
+      lanzarMensaje(t.value.errorPlaces, "error")
+      return
+    }
+  }
+
   if (sesiones.value.length === 0) {
     lanzarMensaje(t.value.noSessionWarning, "error")
     return
@@ -808,6 +824,7 @@ const crearActividad = async () => {
     } else if (e.response.data.tipo == "monitor") {
       lanzarMensaje(t.value.noModifyActivityMonitor, "error")
     }
+
     console.log("Error al crear la actividad", e)
   }
 }

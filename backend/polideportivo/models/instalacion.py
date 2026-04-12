@@ -89,9 +89,13 @@ class Instalacion(models.Model):
         return precio
 
     # Función para comprobar el aforo de la instalacion frente a las plazas máximas de la actividad
-    def comprobarAforo(self, instalacion_data):
+    def comprobarAforo(self, aforoMaximo, numeroCalles):
+        # En el caso de las piscinas dividimos entre el numero de calles para conocer el aforo maximo por calle
+        if self.tipoInstalacion == TipoInstalacion.PISCINA and self.numeroCalles > 0:
+            aforoMaximo = aforoMaximo // numeroCalles
+
         for act in self.actividad.all():
-            if act.plazasMaximas > instalacion_data["aforoMaximo"]:
+            if act.plazasMaximas > aforoMaximo:
                 return False
 
         return True
@@ -123,8 +127,9 @@ class Instalacion(models.Model):
             dia = sesion.get('dia')
             hora_inicio = sesion.get('horaInicio')
             hora_fin = sesion.get('horaFin')
-            calle_num = sesion.get('calle')
+            calle_sesion = sesion.get('calle')
 
+            calle_num = calle_sesion.numero
             calle = None
             if self.tipoInstalacion == TipoInstalacion.PISCINA:
                 calle = self.calles.filter(numero=calle_num).first()
@@ -296,7 +301,7 @@ class Instalacion(models.Model):
         }
 
     # Función para controlar los horarios de sesiones de una actividad para saber si coinciden con otras sesiones de otras actividades
-    def controlarHorarioActividad(self, dia, horaInicio, horaFin, sesion_id=None, calle=None):
+    def controlarHorarioActividad(self, dia, horaInicio, horaFin, periodo, sesion_id=None, calle=None):
         if isinstance(horaInicio, str):
             h, m = map(int, horaInicio.split(":"))
             horaInicio = time(h, m)
@@ -305,21 +310,13 @@ class Instalacion(models.Model):
             h, m = map(int, horaFin.split(":"))
             horaFin = time(h, m)
 
-        agenda = self.agenda.filter(dia__iexact=dia).first()
+        agenda = self.agenda.filter(dia__iexact=dia, instalacion=self).first()
 
         if not agenda or not agenda.abierto:
             return False
 
         if agenda.horaApertura > horaInicio or agenda.horaCierre < horaFin:
             return False
-
-        mes = date.today().month
-        if 9 <= mes or mes == 1:
-            periodo = Periodo.PRIMER_CUATRIMESTRE
-        elif 2 <= mes <= 5:
-            periodo = Periodo.SEGUNDO_CUATRIMESTRE
-        else:
-            periodo = Periodo.ANUAL
         
         if periodo == Periodo.ANUAL:
             periodos_a_revisar = [Periodo.PRIMER_CUATRIMESTRE, Periodo.SEGUNDO_CUATRIMESTRE, Periodo.ANUAL]
@@ -362,8 +359,9 @@ class Instalacion(models.Model):
     # Función para controlar si se puede realizar un alquiler en el preiodo seleccionado
     def controlarAlquiler(self, dia, horaInicio, horaFin, calle=None):
         agenda = self.agenda.filter(fecha=dia).first()
-
-        if not agenda:
+        if agenda:
+            return False
+        else:
             dia_semana = dia.strftime("%A").upper()
 
             mapa_dias = {
@@ -430,26 +428,14 @@ class Instalacion(models.Model):
         self.sincronizarMapaReservas(agenda, minutos=60)
         return True
 
-    # Función para cambiar el horario especial de la instalación siempre y cuando no haya actividades programadas
-    def nuevoHorarioEspecial(self, fecha, horaApertura, horaCierre, abierto):
-        if isinstance(horaApertura, str):
-            h, m = map(int, horaApertura.split(":")[:2])
-            horaApertura = time(h, m)
-
-        if isinstance(horaCierre, str):
-            h, m = map(int, horaCierre.split(":")[:2])
-            horaCierre = time(h, m)
-
-        if not abierto:
-            Agenda.objects.create(instalacion=self, fecha=fecha, abierto=False)
-            return True
-
-        if not horaApertura or not horaCierre or horaCierre <= horaApertura:
-            return False
-
-        agenda = Agenda.objects.create(instalacion=self, fecha=fecha, horaApertura=horaApertura, horaCierre=horaCierre)
-        self.sincronizarMapaReservas(agenda, minutos=60)
-
+    # Función para crear nuevos horarios especiales en los que la instalacion estaá cerrada
+    def nuevoHorarioEspecial(self, fecha):
+        Agenda.objects.create(
+            instalacion=self,
+            fecha=fecha,
+            abierto=False
+        )
+    
         return True
 
     # Función para devolver el horario de una isntalación en una fecha concreta

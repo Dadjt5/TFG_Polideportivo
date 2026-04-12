@@ -182,6 +182,10 @@
             </select>
           </div>
 
+          <div class="col-md-4 mb-3 fw-bold" v-if="instalacionSeleccionada">
+            {{ t.totalCapacity }}: {{ instalacionSeleccionada?.aforoMaximo }}
+          </div>
+
           <div v-if="instalacionSeleccionada?.agenda?.length" class="card border-0 shadow-sm rounded-4 p-4 bg-light">
             <h5 class="fw-bold mb-3">{{ t.weekHours }}</h5>
 
@@ -748,6 +752,13 @@ const comprobarAlquiler = async () => {
     return
   }
 
+  if (instalacionSeleccionada.value.tipoInstalacion == "Piscina") {
+    if (actividad.value.plazasMaximas > instalacionSeleccionada.value.aforoMaximo/instalacionSeleccionada.value.numeroCalles) {
+      lanzarMensaje(t.value.errorPlaces, "error")
+      return
+    }
+  }
+
   if (sesiones.value.length === 0) {
     lanzarMensaje(t.value.noSessionWarning, "error")
     return
@@ -962,6 +973,7 @@ async function guardarCambios() {
     } else if (e.response.data.tipo == "monitor") {
       lanzarMensaje(t.value.noModifyActivityMonitor, "error")
     }
+
     console.error("No se ha podido editar la actividad", e)
   }
 }

@@ -127,7 +127,7 @@
           <button class="btn btn-success" v-else @click="handleFinish">{{ t.finish }}</button>
         </div>
 
-        <div v-if="mostrarMensaje" class="text-center mb-3">
+        <div v-if="mostrarMensaje" class="text-center mb-3 mt-3">
         <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
           {{ mensaje }}
         </div>
@@ -249,7 +249,9 @@ const siguiente = () => {
       errores.value.sexo = false
     }
 
-    if (formData.value.fechaNacimiento == '') {
+    const hoy = new Date()
+    const fechaNacimiento = new Date(formData.value.fechaNacimiento)
+    if (formData.value.fechaNacimiento == '' || fechaNacimiento >= hoy) {
       errores.value.fechaNacimiento = true
       continuar.value = false
     } else {

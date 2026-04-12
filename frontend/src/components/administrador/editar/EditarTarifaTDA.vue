@@ -28,10 +28,15 @@
 
             <div class="row g-3">
 
-              <!-- Titulo -->
+              <!-- TITULO -->
               <div class="col-12 col-sm-6">
-                <span v-if="!editando">{{ tarifa.titulo }}</span>
-                <input v-else v-model="tarifa.titulo" class="form-control form-control-lg text-center fw-semibold"
+                <span class="fw-medium">{{ t.name }}:</span>
+
+                <p v-if="!editando" class="fs-5 fw-semibold">
+                  {{ tarifa.titulo }}
+                </p>
+
+                <input v-else v-model="tarifa.titulo" class="form-control form-control-lg"
                   :class="{ 'is-invalid': errores.titulo }" :placeholder="tarifa.titulo" />
               </div>
 

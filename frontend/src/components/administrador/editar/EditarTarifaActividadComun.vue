@@ -28,11 +28,24 @@
 
             <div class="row g-3">
 
-              <!-- Titulo -->
+              <!-- TITULO -->
               <div class="col-12 col-sm-6">
-                <span v-if="!editando">{{ tarifa.titulo }}</span>
-                <input v-else v-model="tarifa.titulo" class="form-control form-control-lg text-center fw-semibold"
+                <span class="fw-medium">{{ t.name }}:</span>
+
+                <p v-if="!editando" class="fs-5 fw-semibold">
+                  {{ tarifa.titulo }}
+                </p>
+
+                <input v-else v-model="tarifa.titulo" class="form-control form-control-lg"
                   :class="{ 'is-invalid': errores.titulo }" :placeholder="tarifa.titulo" />
+              </div>
+
+              <!-- HORAS POR SEMANA -->
+              <div class="col-12 col-sm-6">
+                <span class="fw-medium">{{ t.weekHours }}:</span>
+                <p v-if="!editando" class="fs-5 fw-semibold">{{ tarifa.numeroHorasSemana }}</p>
+                <input v-else type="number" min="0" class="form-control form-control-lg "
+                  v-model.number="tarifa.numeroHorasSemana" :class="{ 'is-invalid': errores.numeroHorasSemana }" />
               </div>
 
               <!-- PRECIO UAM -->
@@ -51,20 +64,12 @@
                   v-model.number="tarifa.precioOtros" :class="{ 'is-invalid': errores.precioOtros }" />
               </div>
 
-              <!-- HORAS POR SEMANA -->
-              <div class="col-12 col-sm-6">
-                <span class="fw-medium">{{ t.weekHours }}:</span>
-                <p v-if="!editando" class="fs-5 fw-semibold">{{ tarifa.numeroHorasSemana }}</p>
-                <input v-else type="number" min="0" class="form-control form-control-lg "
-                  v-model.number="tarifa.numeroHorasSemana" :class="{ 'is-invalid': errores.numeroHorasSemana }" />
-              </div>
-
             </div>
           </div>
         </div>
       </div>
 
-      <div v-if="mostrarMensaje" class="text-center mb-3">
+      <div v-if="mostrarMensaje" class="text-center mb-3 mt-3">
         <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
           {{ mensajeEditar }}
         </div>

@@ -69,28 +69,28 @@
               <div class="col-6">
                 <span class="fw-medium">{{ t.priceTDA }}:</span>
                 <p v-if="!editando">{{ bono.precioTDA }} €</p>
-                <input v-else type="number" step="0.01" min="0" class="form-control" v-model.number="bono.precioTDA"
+                <input v-else type="number" step="1" min="0" class="form-control" v-model.number="bono.precioTDA"
                   :class="{ 'is-invalid': errores.precioTDA }" />
               </div>
 
               <div class="col-6">
                 <span class="fw-medium">{{ t.priceUAM }}:</span>
                 <p v-if="!editando">{{ bono.precioUAM }} €</p>
-                <input v-else type="number" step="0.01" min="0" class="form-control" v-model.number="bono.precioUAM"
+                <input v-else type="number" step="1" min="0" class="form-control" v-model.number="bono.precioUAM"
                   :class="{ 'is-invalid': errores.precioUAM }" />
               </div>
 
               <div class="col-6">
                 <span class="fw-medium">{{ t.priceSubscripcion }}:</span>
                 <p v-if="!editando">{{ bono.precioAbono }} €</p>
-                <input v-else type="number" step="0.01" min="0" class="form-control" v-model.number="bono.precioAbono"
+                <input v-else type="number" step="1" min="0" class="form-control" v-model.number="bono.precioAbono"
                   :class="{ 'is-invalid': errores.precioAbono }" />
               </div>
 
               <div class="col-6">
                 <span class="fw-medium">{{ t.priceOthers }}:</span>
                 <p v-if="!editando">{{ bono.precioOtros }} €</p>
-                <input v-else type="number" step="0.01" min="0" class="form-control" v-model.number="bono.precioOtros"
+                <input v-else type="number" step="1" min="0" class="form-control" v-model.number="bono.precioOtros"
                   :class="{ 'is-invalid': errores.precioOtros }" />
               </div>
 
@@ -107,7 +107,7 @@
               <!-- INSTALACIÓN -->
               <div class="col-md-6">
                 <span class="fw-medium">{{ t.facility }}:</span>
-                <p v-if="!editando">{{ bono.nombreInstalacion || "—" }}</p>
+                <p class="fs-4" v-if="!editando">{{ bono.nombreInstalacion || "—" }}</p>
 
                 <select v-else class="form-select" v-model="bono.instalacion"
                   :class="{ 'is-invalid': errores.instalacion }">
@@ -121,7 +121,7 @@
         </div>
       </div>
 
-      <div v-if="mostrarMensaje" class="text-center mb-3">
+      <div v-if="mostrarMensaje" class="text-center mb-3 mt-3">
         <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
           {{ mensajeEditar }}
         </div>

@@ -83,7 +83,7 @@
           </div>
         </div>
 
-        <div v-if="mostrarMensaje" class="text-center mb-3">
+        <div v-if="mostrarMensaje" class="text-center mb-3 mt-3">
           <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
             {{ mensajeEditar }}
           </div>
@@ -170,6 +170,7 @@ function validar() {
   errores.value.precioFamiliar = abono.value.precioFamiliar <= 0
   errores.value.precioTotalMensualOtros = abono.value.precioTotalMensualOtros <= 0
   errores.value.precioPagoUnicoOtros = abono.value.precioPagoUnicoOtros <= 0
+  errores.value.meses = abono.value.meses <= 0
 
   errores.value.descuentoPrimeraActividad = 
     abono.value.descuentoPrimeraActividad <= 0 || abono.value.descuentoPrimeraActividad > 100

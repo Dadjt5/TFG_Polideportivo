@@ -99,8 +99,7 @@
 
               <div v-else class="d-flex flex-wrap gap-3">
                 <div v-for="tipo in estadisticasStore.data.tiposInstalacion" :key="tipo" class="form-check">
-                  <input type="checkbox" class="form-check-input" :value="tipo"
-                    v-model="descuento.tiposInstalacion" />
+                  <input type="checkbox" class="form-check-input" :value="tipo" v-model="descuento.tiposInstalacion" />
                   <label class="form-check-label">
                     {{ tipo }}
                   </label>
@@ -119,18 +118,23 @@
                 </p>
               </div>
 
-              <select v-else multiple class="form-select" v-model="descuento.deportes">
-                <option v-for="deporte in deportes" :key="deporte.id" :value="deporte.id">
-                  {{ deporte.nombre }}
-                </option>
-              </select>
+              <div v-else class="border rounded-3 p-2 bg-light">
+                <div v-for="deporte in deportes" :key="deporte.id" class="form-check">
+                  <input class="form-check-input" type="checkbox" :id="'dep-' + deporte.id" :value="deporte.id"
+                    v-model="descuento.deportes_ids" />
+
+                  <label class="form-check-label" :for="'dep-' + deporte.id">
+                    {{ deporte.titulo }}
+                  </label>
+                </div>
+              </div>
             </div>
 
           </div>
         </div>
       </div>
 
-      <div v-if="mostrarMensaje" class="text-center mb-3">
+      <div v-if="mostrarMensaje" class="text-center mb-3 mt-3">
         <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
           {{ mensajeEditar }}
         </div>
@@ -262,8 +266,11 @@ const descuentoOriginal = ref<any>(null)
 const deportes = ref<any[]>([])
 
 const nombresDeportesSeleccionados = computed(() => {
-  if (!descuento.value.deportes) return []
-  return descuento.value.deportes.map((d: any) => d.titulo)
+  if (!descuento.value.deportes_ids || deportes.value.length === 0) return []
+
+  return deportes.value
+    .filter((dep: any) => descuento.value.deportes_ids.includes(dep.id))
+    .map((dep: any) => dep.titulo)
 })
 
 function validarFormulario() {
@@ -329,7 +336,11 @@ const guardarCambios = async () => {
   }
 
   if (!fechasValidas()) {
-    lanzarMensaje(t.value.dateError, "error")
+    return
+  }
+
+  if (descuento.value.tiposInstalacion.length == 0 || descuento.value.deportes.length == 0) {
+    lanzarMensaje(t.value.selectAtLeastOne, "error")
     return
   }
 
@@ -367,11 +378,21 @@ function fechasValidas() {
   const fin = new Date(descuento.value.fechaFinValidez)
   const hoy = new Date()
 
-  inicio.setHours(0,0,0,0)
-  fin.setHours(0,0,0,0)
-  hoy.setHours(0,0,0,0)
+  inicio.setHours(0, 0, 0, 0)
+  fin.setHours(0, 0, 0, 0)
+  hoy.setHours(0, 0, 0, 0)
 
-  return fin > inicio && inicio >= hoy
+  if (inicio < hoy) {
+    lanzarMensaje(t.value.dateError2, "error")
+    return false
+  }
+
+  if (fin < inicio) {
+    lanzarMensaje(t.value.dateError, "error")
+    return false
+  }
+
+  return true
 }
 
 async function confirmarEliminar() {
@@ -412,6 +433,7 @@ onMounted(async () => {
     const detalles = await getDescuentoDetalle(parseInt(props.id))
 
     descuento.value = detalles
+    descuento.value.deportes_ids = detalles.deportes.map((d: any) => d.id)
     descuentoOriginal.value = JSON.parse(JSON.stringify(descuento.value))
     deportes.value = await getDeportes()
   } catch (e) {

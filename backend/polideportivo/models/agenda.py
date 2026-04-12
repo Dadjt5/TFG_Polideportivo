@@ -13,14 +13,26 @@ class Agenda(models.Model):
     fecha = models.DateField(blank=True, null=True)
     dia = models.CharField(max_length=10, choices=Dia.choices, blank=True, null=True)
 
-    horaApertura = models.TimeField(default=time(8, 0))
-    horaCierre = models.TimeField(default=time(20, 0))
+    horaApertura = models.TimeField(default=time(8, 0), blank=True, null=True)
+    horaCierre = models.TimeField(default=time(20, 0), blank=True, null=True)
     abierto = models.BooleanField(default=True)
 
     instalacion = models.ForeignKey('Instalacion', on_delete=models.CASCADE, related_name="agenda")
 
     class Meta:
         unique_together = [('dia', 'instalacion'), ('fecha', 'instalacion')]
+
+    # Función que sobreescribe el guardado para guardar las fechas especiales en las que hay que cerrar la instalacion
+    def save(self, *args, **kwargs):
+        if self.fecha and self.dia:
+            raise ValueError("No puede tener fecha y día a la vez")
+
+        if self.fecha:
+            self.horaApertura = None
+            self.horaCierre = None
+            self.abierto = False
+
+        super().save(*args, **kwargs)
 
     def __str__(self):
         if self.dia:
@@ -67,7 +79,11 @@ class MapaReservas(models.Model):
     calle = models.ForeignKey('Calle', on_delete=models.CASCADE, null=True, blank=True, related_name="mapas")
 
     def __str__(self):
-        return f'{self.agenda.dia} {self.horaInicio}-{self.horaFin}'
+        if self.agenda:
+            return f'{self.agenda} {self.horaInicio}-{self.horaFin}'
+        elif self.calle:
+            return f'{self.calle} {self.horaInicio}-{self.horaFin}'
+        
 
     class Meta:
         ordering = ['horaInicio']

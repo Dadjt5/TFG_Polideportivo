@@ -47,16 +47,6 @@
           </div>
 
           <div class="col-md-4">
-            <label class="form-label">DNI</label>
-            <p class="form-control-plaintext">{{ usuario.DNI || '-' }}</p>
-          </div>
-
-          <div class="col-md-4">
-            <label class="form-label">{{ t.loginCode }}</label>
-            <p class="form-control-plaintext">{{ usuario.codigo_usuario || '-' }}</p>
-          </div>
-
-          <div class="col-md-4">
             <label class="form-label">{{ t.sex }}</label>
             <select v-if="isEditing" class="form-select" :class="{ 'is-invalid': errores.sexo }" v-model="usuario.sexo">
               <option value="Mujer">{{ t.female }}</option>
@@ -103,8 +93,8 @@
           </div>
 
           <div class="col-md-4">
-            <label class="form-label">{{ t.madeActivities }}</label>
-            <p class="form-control-plaintext">{{ usuario.actividadesRealizadas }}</p>
+            <label class="form-label">DNI</label>
+            <p class="form-control-plaintext">{{ usuario.DNI || '-' }}</p>
           </div>
 
           <div class="col-md-4">
@@ -112,6 +102,15 @@
             <p class="form-control-plaintext">{{ usuario.email }}</p>
           </div>
 
+          <div class="col-md-4">
+            <label class="form-label">{{ t.loginCode }}</label>
+            <p class="form-control-plaintext">{{ usuario.codigo_usuario || '-' }}</p>
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">{{ t.madeActivities }}</label>
+            <p class="form-control-plaintext">{{ usuario.actividadesRealizadas }}</p>
+          </div>
         </div>
 
         <!-- ESTADOS -->
@@ -149,7 +148,7 @@
         </div>
 
         <!-- MENSAJE -->
-        <div v-if="mostrarMensaje" class="text-center mb-3">
+        <div v-if="mostrarMensaje" class="text-center mb-3 mt-3">
           <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
             {{ mensajeEditar }}
           </div>
@@ -276,6 +275,9 @@ const usuarioOriginal = ref<any>(null);
 function validarFormulario() {
   let valido = true
 
+  const hoy = new Date()
+  const fechaNacimiento = new Date(usuario.value.fechaNacimiento)
+
 	errores.value.nombre = usuario.value.nombre === ''
 	errores.value.apellidos = usuario.value.apellidos === ''
   errores.value.sexo = usuario.value.sexo === ''
@@ -285,6 +287,9 @@ function validarFormulario() {
   errores.value.municipio = usuario.value.municipio === ''
   errores.value.localidad = usuario.value.localidad === ''
   errores.value.codigoPostal = usuario.value.codigoPostal === ''
+
+  errores.value.fechaNacimiento =
+    !usuario.value.fechaNacimiento || fechaNacimiento >= hoy
 
   for (const key in errores.value) {
     if(errores.value[key]) {

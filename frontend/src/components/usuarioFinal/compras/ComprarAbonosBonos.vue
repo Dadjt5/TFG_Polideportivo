@@ -43,7 +43,7 @@
                   <p v-if="b.textoPrecio != ''">{{ b.textoPrecio }}</p>
                 </div>
                 <div class="card-footer bg-transparent border-0">
-                  <div v-if="mostrarMensaje" class="text-center mb-3">
+                  <div v-if="mostrarMensaje" class="text-center mb-3 mt-3">
                     <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
                       {{ mensaje }}
                     </div>

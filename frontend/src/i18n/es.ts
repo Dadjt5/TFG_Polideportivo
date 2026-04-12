@@ -84,7 +84,9 @@ export default {
   confirmReservationDelete: "¿Seguro que desea eliminar la reserva?",
   reservationDeleted: "La reserva ha sido eliminada",
 
-  userNoCreated: 'Ya existe un usuario con ese DNI o correo en el sistema',
+  monitorNoDeleted: "El monitor no pudo ser eliminado ya que esta dirigiendo una o mas actividades",
+  finalUserNoDeleted: "El usuario final no pudo ser eliminado debido a un error",
+  adminNoDeleted: "No tienes los permisos suficientes para eliminar a este administrador",
   tariffNoDeleted: "La tarifa no pudo ser eliminada debido a que esta siendo utilizada",
   bonusNoDeleted: "El bono no pudo ser eliminado porque uno o mas usuarios lo han comprado",
   subscriptionNoDeleted: "El abono no pudo ser eliminado porque ino o mas usuarios lo han comprado",
@@ -96,6 +98,7 @@ export default {
   sportNoDeleted: "El deporte no pudo ser eliminado porque se desarrolla en una o mas actividades",
   reservationNoDeleted: "La reserva no pudo ser eliminada",
 
+  userNoCreated: 'Ya existe un usuario con ese DNI o correo en el sistema',
   monitorNoCreated: "El monitor ya existe en el sistema",
   finalUserNoCreated: "El usuario final ya existe en el sistema",
   adminNoCreated: "El administrador ya existe en el sistema",
@@ -138,6 +141,9 @@ export default {
   errorPlaces: "La cantidad de plazas en la actividad no puede superar el aforo de la instalación",
   errorPlaces2: "Alguna de las actividades que se desarrollan en esta instalacion tienen un número de plazas mayor al aforo máximo",
   dateError: "La fecha de expiración no puede ser anterior o igual a la fecha de inicio",
+  dateError2: "La fecha de inicio debe ser a partir de hoy",
+  selectAtLeastOne: "Selecciona al menos un tipo de instalación o un deporte",
+  selectFacilityFirst: "Selecciona una instalación primero",
 
   /* Perfil */
   role: "Rol",
@@ -300,6 +306,7 @@ export default {
 
   /* Detalle instalacion */
   capacity: "Capacidad",
+  totalCapacity: "Capacidad total",
   light: "Luz",
   facilityValidity: "Necesita validación",
   tdaPercent: "Porcentaje de TDA",

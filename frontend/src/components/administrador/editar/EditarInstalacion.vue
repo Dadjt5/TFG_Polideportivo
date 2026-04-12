@@ -256,57 +256,53 @@
 
           <!-- TAB 3: FECHAS ESPECIALES -->
           <div class="tab-pane fade" id="especiales">
+
+            <!-- Botón añadir -->
             <div v-if="editando" class="mb-4">
-              <button class="btn btn-primary rounded-pill px-4 shadow-sm"
-                @click="fechasEspeciales.push({ fecha: '', horaApertura: '08:00', horaCierre: '22:00', abierto: true })">
+              <button class="btn btn-danger rounded-pill px-4 shadow-sm" @click="fechasEspeciales.push({ fecha: '' })">
                 <i class="bi bi-plus-circle me-2"></i> + {{ t.newSpecialDate }}
               </button>
             </div>
 
+            <!-- Lista -->
             <div v-if="fechasEspeciales?.length" class="row g-3">
               <div class="col-md-6 col-lg-4" v-for="(fecha, index) in fechasEspeciales" :key="index">
+
                 <div class="card border-1 border-light shadow-sm rounded-4 p-3" :class="{ 'bg-light': !editando }">
+
+                  <!-- Fecha -->
                   <div class="d-flex justify-content-between align-items-center mb-3">
+
                     <div v-if="editando" class="w-75">
                       <input type="date" class="form-control" v-model="fecha.fecha" />
                     </div>
-                    <div v-else class="fw-bold fs-5 text-dark">{{ fecha.fecha }}</div>
+
+                    <div v-else class="fw-bold fs-5 text-dark">
+                      {{ fecha.fecha }}
+                    </div>
+
                     <button v-if="editando" class="btn btn-sm btn-outline-danger"
-                      @click="fechasEspeciales.splice(index, 1)">✕</button>
+                      @click="fechasEspeciales.splice(index, 1)">
+                      ✕
+                    </button>
                   </div>
-                  <div class="mb-3">
-                    <div v-if="editando" class="form-check form-switch">
-                      <input class="form-check-input" type="checkbox" v-model="fecha.abierto" />
-                      <label class="form-check-label fw-medium ms-1">{{ t.open }}</label>
-                    </div>
-                    <span v-else class="badge" :class="fecha.abierto ? 'bg-success' : 'bg-danger'">{{ fecha.abierto ?
-                      'Abierto' : 'Cerrado' }}</span>
+
+                  <!-- Estado (siempre cerrado) -->
+                  <div class="text-center">
+                    <span class="badge bg-danger fs-6 px-3 py-2">
+                      {{ t.close }}
+                    </span>
                   </div>
-                  <div v-if="fecha.abierto">
-                    <div v-if="editando" class="row g-2">
-                      <div class="col-6">
-                        <label class="small text-muted fw-bold">{{ t.openHour }}</label>
-                        <input type="time" class="form-control form-control-sm" v-model="fecha.horaApertura" />
-                      </div>
-                      <div class="col-6">
-                        <label class="small text-muted fw-bold">{{ t.closeHour }}</label>
-                        <input type="time" class="form-control form-control-sm" v-model="fecha.horaCierre" />
-                      </div>
-                    </div>
-                    <div v-else
-                      class="d-flex align-items-center justify-content-center gap-2 py-2 bg-white rounded border">
-                      <span class="fw-semibold text-primary">{{ fecha.horaApertura?.slice(0, 5) }}</span>
-                      <span class="text-muted">-</span>
-                      <span class="fw-semibold text-primary">{{ fecha.horaCierre?.slice(0, 5) }}</span>
-                    </div>
-                  </div>
+
                 </div>
               </div>
             </div>
 
+            <!-- Vacío -->
             <div v-else class="text-center p-5 text-muted bg-light rounded-4 border">
               <p class="mb-0 fs-5">{{ t.noSpecialDates }}</p>
             </div>
+
           </div>
 
           <!-- TAB 4: IMÁGENES -->
@@ -658,9 +654,16 @@ async function guardarCambios() {
     return
   }
 
-  if (instalacion.value.aforoMaximo < instalacion.value.plazasMinimas){
+  if (instalacion.value.aforoMaximo < instalacion.value.plazasMinimas) {
     lanzarMensaje(t.value.errorPlaces2, "error")
     return
+  }
+
+  if (instalacion.value.tipoInstalacion == "Piscina") {
+    if (instalacion.value.plazasMinimas > instalacion.value.aforoMaximo/instalacion.value.numeroCalles) {
+      lanzarMensaje(t.value.errorPlaces2, "error")
+      return
+    }
   }
 
   if (!validarTipoInstalacion()) {
@@ -672,7 +675,8 @@ async function guardarCambios() {
 
   formData.append("instalacion", JSON.stringify(instalacion.value))
   formData.append("agenda", JSON.stringify(agenda.value))
-  formData.append("fechasEspeciales", JSON.stringify(fechasEspeciales.value))
+  formData.append("fechasEspeciales", JSON.stringify(fechasEspeciales.value.map(f => ({fecha: f.fecha})))
+)
 
   if (imagen.value) {
     formData.append("imagen", imagen.value)
@@ -694,8 +698,15 @@ async function guardarCambios() {
     }
 
     instalacionOriginal.value = JSON.parse(JSON.stringify(instalacion.value))
-  } catch (e) {
-    lanzarMensaje(t.value.noModify, "error")
+  } catch (e: any) {
+    if (e.response.data.tipo == "sesiones") {
+      lanzarMensaje(t.value.noModifyActivity, "error")
+    } else if (e.response.data.tipo == "otro") {
+      lanzarMensaje(t.value.noModify, "error")
+    } else if (e.response.data.tipo == "aforo") {
+      lanzarMensaje(t.value.errorPlaces, "error")
+    }
+    
     console.error("Error al modificar la instalacion", e)
   }
 }
@@ -767,7 +778,12 @@ onMounted(async () => {
     tarifas.value = await getTarifasInstalacion()
 
     agenda.value = data.agenda.filter((a: any) => a.dia && !a.fecha)
-    fechasEspeciales.value = data.agenda.filter((a: any) => a.fecha)
+    fechasEspeciales.value = data.agenda
+      .filter((a: any) => a.fecha)
+      .map((a: any) => ({
+      fecha: a.fecha
+    }))
+  
     calleSeleccionada.value = data.calles?.[0]?.id
 
     instalacion.value = {

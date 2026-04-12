@@ -92,7 +92,7 @@
 
         </div>
 
-        <div v-if="mostrarMensaje" class="text-center mb-3">
+        <div v-if="mostrarMensaje" class="text-center mb-3 mt-3">
           <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
             {{ mensajeEditar }}
           </div>
@@ -187,6 +187,7 @@ function toggleTipo(valor: string) {
   const index = descuento.value.tiposInstalacion.indexOf(valor)
 
   if (index > -1) {
+
     descuento.value.tiposInstalacion.splice(index, 1)
   } else {
     descuento.value.tiposInstalacion.push(valor)
@@ -206,7 +207,17 @@ function fechasValidas() {
   fin.setHours(0,0,0,0)
   hoy.setHours(0,0,0,0)
 
-  return fin > inicio && inicio >= hoy
+  if (inicio < hoy) {
+    lanzarMensaje(t.value.dateError2, "error")
+    return false
+  }
+
+  if (fin < inicio) {
+    lanzarMensaje(t.value.dateError, "error")
+    return false
+  }
+
+  return true
 }
 
 const crearDescuento = async () => {
@@ -216,7 +227,11 @@ const crearDescuento = async () => {
   }
 
   if (!fechasValidas()) {
-    lanzarMensaje(t.value.dateError, "error")
+    return
+  }
+
+  if (descuento.value.tiposInstalacion.length == 0 || descuento.value.deportes.length == 0) {
+    lanzarMensaje(t.value.selectAtLeastOne, "error")
     return
   }
 

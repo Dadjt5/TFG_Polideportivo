@@ -28,10 +28,15 @@
 
             <div class="row g-3">
 
-              <!-- Titulo -->
+              <!-- TITULO -->
               <div class="col-12 col-sm-6">
-                <span v-if="!editando">{{ tarifa.titulo }}</span>
-                <input v-else v-model="tarifa.titulo" class="form-control form-control-lg text-center fw-semibold"
+                <span class="fw-medium">{{ t.name }}:</span>
+
+                <p v-if="!editando" class="fs-5 fw-semibold">
+                  {{ tarifa.titulo }}
+                </p>
+
+                <input v-else v-model="tarifa.titulo" class="form-control form-control-lg"
                   :class="{ 'is-invalid': errores.titulo }" :placeholder="tarifa.titulo" />
               </div>
 
@@ -59,14 +64,6 @@
                   v-model.number="tarifa.precio" :class="{ 'is-invalid': errores.precio }" />
               </div>
 
-              <!-- PRECIO CUATRIMESTRE -->
-              <div class="col-12 col-sm-6">
-                <span class="fw-medium">{{ t.quarterPrice }}:</span>
-                <p v-if="!editando" class="fs-5 fw-semibold">{{ tarifa.precioCuatrimestre }} €</p>
-                <input v-else type="number" min="0" step="0.01" class="form-control form-control-lg"
-                  v-model.number="tarifa.precioCuatrimestre" :class="{ 'is-invalid': errores.precioCuatrimestre }" />
-              </div>
-
               <!-- PRECIO MENSUAL -->
               <div class="col-12 col-sm-6">
                 <span class="fw-medium">{{ t.monthlyPrice }}:</span>
@@ -74,13 +71,21 @@
                 <input v-else type="number" min="0" step="0.01" class="form-control form-control-lg"
                   v-model.number="tarifa.precioMensual" :class="{ 'is-invalid': errores.precioMensual }" />
               </div>
+
+              <!-- PRECIO CUATRIMESTRE -->
+              <div class="col-12 col-sm-6">
+                <span class="fw-medium">{{ t.quarterPrice }}:</span>
+                <p v-if="!editando" class="fs-5 fw-semibold">{{ tarifa.precioCuatrimestre }} €</p>
+                <input v-else type="number" min="0" step="0.01" class="form-control form-control-lg"
+                  v-model.number="tarifa.precioCuatrimestre" :class="{ 'is-invalid': errores.precioCuatrimestre }" />
+              </div>
             </div>
           </div>
         </div>
 
       </div>
 
-      <div v-if="mostrarMensaje" class="text-center mb-3">
+      <div v-if="mostrarMensaje" class="text-center mb-3 mt-3">
         <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
           {{ mensajeEditar }}
         </div>
