@@ -86,9 +86,11 @@ class Pago(models.Model):
         descripcionPorcentajes = {}
 
         if not isinstance(objeto, (CompraBono, CompraAbono, TDA)):
-            porcentaje = objeto.calcularDescuento()
-            if porcentaje > 0.0:
-                descripcionPorcentajes["Descuento especial"] = porcentaje
+            infoDescuento = objeto.calcularDescuento()
+
+            for nombre, porcent in infoDescuento.items():
+                descripcionPorcentajes[nombre] = porcent
+                porcentaje += porcent
 
         if isinstance(objeto, CompraAbono):
             coste = objeto.calcularPrecio(

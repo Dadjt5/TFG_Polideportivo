@@ -82,3 +82,11 @@ export const confirmarPago = async (id: number) => {
 export const cancelarIntentoPago = async (id: number) => {
   await api.post(`api/v1/pagos/${id}/cancelar/`)
 }
+
+export const cancelarIntentoPagoBeacon = (id: number) => {
+  const url = `${import.meta.env.VITE_API_URL}/api/v1/pagos/${id}/cancelar/`
+
+  const data = new Blob([], { type: "application/json" })
+
+  navigator.sendBeacon(url, data)
+}

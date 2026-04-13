@@ -95,11 +95,16 @@
           </label>
         </div>
 
-        <!-- TOTAL -->
-        <div class="pt-3 mt-3 border-top">
-          <div class="d-flex justify-content-between fs-5">
-            <span class="fw-bold">{{ t.price }}</span>
-            <span class="fw-bold text-primary">{{ total }} €</span>
+        <!-- Total -->
+        <div class="border-top pt-3 mt-3">
+          <div class="d-flex justify-content-between">
+            <span class="text-muted">{{ t.basePrice }}</span>
+            <span>{{ precioBase }} €</span>
+          </div>
+
+          <div class="d-flex justify-content-between mt-2">
+            <span class="fw-bold">{{ t.finalPrice }}</span>
+            <span class="fw-bold text-success">{{ total }} €</span>
           </div>
         </div>
 
@@ -355,7 +360,7 @@ const toggleHora = (intervalo: any) => {
   }
 }
 
-const total = computed(() => {
+const precioBase = computed(() => {
   let base = reserva.value.tarifa.datos.precioOtros
   otroCaso.value = true
 
@@ -376,8 +381,13 @@ const total = computed(() => {
     base = base + reserva.value.tarifa.datos.costeIluminacion
   }
 
-  const descuento = (base * reserva.value.descuento.porcentaje_total) / 100
-  return base - descuento
+  return base
+})
+
+
+const total = computed(() => {
+  const descuento = (precioBase.value * reserva.value.descuento.porcentaje_total) / 100
+  return precioBase.value - descuento
 })
 
 function lanzarMensaje(texto: string, tipo: 'success' | 'error') {

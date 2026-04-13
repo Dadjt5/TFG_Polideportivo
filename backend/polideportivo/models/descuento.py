@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
+from django.db.models import Q
 from multiselectfield import MultiSelectField
 
 from .constantes import TipoInstalacion
@@ -36,7 +37,8 @@ class Descuento(models.Model):
 
         if actividad:
             descuentos = cls.objects.filter(
-                deportes__in=[actividad.deportes],
+                Q(deportes__in=[actividad.deportes]) |
+                Q(tiposInstalacion__contains=actividad.instalacion.tipoInstalacion),
                 fechaInicio__lte=hoy,
                 fechaFinValidez__gte=hoy
             ).distinct()

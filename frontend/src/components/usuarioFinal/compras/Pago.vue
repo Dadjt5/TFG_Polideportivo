@@ -12,10 +12,14 @@
 
       <!-- Resumen pago -->
       <div class="mb-4">
-        <h5 class="fw-semibold">{{ t.reservationSummary }}</h5>
+        <h5 class="fw-semibold">{{ t.reservationSummary }} - {{ resumen.nombre }}</h5>
 
-        <!-- Nombre del recurso -->
-        <p class="mb-1">{{ resumen.nombre }}</p>
+        <p class="mb-1">
+          <strong>{{ t.basePrice }}: </strong>
+          <span>
+            {{ resumen.pago.coste.toFixed(2) }} €
+          </span>
+        </p>
 
         <!-- Descuento aplicado -->
         <p class="mb-1" v-if="resumen.pago.descuentoAplicado > 0">
@@ -55,7 +59,7 @@
         <!-- Precio final -->
         <p class="mb-1">
           <strong>{{ t.price }}: </strong>
-          <span class="text-success fw-bold">
+          <span class="text-success fw-bold fs-5">
             {{ resumen.pago.costeFinal.toFixed(2) }} €
           </span>
         </p>
@@ -113,7 +117,7 @@ import { computed, onMounted, type Ref, ref, inject, onBeforeUnmount } from "vue
 import { useRouter } from "vue-router"
 import { loadStripe } from "@stripe/stripe-js"
 
-import { cancelarIntentoPago, intentarPago, getResumenPago } from "@/services/reservaPagoService";
+import { cancelarIntentoPago, intentarPago, getResumenPago, cancelarIntentoPagoBeacon } from "@/services/reservaPagoService";
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
 import type { Language } from "@/useI18N";
@@ -153,6 +157,7 @@ let stripe: any
 let cardElement: any
 let clientSecret = ""
 
+
 const tiempoRestante = ref(900)
 
 const cancelarPago = async () => {
@@ -161,6 +166,10 @@ const cancelarPago = async () => {
   } catch (e) {
     console.warn("No se pudo cancelar el pago", e)
   }
+}
+
+const cancelarPagoBeacon = () => {
+  cancelarIntentoPagoBeacon(parseInt(props.id))
 }
 
 const countdown = setInterval(() => {
@@ -215,11 +224,18 @@ const pagar = async () => {
   }
 }
 
+const handleBeforeUnload = () => {
+  cancelarPagoBeacon()
+}
+
 onBeforeUnmount(() => {
+  window.removeEventListener("beforeunload", handleBeforeUnload)
   cancelarPago()
 })
 
 onMounted(async () => {
+  window.addEventListener("beforeunload", handleBeforeUnload)
+
   try {
     const resumenResponse = await getResumenPago(parseInt(props.id), props.tipo)
     resumen.value = resumenResponse

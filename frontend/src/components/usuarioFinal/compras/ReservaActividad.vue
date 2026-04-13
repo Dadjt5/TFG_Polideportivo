@@ -11,13 +11,14 @@
       </div>
 
       <!-- Card principal -->
-      <div class="rounded-3 shadow-sm p-4 card-hover" style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(8px);">
+      <div class="rounded-3 shadow-sm p-4 card-hover"
+        style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(8px);">
         <h5 class="fw-bold mb-3">{{ reserva.tarifa.nombre }}</h5>
 
         <!-- Horarios -->
         <ul class="list-group list-group-flush mb-4">
           <li v-if="reserva.tarifa.horario.length" v-for="(h, index) in reserva.tarifa.horario" :key="index"
-              class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2">
+            class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2">
             <span class="fw-semibold">
               <i class="bi bi-calendar-event me-2 text-muted"></i>{{ h.dia }}
             </span>
@@ -36,11 +37,13 @@
           <tbody>
             <tr :class="{ 'table-primary': usuarioFinalStore.isUAM }">
               <td>UAM</td>
-              <td class="text-end">{{ reserva.tarifa.datos.precioUAM }} € / {{ reserva.tarifa.datos.numeroHorasSemana }} {{ t.weekHours }}</td>
+              <td class="text-end">{{ reserva.tarifa.datos.precioUAM }} € / {{ reserva.tarifa.datos.numeroHorasSemana }}
+                {{ t.weekHours }}</td>
             </tr>
             <tr :class="{ 'table-primary': !usuarioFinalStore.isUAM }">
               <td>{{ t.others }}</td>
-              <td class="text-end">{{ reserva.tarifa.datos.precioOtros }} € / {{ reserva.tarifa.datos.numeroHorasSemana }} {{ t.weekHours }}</td>
+              <td class="text-end">{{ reserva.tarifa.datos.precioOtros }} € / {{ reserva.tarifa.datos.numeroHorasSemana
+                }} {{ t.weekHours }}</td>
             </tr>
           </tbody>
         </table>
@@ -52,8 +55,7 @@
               <td><i class="bi bi-people me-2"></i>{{ t.people }}</td>
               <td class="text-end" style="max-width: 120px">
                 <input type="number" class="form-control form-control-sm text-end"
-                       v-model.number="reserva.seleccion.personas"
-                       :min="1" :max="reserva.tarifa.datos.numeroPersonas" />
+                  v-model.number="reserva.seleccion.personas" :min="1" :max="reserva.tarifa.datos.numeroPersonas" />
               </td>
             </tr>
             <tr>
@@ -66,12 +68,31 @@
                 </select>
               </td>
             </tr>
-            <tr><td colspan="2"><hr class="my-2"></td></tr>
-            <tr><td>{{ t.hours }}</td><td class="text-end">{{ reserva.tarifa.datos.numeroHoras }}</td></tr>
-            <tr><td>{{ t.people }}</td><td class="text-end">{{ reserva.tarifa.datos.numeroPersonas }}</td></tr>
-            <tr><td>{{ t.monthly }}</td><td class="text-end">{{ reserva.tarifa.datos.precioMensual }} €</td></tr>
-            <tr><td>{{ t.quarterly }}</td><td class="text-end">{{ reserva.tarifa.datos.precioCuatrimestre }} €</td></tr>
-            <tr class="table-light fw-bold"><td>{{ t.fullPayment }}</td><td class="text-end">{{ reserva.tarifa.datos.precio }} €</td></tr>
+            <tr>
+              <td colspan="2">
+                <hr class="my-2">
+              </td>
+            </tr>
+            <tr>
+              <td>{{ t.hours }}</td>
+              <td class="text-end">{{ reserva.tarifa.datos.numeroHoras }}</td>
+            </tr>
+            <tr>
+              <td>{{ t.people }}</td>
+              <td class="text-end">{{ reserva.tarifa.datos.numeroPersonas }}</td>
+            </tr>
+            <tr>
+              <td>{{ t.monthly }}</td>
+              <td class="text-end">{{ reserva.tarifa.datos.precioMensual }} €</td>
+            </tr>
+            <tr>
+              <td>{{ t.quarterly }}</td>
+              <td class="text-end">{{ reserva.tarifa.datos.precioCuatrimestre }} €</td>
+            </tr>
+            <tr class="table-light fw-bold">
+              <td>{{ t.fullPayment }}</td>
+              <td class="text-end">{{ reserva.tarifa.datos.precio }} €</td>
+            </tr>
           </tbody>
         </table>
 
@@ -89,13 +110,16 @@
               </td>
             </tr>
             <tr :class="{ 'table-primary': usuarioFinalStore.hasTda }">
-              <td>TDA</td><td class="text-end">{{ precioFisioTDA }} €</td>
+              <td>TDA</td>
+              <td class="text-end">{{ precioFisioTDA }} €</td>
             </tr>
             <tr :class="{ 'table-primary': usuarioFinalStore.isUAM }">
-              <td>UAM</td><td class="text-end">{{ precioFisioUAM }} €</td>
+              <td>UAM</td>
+              <td class="text-end">{{ precioFisioUAM }} €</td>
             </tr>
             <tr :class="{ 'table-primary': !usuarioFinalStore.isUAM && !usuarioFinalStore.hasTda }">
-              <td>{{ t.others }}</td><td class="text-end">{{ precioFisioOtros }} €</td>
+              <td>{{ t.others }}</td>
+              <td class="text-end">{{ precioFisioOtros }} €</td>
             </tr>
           </tbody>
         </table>
@@ -112,9 +136,14 @@
 
         <!-- Total -->
         <div class="border-top pt-3 mt-3">
-          <div class="d-flex justify-content-between fs-5 fw-bold">
-            <span>{{ t.price }}</span>
-            <span>{{ total }} €</span>
+          <div class="d-flex justify-content-between">
+            <span class="text-muted">{{ t.basePrice }}</span>
+            <span>{{ precioBase }} €</span>
+          </div>
+
+          <div class="d-flex justify-content-between mt-2">
+            <span class="fw-bold">{{ t.finalPrice }}</span>
+            <span class="fw-bold text-success">{{ total }} €</span>
           </div>
         </div>
 
@@ -147,7 +176,7 @@ import { useUserStore } from '@/stores/usuarioFinal'
 import type { Language } from "@/useI18N";
 import { useI18n } from "@/useI18N";
 
-const props = defineProps<{id: string}>();
+const props = defineProps<{ id: string }>();
 
 const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);
@@ -240,7 +269,7 @@ function obtenerPrecioFisioterapia(precios: any, sel: any) {
     if (usuarioFinalStore.hasTda) {
       precio = precios.precioConsultaTDA;
     } else if (usuarioFinalStore.isUAM) {
-        precio = precios.precioConsultaUAM;
+      precio = precios.precioConsultaUAM;
     }
   } else if (sel.tipoSesion == "sesiones1_5") {
     precioFisioUAM.value = precios.precioSesiones1_5UAM;
@@ -251,7 +280,7 @@ function obtenerPrecioFisioterapia(precios: any, sel: any) {
     if (usuarioFinalStore.hasTda) {
       precio = precios.precioSesiones1_5TDA;
     } else if (usuarioFinalStore.isUAM) {
-        precio = precios.precioSesiones1_5UAM;
+      precio = precios.precioSesiones1_5UAM;
     }
   } else if (sel.tipoSesion == "sesiones6") {
     precioFisioUAM.value = precios.precioSesiones6UAM;
@@ -262,7 +291,7 @@ function obtenerPrecioFisioterapia(precios: any, sel: any) {
     if (usuarioFinalStore.hasTda) {
       precio = precios.precioSesiones6TDA;
     } else if (usuarioFinalStore.isUAM) {
-        precio = precios.precioSesiones6UAM;
+      precio = precios.precioSesiones6UAM;
     }
   }
 
@@ -311,7 +340,7 @@ const continuarPago = async () => {
       name: 'pasarela-pago',
       params: { tipo: "reserva_actividad", id: idPago }
     })
-  } catch(e) {
+  } catch (e) {
     lanzarMensaje(t.value.noActivityReservation, "error")
     console.error("Error al reservar la actividad", e)
   }

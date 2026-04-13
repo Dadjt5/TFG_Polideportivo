@@ -31,6 +31,11 @@
             </button>
           </li>
           <li class="nav-item">
+            <button class="nav-link fw-bold" data-bs-toggle="pill" data-bs-target="#horarioEspecial">
+              {{ t.specialDates }}
+            </button>
+          </li>
+          <li class="nav-item">
             <button class="nav-link fw-bold" data-bs-toggle="pill" data-bs-target="#imagenes">
               {{ t.images }}
             </button>
@@ -65,7 +70,7 @@
               <div class="col-12 col-sm-6" v-if="instalacion.pabellon">
                 <p>
                   <i class="bi bi-building text-primary me-1"></i>
-                  <span class="fw-medium">{{ t.pavilion }}:</span>
+                  <span class="fw-medium">{{ t.pavilion }}: </span>
                   <span class="text-primary fw-medium" style="cursor: pointer;"
                     @click="pavilionDetail(instalacion.pabellon.id)">
                     {{ instalacion.pabellon.nombre }}
@@ -90,6 +95,137 @@
             </div>
           </div>
 
+          <!-- TAB 2: HORARIO -->
+          <div class="tab-pane fade" id="horario">
+            <div class="row g-3">
+
+              <!-- VISTA NORMAL -->
+              <div v-if="agenda.length" class="card border-0 shadow-sm rounded-4 p-4 bg-light">
+                <h5 class="fw-bold mb-3">
+                  {{ t.timetable }}
+                </h5>
+
+                <div class="card border-0 shadow-sm rounded-4 p-3 bg-light mb-3">
+                  <div class="row g-3 align-items-end">
+
+                    <!-- Tipo de reserva -->
+                    <div class="col-md-4">
+                      <label class="form-label fw-semibold">{{ t.reserveType }}</label>
+                      <select class="form-select form-select-lg" v-model="tipoVista">
+                        <option value="actividades">{{ t.activities }}</option>
+                        <option value="alquileres">{{ t.rents }}</option>
+                      </select>
+                    </div>
+
+                    <!-- Periodo (solo reservas de actividades) -->
+                    <div class="col-md-4" v-if="tipoVista === 'actividades'">
+                      <label class="form-label fw-semibold">{{ t.period }}</label>
+                      <select class="form-select form-select-lg" v-model="periodo">
+                        <option v-for="p in tiposStore.periodos" :key="p" :value="p">{{ p }}</option>
+                      </select>
+                    </div>
+
+                    <!-- Calle (solo piscina) -->
+                    <div class="col-md-4" v-if="instalacion.tipoInstalacion === 'Piscina'">
+                      <label class="form-label fw-semibold">{{ t.poolStreet }}</label>
+                      <select class="form-select form-select-lg" v-model="calleSeleccionada">
+                        <option v-for="c in instalacion.calles" :key="c.id" :value="c.id">
+                          {{ t.street }} {{ c.numero || c.id }}
+                        </option>
+                      </select>
+                    </div>
+
+                  </div>
+                </div>
+
+                <!-- LEYENDA -->
+                <div class="mt-4 mb-2">
+                  <span class="badge bg-success me-2">{{ t.free }}</span>
+
+                  <template v-if="tipoVista === 'actividades'">
+                    <span class="badge bg-primary">{{ t.activity }}</span>
+                  </template>
+
+                  <template v-else>
+                    <span class="badge bg-danger me-2">{{ t.rented }}</span>
+                    <span class="badge bg-warning text-dark me-2">{{ t.rentedNoPay }}</span>
+                  </template>
+                </div>
+
+                <div class="row" :key="`${tipoVista}-${periodo}-${calleSeleccionada}`">
+                  <div v-for="dia in agenda" :key="dia.id" class="col-12 mb-3">
+                    <div class="p-3 rounded-3 bg-white border shadow-sm">
+
+                      <!-- CABECERA CLICKABLE -->
+                      <div class="d-flex justify-content-between align-items-center cursor-pointer"
+                        @click="toggleDia(dia.id)">
+                        <span class="fw-semibold">{{ dia.dia }}</span>
+                        <span v-if="!dia.abierto" class="text-danger fw-semibold">{{ t.close }}</span>
+                        <span v-else>
+                          <i v-if="isOpen(dia.id)" class="bi bi-chevron-up"></i>
+                          <i v-else class="bi bi-chevron-down"></i>
+                        </span>
+                      </div>
+
+                      <!-- DESPLEGABLE -->
+                      <transition name="fade">
+                        <div v-if="dia.abierto && isOpen(dia.id)" class="mt-2">
+                          <div class="d-flex flex-wrap gap-2">
+                            <div v-for="intervalo in filtrarIntervalos(dia.mapa_reservas)" :key="intervalo.id"
+                              class="small text-white text-center px-3 py-2 rounded"
+                              :class="getClaseIntervalo(intervalo)">
+                              {{ intervalo.horaInicio.slice(0, 5) }} - {{ intervalo.horaFin.slice(0, 5) }}
+                            </div>
+                          </div>
+                        </div>
+                      </transition>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <button class="btn btn-outline-primary mt-4" @click="descargarPDF">
+                <i class="bi bi-file-earmark-pdf"></i> {{ t.downloadTimetable }}
+              </button>
+
+            </div>
+          </div>
+
+          <!-- TAB 3: FECHAS ESPECIALES -->
+          <div class="tab-pane fade" id="horarioEspecial">
+
+            <!-- Lista -->
+            <div v-if="fechasEspeciales?.length" class="row g-3">
+              <div class="col-md-6 col-lg-4" v-for="(fecha, index) in fechasEspeciales" :key="index">
+
+                <div class="card border-1 border-light shadow-sm rounded-4 p-3">
+
+                  <!-- Fecha -->
+                  <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="fw-bold fs-5 text-dark">
+                      {{ fecha.fecha }}
+                    </div>
+                  </div>
+
+                  <!-- Estado (siempre cerrado) -->
+                  <div class="text-center">
+                    <span class="badge bg-danger fs-6 px-3 py-2">
+                      {{ t.close }}
+                    </span>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <!-- Vacío -->
+            <div v-else class="text-center p-5 text-muted bg-light rounded-4 border">
+              <p class="mb-0 fs-5">{{ t.noSpecialDates }}</p>
+            </div>
+
+          </div>
+
           <!-- TAB HORARIO -->
           <div class="tab-pane fade" id="horario">
             <div class="row g-3">
@@ -104,8 +240,7 @@
                     </div>
 
                     <div v-if="dia.abierto">
-                      <div
-                        class="d-flex align-items-center justify-content-center gap-2 py-2 bg-white rounded border">
+                      <div class="d-flex align-items-center justify-content-center gap-2 py-2 bg-white rounded border">
                         <span class="fw-semibold text-primary">{{ dia.horaApertura?.slice(0, 5) }}</span>
                         <span class="text-muted">-</span>
                         <span class="fw-semibold text-primary">{{ dia.horaCierre?.slice(0, 5) }}</span>
@@ -124,9 +259,14 @@
 
           <!-- TAB IMÁGENES -->
           <div class="tab-pane fade" id="imagenes">
-            <div class="d-flex justify-content-center">
+            <div v-if="instalacion.imagen" class="d-flex justify-content-center">
               <img :src="instalacion.imagen" class="img-fluid rounded shadow"
                 style="max-height: 400px; object-fit: cover;" />
+            </div>
+
+            <div v-else class="text-center text-muted mt-5">
+              <i class="bi bi-image fs-1"></i>
+              <p class="mt-3">{{ t.noImage }}</p>
             </div>
           </div>
 
@@ -152,17 +292,19 @@
 </template>
 
 <script setup lang="ts">
-import { inject, ref, onMounted, type Ref } from 'vue';
+import { inject, ref, onMounted, type Ref, watch } from 'vue';
 import { useRouter } from "vue-router";
 
 /* Importamos la comunicacion para recuperar la informacion de instalaciones del backend */
 import { getInstalacionDetalle } from "@/services/detalleService";
 import { useUserStore } from '@/stores/usuarioFinal';
+import { useTiposStore } from '@/stores/tipos';
+import { descargarHorario } from '@/services/crearRecursosService';
+
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
 import type { Language } from "@/useI18N";
 import { useI18n } from "@/useI18N";
-import { descargarHorario } from '@/services/crearRecursosService';
 
 const props = defineProps<{ id: string }>();
 
@@ -170,22 +312,33 @@ const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);
 
 const router = useRouter();
+
+const tiposStore = useTiposStore();
 const usuarioFinalStore = useUserStore();
+
 const agenda = ref<any[]>([])
 const fechasEspeciales = ref<any[]>([])
+const tipoVista = ref<'actividades' | 'alquileres'>('actividades')
+const periodo = ref("Todo el año")
+const calleSeleccionada = ref()
 
 const instalacion = ref({
   id: 0,
   nombre: "",
   imagen: "",
   aforoMaximo: 50,
+  estado: "",
+  pagada: false,
   luz: false,
   porcentajeTDA: 0,
-  horaApertura: "",
-  horaCierre: "",
-  pabellon: { id: -1, nombre: "", direccion: "" },
+  plazasMinimas: 0,
+  pabellon: null,
+  tarifa: null,
+  calles: null,
   tipoInstalacion: "",
+  numeroCalles: 0,
   agenda: [] as any[],
+  reservas_usuarios: [] as any[],
 });
 
 const cambiarFavorito = () => {
@@ -210,6 +363,99 @@ async function descargarPDF() {
   }
 }
 
+const openDias = ref([])
+
+const toggleDia = (id: any) => {
+  if (openDias.value.includes(id)) {
+    openDias.value = openDias.value.filter(i => i !== id)
+  } else {
+    openDias.value.push(id)
+  }
+}
+
+const isOpen = (id: any) => openDias.value.includes(id)
+
+function filtrarIntervalos(intervalos: any) {
+  if (instalacion.value.tipoInstalacion !== 'Piscina') {
+    return intervalos
+  }
+
+  return intervalos.filter(i => i.calle === calleSeleccionada.value)
+}
+
+function esOcupadoPorPeriodo(intervalo: any) {
+  const periodos = intervalo.periodo || []
+
+  if (periodo.value === "Todo el año") {
+    return periodos.length > 0
+  }
+
+  return (
+    periodos.includes(periodo.value) ||
+    periodos.includes("Todo el año")
+  )
+}
+
+function getClaseIntervalo(intervalo: any) {
+  if (tipoVista.value === 'actividades') {
+    return {
+      'bg-success': intervalo.estado === 'Libre' || !esOcupadoPorPeriodo(intervalo) || (intervalo.estado === 'Reserva usuario' && !intervalo.pagada),
+      'bg-primary': intervalo.estado === 'Reserva actividad' && esOcupadoPorPeriodo(intervalo),
+      'bg-danger': intervalo.estado === 'Reserva usuario' && intervalo.pagada
+    }
+  }
+
+  // Alquileres
+  return {
+    'bg-success': intervalo.estado === 'Libre' || intervalo.estado === 'Reserva actividad',
+    'bg-danger': intervalo.estado === 'Reserva usuario' && intervalo.pagada,
+    'bg-warning text-dark': intervalo.estado === 'Reserva usuario' && !intervalo.pagada,
+  }
+}
+
+function estaDentro(intervalo: any, reserva: any) {
+  const inicioIntervalo = intervalo.horaInicio.slice(0, 5);
+  const finIntervalo = intervalo.horaFin.slice(0, 5);
+
+  const inicioReserva = reserva.horaInicio.slice(0, 5);
+  const finReserva = reserva.horaFin.slice(0, 5);
+
+  return (
+    inicioIntervalo >= inicioReserva &&
+    finIntervalo <= finReserva
+  );
+}
+
+const diasSemana = [
+  "Lunes",
+  "Martes",
+  "Miercoles",
+  "Jueves",
+  "Viernes",
+  "Sabado",
+  "Domingo"
+];
+
+function mezclarReservas() {
+  instalacion.value.agenda.forEach((dia: any) => {
+    if (!dia.abierto) return;
+
+    dia.mapa_reservas.forEach((intervalo: any) => {
+      const reserva = instalacion.value.reservas_usuarios.find((r: any) => {
+        return (
+          r.diaSemana === diasSemana.indexOf(dia.dia) &&
+          estaDentro(intervalo, r)
+        );
+      });
+
+      if (reserva) {
+        intervalo.estado = 'Reserva usuario';
+        intervalo.pagada = reserva.pagada;
+      }
+    });
+  });
+}
+
 const pavilionDetail = (id: number) => {
   router.push({
     name: 'detalle-pabellon',
@@ -228,19 +474,32 @@ const volver = () => {
   router.back();
 };
 
+watch(() => periodo, () => {
+  openDias.value = []
+})
+
 onMounted(async () => {
   const id = parseInt(props.id);
 
   try {
     const data = await getInstalacionDetalle(id)
+    tiposStore.obtenerTipos()
 
     agenda.value = data.agenda.filter((a: any) => a.dia && !a.fecha)
-    fechasEspeciales.value = data.agenda.filter((a: any) => a.fecha)
+    fechasEspeciales.value = data.agenda
+      .filter((a: any) => a.fecha)
+      .map((a: any) => ({
+        fecha: a.fecha
+      }))
+
+    calleSeleccionada.value = data.calles?.[0]?.id
 
     instalacion.value = {
       ...data,
       agenda: agenda.value
     }
+
+    mezclarReservas()
   } catch (e) {
     console.log("Error al obtener la informacion de instalaciones", e);
   }

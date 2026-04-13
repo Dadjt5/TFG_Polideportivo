@@ -54,6 +54,8 @@ export default {
   confirmLeaveListDelete: "Confirmar salida de la lista de espera",
   listNotifMessage: "Al pulsar en 'Confirmar', se redirigirá a la compra. Este mensaje será eliminado automáticamente. Sino termina la compra, perderá la opción.",
   street: "Calle",
+  noImage: "No hay imágenes",
+  finalPrice: "Precio final",
 
   /* Eliminaciones */
   confirmDelete: "Confirmar eliminación",
@@ -144,6 +146,9 @@ export default {
   dateError2: "La fecha de inicio debe ser a partir de hoy",
   selectAtLeastOne: "Selecciona al menos un tipo de instalación o un deporte",
   selectFacilityFirst: "Selecciona una instalación primero",
+  wrongBookingType: "Esta actividad no se puede reservar por internet",
+  wrongPeriodToBook: "La actividad no se esta realizando en este momento",
+  wrongAge: "No tiene edad suficiente para reservar esta actividad",
 
   /* Perfil */
   role: "Rol",
@@ -458,7 +463,7 @@ export default {
 
   /* Pasarela de pago */
   processing: "Procesando",
-  reservationSummary: "Resumen de la reserva",
+  reservationSummary: "Resumen del pago",
   paymentTitle: "Finalizar el pago",
   reservationConfirmed: "Reserva confirmada",
   thankYouMessage: "Muchas gracias por su compra",

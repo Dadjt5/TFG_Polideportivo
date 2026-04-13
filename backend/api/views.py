@@ -7,6 +7,7 @@ from rest_framework.permissions import (
     IsAuthenticated,
     AllowAny
 )
+from django.db.models import Case, When, IntegerField
 from rest_framework import status
 import stripe
 from rest_framework.exceptions import PermissionDenied
@@ -660,7 +661,7 @@ class EstadisticasView(APIView):
 
 # Informacion con los tipos de cada grupo necesario: reservas, actividades, terrenos, etc
 class TiposViews(APIView):
-    permission_classes = [IsAdministrador]
+    permission_classes = [AllowAny]
 
     def get(self, request):
         data = {
@@ -2185,6 +2186,7 @@ class ResumenPagoView(APIView):
             return Response({
                 "id": compra.id,
                 "estado": compra.estado,
+
                 "nombre": f'Bono para {compra.bono.instalacion.nombre}',
                 "tipo": "unico",
                 "pago": {
@@ -2732,7 +2734,19 @@ class DescargarHorarioView(APIView):
         elements.append(Paragraph("Horarios de la instalación", styles['Title']))
         elements.append(Spacer(1, 12))
 
-        agendas = Agenda.objects.filter(instalacion_id=instalacion_id).order_by('dia', 'fecha')
+        agendas = Agenda.objects.filter(instalacion_id=instalacion_id).annotate(
+            orden_dia=Case(
+                When(dia='Lunes', then=1),
+                When(dia='Martes', then=2),
+                When(dia='Miercoles', then=3),
+                When(dia='Jueves', then=4),
+                When(dia='Viernes', then=5),
+                When(dia='Sabado', then=6),
+                When(dia='Domingo', then=7),
+                default=8,
+                output_field=IntegerField()
+            )
+            ).order_by('orden_dia', 'fecha')
 
         data = [["Día / Fecha", "Estado", "Apertura", "Cierre"]]
 

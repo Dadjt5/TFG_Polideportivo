@@ -70,6 +70,21 @@ export const useUserStore = defineStore("user", {
     hasAbono: (s) => {
       return s.usuarioFinal.tieneAbono;
     },
+    edad: (state) => {
+      const hoy = new Date()
+      const nacimiento = new Date(state.usuarioFinal.fechaNacimiento)
+
+      let edad = hoy.getFullYear() - nacimiento.getFullYear()
+
+      const mes = hoy.getMonth() - nacimiento.getMonth()
+
+      // Restamos si aun no ha cumplido años este año
+      if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
+        edad--
+      }
+
+      return edad
+    },
     unreadCount: (state) =>
       state.notificaciones.filter(n => !n.leido).length,
     sortedNotifications: (state) => [

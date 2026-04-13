@@ -202,12 +202,12 @@
             </select>
           </div>
 
-          <div class="col-md-4 mb-3 fw-bold" v-if="instalacionSeleccionada">
-            {{ t.totalCapacity }}: {{ instalacionSeleccionada?.aforoMaximo }}
+          <div class="col-md-4 mb-3 fw-bold" v-if="instalacionDetalle">
+            {{ t.totalCapacity }}: {{ instalacionDetalle?.aforoMaximo }}
           </div>
 
           <!-- HORARIO -->
-          <div v-if="instalacionSeleccionada?.agenda?.length" class="card border-0 shadow-sm rounded-4 p-4 bg-light">
+          <div v-if="instalacionDetalle?.agenda?.length" class="card border-0 shadow-sm rounded-4 p-4 bg-light">
             <h5 class="fw-bold mb-3">
               {{ t.weekHours }}
             </h5>
@@ -220,7 +220,7 @@
             </div>
 
             <div class="row">
-              <div v-for="dia in instalacionSeleccionada.agenda" :key="dia.id" class="col-12 mb-3">
+              <div v-for="dia in instalacionDetalle.agenda" :key="dia.id" class="col-12 mb-3">
                 <div class="p-3 rounded-3 bg-white border shadow-sm">
 
                   <!-- CABECERA CLICKABLE -->
@@ -431,7 +431,7 @@
 
               <span>
                 {{ s.dia }} | {{ s.horaInicio }} - {{ s.horaFin }} <span
-                  v-if="instalacionSeleccionada.tipoInstalacion === 'Piscina'">{{ t.street }} {{ s.calle }}</span>
+                  v-if="instalacionDetalle.tipoInstalacion === 'Piscina'">{{ t.street }} {{ s.calle }}</span>
               </span>
 
               <button type="button" class="btn btn-sm btn-danger" @click="sesiones.splice(index, 1)">
@@ -503,6 +503,7 @@ import { useTiposStore } from "@/stores/tipos"
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
 import type { Language } from "@/useI18N"
 import { useI18n } from "@/useI18N"
+import { getInstalacionDetalle } from "@/services/detalleService"
 
 const language = inject<Ref<Language>>("language")!
 const t = useI18n(language)
@@ -599,7 +600,7 @@ function esPropio(intervalo: any, dia: any) {
 }
 
 function filtrarIntervalos(intervalos: any) {
-  if (instalacionSeleccionada.value.tipoInstalacion !== 'Piscina') {
+  if (instalacionDetalle.value.tipoInstalacion !== 'Piscina') {
     return intervalos
   }
 
@@ -614,10 +615,6 @@ const tarifaSeleccionada = computed(() =>
   tarifas.value.find(t => t.id === actividad.value.tarifa)
 )
 
-const instalacionSeleccionada = computed(() =>
-  instalaciones.value.find(i => i.id === actividad.value.instalacion)
-)
-
 function onFileChange(e: Event) {
   const input = e.target as HTMLInputElement
   if (!input.files || input.files.length === 0) return
@@ -627,7 +624,7 @@ function onFileChange(e: Event) {
 }
 
 function agregarSesion() {
-  if (!instalacionSeleccionada) {
+  if (!instalacionDetalle.value.tipoInstalacion) {
     lanzarMensaje(t.value.selectFacilityFirst, "error")
     return
   }
@@ -635,7 +632,7 @@ function agregarSesion() {
   if (!crearSesion.value.dia ||
     !crearSesion.value.horaInicio ||
     !crearSesion.value.horaFin ||
-    (instalacionSeleccionada.value.tipoInstalacion === 'Piscina' && !crearSesion.value.calle)) {
+    (instalacionDetalle.value.tipoInstalacion === 'Piscina' && !crearSesion.value.calle)) {
     lanzarMensaje(t.value.missing, "error")
     return
   }
@@ -772,13 +769,13 @@ const crearActividad = async () => {
     return
   }
 
-  if (actividad.value.plazasMaximas > instalacionSeleccionada.value.aforoMaximo) {
+  if (actividad.value.plazasMaximas > instalacionDetalle.value.aforoMaximo) {
     lanzarMensaje(t.value.errorPlaces, "error")
     return
   }
 
-  if (instalacionSeleccionada.value.tipoInstalacion == "Piscina") {
-    if (actividad.value.plazasMaximas > instalacionSeleccionada.value.aforoMaximo/instalacionSeleccionada.value.numeroCalles) {
+  if (instalacionDetalle.value.tipoInstalacion == "Piscina") {
+    if (actividad.value.plazasMaximas > instalacionDetalle.value.aforoMaximo/instalacionDetalle.value.numeroCalles) {
       lanzarMensaje(t.value.errorPlaces, "error")
       return
     }
@@ -830,6 +827,7 @@ const crearActividad = async () => {
 }
 
 const volver = () => router.back()
+const instalacionDetalle = ref()
 
 watch(
   () => actividad.value.tipoActividad,
@@ -850,7 +848,7 @@ watch(
   }
 )
 
-watch(instalacionSeleccionada, (nuevaInstalacion) => {
+watch(instalacionDetalle, (nuevaInstalacion) => {
   if (!nuevaInstalacion || !nuevaInstalacion.calles?.length) {
     callesDisponibles.value = []
     calleSeleccionada.value = null
@@ -860,6 +858,24 @@ watch(instalacionSeleccionada, (nuevaInstalacion) => {
   callesDisponibles.value = nuevaInstalacion.calles
   calleSeleccionada.value = null
 })
+
+watch(
+  () => actividad.value.instalacion,
+  async (id) => {
+    if (!id) {
+      instalacionDetalle.value = null
+      return
+    }
+
+    try {
+      instalacionDetalle.value = await getInstalacionDetalle(id)
+    } catch (e) {
+      console.error(e)
+      instalacionDetalle.value = null
+    }
+  },
+  { immediate: true }
+)
 
 onMounted(async () => {
   confirmModal = new Modal(document.getElementById('confirmCreateModal')!)

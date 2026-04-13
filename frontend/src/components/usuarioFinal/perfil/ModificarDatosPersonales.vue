@@ -253,6 +253,7 @@ const toggleConfirmPassword = () => {
   showConfirmPassword.value = !showConfirmPassword.value
 }
 
+
 function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
   mensaje.value = texto
   tipoMensaje.value = tipo
@@ -391,14 +392,19 @@ const guardarCambios = async () => {
 /* La variable usuario nos permite cambiar el usuario final unicamente en esta pantalla */
 onMounted(async () => {
   const data = usuarioFinalStore.usuarioFinal
-  configuracionStore.obtenerConfiguracion()
+
+  await configuracionStore.obtenerConfiguracion()
+
   if (data) {
     usuario.value = {
       ...usuario.value,
       ...data,
       deportesFavoritos: data.deportesFavoritos.map((d: any) => d.id)
     }
-    deportesRestantes.value -= favoritosSeleccionados.value.length
+
+    deportesRestantes.value =
+      configuracionStore.max_deportes_por_usuario -
+      favoritosSeleccionados.value.length
   }
 })
 </script>

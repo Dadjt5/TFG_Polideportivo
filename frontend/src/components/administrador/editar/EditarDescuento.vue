@@ -382,11 +382,6 @@ function fechasValidas() {
   fin.setHours(0, 0, 0, 0)
   hoy.setHours(0, 0, 0, 0)
 
-  if (inicio < hoy) {
-    lanzarMensaje(t.value.dateError2, "error")
-    return false
-  }
-
   if (fin < inicio) {
     lanzarMensaje(t.value.dateError, "error")
     return false

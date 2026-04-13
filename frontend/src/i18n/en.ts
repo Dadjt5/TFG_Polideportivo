@@ -54,6 +54,8 @@ export default {
   confirmLeaveListDelete: "Confirm removal from the waiting list",
   listNotifMessage: "When you click 'Confirm', you will be redirected to the checkout. This message will disappear automatically. If you do not complete your purchase, you will lose your place in the queue.",
   street: "Street",
+  noImage: "There is no image",
+  finalPrice: "Final price",
 
   /* Eliminaciones */
   confirmDelete: "Confirm deletion",
@@ -141,6 +143,9 @@ export default {
   dateError2: "The start date must be on or after today",
   selectAtLeastOne: "Select at least one type of facility or sport",
   selectFacilityFirst: "Select a facility first",
+  wrongBookingType: "This activity cannot be booked online",
+  wrongPeriodToBook: "The activity is not currently taking place",
+  wrongAge: "You are not old enough to book this activity",
 
   /* Perfil */
   role: "Role",
@@ -455,7 +460,7 @@ export default {
 
   /* Pasarela de pago */
   processing: "Processing",
-  reservationSummary: "Reservation summary",
+  reservationSummary: "Payment summary",
   paymentTitle: "Complete payment",
   reservationConfirmed: "Reservation confirmed",
   thankYouMessage: "Thank you very much for your purchase",

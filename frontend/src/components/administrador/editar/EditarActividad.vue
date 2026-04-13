@@ -173,20 +173,20 @@
             </select>
           </div>
 
-          <div class="col-md-4 mb-3" v-if="instalacionSeleccionada.tipoInstalacion === 'Piscina'">
+          <div class="col-md-4 mb-3" v-if="instalacionDetalle.tipoInstalacion === 'Piscina'">
             <label class="form-label fw-semibold">{{ t.poolStreets }}</label>
             <select class="form-select form-select-lg" v-model="calleSeleccionada">
-              <option v-for="c in instalacionSeleccionada.calles" :key="c.id" :value="c.id">
+              <option v-for="c in instalacionDetalle.calles" :key="c.id" :value="c.id">
                 {{ t.street }} {{ c.numero || c.id }}
               </option>
             </select>
           </div>
 
-          <div class="col-md-4 mb-3 fw-bold" v-if="instalacionSeleccionada">
-            {{ t.totalCapacity }}: {{ instalacionSeleccionada?.aforoMaximo }}
+          <div class="col-md-4 mb-3 fw-bold" v-if="instalacionDetalle">
+            {{ t.totalCapacity }}: {{ instalacionDetalle?.aforoMaximo }}
           </div>
 
-          <div v-if="instalacionSeleccionada?.agenda?.length" class="card border-0 shadow-sm rounded-4 p-4 bg-light">
+          <div v-if="instalacionDetalle?.agenda?.length" class="card border-0 shadow-sm rounded-4 p-4 bg-light">
             <h5 class="fw-bold mb-3">{{ t.weekHours }}</h5>
 
             <div class="mt-4 mb-2">
@@ -196,7 +196,7 @@
             </div>
 
             <div class="row">
-              <div v-for="dia in instalacionSeleccionada.agenda" :key="dia.id" class="col-12 mb-3">
+              <div v-for="dia in instalacionDetalle.agenda" :key="dia.id" class="col-12 mb-3">
                 <div class="p-3 rounded-3 bg-white border shadow-sm">
 
                   <!-- CABECERA CLICKABLE -->
@@ -359,11 +359,11 @@
         <div v-if="tab === 5">
           <!-- CREAR SESIÓN -->
           <div v-if="editando" class="row g-3 align-items-end mb-4">
-            <div class="col-md-2" v-if="instalacionSeleccionada.tipoInstalacion === 'Piscina'">
+            <div class="col-md-2" v-if="instalacionDetalle.tipoInstalacion === 'Piscina'">
               <label class="form-label fw-semibold">{{ t.poolStreets }}</label>
               <select class="form-select" v-model="crearSesion.calle">
                 <option value="">--</option>
-                <option v-for="c in instalacionSeleccionada.calles" :key="c.id" :value="c.id">
+                <option v-for="c in instalacionDetalle.calles" :key="c.id" :value="c.id">
                   {{ t.street }} {{ c.numero || c.id }}
                 </option>
               </select>
@@ -423,9 +423,9 @@
                       <input type="time" class="form-control form-control-sm" v-model="sesion.horaFin"
                         style="width: 120px;" />
 
-                      <select v-if="instalacionSeleccionada.tipoInstalacion === 'Piscina'"
+                      <select v-if="instalacionDetalle.tipoInstalacion === 'Piscina'"
                         class="form-select form-select-sm" v-model="sesion.calle" style="width: 100px;">
-                        <option v-for="c in instalacionSeleccionada.calles" :key="c.id" :value="c.id">
+                        <option v-for="c in instalacionDetalle.calles" :key="c.id" :value="c.id">
                           {{ c.numero || c.id }}
                         </option>
                       </select>
@@ -437,7 +437,7 @@
                     <div>
                       <strong>{{ sesion.dia }}</strong> |
                       {{ sesion.horaInicio }} - {{ sesion.horaFin }}
-                      <span v-if="instalacionSeleccionada?.tipoInstalacion === 'Piscina'">{{ t.street }} {{ sesion.calle }}</span>
+                      <span v-if="instalacionDetalle?.tipoInstalacion === 'Piscina'">{{ t.street }} {{ sesion.calle }}</span>
                     </div>
                   </template>
 
@@ -565,12 +565,14 @@
 
 
 <script setup lang="ts">
-import { ref, onMounted, inject, type Ref, computed } from "vue"
+import { ref, onMounted, inject, type Ref, computed, watch
+
+ } from "vue"
 import { useRouter } from "vue-router"
 import { Modal } from 'bootstrap'
 
 import { getInstalacionesSimples, getMonitoresSimples, getTarifasActividadComun, getTarifasFisioterapia, getTarifasGrupoReducido, getDeportes } from "@/services/listadoService"
-import { eliminarActividad, getActividadDetalle, modificarActividad } from "@/services/detalleService"
+import { eliminarActividad, getActividadDetalle, getInstalacionDetalle, modificarActividad } from "@/services/detalleService"
 import { useTiposStore } from "@/stores/tipos"
 
 import type { Language } from "@/useI18N"
@@ -644,7 +646,7 @@ function esPropio(intervalo: any, dia: any) {
 }
 
 function filtrarIntervalos(intervalos: any) {
-  if (instalacionSeleccionada.value.tipoInstalacion !== 'Piscina') {
+  if (instalacionDetalle.value.tipoInstalacion !== 'Piscina') {
     return intervalos
   }
 
@@ -682,10 +684,8 @@ const monitorSeleccionado = computed(() =>
 const tarifaSeleccionada = computed(() =>
   tarifas.value.find(t => t.id === actividad.value.tarifa)
 )
-const instalacionSeleccionada = computed(() =>
-  instalaciones.value.find(i => i.id === actividad.value.instalacion)
-)
 
+const instalacionDetalle = ref()
 const instalaciones = ref<any[]>([])
 const monitores = ref<any[]>([])
 const tarifas = ref<any[]>([])
@@ -725,7 +725,7 @@ function agregarSesion() {
   if (!crearSesion.value.dia ||
     !crearSesion.value.horaInicio ||
     !crearSesion.value.horaFin ||
-    (instalacionSeleccionada.value.tipoInstalacion === 'Piscina' && !crearSesion.value.calle)) {
+    (instalacionDetalle.value.tipoInstalacion === 'Piscina' && !crearSesion.value.calle)) {
     lanzarMensaje(t.value.missing, "error")
     return
   }
@@ -747,13 +747,13 @@ const comprobarAlquiler = async () => {
     return
   }
 
-  if (actividad.value.plazasMaximas > instalacionSeleccionada.value.aforoMaximo) {
+  if (actividad.value.plazasMaximas > instalacionDetalle.value.aforoMaximo) {
     lanzarMensaje(t.value.errorPlaces, "error")
     return
   }
 
-  if (instalacionSeleccionada.value.tipoInstalacion == "Piscina") {
-    if (actividad.value.plazasMaximas > instalacionSeleccionada.value.aforoMaximo/instalacionSeleccionada.value.numeroCalles) {
+  if (instalacionDetalle.value.tipoInstalacion == "Piscina") {
+    if (actividad.value.plazasMaximas > instalacionDetalle.value.aforoMaximo/instalacionDetalle.value.numeroCalles) {
       lanzarMensaje(t.value.errorPlaces, "error")
       return
     }
@@ -927,7 +927,7 @@ async function guardarCambios() {
     return
   }
 
-  if (actividad.value.plazasMaximas > instalacionSeleccionada.value.aforoMaximo) {
+  if (actividad.value.plazasMaximas > instalacionDetalle.value.aforoMaximo) {
     lanzarMensaje(t.value.errorPlaces, "error")
     return
   }
@@ -978,6 +978,55 @@ async function guardarCambios() {
   }
 }
 
+watch(
+  () => actividad.value.tipoActividad,
+  async (nuevoTipo: string) => {
+    actividad.value.tarifa = null
+    if (!nuevoTipo) {
+      tarifas.value = []
+      return
+    }
+
+    if (nuevoTipo === "Otros") {
+      tarifas.value = await getTarifasActividadComun()
+    } else if (nuevoTipo === "Grupos reducidos") {
+      tarifas.value = await getTarifasGrupoReducido()
+    } else if (nuevoTipo === "Fisioterapia") {
+      tarifas.value = await getTarifasFisioterapia()
+    }
+  }
+)
+
+
+watch(instalacionDetalle, (nuevaInstalacion) => {
+  if (!nuevaInstalacion || !nuevaInstalacion.calles?.length) {
+    callesDisponibles.value = []
+    calleSeleccionada.value = null
+    return
+  }
+
+  callesDisponibles.value = nuevaInstalacion.calles
+  calleSeleccionada.value = null
+})
+
+watch(
+  () => actividad.value.instalacion,
+  async (id) => {
+    if (!id) {
+      instalacionDetalle.value = null
+      return
+    }
+
+    try {
+      instalacionDetalle.value = await getInstalacionDetalle(id)
+    } catch (e) {
+      console.error(e)
+      instalacionDetalle.value = null
+    }
+  },
+  { immediate: true }
+)
+
 onMounted(async () => {
   const id = parseInt(props.id);
 
@@ -992,6 +1041,7 @@ onMounted(async () => {
     actividadOriginal.value = JSON.parse(JSON.stringify(actividad.value))
 
     instalaciones.value = await getInstalacionesSimples()
+    instalacionDetalle.value = await getInstalacionDetalle(actividad.value.instalacion)
     monitores.value = await getMonitoresSimples()
     deportes.value = await getDeportes()
 

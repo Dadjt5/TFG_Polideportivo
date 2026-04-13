@@ -121,12 +121,12 @@
             </div>
             <div class="col-md-4">
               <FilterCard :icon="Activity" :title="t.activityType" :subtitle="selectedActivityTypes.join(', ')"
-                @click="() => activar('A2')" :theme="'dark'"/>
+                @click="() => activar('A2')" :theme="'dark'" />
             </div>
             <div class="col-md-4">
               <FilterCard :icon="Clock" :title="t.sessionTime"
                 :subtitle="activityStartTime || activityEndTime ? `${activityStartTime} - ${activityEndTime}` : ''"
-                @click="() => activar('A3')" :theme="'dark'"/>
+                @click="() => activar('A3')" :theme="'dark'" />
             </div>
           </div>
         </div>
@@ -135,12 +135,12 @@
           <div class="row g-4 justify-content-center">
             <div class="col-md-6">
               <FilterCard :icon="Building2" :title="t.facilityType" :subtitle="selectedFacilityTypes.join(', ')"
-                @click="() => activar('I1')" :theme="'dark'"/>
+                @click="() => activar('I1')" :theme="'dark'" />
             </div>
             <div class="col-md-6">
               <FilterCard :icon="Clock" :title="t.openingHours"
                 :subtitle="facilityStartTime || facilityEndTime ? `${facilityStartTime} - ${facilityEndTime}` : ''"
-                @click="() => activar('I2')" :theme="'dark'"/>
+                @click="() => activar('I2')" :theme="'dark'" />
             </div>
           </div>
         </div>
@@ -164,23 +164,36 @@
         :startTime="facilityStartTime" :endTime="facilityEndTime"
         @apply="({ start, end }) => { facilityStartTime = start; facilityEndTime = end }" :theme="'dark'" />
 
-      <!-- Favoritos -->
-      <div class="container-fluid mt-5 row">
+      <div class="container-fluid mt-5">
+
+        <!-- ACTIVIDADES FAVORITAS -->
         <div v-if="longitudActividades !== 0">
-          <p class="fs-2 fw-semibold text-center text-white">{{ t.activities }} {{ t.favourites }}</p>
-          <div v-for="actividad in actividadesFavoritas" :key="actividad.id" class="col-12 col-sm-6 col-lg-4"
-            @click="activityDetail(actividad.id)">
-            <ActivityCard :icon="Activity" :actividad="actividad" :theme="'dark'"/>
+          <p class="fs-2 fw-semibold text-center text-white">
+            {{ t.activities }} {{ t.favourites }}
+          </p>
+
+          <div class="row g-4">
+            <div v-for="actividad in actividadesFavoritas" :key="actividad.id" class="col-12 col-sm-6 col-lg-4"
+              @click="activityDetail(actividad.id)">
+              <ActivityCard :icon="Activity" :actividad="actividad" :theme="'dark'" />
+            </div>
           </div>
         </div>
 
-        <div v-if="longitudInstalaciones !== 0">
-          <p class="fs-2 fw-semibold text-center text-white mt-5">{{ t.facilities }} {{ t.favourites }}</p>
-          <div v-for="instalacion in instalacionesFavoritas" :key="instalacion.id" class="col-12 col-sm-6 col-lg-4"
-            @click="facilityDetail(instalacion.id)">
-            <FacilityCard :icon="Building2" :instalacion="instalacion" :theme="'dark'"/>
+        <!-- INSTALACIONES FAVORITAS -->
+        <div v-if="longitudInstalaciones !== 0" class="mt-5">
+          <p class="fs-2 fw-semibold text-center text-white">
+            {{ t.facilities }} {{ t.favourites }}
+          </p>
+
+          <div class="row g-4">
+            <div v-for="instalacion in instalacionesFavoritas" :key="instalacion.id" class="col-12 col-sm-6 col-lg-4"
+              @click="facilityDetail(instalacion.id)">
+              <FacilityCard :icon="Building2" :instalacion="instalacion" :theme="'dark'" />
+            </div>
           </div>
         </div>
+
       </div>
 
     </main>
@@ -447,51 +460,51 @@ input::placeholder {
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
 }
 
-.tabs-hero{
-  display:flex;
-  justify-content:center;
-  gap:6px;
-  background:rgba(255,255,255,0.15);
-  backdrop-filter:blur(10px);
-  border-radius:40px;
-  padding:6px;
-  width:fit-content;
-  margin:auto;
+.tabs-hero {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border-radius: 40px;
+  padding: 6px;
+  width: fit-content;
+  margin: auto;
 }
 
-.tabs-hero button{
-  border:none;
-  background:transparent;
-  color:white;
-  padding:10px 28px;
-  border-radius:30px;
-  font-weight:500;
-  transition:all .25s;
+.tabs-hero button {
+  border: none;
+  background: transparent;
+  color: white;
+  padding: 10px 28px;
+  border-radius: 30px;
+  font-weight: 500;
+  transition: all .25s;
 }
 
-.tabs-hero button.active{
-  background:white;
-  color:black;
+.tabs-hero button.active {
+  background: white;
+  color: black;
 }
 
-.tabs-hero button:hover{
-  background:rgba(255,255,255,0.2);
+.tabs-hero button:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
-.search-hero{
-  display:flex;
-  align-items:center;
-  gap:15px;
+.search-hero {
+  display: flex;
+  align-items: center;
+  gap: 15px;
 
-  background:rgba(255,255,255,0.12);
-  backdrop-filter:blur(12px);
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
 
-  border-radius:20px;
-  padding:14px 20px;
+  border-radius: 20px;
+  padding: 14px 20px;
 
-  border:1px solid rgba(255,255,255,0.25);
+  border: 1px solid rgba(255, 255, 255, 0.25);
 
-  max-width:900px;
-  margin:auto;
+  max-width: 900px;
+  margin: auto;
 }
 </style>

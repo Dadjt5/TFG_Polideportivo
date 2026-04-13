@@ -34,7 +34,7 @@
               <div class="col-12">
                 <p>
                   <i class="bi bi-geo-alt-fill text-danger me-1"></i>
-                  <span class="fw-medium">{{ t.address }}:</span>
+                  <span class="fw-medium">{{ t.address }}:</span><br />
                   {{ pabellon.direccion }}
                 </p>
               </div>
@@ -64,7 +64,13 @@
               {{ t.images }}
             </h4>
 
-            <img :src="pabellon.imagen" class="img-fluid rounded mb-3 img-hover" />
+            <span v-if="pabellon.imagen">
+              <img :src="pabellon.imagen" class="img-fluid rounded mb-3 img-hover" />
+            </span>
+             <span v-else class="text-center text-muted mt-5">
+              <i class="bi bi-image fs-1"></i>
+              <p class="mt-3">{{ t.noImage }}</p>
+            </span>
           </div>
         </div>
 

@@ -20,7 +20,6 @@
 
       </div>
 
-
       <!-- TAB CONTENT -->
       <div class="tab-content mb-3">
         <!-- ACTIVIDADES -->

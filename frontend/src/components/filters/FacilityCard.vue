@@ -30,30 +30,28 @@ const cambiarFavorito = () => {
 // Computed para clases dinámicas según el tema
 const cardClass = computed(() =>
   props.theme === 'dark'
-    ? 'card shadow-sm h-100 installation-card bg-white bg-opacity-10 border border-white border-opacity-25'
-    : 'card shadow-sm h-100 installation-card bg-light bg-opacity-50 border border-dark border-opacity-25'
-);
+    ? 'card shadow-sm h-100 activity-card bg-white bg-opacity-10 border border-white border-opacity-25'
+    : 'card shadow-sm h-100 activity-card bg-light border border-dark'
+)
 
 const textClass = computed(() =>
-  props.theme === 'dark'
-    ? 'text-white text-opacity-75 small'
-    : 'text-dark text-opacity-75 small'
-);
+  props.theme === 'dark' ? 'text-white' : 'text-dark'
+)
+
+const textOpacityClass = computed(() =>
+  props.theme === 'dark' ? 'text-white text-opacity-75' : 'text-dark text-opacity-75'
+)
 
 const iconWrapperClass = computed(() =>
-  props.theme === 'dark'
-    ? 'icon-wrapper bg-white bg-opacity-10'
-    : 'icon-wrapper bg-dark bg-opacity-10'
-);
+  props.theme === 'dark' ? 'icon-wrapper bg-white bg-opacity-10' : 'icon-wrapper bg-light'
+)
+
+const badgeClass = computed(() =>
+  props.theme === 'dark' ? 'badge rounded-pill bg-success bg-opacity-75 text-white' : 'badge rounded-pill bg-success text-dark'
+)
 
 const titleClass = computed(() =>
   props.theme === 'dark' ? 'mb-1 text-white' : 'mb-1 text-dark'
-);
-
-const badgeClass = computed(() =>
-  props.theme === 'dark'
-    ? 'badge rounded-pill bg-success bg-opacity-75 text-white'
-    : 'badge rounded-pill bg-success bg-opacity-50 text-dark'
 );
 </script>
 
@@ -83,7 +81,7 @@ const badgeClass = computed(() =>
 
       </div>
 
-      <div :class="textClass">
+      <div :class="['small', textOpacityClass]">
         <div class="d-flex justify-content-between mb-1">
           <span>{{ t.facilityType }}</span>
           <strong>{{ instalacion.tipoInstalacion }}</strong>

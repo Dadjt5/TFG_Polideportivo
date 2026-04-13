@@ -118,14 +118,17 @@ class UsuarioFinalSerializer(serializers.ModelSerializer):
             .filter(instalacion__isnull=False)
             .values_list("instalacion_id", flat=True)
         )
-        
+    
     def update(self, instance, validated_data):
         user_data = validated_data.pop('user', {})
+
+        password = validated_data.pop('password', None)
+
+        deportes = validated_data.pop('deportesFavoritos', None)
 
         if 'email' in user_data:
             instance.user.email = user_data['email']
 
-        password = validated_data.pop('password', None)
         if password:
             instance.user.set_password(password)
 
@@ -135,6 +138,10 @@ class UsuarioFinalSerializer(serializers.ModelSerializer):
             setattr(instance, attr, value)
 
         instance.save()
+
+        if deportes is not None:
+            instance.deportesFavoritos.set(deportes)
+
         return instance
 
 
@@ -368,13 +375,11 @@ class PabellonSerializer(serializers.ModelSerializer):
 
 
 class InstalacionSimpleSerializer(serializers.ModelSerializer):
-    agenda = AgendaSerializer(many=True, read_only=True)
-    calles = CalleSerializer(many=True, read_only=True)
     pabellon = PabellonSimpleSerializer(read_only=True)
 
     class Meta:
         model = Instalacion
-        fields = ("id", "nombre", "agenda", "calles", "numeroCalles", "tipoInstalacion", "pabellon", "aforoMaximo")
+        fields = ("id", "nombre", "numeroCalles", "tipoInstalacion", "pabellon", "aforoMaximo")
 
 
 class InstalacionSerializer(serializers.ModelSerializer):

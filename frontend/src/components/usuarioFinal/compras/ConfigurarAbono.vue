@@ -100,7 +100,7 @@
           <!-- TOTAL -->
           <div class="border-top pt-3 mt-3">
             <div class="d-flex justify-content-between fs-5">
-              <span class="fw-bold">{{ t.price }}</span>
+              <span class="fw-bold">{{ t.finalPrice }}</span>
               <span class="fw-bold text-primary">{{ total }} €</span>
             </div>
           </div>

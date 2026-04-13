@@ -48,7 +48,7 @@
 
               <div class="col-12 col-sm-4">
                 <p><i class="bi bi-people-fill text-success me-1"></i><span class="fw-medium">{{ t.availablePlaces
-                }}:</span> {{ actividad.plazasMaximas }}</p>
+                    }}:</span> {{ actividad.plazasMaximas }}</p>
               </div>
 
               <div class="col-12 col-sm-4" v-if="actividad.nivel">
@@ -68,17 +68,17 @@
 
               <div class="col-12 col-sm-4" v-if="actividad.terreno">
                 <p><i class="bi bi-signpost-split-fill text-secondary me-1"></i><span class="fw-medium">{{ t.terrainType
-                }}:</span> {{ actividad.terreno }}</p>
+                    }}:</span> {{ actividad.terreno }}</p>
               </div>
 
               <div class="col-12 col-sm-4">
                 <p><i class="bi bi-credit-card-2-front-fill text-success me-1"></i><span class="fw-medium">{{ t.credits
-                }}:</span> {{ actividad.numeroCreditos }}</p>
+                    }}:</span> {{ actividad.numeroCreditos }}</p>
               </div>
 
               <div class="col-12 col-sm-4" v-if="actividad.año">
                 <p><i class="bi bi-calendar-year text-info me-1"></i><span class="fw-medium">{{ t.academicYear
-                }}:</span> {{ actividad.año }}</p>
+                    }}:</span> {{ actividad.año }}</p>
               </div>
 
               <div class="col-12 col-sm-4" v-if="actividad.instalacion">
@@ -122,7 +122,13 @@
               {{ t.images }}
             </h4>
 
-            <img :src="actividad.imagen" class="img-fluid rounded mb-3 img-hover" />
+            <span v-if="actividad.imagen">
+              <img :src="actividad.imagen" class="img-fluid rounded mb-3 img-hover" />
+            </span>
+            <span v-else class="text-center text-muted mt-5">
+              <i class="bi bi-image fs-1"></i>
+              <p class="mt-3">{{ t.noImage }}</p>
+            </span>
           </div>
 
           <!-- SESIONES -->
@@ -148,12 +154,29 @@
         </div>
       </div>
 
-      <div v-if="actividad.plazasReservadas >= actividad.plazasMaximas"
+      <div v-if="actividad.plazasReservadas >= actividad.plazasMaximas && actividad.id != -1"
         class="alert alert-warning text-center mt-4 shadow-sm">
 
         <i class="bi bi-exclamation-triangle-fill me-2"></i>
         {{ t.noPlacesMessage }}
+      </div>
 
+      <div
+        v-else-if="actividad.tipoReserva !== 'Permite la reserva solo online' && actividad.tipoReserva !== 'Permite ambos tipos de reserva' && actividad.id != -1"
+        class="alert alert-warning text-center mt-4 shadow-sm">
+
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        {{ t.wrongBookingType }}
+      </div>
+
+      <div v-else-if="!mesDentroDePeriodo(actividad.periodo) && actividad.id != -1" class="alert alert-warning text-center mt-4 shadow-sm">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        {{ t.wrongPeriodToBook }}
+      </div>
+
+      <div v-else-if="actividad.edadMinima > usuarioFinalStore.edad && actividad.id != -1" class="alert alert-warning text-center mt-4 shadow-sm">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        {{ t.wrongAge }}
       </div>
 
       <div v-if="mostrarMensaje" class="text-center mb-3 mt-3">
@@ -163,16 +186,15 @@
       </div>
 
       <!-- Reserva y Volver -->
-      <div class="d-flex justify-content-center align-items-center mt-5 gap-3 flex-wrap">
-
-        <!-- RESERVAR -->
-        <button v-if="puedeReservar" class="btn btn-success btn-lg px-5 shadow-sm" @click="reservar">
+      <div v-if="actividad" class="d-flex justify-content-center align-items-center mt-4 gap-3 flex-wrap">
+        <button v-if="puedeReservar" class="btn btn-success btn-lg px-5 shadow-sm d-flex align-items-center gap-2"
+          @click="reservar">
           {{ t.booking }}
         </button>
 
         <!-- LISTA DE ESPERA -->
-        <button v-else-if="actividad.plazasReservadas >= actividad.plazasMaximas"
-          class="btn btn-warning btn-lg px-5 shadow-sm" @click="pasarAEspera">
+        <button v-else-if="actividad.plazasReservadas >= actividad.plazasMaximas && actividad.id != -1"
+          class="btn btn-warning btn-lg px-5 shadow-sm d-flex align-items-center gap-2" @click="pasarAEspera">
           {{ t.goToList }}
         </button>
 
@@ -180,6 +202,7 @@
         <button class="btn btn-outline-secondary btn-lg px-5" @click="volver">
           {{ t.return }}
         </button>
+
       </div>
     </main>
   </div>
@@ -218,7 +241,7 @@ type Generic = {
 }
 
 const actividad = ref({
-  id: 0,
+  id: -1,
   nombre: "",
   tipoActividad: "",
   imagen: "",
@@ -244,6 +267,27 @@ const actividad = ref({
   sesiones: [] as any[]
 });
 
+function mesDentroDePeriodo(periodo) {
+  const mes = new Date().getMonth() + 1
+
+  switch (periodo) {
+    case 'Todo el año':
+      return true
+
+    case 'Desde septiembre hasta enero':
+      return mes >= 9 || mes == 1
+
+    case 'Desde febrero hasta mayo':
+      return mes >= 2 && mes <= 5
+
+    case 'Meses de verano':
+      return mes >= 6 && mes <= 8
+
+    default:
+      return false
+  }
+}
+
 const puedeReservar = computed(() => {
   if (!usuarioFinalStore.isLogged) {
     return false
@@ -258,6 +302,14 @@ const puedeReservar = computed(() => {
   }
 
   if (actividad.value.plazasReservadas >= actividad.value.plazasMaximas) {
+    return false
+  }
+
+  if (!mesDentroDePeriodo(actividad.value.periodo)) {
+    return false
+  }
+
+  if (actividad.value.edadMinima > usuarioFinalStore.edad) {
     return false
   }
 

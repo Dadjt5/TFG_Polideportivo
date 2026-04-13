@@ -6,8 +6,7 @@ from datetime import time
 
 from .constantes import EstadoReserva
 from .descuento import Descuento
-from .lista_espera import ListaEspera, EntradaListaEspera
-from .notificacion import Notificacion
+from .actividad import Actividad
 from .constantes import FormaReserva, TipoInstalacion
 
 
@@ -25,12 +24,12 @@ class Reserva(models.Model):
     
     # Función para calcular el descuento aplicado a la reserva
     def calcularDescuento(self):
-        porcentaje = 0.0
+        resultado = {}
 
         for descuento in self.descuentos.all():
-            porcentaje += descuento.porcentaje
+            resultado[descuento.nombre] = descuento.porcentaje
 
-        return porcentaje
+        return resultado
 
 
 class ReservaActividad(Reserva):
@@ -50,7 +49,7 @@ class ReservaActividad(Reserva):
     # Función para calcular el precio de la actividad
     def calcularPrecio(self):
         """Calcula el precio final de la reserva usando la actividad"""
-        return self.actividad._calcularPrecio_base(
+        return self.actividad._calcular_precio_base(
             usuario=self.usuarioFinal,
             numeroHorasSemana=self.numeroHorasSemana,
             numeroPersonas=self.numeroPersonas,
@@ -69,27 +68,28 @@ class ReservaActividad(Reserva):
 
     # Función para cancelar una reserva de una actividad y notificar al siguiente usuario de la lista de espera
     def cancelarCompra(self):
-        if self.estado == EstadoReserva.CONFIRMADA:
-            self.usuarioFinal.actividadesRealizadas -= 1
-            self.actividad.eliminarAsistencia(self.usuarioFinal)
-            self.usuarioFinal.save()
+        with transaction.atomic():
+            actividad = Actividad.objects.select_for_update().get(id=self.actividad.id)
 
-        self.actividad.plazasReservadas -= 1
-        self.estado = EstadoReserva.CANCELADO
-        self.save()
+            if self.estado == EstadoReserva.CONFIRMADA:
+                self.usuarioFinal.actividadesRealizadas -= 1
+                actividad.eliminarAsistencia(self.usuarioFinal)
+                self.usuarioFinal.save()
 
-        lista_espera = self.actividad.lista_espera
-        while self.actividad.plazasReservadas < self.actividad.plazasMaximas:
-            entrada = lista_espera.siguienteUsuario()
-            if not entrada:
-                break
+            actividad.plazasReservadas -= 1
+            actividad.save()
 
-            self.actividad.plazasReservadas += 1
-            self.actividad.save()
+            self.estado = EstadoReserva.CANCELADO
+            self.save()
 
-            Notificacion.notificarSalidaListaDeEspera(entrada.usuarioFinal, self.actividad)
+            lista_espera = actividad.lista_espera
+            while actividad.plazasReservadas < actividad.plazasMaximas:
+                entrada = lista_espera.siguienteUsuario()
+                if not entrada:
+                    break
 
-            entrada.delete()
+                actividad.plazasReservadas += 1
+                actividad.save()
 
     # Función para contar el número de reservas de actividades en el sistema
     @classmethod
@@ -129,9 +129,9 @@ class ReservaActividad(Reserva):
             )
 
             if descuentos:
-                reserva.descuentos.set(descuentos["descuento"]["aplicados"])
+                reserva.descuentos.set(descuentos["descuentos"])
 
-            actividad.plazasReservadas = cls.objects.filter(actividad=actividad, estado__in=[EstadoReserva.PENDIENTE, EstadoReserva.CONFIRMADA]).count()
+            actividad.plazasReservadas += 1
             actividad.save()
 
             actividad.activarAsistencia(usuario)
@@ -171,7 +171,7 @@ class Alquiler(Reserva):
             self.luz = True
             precio += self.instalacion.tarifa.costeIluminacion
 
-        precio += self.instalacion._calcularPrecio_base(usuario=self.usuarioFinal)*self.numeroHoras
+        precio += self.instalacion._calcular_precio_base(usuario=self.usuarioFinal)*self.numeroHoras
         return precio
 
     # FUnción para confirmar el alquiler
@@ -231,7 +231,7 @@ class Alquiler(Reserva):
             )
 
             if descuentos:
-                reserva.descuentos.set(descuentos["descuento"]["aplicados"])
+                reserva.descuentos.set(descuentos["descuentos"])
 
             return reserva
 
