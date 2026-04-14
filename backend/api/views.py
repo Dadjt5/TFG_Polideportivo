@@ -1845,6 +1845,119 @@ class TarifaInstalacionView(APIView):
         return Response(data)
 
 
+class ReservasPorDiaView(APIView):
+    permission_classes = [AllowAny]
+
+    def esta_ocupado(self, intervalo, alquiler):
+        return (
+            intervalo.horaInicio >= alquiler.horaInicio and
+            intervalo.horaFin <= alquiler.horaFin
+        )
+
+    def generar_slots(self, queryset_mapas, alquileres, calle=None):
+        resultado = []
+
+        for intervalo in queryset_mapas:
+            estado = "Libre"
+            pagada = False
+
+            for alquiler in alquileres:
+                if calle and alquiler.calle != calle:
+                    continue
+
+                if self.esta_ocupado(intervalo, alquiler):
+                    estado = "Reservado"
+                    pagada = alquiler.estado == EstadoReserva.CONFIRMADA
+                    break
+
+            resultado.append({
+                "horaInicio": intervalo.horaInicio.strftime("%H:%M"),
+                "horaFin": intervalo.horaFin.strftime("%H:%M"),
+                "estado": estado,
+                "pagada": pagada
+            })
+
+        return resultado
+
+
+    def get(self, request, instalacion_id):
+        instalacion = get_object_or_404(Instalacion, id=instalacion_id)
+
+        fecha_str = request.query_params.get('fecha')
+        fecha = parse_date(fecha_str) if fecha_str else date.today()
+
+        agenda_fecha = Agenda.objects.filter(
+            fecha=fecha,
+            instalacion=instalacion
+        ).first()
+
+        # Obtener agenda del día
+        if agenda_fecha:
+            dia = agenda_fecha
+        else:
+            dia_semana = fecha.strftime("%A").upper()
+
+            mapa_dias = {
+                "MONDAY": Dia.LUNES,
+                "TUESDAY": Dia.MARTES,
+                "WEDNESDAY": Dia.MIERCOLES,
+                "THURSDAY": Dia.JUEVES,
+                "FRIDAY": Dia.VIERNES,
+                "SATURDAY": Dia.SABADO,
+                "SUNDAY": Dia.DOMINGO,
+            }
+
+            dia_modelo = mapa_dias[dia_semana]
+
+            dia = Agenda.objects.filter(
+                dia__iexact=dia_modelo,
+                instalacion=instalacion
+            ).first()
+
+        if not dia or not dia.abierto:
+            return Response({
+                "abierto": False,
+                "slots": [],
+                "calles": []
+            })
+
+        alquileres = Alquiler.objects.filter(
+            fecha=fecha,
+            instalacion=instalacion
+        ).exclude(estado=EstadoReserva.CANCELADO)
+
+        if instalacion.tipoInstalacion == TipoInstalacion.PISCINA:
+            calles = []
+
+            for calle in instalacion.calles.all():
+                mapas = dia.mapa_reservas.filter(calle=calle)
+
+                calles.append({
+                    "numero": calle.numero,
+                    "slots": self.generar_slots(mapas, alquileres, calle)
+                })
+
+            data = {
+                "abierto": True,
+                "horaApertura": dia.horaApertura,
+                "horaCierre": dia.horaCierre,
+                "calles": calles,
+                "numeroCalles": instalacion.numeroCalles
+            }
+        else:
+            mapas = dia.mapa_reservas.filter(calle__isnull=True)
+
+            data = {
+                "abierto": True,
+                "horaApertura": dia.horaApertura,
+                "horaCierre": dia.horaCierre,
+                "slots": self.generar_slots(mapas, alquileres),
+                "numeroCalles": 0
+            }
+
+        return Response(data)
+
+
 class GestionUsuariosView(APIView):
     permission_classes = [IsAdministradorUsuarios]
 

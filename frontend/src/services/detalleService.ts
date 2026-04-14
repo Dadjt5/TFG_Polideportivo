@@ -52,6 +52,15 @@ export const eliminarInstalacion = async (id: number) => {
   return response.data;
 };
 
+/* Función para obtener los alquileres en una instalación un dia concreto */
+export const getAlquileresPorDia = async (id: number, fecha: string) => {
+  const response = await api.get(`api/v1/instalaciones/${id}/obtener/alquileres/`, {
+    params: { fecha }
+  });
+  return response.data;
+}
+
+
 /* Función para obtener la informacion de un pabellon */
 export const getPabellonDetalle = async (id: number) => {
   const response = await api.get(`/api/v1/pabellones/${id}/`);

@@ -386,7 +386,6 @@ class InstalacionSerializer(serializers.ModelSerializer):
     agenda = AgendaSerializer(many=True, read_only=True)
     calles = CalleSerializer(many=True, read_only=True)
     pabellon = PabellonSimpleSerializer(read_only=True)
-    reservas_usuarios = serializers.SerializerMethodField()
     plazasMinimas = serializers.SerializerMethodField()
 
     class Meta:
@@ -404,7 +403,6 @@ class InstalacionSerializer(serializers.ModelSerializer):
             "tarifa",
             "numeroCalles",
             "calles",
-            "reservas_usuarios",
             "plazasMinimas"
         )
 
@@ -416,26 +414,6 @@ class InstalacionSerializer(serializers.ModelSerializer):
 
         return min(act.plazasMaximas for act in actividades)
 
-    def get_reservas_usuarios(self, obj):
-        hoy = date.today()
-
-        inicio_semana = hoy - timedelta(days=hoy.weekday())
-        fin_semana = inicio_semana + timedelta(days=6)
-
-        reservas = obj.reservas.filter(fecha__range=(inicio_semana, fin_semana))
-
-        return [
-            {
-                "id": r.id,
-                "horaInicio": r.horaInicio.isoformat(),
-                "horaFin": r.horaFin.isoformat(),
-                "diaSemana": r.fecha.weekday(),
-                "pagada": r.estado == EstadoReserva.CONFIRMADA,
-                "usuario": r.usuarioFinal.id,
-                "fecha": r.fecha.isoformat(),
-            }
-            for r in reservas
-        ]
 
 # --------------------
 # Actividades
@@ -978,7 +956,8 @@ class AlquilerSimpleSerializer(serializers.ModelSerializer):
             "horaFin",
             "numeroHoras",
             "pago",
-            "nombre"
+            "nombre",
+            "estado"
         )
 
     def get_nombre(self, obj):

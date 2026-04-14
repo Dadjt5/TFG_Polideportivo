@@ -107,6 +107,7 @@ urlpatterns = [
     path("instalaciones/<int:instalacion_id>/comprobar/alquiler/", views.ComprobarAlquileresView.as_view(), name="comprobar-alquileres"),
     path("tarifas/actividades/<int:actividad_id>/", views.TarifaActividadView.as_view(), name="tarifa-actividad"),
     path("tarifas/instalaciones/<int:instalacion_id>/", views.TarifaInstalacionView.as_view(), name="tarifa-instalacion"),
+    path("instalaciones/<int:instalacion_id>/obtener/alquileres/", views.ReservasPorDiaView.as_view(), name="obtener-alquileres-por-dia"),
     path("usuarios/", views.GestionUsuariosView.as_view(), name="obtener-usuarios"),
     path("espacios/", views.GestionEspaciosView.as_view(), name="obtener-espacios"),
     path("tarifas/", views.GestionTarifasView.as_view(), name="obtener-tarifas"),
