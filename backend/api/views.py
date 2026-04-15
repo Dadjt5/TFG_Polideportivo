@@ -983,11 +983,16 @@ class ReservasView(APIView):
         actividades = ReservaActividad.objects.filter(usuarioFinal__user=user, estado=EstadoReserva.CONFIRMADA)
         listas_espera = EntradaListaEspera.objects.filter(usuarioFinal__user=user)
 
-        for alquiler in alquileres:
+        alquiler_ct = ContentType.objects.get_for_model(Alquiler)
+        reserva_ct = ContentType.objects.get_for_model(Alquiler)
+
+        for alquiler in alquileres:            
+            pago = Pago.objects.get(content_type=alquiler_ct, object_id=alquiler.id)
+
             reservas.append({
                 "id": alquiler.id,
                 "tipo": "ALQUILER",
-                "estado": "CONFIRMADA",
+                "estado": alquiler.estado,
                 "puede_cancelar": True,
                 "instalacion": {
                     "id": alquiler.instalacion.id,
@@ -998,11 +1003,14 @@ class ReservasView(APIView):
                 "fecha": str(alquiler.fecha) if hasattr(alquiler, "fecha") else None,
                 "horaInicio": alquiler.horaInicio,
                 "horaFin": alquiler.horaFin,
+                "coste": pago.costeFinal,
                 "tarifa": None,
                 "descuentos": [],
             })
 
         for reserva_act in actividades:
+            pago = Pago.objects.get(content_type=reserva_ct, object_id=reserva_act.id)
+
             sesiones = reserva_act.actividad.sesiones.all()
             reservas.append({
                 "id": reserva_act.id,
@@ -1027,6 +1035,7 @@ class ReservasView(APIView):
                 "fecha": str(reserva_act.actividad.periodo_inicio) if hasattr(reserva_act.actividad, "periodo_inicio") else None,
                 "horaInicio": None,
                 "horaFin": None,
+                "coste": pago.costeFinal,
                 "descuentos": [
                     {"id": d.id, "nombre": d.nombre, "porcentaje": d.porcentaje} 
                     for d in getattr(reserva_act, "descuentos", []).all()
@@ -1065,7 +1074,7 @@ class ReservasView(APIView):
                 "fecha": str(entrada.fechaEntrada),
                 "horaInicio": entrada.horaEntrada,
                 "horaFin": None,
-
+                "coste": None,
                 "posicion": posicion,
 
                 "descuentos": [],
@@ -2632,21 +2641,12 @@ class ObtenerEstadisticasAdministradorView(APIView):
         ]
 
         uso_pabellones = []
-        for pab in Pabellon.objects.all():
-            sesiones = Sesion.objects.filter(
-                actividad__instalacion__pabellon=pab
-            )
-
-            if actividad_id:
-                sesiones = sesiones.filter(actividad_id=actividad_id)
-
-            horas = sesiones.count()
-
-            capacidad_total = 200
-            ocupacion = min(int((horas / capacidad_total) * 100), 100)
+        for inst in Instalacion.objects.all():
+            horas = Alquiler.objects.filter(instalacion=inst).count()
+            ocupacion = min(int((horas / 200) * 100), 100)
 
             uso_pabellones.append({
-                "nombre": pab.nombre,
+                "nombre": inst.nombre,
                 "horas": horas,
                 "ocupacion": ocupacion
             })
@@ -2774,17 +2774,17 @@ class ObtenerEstadisticasUsuarioFinalView(APIView):
         actividad_favorita = actividad_favorita["actividad__nombre"] if actividad_favorita else "-"
 
 
-        # PABELLÓN FAVORITO
-        pabellon_favorito = (
+        # INSTALACION FAVORITA
+        instalacion_favorita = (
             ReservaActividad.objects
             .filter(usuarioFinal=usuario)
-            .values("actividad__instalacion__pabellon__nombre")
+            .values("actividad__instalacion__nombre")
             .annotate(total=Count("id"))
             .order_by("-total")
             .first()
         )
 
-        pabellon_favorito = pabellon_favorito["actividad__instalacion__pabellon__nombre"] if pabellon_favorito else "-"
+        instalacion_favorita = instalacion_favorita["actividad__instalacion__nombre"] if instalacion_favorita else "-"
 
 
         # RESERVAS POR DÍA DE LA SEMANA
@@ -2811,7 +2811,7 @@ class ObtenerEstadisticasUsuarioFinalView(APIView):
             "dinero_total": dinero_total,
 
             "actividad_favorita": actividad_favorita,
-            "pabellon_favorito": pabellon_favorito,
+            "instalacion_favorita": instalacion_favorita,
 
             "reservas_por_mes": {
                 "labels": reservas_labels,

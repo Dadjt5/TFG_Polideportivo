@@ -680,7 +680,20 @@ export default {
   activityReservations12Months: "Reservas de actividades últimos 12 meses",
   incomeForType: "Ingresos por tipo",
   activityInscriptions: "Inscripciones por actividad",
-  pavilionUses: "Uso de pabellones",
+  pavilionUses: "Uso de instalaciones",
+  inscriptions: "Inscripciones",
+  income: "Ingresos",
+  hoursUsed: "Horas reservadas",
+  occupancy: "Ocupacion",
+
+  /* Estadisticas usuario final */
+  totalReservations: "Reservas totales",
+  monthReservations: "Reservas este mes",
+  cancels: "Cancelaciones",
+  moneyUsed: "Dinero gastado",
+  favouriteActivity: "Actividad favorita",
+  favouriteFacility: "Instalación favorita",
+  reservations: "Reservas",
 
   /* Nueva notificacion */
   newNotification: "Nueva notificación",

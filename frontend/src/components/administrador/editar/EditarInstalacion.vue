@@ -154,6 +154,12 @@
                       </select>
                     </div>
 
+                    <!-- Dia (solo alquileres de instalaciones) -->
+                    <div class="col-md-4" v-if="tipoVista === 'alquileres'">
+                      <label class="form-label fw-semibold">{{ t.selectedDate }}</label>
+                      <input type="date" class="form-control form-control-lg" v-model="reserva.seleccion.fecha" />
+                    </div>
+
                     <!-- Calle (solo piscina) -->
                     <div class="col-md-4" v-if="instalacion.tipoInstalacion === 'Piscina'">
                       <label class="form-label fw-semibold">{{ t.poolStreet }}</label>
@@ -182,7 +188,7 @@
                 </div>
 
                 <div class="row" :key="`${tipoVista}-${periodo}-${calleSeleccionada}`">
-                  <div v-for="dia in agenda" :key="dia.id" class="col-12 mb-3">
+                  <div v-if="tipoVista === 'actividades'" v-for="dia in agenda" :key="dia.id" class="col-12 mb-3">
                     <div class="p-3 rounded-3 bg-white border shadow-sm">
 
                       <!-- CABECERA CLICKABLE -->
@@ -210,6 +216,18 @@
                       </transition>
 
                     </div>
+                  </div>
+                  <div v-else-if="reserva.fecha.abierto" class="d-flex flex-wrap gap-2">
+                    <button v-for="hora in reservasActuales" :key="hora.horaInicio"
+                      class="small text-white text-center px-3 py-2 rounded" :class="getClaseIntervalo(hora)">
+                      {{ hora.horaInicio }} - {{ hora.horaFin }}
+                    </button>
+                  </div>
+
+                  <div v-else class="text-center w-100 py-4">
+                    <span class="badge bg-danger fs-6 px-4 py-3">
+                      {{ t.close || 'Instalación cerrada' }}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -412,12 +430,12 @@
 
 
 <script setup lang="ts">
-import { inject, ref, onMounted, type Ref, watch } from 'vue';
+import { inject, ref, onMounted, type Ref, watch, computed } from 'vue';
 import { useRouter } from "vue-router";
 import { Modal } from 'bootstrap'
 
 /* Importamos la comunicacion para recuperar la informacion de instalaciones del backend */
-import { getInstalacionDetalle, modificarInstalacion, eliminarInstalacion } from "@/services/detalleService";
+import { getInstalacionDetalle, modificarInstalacion, eliminarInstalacion, getAlquileresPorDia } from "@/services/detalleService";
 import { getPabellonesSimples, getTarifasInstalacion } from "@/services/listadoService"
 
 import { useTiposStore } from '@/stores/tipos';
@@ -468,6 +486,13 @@ const instalacion = ref({
   reservas_usuarios: [] as any[],
 });
 
+const reserva = ref({
+  fecha: null as any,
+  seleccion: {
+    fecha: new Date().toISOString().slice(0, 10),
+  },
+})
+
 const errores = ref({
   nombre: false,
   aforoMaximo: false,
@@ -479,6 +504,21 @@ const errores = ref({
   tipoInstalacion: false,
   numeroCalles: false
 })
+
+const reservasActuales = computed(() => {
+  if (!reserva.value.fecha) return []
+
+  if (reserva.value.fecha.numeroCalles === 0) {
+    return reserva.value.fecha.slots || []
+  }
+
+  const calle = reserva.value.fecha.calles?.find(
+    (c: any) => c.numero === calleSeleccionada.value
+  )
+
+  return calle ? calle.slots : []
+})
+
 
 const openDias = ref([])
 
@@ -537,26 +577,6 @@ const diasSemana = [
   "Domingo"
 ];
 
-function mezclarReservas() {
-  instalacion.value.agenda.forEach((dia: any) => {
-    if (!dia.abierto) return;
-
-    dia.mapa_reservas.forEach((intervalo: any) => {
-      const reserva = instalacion.value.reservas_usuarios.find((r: any) => {
-        return (
-          r.diaSemana === diasSemana.indexOf(dia.dia) &&
-          estaDentro(intervalo, r)
-        );
-      });
-
-      if (reserva) {
-        intervalo.estado = 'Reserva usuario';
-        intervalo.pagada = reserva.pagada;
-      }
-    });
-  });
-}
-
 function esOcupadoPorPeriodo(intervalo: any) {
   const periodos = intervalo.periodo || []
 
@@ -583,17 +603,17 @@ const tipoVista = ref<'actividades' | 'alquileres'>('actividades')
 function getClaseIntervalo(intervalo: any) {
   if (tipoVista.value === 'actividades') {
     return {
-      'bg-success': intervalo.estado === 'Libre' || !esOcupadoPorPeriodo(intervalo) || (intervalo.estado === 'Reserva usuario' && !intervalo.pagada),
-      'bg-primary': intervalo.estado === 'Reserva actividad' && esOcupadoPorPeriodo(intervalo),
+      'bg-success': intervalo.estado === 'Libre' || !esOcupadoPorPeriodo(intervalo),
+      'bg-primary': intervalo.estado === 'Reserva actividad',
       'bg-danger': intervalo.estado === 'Reserva usuario' && intervalo.pagada
     }
   }
 
-  // Alquileres
+  // NUEVO alquileres
   return {
-    'bg-success': intervalo.estado === 'Libre' || intervalo.estado === 'Reserva actividad',
-    'bg-danger': intervalo.estado === 'Reserva usuario' && intervalo.pagada,
-    'bg-warning text-dark': intervalo.estado === 'Reserva usuario' && !intervalo.pagada,
+    'bg-success': intervalo.estado === 'Libre',
+    'bg-danger': intervalo.estado === 'Reservado' && intervalo.pagada,
+    'bg-warning text-dark': intervalo.estado === 'Reservado' && !intervalo.pagada,
   }
 }
 
@@ -766,6 +786,14 @@ watch(() => periodo, () => {
   openDias.value = []
 })
 
+watch(
+  () => reserva.value.seleccion.fecha,
+  async (nuevaFecha) => {
+    const data = await getAlquileresPorDia(instalacion.value.id, nuevaFecha)
+    reserva.value.fecha = data
+  }
+)
+
 onMounted(async () => {
   const id = parseInt(props.id);
 
@@ -792,7 +820,10 @@ onMounted(async () => {
     }
 
     instalacionOriginal.value = JSON.parse(JSON.stringify(instalacion.value))
-    mezclarReservas()
+
+    const alquileres = await getAlquileresPorDia(id, reserva.value.seleccion.fecha)
+    reserva.value.fecha = alquileres
+
   } catch (e) {
     mensaje.value = t.value.unexpectedError
     console.log("Error al obtener la informacion de la instalacion", e);

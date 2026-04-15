@@ -127,7 +127,7 @@
                     <!-- Dia (solo alquileres de instalaciones) -->
                     <div class="col-md-4" v-if="tipoVista === 'alquileres'">
                       <label class="form-label fw-semibold">{{ t.selectedDate }}</label>
-                      <input type="date" class="form-control" v-model="reserva.seleccion.fecha" />
+                      <input type="date" class="form-control form-control-lg" v-model="reserva.seleccion.fecha" />
                     </div>
 
                     <!-- Calle (solo piscina) -->
@@ -439,15 +439,14 @@ function getClaseIntervalo(intervalo: any) {
     return {
       'bg-success': intervalo.estado === 'Libre' || !esOcupadoPorPeriodo(intervalo),
       'bg-primary': intervalo.estado === 'Reserva actividad',
-      'bg-danger': intervalo.estado === 'Reserva usuario' && intervalo.pagada
+      'bg-danger': intervalo.estado === 'Reserva usuario'
     }
   }
 
   // NUEVO alquileres
   return {
     'bg-success': intervalo.estado === 'Libre',
-    'bg-danger': intervalo.estado === 'Reservado' && intervalo.pagada,
-    'bg-warning text-dark': intervalo.estado === 'Reservado' && !intervalo.pagada,
+    'bg-danger': intervalo.estado === 'Reservado',
   }
 }
 

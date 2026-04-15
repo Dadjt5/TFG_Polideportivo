@@ -10,7 +10,7 @@
       <!-- KPIs -->
       <div class="row g-4 mb-4 mt-3">
 
-        <div class="col-md-4 col-xl-2" v-for="kpi in kpis" :key="kpi.title">
+        <div class="col-md-4 col-xl-2" v-for="kpi in kpis" :key="kpi.key">
           <div class="card shadow-sm border-0 rounded-4 h-100">
             <div class="card-body text-center">
               <h6 class="text-muted">{{ kpi.title }}</h6>
@@ -85,7 +85,7 @@
 
 <script setup lang="ts">
 
-import { inject, type Ref, ref, onMounted } from 'vue'
+import { inject, type Ref, ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { Line, Bar } from 'vue-chartjs'
@@ -127,13 +127,24 @@ ChartJS.register(
   PointElement
 )
 
-const kpis = ref([
-  { title: 'Reservas totales', value: 0 },
-  { title: 'Reservas este mes', value: 0 },
-  { title: 'Cancelaciones', value: 0 },
-  { title: 'Dinero gastado', value: '0 €' },
-  { title: 'Actividad favorita', value: '-' },
-  { title: 'Pabellón favorito', value: '-' }
+// Valores base (solo datos)
+const kpisData = ref({
+  total: 0,
+  mes: 0,
+  cancelaciones: 0,
+  dinero: 0,
+  actividad: '-',
+  instalacion: '-'
+})
+
+// KPIs reactivos con textos dinámicos
+const kpis = computed(() => [
+  { key: 'total', title: t.value.totalReservations, value: kpisData.value.total },
+  { key: 'mes', title: t.value.monthReservations, value: kpisData.value.mes },
+  { key: 'cancelaciones', title: t.value.cancels, value: kpisData.value.cancelaciones },
+  { key: 'dinero', title: t.value.moneyUsed, value: kpisData.value.dinero + ' €' },
+  { key: 'actividad', title: t.value.favouriteActivity, value: kpisData.value.actividad },
+  { key: 'instalacion', title: t.value.favouriteFacility, value: kpisData.value.instalacion }
 ])
 
 const reservasChart = ref<any>(null)
@@ -155,20 +166,20 @@ onMounted(async () => {
 
     const data = await getEstadisticasUsuarioFinal()
 
-    kpis.value = [
-      { title: 'Reservas totales', value: data.reservas_totales },
-      { title: 'Reservas este mes', value: data.reservas_mes },
-      { title: 'Cancelaciones', value: data.cancelaciones },
-      { title: 'Dinero gastado', value: data.dinero_total + " €" },
-      { title: 'Actividad favorita', value: data.actividad_favorita },
-      { title: 'Pabellón favorito', value: data.pabellon_favorito }
-    ]
+    kpisData.value = {
+      total: data.reservas_totales,
+      mes: data.reservas_mes,
+      cancelaciones: data.cancelaciones,
+      dinero: data.dinero_total,
+      actividad: data.actividad_favorita,
+      instalacion: data.instalacion_favorita
+    }
 
     reservasChart.value = {
       labels: data.reservas_por_mes.labels,
       datasets: [
         {
-          label: "Reservas",
+          label: t.value.reservations,
           data: data.reservas_por_mes.data,
           borderColor: "#0d6efd",
           backgroundColor: "rgba(13,110,253,0.2)",
@@ -181,7 +192,7 @@ onMounted(async () => {
       labels: data.actividades_usuario.labels,
       datasets: [
         {
-          label: "Reservas",
+          label: t.value.reservations,
           data: data.actividades_usuario.data,
           backgroundColor: "#198754"
         }
@@ -192,7 +203,7 @@ onMounted(async () => {
       labels: data.reservas_por_dia.labels,
       datasets: [
         {
-          label: "Reservas",
+          label: t.value.reservations,
           data: data.reservas_por_dia.data,
           backgroundColor: "#ffc107"
         }

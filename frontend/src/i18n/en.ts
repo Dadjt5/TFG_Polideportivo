@@ -687,7 +687,20 @@ export default {
   activityReservations12Months: 'Activity bookings last 12 months',
   incomeForType: 'Revenue by type',
   activityInscriptions: 'Bookings by activity',
-  pavilionUses: 'Use of halls',
+  pavilionUses: 'Use of facilities',
+  inscriptions: "Inscriptions",
+  income: "Income",
+  hoursUsed: "Booking hours",
+  occupancy: "Occupancy",
+
+  /* Estadisticas usuario final */
+  totalReservations: "Total bookings",
+  monthReservations: "Bookings this month",
+  cancels: "Cancellations",
+  moneyUsed: "Money spent",
+  favouriteActivity: "Favourite activity",
+  favouriteFacility: "Favourite facility",
+  reservations: "Bookings",
 
   /* Contacto */
   contactTitle: "Sports Center Contact",

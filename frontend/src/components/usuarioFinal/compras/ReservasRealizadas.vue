@@ -46,10 +46,9 @@
             <template v-if="reserva.tipo === 'ALQUILER'">
               <p class="mb-1"><i class="bi bi-calendar-event me-1 text-primary"></i>{{ t.date }}: {{ reserva.fecha }}
               </p>
-              <p class="mb-1"><i class="bi bi-clock me-1 text-success"></i>{{ t.hours }}: {{ reserva.horaInicio }} - {{
-                reserva.horaFin }}</p>
-              <p class="mb-1"><i class="bi bi-building me-1 text-primary"></i>{{ t.facilityType }}: {{
-                reserva.instalacion?.tipo }}</p>
+              <p class="mb-1"><i class="bi bi-clock me-1 text-success"></i>{{ t.hours }}: {{ reserva.horaInicio }} - {{reserva.horaFin }}</p>
+              <p class="mb-1"><i class="bi bi-building me-1 text-primary"></i>{{ t.facilityType }}: {{reserva.instalacion?.tipo }}</p>
+              <p class="mb-1"><i class="bi bi-currency-euro me-1 text-primary"></i>{{ t.price }}: {{ reserva.coste }}€</p>
             </template>
 
             <!-- RESERVA -->
@@ -66,6 +65,7 @@
                 <i class="bi bi-percent me-1 text-success"></i>{{ t.discounts }}:
                 <span v-for="d in reserva.descuentos" :key="d.id">{{ d.nombre }} ({{ d.porcentaje }}%)</span>
               </p>
+              <p class="mb-1"><i class="bi bi-currency-euro me-1 text-primary"></i>{{ t.price }}: {{ reserva.coste }}€</p>
             </template>
 
             <!-- LISTA DE ESPERA -->
@@ -226,6 +226,7 @@ type Reserva = {
   fecha?: string
   horaInicio?: string | number
   horaFin?: string | number
+  coste?: number
   tarifa?: {
     id?: number
     nombre?: string
@@ -247,6 +248,7 @@ let confirmModalLista: Modal
 let successModal: Modal
 
 const puedeCancelar = (reserva: Reserva) => {
+  if (!reserva.puede_cancelar) return false
   if (reserva.estado !== "Confirmada") return false
 
   if (!reserva.actividad) return reserva.tipo === "ALQUILER" ? true : false
