@@ -359,6 +359,7 @@ class Instalacion(models.Model):
     # Función para controlar si se puede realizar un alquiler en el preiodo seleccionado
     def controlarAlquiler(self, dia, horaInicio, horaFin, calle=None):
         agenda = self.agenda.filter(fecha=dia).first()
+
         if agenda:
             return False
         else:
@@ -375,7 +376,6 @@ class Instalacion(models.Model):
             }
 
             dia_modelo = mapa_dias[dia_semana]
-
             agenda = Agenda.objects.filter(instalacion=self, dia__iexact=dia_modelo).first()
 
         if not agenda:
@@ -397,7 +397,6 @@ class Instalacion(models.Model):
             horaCierre = time(h, m)
 
         agenda = Agenda.objects.filter(instalacion=self, dia=dia, fecha__isnull=True).first()
-
         if not abierto:
             if agenda:
                 agenda.abierto = False

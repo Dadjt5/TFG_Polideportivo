@@ -75,7 +75,7 @@ class MapaReservas(models.Model):
     horaFin = models.TimeField()
     estado = models.CharField(max_length=40, default=TipoReserva.LIBRE, choices=TipoReserva.choices)
 
-    agenda = models.ForeignKey(Agenda, on_delete=models.CASCADE, related_name="mapa_reservas")
+    agenda = models.ForeignKey(Agenda, on_delete=models.CASCADE, related_name="mapa_reservas", blank=True, null=True)
     calle = models.ForeignKey('Calle', on_delete=models.CASCADE, null=True, blank=True, related_name="mapas")
 
     def __str__(self):

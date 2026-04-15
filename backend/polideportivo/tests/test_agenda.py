@@ -38,7 +38,13 @@ class AgendaTests(TestCase):
     # ---------------- ESTA OCUPADO ----------------
 
     def test_esta_ocupado_sin_reservas(self):
-        # Sin reservas un slot debe estar libre
+        MapaReservas.objects.create(
+            agenda=self.agenda,
+            horaInicio=time(9,0),
+            horaFin=time(10,0),
+            estado=TipoReserva.LIBRE
+        )
+
         ocupado = self.agenda.estaOcupado(time(9,0), time(10,0))
         self.assertFalse(ocupado)
 
@@ -60,6 +66,14 @@ class AgendaTests(TestCase):
             horaInicio=time(10,0),
             horaFin=time(11,0),
             estado=TipoReserva.LIBRE,
+            calle=self.calle2
+        )
+
+        MapaReservas.objects.create(
+            agenda=self.agenda,
+            horaInicio=time(10,0),
+            horaFin=time(11,0),
+            estado=TipoReserva.ACTIVIDAD,
             calle=self.calle1
         )
 
@@ -112,17 +126,27 @@ class MapaReservasTests(TestCase):
 
     # ---------------- STR ----------------
 
-    def test_str_mapa_reserva(self):
+    def test_str_mapa_reserva_con_agenda(self):
         reserva = MapaReservas.objects.create(
             agenda=self.agenda,
-            horaInicio=time(9,0),
-            horaFin=time(10,0),
+            horaInicio=time(9, 0),
+            horaFin=time(10, 0),
             estado=TipoReserva.LIBRE,
-            calle=self.calle1
         )
 
-        self.assertEqual(str(reserva), f'{Dia.LUNES} 09:00:00-10:00:00')
+        expected = f"{self.agenda} 09:00:00-10:00:00"
+        self.assertEqual(str(reserva), expected)
 
+    def test_str_mapa_reserva_con_calle(self):
+        reserva = MapaReservas.objects.create(
+            calle=self.calle1,
+            horaInicio=time(11, 0),
+            horaFin=time(12, 0),
+            estado=TipoReserva.LIBRE,
+        )
+
+        expected = f"{self.calle1} 11:00:00-12:00:00"
+        self.assertEqual(str(reserva), expected)
 
     # ---------------- ORDEN DE LAS RESERVAS ----------------
 

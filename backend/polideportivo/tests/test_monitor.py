@@ -1,14 +1,14 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.db.utils import IntegrityError
-from unittest.mock import Mock, patch
+from unittest.mock import MagicMock, Mock, patch
 from datetime import datetime, time, date, timedelta
 from django.utils import timezone
 
 
 from ..models import (
-    Monitor, Usuario, Periodo, Actividad, Sesion, Instalacion,
-    Pabellon, Asistencia
+    Monitor, UsuarioFinal, Periodo, Actividad, Sesion, Instalacion,
+    Pabellon, Asistencia, Configuracion, Notificacion
 )
 
 
@@ -17,6 +17,9 @@ class MonitorTests(TestCase):
         User = get_user_model()
         self.auth_user = User.objects.create_user(username="dni1", email="monitor1@test.com", password="pass123")
         self.monitor = Monitor.objects.create(user=self.auth_user, nombre="Test", apellidos="Monitor", DNI="dni1")
+
+        user = User.objects.create_user(username="user", password="pass123")
+        self.usuario = UsuarioFinal.objects.create(nombre="user", user=user, fechaNacimiento=date(2001,1,1))
 
         pabellon = Pabellon.objects.create()
         instalacion = Instalacion.objects.create(pabellon=pabellon)
@@ -32,26 +35,50 @@ class MonitorTests(TestCase):
 
     # ----------------- REVISAR ACTIVIDADES -----------------
     
-    @patch("polideportivo.models.Notificacion")
-    def test_revisarActividades_notifica_correctamente(self, NotificacionMock):
+    def test_revisarActividades_notifica_correctamente(self):
         ahora = timezone.now()
+        dia_hoy = ahora.weekday()
+
+        mapa_dias_reverse = {
+            0: "Lunes",
+            1: "Martes",
+            2: "Miercoles",
+            3: "Jueves",
+            4: "Viernes",
+            5: "Sabado",
+            6: "Domingo",
+        }
+
+        Configuracion.objects.create(
+            titulo_avisos_sobre_actividades_monitores="Aviso"
+        )
 
         sesion = Sesion.objects.create(
-            dia=ahora.weekday(),  # día de hoy
+            dia=mapa_dias_reverse[dia_hoy],
             horaInicio=(ahora + timedelta(minutes=30)).time(),
             horaFin=(ahora + timedelta(minutes=90)).time(),
             actividad=self.actividad
         )
 
-        asistencia_real = Asistencia.objects.create(usuarioFinal=self.usuario, sesion=sesion)
+        asistencia_real = Asistencia.objects.create(
+            usuarioFinal=self.usuario,
+            sesion=sesion
+        )
+        
         self.usuario.asistencias.set([asistencia_real])
 
-        with patch("polideportivo.models.Monitor.timezone.now") as now_mock:
-            now_mock.return_value = ahora
+        # Fijamos el tiempo actual
+        with patch("polideportivo.models.monitor.now", return_value=ahora):
             self.monitor.revisarActividades()
 
-        # Verificamos que se haya llamado a la notificación
-        NotificacionMock.notificarActividadMonitor.assert_called_once_with(sesion.actividad, sesion)
+        self.assertTrue(
+            Notificacion.objects.filter(
+                usuario=self.monitor.user,
+                actividad=sesion.actividad,
+                sesion=sesion,
+                fecha=ahora.date()
+            ).exists()
+    )
 
     # ----------------- COMPROBAR DISPONIBILIDAD -----------------
 

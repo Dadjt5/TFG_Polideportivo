@@ -208,8 +208,18 @@ class UsuarioFinalTests(TestCase):
         ahora = timezone.now()
         dia_hoy = ahora.weekday()
 
+        mapa_dias_reverse = {
+            0: "Lunes",
+            1: "Martes",
+            2: "Miercoles",
+            3: "Jueves",
+            4: "Viernes",
+            5: "Sabado",
+            6: "Domingo",
+        }
+
         sesion = Sesion.objects.create(
-            dia=dia_hoy,
+            dia=mapa_dias_reverse[dia_hoy],
             horaInicio=(ahora + timedelta(minutes=30)).time(),
             horaFin=(ahora + timedelta(minutes=90)).time(),
             actividad=self.actividad
@@ -220,7 +230,7 @@ class UsuarioFinalTests(TestCase):
 
         mock_filter.return_value.exists.return_value = False
 
-        with patch("polideportivo.models.UsuarioFinal.timezone.now") as now_mock:
+        with patch("polideportivo.models.usuario_final.now") as now_mock:
             now_mock.return_value = ahora
             self.usuario.revisarActividades()
 

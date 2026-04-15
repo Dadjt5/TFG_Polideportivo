@@ -63,7 +63,6 @@ class UsuarioFinal(Usuario):
 
         for asistencia in self.asistencias.all():
             sesion = asistencia.sesion
-
             sesion.comprobarPeriodo(fecha_actual.month)
 
             hoy = fecha_actual.date()

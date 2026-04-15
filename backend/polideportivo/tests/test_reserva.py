@@ -6,8 +6,8 @@ from django.contrib.auth import get_user_model
 from ..models import (
     ReservaActividad, UsuarioFinal, Descuento,
     Actividad, EstadoReserva, FormaReserva, ListaEspera,
-    Instalacion, TipoInstalacion, Alquiler, Pabellon, Monitor,
-    TarifaInstalacion
+    Instalacion, Alquiler, Pabellon, Monitor,
+    TarifaInstalacion, ActividadComun
 )
 
 User = get_user_model()
@@ -33,13 +33,13 @@ class ReservaBaseTests(TestCase):
     # ----------------- CALCULAR DESCUENTO -----------------
 
     def test_calcularDescuento_sin_descuentos(self):
-        self.assertEqual(self.reserva.calcularDescuento(), 0.0)
+        self.assertEqual(self.reserva.calcularDescuento(), {})
 
     def test_calcularDescuento_un_descuento(self):
         d = Descuento.objects.create(nombre="D1", porcentaje=10, fechaInicio=date(2000, 1, 1), fechaFinValidez=date(2000, 1, 1))
         self.reserva.descuentos.add(d)
 
-        self.assertEqual(self.reserva.calcularDescuento(), 10)
+        self.assertEqual(self.reserva.calcularDescuento(), {'D1': 10})
 
     def test_calcularDescuento_varios_descuentos(self):
         d1 = Descuento.objects.create(nombre="D1", porcentaje=10, fechaInicio=date(2000, 1, 1), fechaFinValidez=date(2000, 1, 1))
@@ -47,7 +47,7 @@ class ReservaBaseTests(TestCase):
 
         self.reserva.descuentos.add(d1, d2)
 
-        self.assertEqual(self.reserva.calcularDescuento(), 25)
+        self.assertEqual(self.reserva.calcularDescuento(), {'D1': 10, 'D2': 15})
 
 
 
@@ -70,6 +70,7 @@ class ReservaActividadTests(TestCase):
             monitor=monitor
         )
 
+        self.tarifa = ActividadComun
         self.lista = ListaEspera.objects.create(actividad=self.actividad)
 
 
@@ -84,8 +85,7 @@ class ReservaActividadTests(TestCase):
 
     def test_calcularPrecio(self):
         reserva = ReservaActividad.objects.create(usuarioFinal=self.usuario, actividad=self.actividad)
-
-        self.actividad._calcularPrecio_base = Mock(return_value=50)
+        self.actividad._calcular_precio_base = Mock(return_value=50)
 
         precio = reserva.calcularPrecio()
         self.assertEqual(precio, 50)
@@ -107,7 +107,7 @@ class ReservaActividadTests(TestCase):
 
     # ----------------- CANCELAR -----------------
 
-    @patch("polideportivo.models.reserva.Notificacion.notificarSalidaListaDeEspera")
+    @patch("polideportivo.models.Notificacion.notificarSalidaListaDeEspera")
     def test_cancelarCompra(self, noti_mock):
         reserva = ReservaActividad.objects.create(
             usuarioFinal=self.usuario,
@@ -191,13 +191,11 @@ class ReservaActividadTests(TestCase):
         )
 
         descuento_mock.return_value = {
-            "descuento": {
-                "aplicados": [descuento]
-            }
+            "porcentaje_total": 10,
+            "descuentos": [descuento]
         }
 
         reserva = ReservaActividad.nuevaReserva(self.usuario, self.actividad)
-
         self.assertIsNotNone(reserva)
 
 
@@ -216,7 +214,7 @@ class AlquilerTests(TestCase):
         self.instalacion.tarifa = TarifaInstalacion()
         self.instalacion.tarifa.costeIluminacion = 10
 
-        self.instalacion._calcularPrecio_base = Mock(return_value=20)
+        self.instalacion._calcular_precio_base = Mock(return_value=20)
         self.instalacion.controlarAlquiler = Mock(return_value=True)
 
 
@@ -373,9 +371,8 @@ class AlquilerTests(TestCase):
         )
 
         descuento_mock.return_value = {
-            "descuento": {
-                "aplicados": [descuento]
-            }
+            "porcentaje_total": 10,
+            "descuentos": [descuento]
         }
 
         reserva = Alquiler.nuevaReserva(

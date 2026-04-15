@@ -293,3 +293,51 @@ class CompraAbonoTest(TestCase):
 
         self.assertEqual(pendientes.count(), 1)
         self.assertEqual(pendientes.first().id, nueva.id)
+    
+    def test_compra_abono_verano_nueva(self):
+        compra = CompraAbono.compraAbono(
+            self.abono_ver,
+            self.usuario,
+            "abono_verano"
+        )
+
+        self.assertIsNotNone(compra)
+        self.assertEqual(compra.estado, EstadoReserva.PENDIENTE)
+        self.assertEqual(compra.abonoVerano, self.abono_ver)
+    
+    def test_no_duplica_compra_confirmada_verano(self):
+        CompraAbono.objects.create(
+            usuarioFinal=self.usuario,
+            abonoVerano=self.abono_ver,
+            estado=EstadoReserva.CONFIRMADA
+        )
+
+        compra = CompraAbono.compraAbono(
+            self.abono_ver,
+            self.usuario,
+            "abono_verano"
+        )
+
+        self.assertIsNone(compra)
+    
+    def test_elimina_pendientes_verano(self):
+        CompraAbono.objects.create(
+            usuarioFinal=self.usuario,
+            abonoVerano=self.abono_ver,
+            estado=EstadoReserva.PENDIENTE
+        )
+
+        nueva = CompraAbono.compraAbono(
+            self.abono_ver,
+            self.usuario,
+            "abono_verano"
+        )
+
+        pendientes = CompraAbono.objects.filter(
+            usuarioFinal=self.usuario,
+            abonoVerano=self.abono_ver,
+            estado=EstadoReserva.PENDIENTE
+        )
+
+        self.assertEqual(pendientes.count(), 1)
+        self.assertEqual(pendientes.first().id, nueva.id)

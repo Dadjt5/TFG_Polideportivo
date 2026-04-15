@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.utils.timezone import now
 from datetime import timedelta, date
 
-from ..models import Descuento, Deporte, TipoInstalacion
+from ..models import Descuento, Deporte, TipoInstalacion, Pabellon, Instalacion
 
 class DescuentoTests(TestCase):
     def setUp(self):
@@ -12,6 +12,9 @@ class DescuentoTests(TestCase):
         self.hoy = now().date()
         self.ayer = self.hoy - timedelta(days=1)
         self.manana = self.hoy + timedelta(days=1)
+
+        pabellon = Pabellon.objects.create()
+        self.instalacion = Instalacion.objects.create(pabellon=pabellon)
 
         self.desc1 = Descuento.objects.create(
             nombre="Descuento 10%",
@@ -81,8 +84,16 @@ class DescuentoTests(TestCase):
 
     def test_obtener_descuentos_por_deporte(self):
         class ActividadMock:
-            deportes = self.futbol
-        resultado = Descuento.obtenerDescuentos(actividad=ActividadMock())
+            def __init__(self, deporte, instalacion):
+                self.deportes = deporte
+                self.instalacion = instalacion
+
+        actividad = ActividadMock(
+            deporte=self.futbol,
+            instalacion=self.instalacion
+        )
+
+        resultado = Descuento.obtenerDescuentos(actividad=actividad)
 
         self.assertIsNotNone(resultado)
         self.assertEqual(resultado['porcentaje_total'], 10)
