@@ -59,6 +59,12 @@ api.interceptors.response.use(
         return api(originalRequest)
       } catch (err) {
         auth.logout()
+
+        localStorage.removeItem("access")
+        localStorage.removeItem("refresh")
+
+        window.location.href = "/login"
+
         return Promise.reject(err)
       }
     }
