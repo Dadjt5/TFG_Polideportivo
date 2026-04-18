@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from django.test import TestCase
 from django.db.utils import IntegrityError
 from datetime import date, timedelta
@@ -135,3 +137,39 @@ class TDATests(TestCase):
         TDA.objects.create(usuarioFinal=usuario, tarifa=tarifa)
 
         self.assertEqual(TDA.contar(), 2)
+
+
+    # ----------------- COMPRAR TDA -----------------
+
+    def test_compra_tda_sin_tarifa_devuelve_none(self):
+        TarifaTDA.objects.all().delete()
+
+        tda = TDA.compraTDA(self.usuario)
+
+        self.assertIsNone(tda)
+    
+    @patch("polideportivo.models.tda.TarifaTDA.objects.exists")
+    @patch("polideportivo.models.tda.TarifaTDA.objects.first")
+    def test_compra_tda_tarifa_exists_false(self, mock_first, mock_exists):
+        mock_first.return_value = object()
+        mock_exists.return_value = False
+
+        tda = TDA.compraTDA(self.usuario)
+
+        self.assertIsNone(tda)
+
+    def test_compra_tda_elimina_tda_caducada(self):
+        tda_vencida = TDA.objects.create(
+            usuarioFinal=self.usuario,
+            estado=EstadoReserva.CONFIRMADA,
+            fechaExpiracion=date.today() - timedelta(days=1),
+            tarifa=self.tarifa
+        )
+
+        tda_nueva = TDA.compraTDA(self.usuario)
+
+        self.assertFalse(
+            TDA.objects.filter(id=tda_vencida.id).exists()
+        )
+
+        self.assertIsNotNone(tda_nueva)

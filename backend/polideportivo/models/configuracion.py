@@ -47,20 +47,16 @@ class Configuracion(models.Model):
 
     # Función para editar los campos de la configuracion
     def editar(self, data):
-        try:
-            valor_original_cancelacion = self.dias_minimo_cancelacion
+        valor_original_cancelacion = self.dias_minimo_cancelacion
 
-            for campo, valor in data.items():
-                if hasattr(self, campo):
-                    setattr(self, campo, valor)
+        for campo, valor in data.items():
+            if hasattr(self, campo):
+                setattr(self, campo, valor)
+    
+        self.save()
 
-            self.save()
+        if 'dias_minimo_cancelacion' in data and data['dias_minimo_cancelacion'] != valor_original_cancelacion:
+            from .notificacion import Notificacion
+            Notificacion.notificarCambioCancelacion()
 
-            if 'dias_minimo_cancelacion' in data and data['dias_minimo_cancelacion'] != valor_original_cancelacion:
-                from .notificacion import Notificacion
-                Notificacion.notificarCambioCancelacion()
-
-            return True
-        except Exception as e:
-            print("Error al editar configuración:", e)
-            return False
+        return True

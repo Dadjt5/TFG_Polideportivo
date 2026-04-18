@@ -1,8 +1,9 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from unittest.mock import patch, PropertyMock
+from datetime import date
 
-from ..models import RolAdministrador
+from ..models import RolAdministrador, UsuarioFinal, Monitor
 
 
 class UserTests(TestCase):
@@ -33,11 +34,36 @@ class UserTests(TestCase):
         with patch.object(type(self.user), 'is_usuario_final', new_callable=PropertyMock) as mock_prop:
             mock_prop.return_value = True
             self.assertTrue(self.user.is_usuario_final)
+    
+    def test_is_usuario_final(self):
+        self.assertFalse(self.user.is_usuario_final)
+
+        UsuarioFinal.objects.create(
+            user=self.user,
+            nombre="Juan",
+            apellidos="Test",
+            DNI="12345678A",
+            fechaNacimiento=date(2001,1,1)
+        )
+
+        self.assertTrue(self.user.is_usuario_final)
 
     def test_is_monitor(self):
         with patch.object(type(self.user), 'is_monitor', new_callable=PropertyMock) as mock_prop:
             mock_prop.return_value = True
             self.assertTrue(self.user.is_monitor)
+    
+    def test_is_monitor(self):
+        self.assertFalse(self.user.is_monitor)
+
+        Monitor.objects.create(
+            user=self.user,
+            nombre="Juan",
+            apellidos="Test",
+            DNI="12345678A"
+        )
+
+        self.assertTrue(self.user.is_monitor)
 
     def test_is_administrador(self):
         with patch.object(type(self.user), 'is_administrador', new_callable=PropertyMock) as mock_prop:

@@ -1,5 +1,5 @@
 from django.test import TestCase
-from datetime import time
+from datetime import time, date
 
 from ..models import (
     Agenda, MapaReservas, TipoReserva, Dia, TipoInstalacion,
@@ -21,6 +21,20 @@ class AgendaTests(TestCase):
             horaCierre=time(20, 0),
             abierto=True
         )
+
+    # ---------------- CREACION ----------------
+    def test_save_agenda_con_fecha_y_dia_lanza_error(self):
+        agenda = Agenda(
+            fecha=date.today(),
+            dia="Lunes",
+            instalacion=self.instalacion
+        )
+
+        with self.assertRaises(ValueError) as context:
+            agenda.save()
+
+        self.assertEqual(str(context.exception), "No puede tener fecha y día a la vez")
+
 
     # ---------------- STR ----------------
 

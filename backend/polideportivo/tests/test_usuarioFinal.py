@@ -8,7 +8,7 @@ from django.contrib.auth import get_user_model
 
 from ..models import (
     UsuarioFinal, Rol, Sexo, Sesion, Asistencia, Instalacion,
-    Pabellon, Monitor, Actividad, Dia
+    Pabellon, Monitor, Actividad, Dia, Foro, Canal
 )
 
 
@@ -48,6 +48,19 @@ class UsuarioFinalTests(TestCase):
             DNI="12345678A",
             sexo=Sexo.NINGUNO,
             esUAM=False
+        )
+
+        foro = Foro.objects.create(
+            titulo = "Foro",
+            numeroParticipantes = 0
+       )
+    
+        Canal.objects.create(
+            titulo = "Buzón de sugerencias",
+            tema = "Buzón",
+            numeroParticipantes = 0,
+            secreto=True,
+            foro=foro
         )
 
         user = User.objects.create(username="monitor1", password="1234")
@@ -261,3 +274,14 @@ class UsuarioFinalTests(TestCase):
 
         self.usuario.revisarActividades()
         mock_notificar.assert_not_called()
+    
+    def test_delete_elimina_usuario_auth(self):
+        auth_id = self.auth_user.id
+
+        self.usuario.delete()
+
+        User = get_user_model()
+
+        self.assertFalse(
+            User.objects.filter(id=auth_id).exists()
+        )

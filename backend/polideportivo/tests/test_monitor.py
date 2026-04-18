@@ -80,6 +80,7 @@ class MonitorTests(TestCase):
             ).exists()
     )
 
+
     # ----------------- COMPROBAR DISPONIBILIDAD -----------------
 
     def test_comprobarDisponibilidad_true_false(self):
@@ -90,6 +91,15 @@ class MonitorTests(TestCase):
 
         self.assertFalse(self.monitor.comprobarDisponibilidad([sesiones_nueva[1]], Periodo.ANUAL))
         self.assertTrue(self.monitor.comprobarDisponibilidad([sesiones_nueva[0]], Periodo.ANUAL))
+
+    def test_comprobarDisponibilidad_evitando_actividad(self):
+        sesiones_nueva = [
+            {"dia": "Lunes", "horaInicio": time(12, 0), "horaFin": time(13, 0)},
+            {"dia": "Lunes", "horaInicio": time(10, 30), "horaFin": time(11, 30)}
+        ]
+
+        self.assertFalse(self.monitor.comprobarDisponibilidad([sesiones_nueva[1]], Periodo.ANUAL, actividad_id=1))
+        self.assertTrue(self.monitor.comprobarDisponibilidad([sesiones_nueva[0]], Periodo.ANUAL, actividad_id=1))
 
 
     # ----------------- REGISTRAR -----------------

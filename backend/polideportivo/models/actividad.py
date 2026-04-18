@@ -99,7 +99,7 @@ class Actividad(models.Model):
             }
 
         raise Http404("Tipo de actividad no válido")
-    
+
     # Función de ayuda para calcular el precio base de la actividad basandose en la tarifa y el tipo de actividad
     def _calcular_precio_base(self, usuario, numeroHorasSemana=0, numeroPersonas=0, tipoPago='', tipoSesion=''):
         """Devuelve el precio base según tipo de actividad y parámetros"""

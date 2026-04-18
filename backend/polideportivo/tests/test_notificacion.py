@@ -18,10 +18,10 @@ class NotificacionTests(TestCase):
         self.usuario_final = UsuarioFinal.objects.create(user=self.user1, fechaNacimiento=date(2000, 1, 1))
         self.monitor = Monitor.objects.create(user=self.user2, nombre="Mon", apellidos="Test", DNI="dni123")
 
-        pabellon = Pabellon.objects.create()
-        instalacion = Instalacion.objects.create(pabellon=pabellon)
+        self.pabellon = Pabellon.objects.create()
+        self.instalacion = Instalacion.objects.create(pabellon=self.pabellon)
 
-        self.actividad = Actividad.objects.create(nombre="Yoga", monitor=self.monitor, instalacion=instalacion)
+        self.actividad = Actividad.objects.create(nombre="Yoga", monitor=self.monitor, instalacion=self.instalacion)
         self.sesion = Sesion.objects.create(actividad=self.actividad, dia="Lunes", horaInicio=time(10,0), horaFin=time(11,0))
 
         # Debemos crear una reserva para que algunas de las notificaciones se pueden enviar correctamente
@@ -29,8 +29,8 @@ class NotificacionTests(TestCase):
 
         # Configuración de prueba
         Configuracion.objects.create(
-            titulo_aviso_devolucion_dinero_alquiler="Devolucion",
-            texto_aviso_devolucion_dinero_alquiler="Se devolvio dinero",
+            titulo_aviso_devolucion_dinero_alquiler="Devolución alquiler",
+            texto_aviso_devolucion_dinero_alquiler="Se ha realizado la devolución",
             titulo_avisos_sobre_actividades_usuarios="Actividad próxima",
             texto_avisos_sobre_actividades_usuarios="Tu actividad empieza pronto",
             titulo_avisos_sobre_actividades_monitores="Actividad próxima monitor",
@@ -89,7 +89,36 @@ class NotificacionTests(TestCase):
     def test_nuevaNotificacion_mock_bulk(self, bulk_create_mock):
         Notificacion.nuevaNotificacion("Test", "Desc", "USUARIOS_FINALES", None)
         bulk_create_mock.assert_called_once()
+    
+    @patch("polideportivo.models.notificacion.Notificacion.objects.bulk_create")
+    def test_nuevaNotificacion_monitores(self, bulk_create_mock):
+        Notificacion.nuevaNotificacion("Test", "Desc", "MONITORES", None)
+        bulk_create_mock.assert_called_once()
 
+    @patch("polideportivo.models.notificacion.Notificacion.objects.bulk_create")
+    def test_nuevaNotificacion_administradores(self, bulk_create_mock):
+        Notificacion.nuevaNotificacion("Test", "Desc", "ADMINISTRADORES", None)
+        bulk_create_mock.assert_called_once()
+    
+    @patch("polideportivo.models.notificacion.Notificacion.objects.bulk_create")
+    def test_nuevaNotificacion_tipo_invalido(self, bulk_create_mock):
+        Notificacion.nuevaNotificacion("Test", "Desc", "INVALIDO", None)
+        bulk_create_mock.assert_called_once_with([])
+
+    @patch("polideportivo.models.notificacion.Notificacion.objects.bulk_create")
+    def test_nuevaNotificacion_actividad(self, bulk_create_mock):
+        Notificacion.nuevaNotificacion("Test", "Desc", "ACTIVIDAD", self.actividad.id)
+        bulk_create_mock.assert_called_once()
+
+    @patch("polideportivo.models.notificacion.Notificacion.objects.bulk_create")
+    def test_nuevaNotificacion_instalacion(self, bulk_create_mock):
+        Notificacion.nuevaNotificacion("Test", "Desc", "INSTALACION", self.instalacion.id)
+        bulk_create_mock.assert_called_once()
+
+    @patch("polideportivo.models.notificacion.Notificacion.objects.bulk_create")
+    def test_nuevaNotificacion_pabellon(self, bulk_create_mock):
+        Notificacion.nuevaNotificacion("Test", "Desc", "PABELLON", self.pabellon.id)
+        bulk_create_mock.assert_called_once()
 
     # ----------------- NOTIFICACIONES AUTOMATICAS -----------------
 
@@ -107,6 +136,21 @@ class NotificacionTests(TestCase):
         self.assertEqual(n.actividad, self.actividad)
         self.assertEqual(n.sesion, self.sesion)
         self.assertEqual(n.usuario, self.monitor.user)
+    
+    def test_notificarCancelacionYDevolucionDinero(self):
+        usuarios = [self.usuario]
+
+        Notificacion.notificarCancelacionYDevolucionDinero(
+            usuarios,
+            self.instalacion
+        )
+
+        n = Notificacion.objects.first()
+
+        self.assertEqual(n.usuario, self.usuario.user)
+        self.assertEqual(n.instalacion, self.instalacion)
+        self.assertEqual(n.titulo, "Devolución alquiler")
+        self.assertEqual(n.descripcion, "Se ha realizado la devolución")
 
     def test_notificarProblemasPago(self):
         Notificacion.notificarProblemasPago(self.user1)
@@ -127,6 +171,9 @@ class NotificacionTests(TestCase):
         self.assertEqual(n.titulo, "Nueva actividad")
         self.assertEqual(n.actividad, self.actividad)
         self.assertEqual(n.usuario, self.usuario_final.user)
+    
+    def test_notificarNuevaActividad_fallo(self):
+        self.assertIsNone(Notificacion.notificarNuevaActividad(self.actividad))
 
     def test_notificarCambioSesiones(self):
         Notificacion.notificarCambioSesiones(self.actividad)
