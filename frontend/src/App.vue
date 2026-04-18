@@ -43,6 +43,11 @@ function logoutUsuario() {
 
   activeStore.value.cerrarSesion();
   userStore.logout();
+
+  localStorage.removeItem("access");
+  localStorage.removeItem("refresh");
+
+  console.log("buenas")
   router.push("/");
 }
 
@@ -59,6 +64,7 @@ onMounted(() => {
   window.addEventListener('click', resetInactivityTimer);
   window.addEventListener('scroll', resetInactivityTimer);
   window.addEventListener('touchstart', resetInactivityTimer);
+  window.addEventListener("beforeunload", logoutUsuario);
 
   resetInactivityTimer();
 });
@@ -69,6 +75,7 @@ onUnmounted(() => {
   window.removeEventListener('click', resetInactivityTimer);
   window.removeEventListener('scroll', resetInactivityTimer);
   window.removeEventListener('touchstart', resetInactivityTimer);
+  window.removeEventListener("beforeunload", logoutUsuario);
 
   clearTimeout(inactivityTimer);
 });

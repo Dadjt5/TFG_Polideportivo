@@ -1,5 +1,6 @@
 import axios, { type AxiosError, type InternalAxiosRequestConfig } from "axios"
 import { useAuthStore } from "../stores/auth"
+import router from "@/router"
 
 /* Creamos instancia principal */
 const api = axios.create({
@@ -63,7 +64,7 @@ api.interceptors.response.use(
         localStorage.removeItem("access")
         localStorage.removeItem("refresh")
 
-        window.location.href = "/login"
+        await router.push('/login')
 
         return Promise.reject(err)
       }

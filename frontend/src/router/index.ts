@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import type { RouterScrollBehavior } from 'vue-router'
 
 /* Genericos */
 import Home from '@/components/Home.vue'
@@ -208,21 +209,27 @@ const routes = [
   { path: '/editar/descuento/:id', component: EditarDescuento, props: true, name: 'editar-descuento', meta: { requiresAuth: true, allowedAdminRoles: ['Administrador raiz', 'Administrador de tarifas'] } },
 ]
 
+const scrollBehavior: RouterScrollBehavior = () => {
+  return { top: 0 }
+}
 
 /* Cada vez que se accede a una página se redirige el scrollbar arriba */
 const router = createRouter({
   history: createWebHistory(),
   routes,
-  scrollBehavior(to, from, savedPosition) {
-    return { top: 0 };
-  }
+  scrollBehavior
 })
 
 router.beforeEach(async (to) => {
   const auth = useAuthStore();
 
-  if (!auth.user) {
-    await auth.fetchUser();
+  if (!auth.user && auth.isAuthenticated) {
+    try {
+      await auth.fetchUser();
+    } catch {
+      auth.logout();
+      return '/login';
+    }
   }
 
   if (to.path === '/home') {
@@ -231,15 +238,12 @@ router.beforeEach(async (to) => {
     if (auth.isAdmin) return '/home-administrador';
   }
 
-  // Rutas públicas
   if (to.meta.public) return true;
 
-  // Requiere login
   if (!auth.isAuthenticated) return '/login';
 
-  // Roles
   if (to.meta.allowedRoles) {
-    const allowed = to.meta.allowedRoles;
+    const allowed = to.meta.allowedRoles as string[];
 
     if (
       (allowed.includes('usuario_final') && auth.isUsuarioFinal) ||
@@ -252,9 +256,8 @@ router.beforeEach(async (to) => {
     return '/login';
   }
 
-  // Roles de admin
   if (to.meta.allowedAdminRoles) {
-    const allowedAdmin = to.meta.allowedAdminRoles;
+    const allowedAdmin = to.meta.allowedAdminRoles as string[];
 
     if (!auth.isAdmin) return '/login';
 
