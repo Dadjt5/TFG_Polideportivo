@@ -131,7 +131,7 @@ class CompraAbono(models.Model):
             elif tipoAbono == "abono_verano":
                 if cls.objects.filter(usuarioFinal=usuario, abonoVerano=abono, estado=EstadoReserva.CONFIRMADA).exists():
                     return None
-                
+
                 for comAbono in cls.objects.filter(usuarioFinal=usuario, abonoVerano=abono, estado=EstadoReserva.PENDIENTE):
                     comAbono.cancelarCompra()
         

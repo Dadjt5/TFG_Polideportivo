@@ -105,7 +105,6 @@ class Pago(models.Model):
 
             if usuario.tieneAbono:
                 compraAbono = usuario.abono.filter(abonoVerano=None).first()
-
                 if compraAbono and compraAbono.abonoDeportivo:
                     descripcionPorcentajes["Descuento por abono deportivo"] = {}
                     if usuario.actividadesRealizadas == 0:

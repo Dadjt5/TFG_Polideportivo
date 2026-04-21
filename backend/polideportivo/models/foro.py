@@ -113,9 +113,6 @@ class Canal(models.Model):
                 canal=self
             )
 
-            if not creada:
-                return False
-
             self.numeroParticipantes += 1
             self.foro.numeroParticipantes += 1
 

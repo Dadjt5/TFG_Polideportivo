@@ -62,7 +62,7 @@ class Notificacion(models.Model):
 
         elif tipoUsuarios == "ACTIVIDAD":
             # Trae todos los usuarios finales que tengan asistencia en alguna sesión de la actividad
-            usuarios = User.objects.filter(id__in=UsuarioFinal.objects.filter(asistencias__sesion__actividad_id=complemento).values_list('user_id', flat=True)).distinct()
+            usuarios = User.objects.filter(id__in=UsuarioFinal.objects.filter(reservas_actividad__actividad_id=complemento).values_list('user_id', flat=True)).distinct()
 
         elif tipoUsuarios == "INSTALACION":
             usuarios = User.objects.filter(id__in=UsuarioFinal.objects.filter(alquileres__instalacion_id=complemento).values_list('user_id', flat=True)).distinct()
@@ -135,7 +135,7 @@ class Notificacion(models.Model):
     @classmethod
     def notificarNuevaActividad(cls, actividad):
         configuracion = Configuracion.objects.all().first()
-        
+
         if not actividad.deportes:
             return
 
@@ -185,7 +185,7 @@ class Notificacion(models.Model):
     @classmethod
     def notificarCambioCancelacion(cls):
         configuracion = Configuracion.objects.all().first()
-        
+
         usuarios = UsuarioFinal.objects.all()
 
         for usuario in usuarios:

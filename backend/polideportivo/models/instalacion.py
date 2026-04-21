@@ -130,7 +130,7 @@ class Instalacion(models.Model):
             calle_sesion = sesion.get('calle')
 
             calle = None
-            if self.tipoInstalacion == TipoInstalacion.PISCINA:
+            if self.tipoInstalacion == TipoInstalacion.PISCINA and calle_sesion:
                 calle_num = calle_sesion.numero
                 calle = self.calles.filter(numero=calle_num).first()
 

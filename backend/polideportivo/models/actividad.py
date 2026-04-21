@@ -64,10 +64,11 @@ class Actividad(models.Model):
     # Función para que un usuario salga de la lista de espera
     def salirListaEspera(self, usuario):
         if self.sesiones.filter(asistencias__usuarioFinal=usuario).exists():
-            return None
+            return False
 
         lista_espera = self.lista_espera
-        return lista_espera.salirLista(usuario)
+        lista_espera.salirLista(usuario)
+        return True
 
     # Función para obtener los precios de la tarifa aplicada a la actividad dependiendo de su tipo
     def obtenerPrecios(self):
@@ -219,10 +220,10 @@ class Actividad(models.Model):
 
         for campo in campos_simples:
             if campo in actividad_data:
-                setattr(self, campo, actividad_data[campo])
-                
                 if campo == "material" and actividad_data[campo] != self.material:
                     Notificacion.notificarNuevoMaterial(actividad=self)
+                
+                setattr(self, campo, actividad_data[campo])
 
         self.plazasMaximas = nuevas_plazas_max
         self.plazasReservadas = nuevas_plazas_res
@@ -311,8 +312,8 @@ class Sesion(models.Model):
             if asistencia.presente != falta:
                 asistencia.presente = falta
                 asistencia.save(update_fields=["presente"])
-            
-            if Asistencia.objects.filter(usuarioFinal=usuarioFinal, sesion=self, presente=False).count() > 10:
+
+            if Asistencia.objects.filter(usuarioFinal=usuarioFinal, sesion__actividad=self.actividad, presente=False).count() > 10:
                 Notificacion.notificarAusencias(usuario=usuarioFinal, actividad=self.actividad)
             return True
         except:

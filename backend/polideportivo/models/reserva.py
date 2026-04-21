@@ -72,24 +72,30 @@ class ReservaActividad(Reserva):
             actividad = Actividad.objects.select_for_update().get(id=self.actividad.id)
 
             if self.estado == EstadoReserva.CONFIRMADA:
-                self.usuarioFinal.actividadesRealizadas -= 1
+                if self.usuarioFinal.actividadesRealizadas > 0:
+                    self.usuarioFinal.actividadesRealizadas -= 1
+    
                 actividad.eliminarAsistencia(self.usuarioFinal)
                 self.usuarioFinal.save()
 
-            actividad.plazasReservadas -= 1
-            actividad.save()
+            if actividad.plazasReservadas > 0:
+                actividad.plazasReservadas -= 1
+                actividad.save()
 
             self.estado = EstadoReserva.CANCELADO
             self.save()
 
-            lista_espera = actividad.lista_espera
-            while actividad.plazasReservadas < actividad.plazasMaximas:
-                entrada = lista_espera.siguienteUsuario()
-                if not entrada:
-                    break
+            try:
+                lista_espera = actividad.lista_espera
+                while actividad.plazasReservadas < actividad.plazasMaximas:
+                    entrada = lista_espera.siguienteUsuario()
+                    if not entrada:
+                        break
 
-                actividad.plazasReservadas += 1
-                actividad.save()
+                    actividad.plazasReservadas += 1
+                    actividad.save()
+            except:
+                pass
 
     # Función para contar el número de reservas de actividades en el sistema
     @classmethod
@@ -100,9 +106,6 @@ class ReservaActividad(Reserva):
     @classmethod
     def nuevaReserva(cls, usuario, actividad, lista=False):
         if actividad.tipoReserva == FormaReserva.PRESENCIAL or actividad.tipoReserva == FormaReserva.NINGUNA:
-            return None
-
-        if cls.objects.filter(actividad=actividad, usuarioFinal=usuario, estado=EstadoReserva.CONFIRMADA).exists():
             return None
 
         with transaction.atomic():
@@ -196,7 +199,6 @@ class Alquiler(Reserva):
             instalacion.refresh_from_db()
 
             descuentos = Descuento.obtenerDescuentos(instalacion=instalacion)
-            
             conflictos = cls.objects.filter(
                 instalacion=instalacion,
                 fecha=fecha,

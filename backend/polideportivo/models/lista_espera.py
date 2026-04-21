@@ -25,7 +25,13 @@ class ListaEspera(models.Model):
 
     # Función para obtener el usuario siguiente de la lista de espera
     def siguienteUsuario(self):
-        return self.registro.order_by('fechaEntrada', 'horaEntrada').first()
+        entrada = self.registro.order_by('fechaEntrada', 'horaEntrada').first()
+
+        if not entrada:
+            return None
+
+        entrada.delete()
+        return entrada
 
 
 class EntradaListaEspera(models.Model):

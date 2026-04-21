@@ -42,9 +42,6 @@ class TDA(models.Model):
 
             if cls.objects.filter(usuarioFinal=usuario, estado=EstadoReserva.CONFIRMADA, fechaExpiracion__gte=hoy).exists():
                 return None
-            
-            if not TarifaTDA.objects.exists():
-                return None
 
             for tda in cls.objects.filter(usuarioFinal=usuario, estado=EstadoReserva.PENDIENTE):
                 tda.delete()
