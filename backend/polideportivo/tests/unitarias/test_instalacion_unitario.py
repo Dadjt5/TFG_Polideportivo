@@ -1,5 +1,7 @@
 from django.test import TestCase
 from datetime import time
+from unittest.mock import MagicMock
+
 from ...models import (
     Pabellon, Instalacion, Calle, TipoInstalacion, TarifaInstalacion, Dia
 )
@@ -76,17 +78,45 @@ class InstalacionUnitTest(TestCase):
             "img.png"
         )
         self.assertEqual(self.instalacion.nombre, "Nueva")
-
-    def test_sincronizar_calles_crea_y_reduce(self):
-        self.instalacion.tipoInstalacion = TipoInstalacion.PISCINA
+    
+    def test_crear_calles_no_piscina(self):
+        self.instalacion.tipoInstalacion = TipoInstalacion.SALA_MULTIUSOS
+        self.instalacion.numeroCalles = 3
         self.instalacion.save()
 
-        self.instalacion.sincronizarCalles(2)
-        self.assertEqual(self.instalacion.calles.count(), 2)
+        self.instalacion.crearCalles()
 
-        self.instalacion.sincronizarCalles(1)
-        self.assertEqual(self.instalacion.calles.count(), 1)
+        self.assertEqual(self.instalacion.calles.count(), 0)
+    
+    def test_crear_calles_piscina(self):
+        self.instalacion.tipoInstalacion = TipoInstalacion.PISCINA
+        self.instalacion.numeroCalles = 3
+        self.instalacion.save()
 
-    def test_get_horario_none(self):
-        h = self.instalacion.getHorario("2026-01-01")
-        self.assertEqual(h, (None, None))
+        self.instalacion.crearCalles()
+
+        self.assertEqual(self.instalacion.calles.count(), 3)
+    
+    def test_calcular_precio_base_uam(self):
+        class U:
+            tieneAbono = False
+            esUAM = True
+            tieneTDA = False
+
+        self.assertEqual(self.instalacion._calcular_precio_base(U()), 20)
+    
+    def test_calcular_precio_base_tda(self):
+        class U:
+            tieneAbono = False
+            esUAM = False
+            tieneTDA = True
+
+        self.assertEqual(self.instalacion._calcular_precio_base(U()), 30)
+    
+    def test_calcular_precio_base_otros(self):
+        class U:
+            tieneAbono = False
+            esUAM = False
+            tieneTDA = False
+
+        self.assertEqual(self.instalacion._calcular_precio_base(U()), 40)

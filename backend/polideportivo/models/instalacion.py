@@ -285,7 +285,7 @@ class Instalacion(models.Model):
                 if pago:
                     pago.cancelarPago("unico")
 
-            return
+            return None
 
         dinero = 0
         for alquiler in alquileres_conflicto:
@@ -436,52 +436,6 @@ class Instalacion(models.Model):
         )
     
         return True
-
-    # Función para devolver el horario de una isntalación en una fecha concreta
-    def getHorario(self, fecha):
-        agenda = Agenda.objects.filter(instalacion=self, fecha=fecha).first()
-
-        if agenda and agenda.abierto:
-            return agenda.horaApertura, agenda.horaCierre
-
-        return None, None
-
-    # Función para obtener las reservas de una instalación en una fecha concreta
-    def getReservas(self, fecha):
-        agenda = Agenda.objects.filter(instalacion=self, fecha=fecha, abierto=True).first()
-
-        if not agenda:
-            return []
-
-        if self.tipoInstalacion != TipoInstalacion.PISCINA:
-            reservas = []
-            for mapa in agenda.mapa_reservas.filter(calle__isnull=True):
-                reservas.append({
-                    "horaInicio": mapa.horaInicio.strftime("%H:%M"),
-                    "horaFin": mapa.horaFin.strftime("%H:%M"),
-                    "estado": mapa.estado
-                })
-
-            return reservas
-        else:
-            calles = []
-            for calle in self.calles.all():
-                reservas = []
-
-                mapas = agenda.mapa_reservas.filter(calle=calle)
-                for mapa in mapas:
-                    reservas.append({
-                        "horaInicio": mapa.horaInicio.strftime("%H:%M"),
-                        "horaFin": mapa.horaFin.strftime("%H:%M"),
-                        "estado": mapa.estado
-                    })
-
-                calles.append({
-                    "calle": calle.numero,
-                    "reservas": reservas
-                })
-
-            return calles
 
     # FUnción para contar el número de instalaciones en el sistema
     @classmethod

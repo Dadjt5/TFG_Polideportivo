@@ -58,13 +58,28 @@ function resetInactivityTimer() {
   }, INACTIVITY_TIME);
 }
 
+function handleVisibilityChange() {
+  if (document.visibilityState === "hidden") {
+    localStorage.setItem("tabClosing", "1");
+  } else {
+    localStorage.removeItem("tabClosing");
+  }
+}
+
+function handlePageHide() {
+  if (localStorage.getItem("tabClosing") === "1") {
+    logoutUsuario();
+  }
+}
+
 onMounted(() => {
   window.addEventListener('mousemove', resetInactivityTimer);
   window.addEventListener('keydown', resetInactivityTimer);
   window.addEventListener('click', resetInactivityTimer);
   window.addEventListener('scroll', resetInactivityTimer);
   window.addEventListener('touchstart', resetInactivityTimer);
-  window.addEventListener("beforeunload", logoutUsuario);
+  document.addEventListener("visibilitychange", handleVisibilityChange);
+  window.addEventListener("pagehide", handlePageHide);
 
   resetInactivityTimer();
 });
@@ -75,7 +90,8 @@ onUnmounted(() => {
   window.removeEventListener('click', resetInactivityTimer);
   window.removeEventListener('scroll', resetInactivityTimer);
   window.removeEventListener('touchstart', resetInactivityTimer);
-  window.removeEventListener("beforeunload", logoutUsuario);
+  document.removeEventListener("visibilitychange", handleVisibilityChange);
+  window.removeEventListener("pagehide", handlePageHide);
 
   clearTimeout(inactivityTimer);
 });

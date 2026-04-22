@@ -84,7 +84,7 @@ export const cancelarIntentoPago = async (id: number) => {
 }
 
 export const cancelarIntentoPagoBeacon = (id: number) => {
-  const url = `${import.meta.env.VITE_API_URL}/api/v1/pagos/${id}/cancelar/`
+  const url = `${import.meta.env.VITE_API_URL}api/v1/pagos/${id}/cancelar/`
 
   const data = new Blob([], { type: "application/json" })
 

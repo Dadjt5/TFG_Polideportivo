@@ -210,6 +210,7 @@ let elements: any
 
 const pagar = async () => {
   loading.value = true
+  cancelar = false
 
   const { error: stripeError } = await stripe.confirmPayment({
     elements,
@@ -224,13 +225,21 @@ const pagar = async () => {
   }
 }
 
+let cancelar = true
+
 const handleBeforeUnload = () => {
-  cancelarPagoBeacon()
+  if(cancelar) {
+    cancelar = false
+    cancelarPagoBeacon()
+  }
 }
 
 onBeforeUnmount(() => {
   window.removeEventListener("beforeunload", handleBeforeUnload)
-  cancelarPago()
+
+  if(cancelar) {
+    cancelarPago()
+  }
 })
 
 onMounted(async () => {
