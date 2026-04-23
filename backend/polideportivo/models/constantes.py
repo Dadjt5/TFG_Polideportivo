@@ -141,12 +141,10 @@ class Rol(models.TextChoices):
     Clase para enumerar los roles de usuario
 
     Tipos de rol:
-    - ESTUDIANTE, PTGAS, PDI, EXTERNO
+    - COMUNIDAD_UAM, EXTERNO
     """
     
-    ESTUDIANTE = 'Estudiante de la UAM'
-    PDI = 'Profesores y personal de investigación'
-    PTGAS = 'Personal administrativo'
+    COMUNIDAD_UAM = 'Miembro de la comunidad UAM'
     EXTERNO = 'Externo a la UAM'
 
 

@@ -48,7 +48,7 @@ class UsuarioFinal(Usuario):
         if not self.esUAM:
             self.rol == Rol.EXTERNO
         else:
-            self.rol = Rol.ESTUDIANTE
+            self.rol = Rol.COMUNIDAD_UAM
 
         super().save(*args, **kwargs)
 

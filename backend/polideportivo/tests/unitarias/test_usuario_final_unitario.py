@@ -48,7 +48,7 @@ class UsuarioFinalUnitTests(TestCase):
         self.usuario.save()
 
         self.usuario.refresh_from_db()
-        self.assertEqual(self.usuario.rol, Rol.ESTUDIANTE)
+        self.assertEqual(self.usuario.rol, Rol.COMUNIDAD_UAM)
 
     # ----------------- ABONO -----------------
 
