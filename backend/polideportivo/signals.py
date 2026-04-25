@@ -17,10 +17,14 @@ Pulsa en este enlace:
 {reset_url}
 """
 
-    send_mail(
-        "Recuperar contraseña",
-        message,
-        settings.DEFAULT_FROM_EMAIL,
-        [reset_password_token.user.email],
-        fail_silently=False
-    )
+    try:
+        send_mail(
+            "Recuperar contraseña",
+            message,
+            settings.DEFAULT_FROM_EMAIL,
+            [reset_password_token.user.email],
+            fail_silently=False
+        )
+    except Exception as e:
+        print("ERROR ENVIANDO EMAIL:", str(e))
+        raise
