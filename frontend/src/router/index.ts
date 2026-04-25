@@ -221,15 +221,11 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to) => {
+  if (to.meta.public) return true;
+
   const auth = useAuthStore();
 
-  // 1. RUTAS PÚBLICAS SIEMPRE ENTRAN
-  if (to.matched.some(r => r.meta.public)) {
-    return true;
-  }
-
-  // 2. Cargar usuario si hay token
-  if (!auth.user && auth.isAuthenticated) {
+  if (!auth.user && auth.isAuthenticated && !to.meta.public) {
     try {
       await auth.fetchUser();
     } catch {
@@ -238,20 +234,15 @@ router.beforeEach(async (to) => {
     }
   }
 
-  // 3. HOME REDIRECT
   if (to.path === '/home') {
     if (auth.isUsuarioFinal) return '/home-usuario';
     if (auth.isMonitor) return '/home-monitor';
     if (auth.isAdmin) return '/home-administrador';
   }
 
-  // 4. BLOQUEO GLOBAL
-  if (!auth.isAuthenticated) {
-    return '/login';
-  }
+  if (!auth.isAuthenticated && !to.meta.public) return '/login';
 
-  // 5. ROLES
-  if (to.meta.allowedRoles) {
+  if (to.meta.allowedRoles && !to.meta.public) {
     const allowed = to.meta.allowedRoles as string[];
 
     if (
@@ -265,7 +256,7 @@ router.beforeEach(async (to) => {
     return '/login';
   }
 
-  if (to.meta.allowedAdminRoles) {
+  if (to.meta.allowedAdminRoles && !to.meta.public) {
     const allowedAdmin = to.meta.allowedAdminRoles as string[];
 
     if (!auth.isAdmin) return '/login';
