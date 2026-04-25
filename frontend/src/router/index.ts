@@ -215,7 +215,7 @@ const scrollBehavior: RouterScrollBehavior = () => {
 
 /* Cada vez que se accede a una página se redirige el scrollbar arriba */
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes,
   scrollBehavior
 })
