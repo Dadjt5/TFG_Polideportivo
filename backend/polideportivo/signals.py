@@ -6,7 +6,7 @@ from django.conf import settings
 @receiver(reset_password_token_created)
 def password_reset_token_created(sender, instance, reset_password_token, *args, **kwargs):
 
-    reset_url = f"http://localhost:5173/reset-password/{reset_password_token.key}"
+    reset_url = f"{settings.FRONTEND_URL}/reset-password/{reset_password_token.key}"
 
     message = f"""
 Hola,
