@@ -221,7 +221,7 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to) => {
-  if (to.path.startsWith('/reset-password')) return true;
+  if (to.meta.public) return true;
 
   const auth = useAuthStore();
 
