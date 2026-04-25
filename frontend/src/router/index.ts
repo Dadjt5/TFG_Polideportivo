@@ -221,11 +221,10 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to) => {
-  const auth = useAuthStore();
-  console.log("buenas")
-  if (to.meta.public) return true;
+  if (to.path.startsWith('/reset-password')) return true;
 
-  console.log("tardes")
+  const auth = useAuthStore();
+
   if (!auth.user && auth.isAuthenticated) {
     try {
       await auth.fetchUser();
