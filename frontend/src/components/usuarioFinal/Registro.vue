@@ -361,7 +361,7 @@ const handleFinish = async () => {
   }
 
   try {
-    const data = await registrarse(formData);
+    const data = await registrarse(formData.value);
 
     userIdentifier.value = data.codigo_usuario;
     showIdentifier.value = true;

@@ -41,15 +41,6 @@
               {{ message }}
             </p>
 
-            <!-- Divider -->
-            <div class="d-flex align-items-center my-4">
-              <hr class="flex-grow-1 border-primary border-opacity-25">
-              <span class="mx-3 text-primary small fw-semibold">
-                {{ t.loginPage }}
-              </span>
-              <hr class="flex-grow-1 border-primary border-opacity-25">
-            </div>
-
             <!-- Volver a login -->
             <router-link to="/login" class="btn btn-outline-primary w-100 py-2 fs-5 rounded-3">
               {{ t.login }}
