@@ -223,7 +223,7 @@ const router = createRouter({
 router.beforeEach(async (to) => {
   const auth = useAuthStore();
 
-  if (to.meta.public) return true;
+  if (to.path.startsWith('/reset-password')) return true;
 
   if (!auth.user && auth.isAuthenticated) {
     try {
@@ -239,6 +239,8 @@ router.beforeEach(async (to) => {
     if (auth.isMonitor) return '/home-monitor';
     if (auth.isAdmin) return '/home-administrador';
   }
+
+  if (to.meta.public) return true;
 
   if (!auth.isAuthenticated) return '/login';
 
