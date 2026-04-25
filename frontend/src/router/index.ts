@@ -221,6 +221,7 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to) => {
+  console.log(to.path, to.meta, auth.isAuthenticated)
   if (to.meta.public) return true;
 
   const auth = useAuthStore();
