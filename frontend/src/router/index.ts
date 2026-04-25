@@ -223,6 +223,8 @@ const router = createRouter({
 router.beforeEach(async (to) => {
   const auth = useAuthStore();
 
+  if (to.meta.public) return true;
+
   if (!auth.user && auth.isAuthenticated) {
     try {
       await auth.fetchUser();
@@ -237,8 +239,6 @@ router.beforeEach(async (to) => {
     if (auth.isMonitor) return '/home-monitor';
     if (auth.isAdmin) return '/home-administrador';
   }
-
-  if (to.meta.public) return true;
 
   if (!auth.isAuthenticated) return '/login';
 

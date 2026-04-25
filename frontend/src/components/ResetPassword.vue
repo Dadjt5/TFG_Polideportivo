@@ -1,13 +1,31 @@
 <template>
-  <div class="min-vh-100 d-flex align-items-center justify-content-center"
+  <div class="min-vh-100 d-flex align-items-center justify-content-center position-relative overflow-hidden"
        style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
 
-    <div class="card p-4 rounded-4 shadow" style="max-width:400px; width:100%; background: rgba(255,255,255,0.85); backdrop-filter: blur(10px);">
+    <!-- Fondo decorativo -->
+    <div class="position-absolute top-0 start-0 w-100 h-100 opacity-25"
+         style="background: radial-gradient(circle at 20% 20%, #0072ff55, transparent 40%),
+                                radial-gradient(circle at 80% 70%, #ff7a0055, transparent 40%);">
+    </div>
+
+    <!-- Card -->
+    <div class="card p-4 p-md-5 rounded-4 shadow-lg border-0 position-relative"
+         style="max-width:420px; width:100%; background: rgba(255,255,255,0.85); backdrop-filter: blur(12px);">
+
+      <!-- Icono -->
+      <div class="text-center mb-3">
+        <div class="rounded-circle bg-primary d-inline-flex align-items-center justify-content-center"
+             style="width:60px; height:60px;">
+          <i class="bi bi-lock-fill text-white fs-4"></i>
+        </div>
+      </div>
 
       <!-- Título -->
-      <h1 class="text-center mb-3 text-primary fw-bold">{{ t.resetPassword }}</h1>
+      <h2 class="text-center text-primary fw-bold mb-1">
+        {{ t.resetPassword }}
+      </h2>
 
-      <p class="text-center text-secondary mb-4">
+      <p class="text-center text-secondary mb-4 small">
         {{ t.newPassword }}
       </p>
 
@@ -15,7 +33,7 @@
       <div class="mb-3 position-relative">
         <input
           :type="showPassword ? 'text' : 'password'"
-          class="form-control py-2 rounded-3"
+          class="form-control py-2 rounded-3 pe-5"
           placeholder="Nueva contraseña"
           v-model="password"
           @keyup.enter="resetPassword"
@@ -23,7 +41,8 @@
         <button type="button"
                 class="position-absolute top-50 end-0 translate-middle-y me-3 border-0 bg-transparent"
                 @click="showPassword = !showPassword">
-          <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'" style="font-size: 1.2rem; color:#0072ff;"></i>
+          <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"
+             style="font-size: 1.2rem; color:#0072ff;"></i>
         </button>
       </div>
 
@@ -31,27 +50,30 @@
       <div class="mb-4 position-relative">
         <input
           :type="showPassword ? 'text' : 'password'"
-          class="form-control py-2 rounded-3"
+          class="form-control py-2 rounded-3 pe-5"
           placeholder="Confirmar contraseña"
           v-model="confirmPassword"
           @keyup.enter="resetPassword"
         />
       </div>
 
-      <!-- Botón cambiar contraseña -->
-      <button class="btn btn-primary w-100 py-2 fs-5 rounded-3 mb-3"
+      <!-- Botón -->
+      <button class="btn btn-primary w-100 py-2 rounded-3 fw-semibold shadow-sm"
               :disabled="loading"
               @click="resetPassword">
-        {{ t.changePassword }}
+        <span v-if="!loading">{{ t.changePassword }}</span>
+        <span v-else class="spinner-border spinner-border-sm"></span>
       </button>
 
       <!-- Mensaje -->
-      <p v-if="message" class="mt-2 text-center fw-medium" :class="success ? 'text-success' : 'text-danger'">
+      <div v-if="message" class="alert mt-3 mb-0 py-2 text-center"
+           :class="success ? 'alert-success' : 'alert-danger'">
         {{ message }}
-      </p>
+      </div>
 
-      <!-- Volver al login -->
-      <router-link to="/login" class="btn btn-outline-primary w-100 py-2 fs-5 rounded-3 mt-3">
+      <!-- Login -->
+      <router-link to="/login"
+                   class="btn btn-outline-primary w-100 py-2 rounded-3 mt-3 fw-medium">
         {{ t.login }}
       </router-link>
 
