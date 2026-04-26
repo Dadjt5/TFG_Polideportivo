@@ -1,10 +1,10 @@
 <template>
   <div class="min-vh-100" style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
-    <main class="container-fluid mt-2 px-5 py-4">
+    <main class="container-fluid px-5 py-4">
 
       <!-- CABECERA -->
       <div class="d-flex justify-content-center align-items-center mb-4 mt-3">
-        <h2 class="fw-bold m-0 text-primary">{{ t.myStadistics }}</h2>
+        <h1 class="fw-bold m-0 text-primary">{{ t.myStadistics }}</h1>
       </div>
 
       <!-- KPIs -->
@@ -30,11 +30,7 @@
             <div class="card-body">
               <h5 class="fw-bold mb-3">{{ t.myBookingsByMonth }}</h5>
 
-              <Line
-                v-if="reservasChart"
-                :data="reservasChart"
-                :options="chartOptions"
-              />
+              <Line v-if="reservasChart" :data="reservasChart" :options="chartOptions" />
 
             </div>
           </div>
@@ -46,11 +42,7 @@
             <div class="card-body">
               <h5 class="fw-bold mb-3">{{ t.moreReservedActivities }}</h5>
 
-              <Bar
-                v-if="actividadesChart"
-                :data="actividadesChart"
-                :options="chartOptions"
-              />
+              <Bar v-if="actividadesChart" :data="actividadesChart" :options="chartOptions" />
 
             </div>
           </div>
@@ -64,11 +56,7 @@
 
           <h5 class="fw-bold mb-3">{{ t.weeklyDayReservations }}</h5>
 
-          <Bar
-            v-if="diasChart"
-            :data="diasChart"
-            :options="chartOptions"
-          />
+          <Bar v-if="diasChart" :data="diasChart" :options="chartOptions" />
 
         </div>
       </div>

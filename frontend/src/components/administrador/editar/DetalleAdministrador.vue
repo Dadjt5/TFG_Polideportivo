@@ -35,7 +35,7 @@
 
           <!-- NOMBRE -->
           <div class="col-md-4">
-            <label class="form-label">{{ t.name }}</label>
+            <label class="form-label fw-bold">{{ t.name }}</label>
             <input v-if="isEditing" class="form-control" v-model="admin.nombre"
               :class="{ 'is-invalid': errores.nombre }" />
             <p v-else class="form-control-plaintext">
@@ -45,7 +45,7 @@
 
           <!-- ROL -->
           <div class="col-md-4">
-            <label class="form-label">{{ t.role }}</label>
+            <label class="form-label fw-bold">{{ t.role }}</label>
             <select v-if="isEditing" class="form-select form-select-lg" :class="{ 'is-invalid': errores.rol }"
               v-model="admin.rol">
               <option value="" disabled>{{ t.selectOption }}</option>
@@ -62,7 +62,7 @@
 
           <!-- DNI -->
           <div class="col-md-4">
-            <label class="form-label">DNI</label>
+            <label class="form-label fw-bold">DNI</label>
             <p class="form-control-plaintext">
               {{ admin.DNI || '-' }}
             </p>
@@ -70,7 +70,7 @@
 
           <!-- Correo -->
           <div class="col-md-4">
-            <label class="form-label">{{ t.email }}</label>
+            <label class="form-label fw-bold">{{ t.email }}</label>
             <p class="form-control-plaintext">
               {{ admin.email }}
             </p>
@@ -78,7 +78,7 @@
 
           <!-- Codigo usuario -->
           <div class="col-md-4">
-            <label class="form-label">{{ t.loginCode }}</label>
+            <label class="form-label fw-bold">{{ t.loginCode }}</label>
             <p class="form-control-plaintext">
               {{ admin.codigo_usuario || '-' }}
             </p>

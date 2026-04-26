@@ -35,19 +35,19 @@
         <div class="row g-3">
 
           <div class="col-md-4">
-            <label class="form-label">{{ t.name }}</label>
+            <label class="form-label fw-bold">{{ t.name }}</label>
             <input v-if="isEditing" class="form-control" v-model="usuario.nombre" :class="{ 'is-invalid': errores.nombre }" />
             <p v-else class="form-control-plaintext">{{ usuario.nombre || '-' }}</p>
           </div>
 
           <div class="col-md-4">
-            <label class="form-label">{{ t.surnames }}</label>
+            <label class="form-label fw-bold">{{ t.surnames }}</label>
             <input v-if="isEditing" class="form-control" v-model="usuario.apellidos" :class="{ 'is-invalid': errores.apellidos }" />
             <p v-else class="form-control-plaintext">{{ usuario.apellidos || '-' }}</p>
           </div>
 
           <div class="col-md-4">
-            <label class="form-label">{{ t.sex }}</label>
+            <label class="form-label fw-bold">{{ t.sex }}</label>
             <select v-if="isEditing" class="form-select" :class="{ 'is-invalid': errores.sexo }" v-model="usuario.sexo">
               <option value="Mujer">{{ t.female }}</option>
               <option value="Hombre">{{ t.male }}</option>
@@ -57,58 +57,58 @@
           </div>
 
           <div class="col-md-4">
-            <label class="form-label">{{ t.birth }}</label>
+            <label class="form-label fw-bold">{{ t.birth }}</label>
             <input v-if="isEditing" type="date" class="form-control" v-model="usuario.fechaNacimiento" :class="{ 'is-invalid': errores.fechaNacimiento }" />
             <p v-else class="form-control-plaintext">{{ usuario.fechaNacimiento || '-' }}</p>
           </div>
 
           <div class="col-md-4">
-            <label class="form-label">{{ t.phoneNumber }}</label>
+            <label class="form-label fw-bold">{{ t.phoneNumber }}</label>
             <input v-if="isEditing" class="form-control" v-model="usuario.telefono" :class="{ 'is-invalid': errores.telefono }" />
             <p v-else class="form-control-plaintext">{{ usuario.telefono || '-' }}</p>
           </div>
 
           <div class="col-md-4">
-            <label class="form-label">{{ t.province }}</label>
+            <label class="form-label fw-bold">{{ t.province }}</label>
             <input v-if="isEditing" class="form-control" v-model="usuario.provincia" :class="{ 'is-invalid': errores.provincia }" />
             <p v-else class="form-control-plaintext">{{ usuario.provincia || '-' }}</p>
           </div>
 
           <div class="col-md-4">
-            <label class="form-label">{{ t.municipality }}</label>
+            <label class="form-label fw-bold">{{ t.municipality }}</label>
             <input v-if="isEditing" class="form-control" v-model="usuario.municipio" :class="{ 'is-invalid': errores.municipio }" />
             <p v-else class="form-control-plaintext">{{ usuario.municipio || '-' }}</p>
           </div>
 
           <div class="col-md-4">
-            <label class="form-label">{{ t.locality }}</label>
+            <label class="form-label fw-bold">{{ t.locality }}</label>
             <input v-if="isEditing" class="form-control" v-model="usuario.localidad" :class="{ 'is-invalid': errores.localidad }" />
             <p v-else class="form-control-plaintext">{{ usuario.localidad || '-' }}</p>
           </div>
 
           <div class="col-md-4">
-            <label class="form-label">{{ t.postalCode }}</label>
+            <label class="form-label fw-bold">{{ t.postalCode }}</label>
             <input v-if="isEditing" class="form-control" v-model="usuario.codigoPostal" :class="{ 'is-invalid': errores.codigoPostal }" />
             <p v-else class="form-control-plaintext">{{ usuario.codigoPostal || '-' }}</p>
           </div>
 
           <div class="col-md-4">
-            <label class="form-label">DNI</label>
+            <label class="form-label fw-bold">DNI</label>
             <p class="form-control-plaintext">{{ usuario.DNI || '-' }}</p>
           </div>
 
           <div class="col-md-4">
-            <label class="form-label">{{ t.email }}</label>
+            <label class="form-label fw-bold">{{ t.email }}</label>
             <p class="form-control-plaintext">{{ usuario.email }}</p>
           </div>
 
           <div class="col-md-4">
-            <label class="form-label">{{ t.loginCode }}</label>
+            <label class="form-label fw-bold">{{ t.loginCode }}</label>
             <p class="form-control-plaintext">{{ usuario.codigo_usuario || '-' }}</p>
           </div>
 
           <div class="col-md-4">
-            <label class="form-label">{{ t.madeActivities }}</label>
+            <label class="form-label fw-bold">{{ t.madeActivities }}</label>
             <p class="form-control-plaintext">{{ usuario.actividadesRealizadas }}</p>
           </div>
         </div>

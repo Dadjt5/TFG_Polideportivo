@@ -56,6 +56,7 @@ export default {
   street: "Calle",
   noImage: "No hay imágenes",
   finalPrice: "Precio final",
+  UAMMessage: "En el acceso al polideportivo podrá solicitarse la acreditación oficial de la UAM. El uso indebido de esta tarifa podrá suponer la cancelación de la reserva o la suspensión del acceso a la plataforma.",
 
   /* Eliminaciones */
   confirmDelete: "Confirmar eliminación",

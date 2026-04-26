@@ -35,7 +35,7 @@
 
             <!-- NOMBRE -->
             <div class="col-md-4">
-              <label class="form-label">{{ t.name }}</label>
+              <label class="form-label fw-bold">{{ t.name }}</label>
               <input v-if="isEditing" class="form-control" v-model="monitor.nombre"
                 :class="{ 'is-invalid': errores.nombre }" />
               <p v-else class="form-control-plaintext">
@@ -45,7 +45,7 @@
 
             <!-- APELLIDOS -->
             <div class="col-md-4">
-              <label class="form-label">{{ t.surnames }}</label>
+              <label class="form-label fw-bold">{{ t.surnames }}</label>
               <input v-if="isEditing" class="form-control" v-model="monitor.apellidos"
                 :class="{ 'is-invalid': errores.apellidos }" />
               <p v-else class="form-control-plaintext">
@@ -55,7 +55,7 @@
 
             <!-- DNI -->
             <div class="col-md-4">
-              <label class="form-label">DNI</label>
+              <label class="form-label fw-bold">DNI</label>
               <p class="form-control-plaintext">
                 {{ monitor.DNI || '-' }}
               </p>
@@ -63,7 +63,7 @@
 
             <!-- Codigo usuarios -->
             <div class="col-md-4">
-              <label class="form-label">{{ t.loginCode }}</label>
+              <label class="form-label fw-bold">{{ t.loginCode }}</label>
               <p class="form-control-plaintext">
                 {{ monitor.codigo_usuario || '-' }}
               </p>
@@ -71,7 +71,7 @@
 
             <!-- Correo -->
             <div class="col-md-4">
-              <label class="form-label">{{ t.email }}</label>
+              <label class="form-label fw-bold">{{ t.email }}</label>
               <p class="form-control-plaintext">
                 {{ monitor.email }}
               </p>

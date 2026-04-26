@@ -1,13 +1,13 @@
 <template>
   <div class="container py-5">
-    <h1 class="text-center mb-4">{{ t.TDATitle }}</h1>
+    <h1 class="text-center mb-5">{{ t.TDATitle }}</h1>
 
     <div class="text-center card shadow-lg rounded-4 p-4 mx-auto" style="max-width: 900px;">
 
       <h5 class="fs-2 mb-5">{{ t.qrTitle }}</h5>
       <QRCodeVue3 :key="qrKey" :value="qrValue" :size="220" level="H" />
 
-      <div class="text-center bg-light rounded-3 p-4 h-100">
+      <div class="text-center bg-light rounded-3 p-4 h-100 mt-3">
         <h5 class="fs-2 mt-4 mb-3">{{ t.cardInfo }}</h5>
 
         <div class="row g-4 align-items-center justify-content-center">

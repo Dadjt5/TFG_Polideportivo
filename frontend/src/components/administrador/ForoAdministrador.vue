@@ -46,7 +46,8 @@
             </button>
 
             <div class="d-flex gap-2">
-              <button class="btn btn-outline-primary rounded-pill px-3" @click="modificarCanal(foro.id, canalSeleccionado.id)">
+              <button class="btn btn-outline-primary rounded-pill px-3"
+                @click="modificarCanal(foro.id, canalSeleccionado.id)">
                 <i class="bi bi-pencil me-1"></i>
                 {{ t.modifyChannel }}
               </button>
@@ -63,17 +64,49 @@
 
         <!-- MENSAJES -->
         <div class="col-lg-8">
-          <div class="border-0 rounded-4 p-3 mb-3 overflow-auto shadow-sm"
-               style="max-height: 400px; background-color: rgba(255,255,255,0.85); backdrop-filter: blur(10px);">
+          <div ref="chatBox" class="border rounded-4 p-3 mb-4 overflow-auto chat-box"
+          style="max-height: 320px; background-color: rgba(255,255,255,0.6);">
+          <template v-if="!canalSeleccionado.secreto">
 
-            <div v-for="(msg, idx) in mensajes" :key="idx"
-            class="rounded-3 p-3 mb-2"
-            :class="msg.es_admin ? 'bg-primary text-white' : 'bg-white text-secondary border'">
-              <p class="fw-semibold mb-1">{{ msg.nombre }}</p>
-              <p class="mb-0">{{ msg.texto }}</p>
+            <div v-for="[dia, mensajesDia] in mensajesAgrupados" :key="dia">
+
+              <!-- Día -->
+              <div class="text-center my-3">
+                <span class="badge bg-light text-secondary px-3 py-2 rounded-pill">
+                  {{ formatearDia(mensajesDia[0].fechaEnvio) }}
+                </span>
+              </div>
+
+              <!-- Mensajes -->
+              <div v-for="m in mensajesDia" :key="m.id" class="d-flex mb-3" :class="{
+                'justify-content-end': m.usuario === authStore.user?.id,
+                'justify-content-start': m.usuario !== authStore.user?.id
+              }">
+                <div class="message-bubble p-3 rounded-4 shadow-sm" :class="{
+                  'bg-primary text-white': m.es_admin,
+                  'bg-white border text-dark': !m.es_admin,
+                  'message-own': m.usuario === authStore.user?.id,
+                  'message-other': m.usuario !== authStore.user?.id
+                }">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <small class="fw-semibold">{{ m.nombre }}</small>
+                    <small class="ms-3" :class="m.es_admin ? 'text-white-50' : 'text-muted'">
+                      {{ formatearHora(m.fechaEnvio) }}
+                    </small>
+                  </div>
+
+                  <p class="mb-0">{{ m.texto }}</p>
+                </div>
+              </div>
+
             </div>
 
-          </div>
+          </template>
+
+          <p v-else class="text-center text-muted fst-italic">
+            {{ t.hiddenMessages }}
+          </p>
+        </div>
 
           <div class="d-flex gap-3">
             <input type="text" class="form-control form-control-lg rounded-3 shadow-sm" v-model="textoMensaje"
@@ -87,7 +120,7 @@
         <!-- USUARIOS DEL CANAL -->
         <div class="col-lg-4">
           <div class="card shadow-lg border-0 rounded-4 p-3"
-               style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(10px);">
+            style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(10px);">
             <h5 class="fw-bold text-primary mb-3">
               <i class="bi bi-people-fill me-2"></i>
               {{ t.channelUsers }}
@@ -96,11 +129,13 @@
               class="d-flex justify-content-between align-items-center mb-2 p-2 bg-light rounded-3">
               <span class="fw-medium">{{ user.nombre }}</span>
               <div class="d-flex gap-2">
-                <button class="btn btn-warning btn-sm rounded-pill px-3" @click="alterarSilencioUsuario(user.usuarioFinal)">
+                <button class="btn btn-warning btn-sm rounded-pill px-3"
+                  @click="alterarSilencioUsuario(user.usuarioFinal)">
                   {{ user.silenciado ? t.unmute : t.mute }}
                 </button>
 
-                <button class="btn btn-danger btn-sm rounded-pill px-3" @click="alterarExpulsionUsuario(user.usuarioFinal)">
+                <button class="btn btn-danger btn-sm rounded-pill px-3"
+                  @click="alterarExpulsionUsuario(user.usuarioFinal)">
                   {{ user.expulsado ? t.unkick : t.kick }}
                 </button>
               </div>
@@ -114,8 +149,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, inject, type Ref, onMounted } from 'vue';
+import { ref, inject, type Ref, onMounted, computed, nextTick, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
 
 import {
   getForo, getMensajes, modificarUsuarioFinal,
@@ -135,23 +171,8 @@ interface Mensaje {
   fechaEnvio: string
   nombre: string
   es_admin: boolean
+  usuario: number
 }
-
-const Canal = ref({
-  id: 0,
-  titulo: "",
-  numeroParticipantes: 0,
-  tema: "",
-  secreto: false,
-  oculto: false,
-  usuarios: [] as {
-    usuarioFinal: 0,
-    nombre: "",
-    silenciado: false,
-    expulsado: false,
-    fechaEntrada: ""
-  }[]
-});
 
 const foro = ref({
   id: 0,
@@ -167,6 +188,47 @@ const router = useRouter();
 const canalSeleccionado = ref();
 const mensajes = ref<Mensaje[]>([]);
 const textoMensaje = ref('');
+const chatBox = ref<HTMLElement | null>(null)
+const authStore = useAuthStore()
+
+function scrollToBottom() {
+  nextTick(() => {
+    if (chatBox.value) {
+      chatBox.value.scrollTop = chatBox.value.scrollHeight
+    }
+  })
+}
+
+const formatearHora = (fecha: string) => {
+  return new Date(fecha).toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit"
+  })
+}
+
+const formatearDia = (fecha: string) => {
+  return new Date(fecha).toLocaleDateString([], {
+    day: "numeric",
+    month: "long",
+    year: "numeric"
+  })
+}
+
+const mensajesAgrupados = computed(() => {
+  const grupos: Record<string, Mensaje[]> = {}
+
+  mensajes.value.forEach(msg => {
+    const dia = new Date(msg.fechaEnvio).toDateString()
+
+    if (!grupos[dia]) {
+      grupos[dia] = []
+    }
+
+    grupos[dia].push(msg)
+  })
+
+  return Object.entries(grupos)
+})
 
 const seleccionarCanal = async (id: number) => {
   try {
@@ -241,8 +303,14 @@ const alterarExpulsionUsuario = async (usuarioId: number) => {
   }
 };
 
+watch(mensajesAgrupados, () => {
+  scrollToBottom()
+}, { deep: true })
+
+
 onMounted(async () => {
   foro.value = await getForo();
+  scrollToBottom()
 });
 </script>
 

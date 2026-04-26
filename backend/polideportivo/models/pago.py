@@ -258,11 +258,13 @@ class Pago(models.Model):
             "payment_settings": {
                 "save_default_payment_method": "on_subscription"
             },
-            "billing_cycle_anchor": inicio_ts,
-            "trial_end": inicio_ts,
-            "proration_behavior": "none",
+            "proration_behavior": "create_prorations",
             "expand": ["latest_invoice.confirmation_secret"],
         }
+
+        if isinstance(self.objeto, ReservaActividad):
+            subscription_data["billing_cycle_anchor"] = inicio_ts
+            subscription_data["trial_end"] = inicio_ts
 
         if fin:
             subscription_data["cancel_at"] = int(fin.timestamp())

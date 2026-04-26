@@ -605,7 +605,7 @@ const actividad = ref<any>({
   instalacion: null,
   monitor: null,
   tipoActividad: "",
-  tarifa: null,
+  tarifa: 0,
   tipoReserva: "",
   terreno: "",
   estado: "",
@@ -981,7 +981,8 @@ async function guardarCambios() {
 watch(
   () => actividad.value.tipoActividad,
   async (nuevoTipo: string) => {
-    actividad.value.tarifa = null
+    const tarifaActual = actividad.value.tarifa
+
     if (!nuevoTipo) {
       tarifas.value = []
       return
@@ -994,6 +995,8 @@ watch(
     } else if (nuevoTipo === "Fisioterapia") {
       tarifas.value = await getTarifasFisioterapia()
     }
+
+    actividad.value.tarifa = tarifas.value.length > 0 && tarifaActual !== null ? tarifaActual : null
   }
 )
 

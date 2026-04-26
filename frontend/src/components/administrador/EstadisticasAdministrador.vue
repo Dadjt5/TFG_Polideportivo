@@ -1,6 +1,6 @@
 <template>
   <div class="min-vh-100" style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
-    <main class="container-fluid mt-2 px-5 py-4">
+    <main class="container-fluid px-5 py-4">
 
       <!-- CABECERA -->
       <div class="d-flex justify-content-between align-items-center mb-4">
@@ -250,7 +250,21 @@ const renderCharts = (data: any) => {
         ]
       }]
     },
-    options: { responsive: true }
+    options: {
+    responsive: true,
+    plugins: {
+      tooltip: {
+        callbacks: {
+          label: (context) => {
+            const value = context.parsed
+            const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0)
+            const percentage = ((value / total) * 100).toFixed(1)
+            return ` ${context.label}: ${value} € (${percentage}%)`
+          }
+        }
+      }
+    }
+  }
   })
 }
 

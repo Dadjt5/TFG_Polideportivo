@@ -984,9 +984,9 @@ class ReservasView(APIView):
         listas_espera = EntradaListaEspera.objects.filter(usuarioFinal__user=user)
 
         alquiler_ct = ContentType.objects.get_for_model(Alquiler)
-        reserva_ct = ContentType.objects.get_for_model(Alquiler)
+        reserva_ct = ContentType.objects.get_for_model(ReservaActividad)
 
-        for alquiler in alquileres:            
+        for alquiler in alquileres:
             pago = Pago.objects.get(content_type=alquiler_ct, object_id=alquiler.id)
 
             reservas.append({
@@ -2625,8 +2625,7 @@ class ObtenerEstadisticasAdministradorView(APIView):
         ]
 
         actividades_top = (
-            ReservaActividad.objects
-            .filter(estado=EstadoReserva.CONFIRMADA)
+            reservas_qs
             .values("actividad__nombre")
             .annotate(total=Count("id"))
             .order_by("-total")[:5]
@@ -2643,7 +2642,8 @@ class ObtenerEstadisticasAdministradorView(APIView):
         uso_pabellones = []
         for inst in Instalacion.objects.all():
             horas = Alquiler.objects.filter(instalacion=inst).count()
-            ocupacion = min(int((horas / 200) * 100), 100)
+            horas_disponibles = 30 * 24
+            ocupacion = min(round((horas / horas_disponibles) * 100, 1), 100)
 
             uso_pabellones.append({
                 "nombre": inst.nombre,
@@ -2653,8 +2653,7 @@ class ObtenerEstadisticasAdministradorView(APIView):
 
         # Número de inscripciones activas por actividad
         inscripciones_actividad = (
-            ReservaActividad.objects
-            .filter(estado=EstadoReserva.CONFIRMADA)
+            reservas_qs
             .values("actividad__nombre")
             .annotate(inscritos=Count("usuarioFinal", distinct=True))
             .order_by("-inscritos")
@@ -2796,13 +2795,19 @@ class ObtenerEstadisticasUsuarioFinalView(APIView):
             .annotate(total=Count("id"))
         )
 
-        dias_labels = ["Dom", "Lun", "Mar", "Mie", "Jue", "Vie", "Sab"]
+        dias_labels = ["Lun", "Mar", "Mie", "Jue", "Vie", "Sab", "Dom"]
         dias_data = [0] * 7
 
         for r in reservas_por_dia_qs:
-            indice = r["dia"] - 1
-            dias_data[indice] = r["total"]
+            dia = r["dia"]
 
+            # Forzamos a lunes, martes, ..., domingo
+            if dia == 1:
+                indice = 6
+            else:
+                indice = dia - 2
+
+            dias_data[indice] = r["total"]
 
         data = {
             "reservas_totales": reservas_totales,

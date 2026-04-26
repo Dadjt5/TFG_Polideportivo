@@ -32,14 +32,14 @@
                 </router-link>
               </div>
 
-              <div v-if="monitorStore.notificaciones.length === 0"
+              <div v-if="monitorStore.sortedNotifications.length === 0"
                 class="d-flex flex-column justify-content-center align-items-center py-5 text-center">
                 <i class="bi bi-bell-slash text-white fs-1 mb-3"></i>
                 <p class="text-white opacity-75 fs-5 mb-0">
                   {{ t.noNotificacions }}
                 </p>
               </div>
-              <div v-else v-for="notf in monitorStore.notificaciones" :key="notf.id" class="rounded p-3 mb-2"
+              <div v-else v-for="notf in monitorStore.sortedNotifications.slice(0, 3)" :key="notf.id" class="rounded p-3 mb-2"
                 :class="notf.leido ? 'bg-white bg-opacity-10 text-white' : 'bg-primary bg-opacity-20 text-white'">
                 <strong>{{ notf.titulo }}</strong>
                 <p class="mb-0 small text-white text-opacity-75">
@@ -131,33 +131,36 @@ const sesionDetail = (idAct: number, idSesion: number) => {
   });
 };
 
-const diasOrdenados = [
-  t.value.monday,
-  t.value.tuesday,
-  t.value.wednesday,
-  t.value.thursday,
-  t.value.friday,
-  t.value.saturday,
-  t.value.sunday
-]
+const DIA_KEY: Record<string, string> = {
+  // Diccionario de traducción, porque del backend siempre viene en espanol
+  "Lunes": "monday", "Martes": "tuesday", "Miércoles": "wednesday",
+  "Jueves": "thursday", "Viernes": "friday", "Sábado": "saturday", "Domingo": "sunday",
+}
+
+const DIAS_KEYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+
+const diasOrdenados = computed(() =>
+  DIAS_KEYS.map(key => t.value[key])
+)
 
 const sesionesPorDia = computed(() => {
   const map: Record<string, Sesion[]> = {}
 
-  diasOrdenados.forEach(dia => {
-    map[dia] = []
+  // Las keys del map son las traducciones actuales
+  DIAS_KEYS.forEach(key => {
+    map[t.value[key]] = []
   })
 
   monitorStore.sesiones.forEach(sesion => {
-    if (map[sesion.dia]) {
-      map[sesion.dia].push(sesion)
+    const key = DIA_KEY[sesion.dia]
+    const diaTraducido = key ? t.value[key] : null
+    if (diaTraducido && map[diaTraducido] !== undefined) {
+      map[diaTraducido].push(sesion)
     }
   })
 
-  Object.keys(map).forEach(dia => {
-    map[dia].sort((a, b) =>
-      a.horaInicio.localeCompare(b.horaInicio)
-    )
+  DIAS_KEYS.forEach(key => {
+    map[t.value[key]].sort((a, b) => a.horaInicio.localeCompare(b.horaInicio))
   })
 
   return map

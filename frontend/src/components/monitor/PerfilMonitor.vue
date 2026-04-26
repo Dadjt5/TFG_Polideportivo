@@ -48,7 +48,7 @@
             {{ t.editableData }}
           </h2>
 
-          <form class="d-grid gap-3">
+          <form class="d-grid gap-3" @submit.prevent="guardarCambios">
 
             <!-- Nombre -->
             <div>
@@ -79,7 +79,8 @@
                   :class="{ 'is-invalid': errores.password }" v-model="monitor.password" />
                 <button type="button"
                   class="position-absolute end-0 me-3 border-0 bg-transparent d-flex align-items-center justify-content-center"
-                  :style="{height: '100%', top: '0.08rem', right: errores.password ? '1.7rem' : '0.5rem'}" @click="togglePassword">
+                  :style="{ height: '100%', top: '0.08rem', right: errores.password ? '1.7rem' : '0.5rem' }"
+                  @click="togglePassword">
                   <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"
                     style="font-size: 1.2rem; color: #0072ff;"></i>
                 </button>
@@ -94,7 +95,8 @@
                   :class="{ 'is-invalid': errores.password }" v-model="monitor.confirmPassword" />
                 <button type="button"
                   class="position-absolute end-0 me-3 border-0 bg-transparent d-flex align-items-center justify-content-center"
-                  :style="{height: '100%', top: '0.08rem', right: errores.password ? '1.7rem' : '0.5rem'}" @click="toggleConfirmPassword">
+                  :style="{ height: '100%', top: '0.08rem', right: errores.password ? '1.7rem' : '0.5rem' }"
+                  @click="toggleConfirmPassword">
                   <i :class="showConfirmPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"
                     style="font-size: 1.2rem; color: #0072ff;"></i>
                 </button>
@@ -108,7 +110,7 @@
             </div>
 
             <!-- Guardar cambios -->
-            <button class="btn btn-primary rounded-pill px-4 py-2 shadow-sm" @click="guardarCambios">
+            <button type="submit" class="btn btn-primary rounded-pill px-4 py-2 shadow-sm">
               {{ t.saveChanges }}
             </button>
           </form>
@@ -128,15 +130,13 @@
 </template>
 
 <script setup lang="ts">
-import { inject, type Ref, ref } from 'vue';
+import { inject, type Ref, ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { useAuthStore } from "@/stores/auth";
 import { useMonitorStore } from "@/stores/monitor";
-
 import { modificarMonitor } from "@/services/monitorService";
 
-/* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
 import type { Language } from "@/useI18N";
 import { useI18n } from "@/useI18N";
 
@@ -147,9 +147,7 @@ const monitorStore = useMonitorStore();
 const authStore = useAuthStore();
 const router = useRouter();
 
-/* Expresion regular para comprobar el email */
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const continuar = ref(true);
 
 const mensaje = ref('')
 const tipoMensaje = ref<'success' | 'error' | ''>('')
@@ -173,13 +171,8 @@ const errores = ref({
 const showPassword = ref(false)
 const showConfirmPassword = ref(false)
 
-const togglePassword = () => {
-  showPassword.value = !showPassword.value
-}
-
-const toggleConfirmPassword = () => {
-  showConfirmPassword.value = !showConfirmPassword.value
-}
+const togglePassword = () => showPassword.value = !showPassword.value
+const toggleConfirmPassword = () => showConfirmPassword.value = !showConfirmPassword.value
 
 function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
   mensaje.value = texto
@@ -191,56 +184,75 @@ function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
   }, 5000)
 }
 
-/* Solo mandamos al backend para modificar los campos que se hayan modificado */
+/* 🔥 IMPORTANTE: inicializar el form con datos reales */
+onMounted(() => {
+  if (monitorStore.monitor) {
+    monitor.value.nombre = monitorStore.monitor.nombre
+    monitor.value.apellidos = monitorStore.monitor.apellidos
+    monitor.value.email = monitorStore.monitor.email
+  }
+})
+
 function camposModificados() {
   const data: any = {}
-  continuar.value = true
-  errores.value.nombre = false
-  errores.value.apellidos = false
-  errores.value.password = false
 
+  // reset errores
+  errores.value = {
+    nombre: false,
+    apellidos: false,
+    email: false,
+    password: false
+  }
+
+  let valido = true
+
+  // nombre
   if (!monitor.value.nombre) {
     errores.value.nombre = true
-    continuar.value = false
+    valido = false
   } else {
-    data.nombre = monitor.value.nombre    
+    data.nombre = monitor.value.nombre
   }
 
+  // apellidos
   if (!monitor.value.apellidos) {
     errores.value.apellidos = true
-    continuar.value = false
+    valido = false
   } else {
-    data.apellidos = monitor.value.apellidos    
+    data.apellidos = monitor.value.apellidos
   }
 
+  // email
   if (!monitor.value.email || !emailRegex.test(monitor.value.email)) {
     errores.value.email = true
-    continuar.value = false
+    valido = false
   } else {
-    data.email = monitor.value.email    
+    data.email = monitor.value.email
   }
 
-  if (!monitor.value.password || monitor.value.password != monitor.value.confirmPassword) {
-    errores.value.password = true
-    continuar.value = false
-  } else {
-    data.password = monitor.value.password
+  // 🔥 password SOLO si se introduce
+  if (monitor.value.password || monitor.value.confirmPassword) {
+    if (monitor.value.password !== monitor.value.confirmPassword) {
+      errores.value.password = true
+      valido = false
+    } else {
+      data.password = monitor.value.password
+    }
   }
 
-  return data
+  return { data, valido }
 }
 
 const guardarCambios = async () => {
   try {
-    const data = camposModificados()
+    const { data, valido } = camposModificados()
 
-    if (!continuar.value) {
-      if (monitor.value.password != monitor.value.confirmPassword) {
+    if (!valido) {
+      if (errores.value.password) {
         lanzarMensaje(t.value.passwordNotMatch, "error")
       } else {
         lanzarMensaje(t.value.emptyFields, "error")
       }
-
       return
     }
 
@@ -250,15 +262,17 @@ const guardarCambios = async () => {
 
     if (data.password) {
       lanzarMensaje(t.value.passwordUpdate, "success")
+
       setTimeout(() => {
         monitorStore.cerrarSesion()
         authStore.logout()
         router.push("/login")
       }, 2500)
+
     } else {
-      lanzarMensaje(t.value.correctlyUpdate, "success")
+      await monitorStore.fetchUser(monitorStore.monitor.id)
     }
-    await monitorStore.fetchUser(monitorStore.monitor.id)
+
   } catch (e) {
     lanzarMensaje(t.value.noModify, "error")
     console.error("Error al modificar el monitor", e)

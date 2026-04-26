@@ -35,14 +35,14 @@
                 </router-link>
               </div>
 
-              <div v-if="usuarioFinalStore.notificaciones.length === 0"
+              <div v-if="usuarioFinalStore.sortedNotifications.length === 0"
                 class="d-flex flex-column justify-content-center align-items-center py-5 text-center">
                 <i class="bi bi-bell-slash text-white fs-1 mb-3"></i>
                 <p class="text-white opacity-75 fs-5 mb-0">
                   {{ t.noNotificacions }}
                 </p>
               </div>
-              <div v-else v-for="notf in usuarioFinalStore.notificaciones" :key="notf.id" class="rounded p-3 mb-2"
+              <div v-else v-for="notf in usuarioFinalStore.sortedNotifications.slice(0, 3)" :key="notf.id" class="rounded p-3 mb-2"
                 :class="notf.leido ? 'bg-white bg-opacity-10 text-white' : 'bg-primary bg-opacity-20 text-white'">
                 <strong>{{ notf.titulo }}</strong>
                 <p class="mb-0 small text-white text-opacity-75">

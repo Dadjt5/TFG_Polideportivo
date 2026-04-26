@@ -53,8 +53,10 @@ export const useMonitorStore = defineStore("monitor", {
     unreadCount: (state) =>
       state.notificaciones.filter(n => !n.leido).length,
     sortedNotifications: (state) => [
-      ...state.notificaciones.filter(n => n.fijado),
-      ...state.notificaciones.filter(n => !n.fijado),
+      ...state.notificaciones.filter(n => n.fijado && !n.leido),
+      ...state.notificaciones.filter(n => n.fijado && n.leido),
+      ...state.notificaciones.filter(n => !n.fijado && !n.leido),
+      ...state.notificaciones.filter(n => !n.fijado && n.leido),
     ],
   },
 

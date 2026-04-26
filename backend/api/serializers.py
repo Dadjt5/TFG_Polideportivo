@@ -742,7 +742,6 @@ class ForoSerializer(serializers.ModelSerializer):
         fields = ("id", "numeroParticipantes", "canales")
 
 
-
 class MensajeSerializer(serializers.ModelSerializer):
     es_admin = serializers.SerializerMethodField()
     nombre = serializers.SerializerMethodField()
@@ -754,7 +753,8 @@ class MensajeSerializer(serializers.ModelSerializer):
             "texto",
             "fechaEnvio",
             "nombre",
-            "es_admin"
+            "es_admin",
+            "usuario"
         )
         
     def get_es_admin(self, obj):

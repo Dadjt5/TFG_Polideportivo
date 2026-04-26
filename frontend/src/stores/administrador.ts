@@ -52,8 +52,10 @@ export const useAdministradorStore = defineStore("administrador", {
     unreadCount: (state) =>
       state.notificaciones.filter(n => !n.leido).length,
     sortedNotifications: (state) => [
-      ...state.notificaciones.filter(n => n.fijado),
-      ...state.notificaciones.filter(n => !n.fijado),
+      ...state.notificaciones.filter(n => n.fijado && !n.leido),
+      ...state.notificaciones.filter(n => n.fijado && n.leido),
+      ...state.notificaciones.filter(n => !n.fijado && !n.leido),
+      ...state.notificaciones.filter(n => !n.fijado && n.leido),
     ],
   },
 

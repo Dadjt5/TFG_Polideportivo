@@ -15,7 +15,7 @@
               <p class="mb-0 text-muted fs-5">{{ usuarioFinalStore.usuarioFinal.rol }}</p>
             </div>
 
-            <div class="col-md-4 text-center">
+            <div class="col-md-6 text-center">
               <QRCodeVue3 :key="qrKey" :value="qrValue" level="H" :size="100" />
             </div>
           </div>

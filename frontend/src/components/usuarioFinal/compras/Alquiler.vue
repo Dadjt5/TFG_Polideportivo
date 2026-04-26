@@ -1,4 +1,13 @@
 <template>
+    <div class="min-vh-100 d-flex align-items-center justify-content-center position-relative overflow-hidden"
+       style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
+
+    <!-- Fondo decorativo -->
+    <div class="position-absolute top-0 start-0 w-100 h-100 opacity-25"
+         style="background: radial-gradient(circle at 20% 20%, #0072ff55, transparent 40%),
+                                radial-gradient(circle at 80% 70%, #ff7a0055, transparent 40%);">
+    </div>
+
   <div class="container py-4">
 
     <!-- TÍTULO -->
@@ -142,7 +151,7 @@
 
       </div>
     </div>
-
+  </div>
   </div>
 </template>
 

@@ -215,19 +215,15 @@ const scrollBehavior: RouterScrollBehavior = () => {
 
 /* Cada vez que se accede a una página se redirige el scrollbar arriba */
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHistory(),
   routes,
   scrollBehavior
 })
 
 router.beforeEach(async (to) => {
-  console.log(to.path, to.meta)
-  if (to.meta.public) return true;
-
   const auth = useAuthStore();
-  console.log(auth.isAuthenticated)
 
-  if (!auth.user && auth.isAuthenticated && !to.meta.public) {
+  if (!auth.user && auth.isAuthenticated) {
     try {
       await auth.fetchUser();
     } catch {
@@ -242,9 +238,11 @@ router.beforeEach(async (to) => {
     if (auth.isAdmin) return '/home-administrador';
   }
 
-  if (!auth.isAuthenticated && !to.meta.public) return '/login';
+  if (to.meta.public) return true;
 
-  if (to.meta.allowedRoles && !to.meta.public) {
+  if (!auth.isAuthenticated) return '/login';
+
+  if (to.meta.allowedRoles) {
     const allowed = to.meta.allowedRoles as string[];
 
     if (
@@ -258,7 +256,7 @@ router.beforeEach(async (to) => {
     return '/login';
   }
 
-  if (to.meta.allowedAdminRoles && !to.meta.public) {
+  if (to.meta.allowedAdminRoles) {
     const allowedAdmin = to.meta.allowedAdminRoles as string[];
 
     if (!auth.isAdmin) return '/login';

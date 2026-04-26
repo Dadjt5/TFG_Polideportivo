@@ -50,7 +50,7 @@
               {{ t.activityDetails }}
             </h5>
 
-            <div class="row g-3 small">
+            <div class="row g-3">
 
               <div class="col-6">
                 <span class="text-muted">{{ t.period }}</span><br>

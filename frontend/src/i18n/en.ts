@@ -56,6 +56,7 @@ export default {
   street: "Street",
   noImage: "There is no image",
   finalPrice: "Final price",
+  UAMMessage: "You may be asked to present official UAM identification upon entering the sports centre. Misuse of this rate may result in the cancellation of your booking or suspension of access to the platform.",
 
   /* Eliminaciones */
   confirmDelete: "Confirm deletion",

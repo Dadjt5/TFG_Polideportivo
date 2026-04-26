@@ -1,6 +1,7 @@
 <template>
   <div class="min-vh-100" style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
     <main class="container py-5" style="max-width: 820px">
+
       <!-- PERFIL ADMIN -->
       <div class="card shadow-lg border-0 rounded-4 mb-4"
         style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(10px);">
@@ -78,7 +79,7 @@
                   :class="{ 'is-invalid': errores.password }" v-model="administrador.confirmPassword" />
                 <button type="button"
                   class="position-absolute d-flex align-items-center justify-content-center border-0 bg-transparent"
-                  :style="{height: '100%', top: '0.08rem', right: errores.password ? '1.7rem' : '0.5rem'}" @click="togglePassword">
+                  :style="{height: '100%', top: '0.08rem', right: errores.password ? '1.7rem' : '0.5rem'}" @click="toggleConfirmPassword">
                   <i :class="showConfirmPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"
                     style="font-size:1.2rem; color:#6c757d;"></i>
                 </button>
@@ -147,7 +148,7 @@ const toggleConfirmPassword = () => {
 }
 
 const administrador = ref({
-  nombre: '',
+  nombre: administradorStore.administrador.nombre,
   password: '',
   confirmPassword: ''
 })

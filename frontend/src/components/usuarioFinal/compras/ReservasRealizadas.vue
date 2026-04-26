@@ -40,15 +40,18 @@
           </div>
 
           <!-- INFO DETALLADA -->
-          <div class="text-muted small mb-2">
+          <div class="text-muted mb-2 reserva-detalle">
 
             <!-- ALQUILER -->
             <template v-if="reserva.tipo === 'ALQUILER'">
               <p class="mb-1"><i class="bi bi-calendar-event me-1 text-primary"></i>{{ t.date }}: {{ reserva.fecha }}
               </p>
-              <p class="mb-1"><i class="bi bi-clock me-1 text-success"></i>{{ t.hours }}: {{ reserva.horaInicio }} - {{reserva.horaFin }}</p>
-              <p class="mb-1"><i class="bi bi-building me-1 text-primary"></i>{{ t.facilityType }}: {{reserva.instalacion?.tipo }}</p>
-              <p class="mb-1"><i class="bi bi-currency-euro me-1 text-primary"></i>{{ t.price }}: {{ reserva.coste }}€</p>
+              <p class="mb-1"><i class="bi bi-clock me-1 text-success"></i>{{ t.hours }}: {{ reserva.horaInicio }} -
+                {{ reserva.horaFin }}</p>
+              <p class="mb-1"><i class="bi bi-building me-1 text-primary"></i>{{ t.facilityType }}:
+                {{ reserva.instalacion?.tipo }}</p>
+              <p class="mb-1"><i class="bi bi-currency-euro me-1 text-primary"></i>{{ t.price }}: {{ reserva.coste }}€
+              </p>
             </template>
 
             <!-- RESERVA -->
@@ -61,11 +64,19 @@
               </ul>
               <p class="mb-1"><i class="bi bi-clock me-1 text-success"></i>{{ t.weekHours }}: {{
                 reserva.actividad?.horasSemanales }}</p>
-              <p v-if="reserva.descuentos?.length" class="mb-0">
-                <i class="bi bi-percent me-1 text-success"></i>{{ t.discounts }}:
-                <span v-for="d in reserva.descuentos" :key="d.id">{{ d.nombre }} ({{ d.porcentaje }}%)</span>
+              <div v-if="reserva.descuentos?.length" class="mb-0">
+                <p class="mb-1">
+                  <i class="bi bi-percent me-1 text-success"></i>{{ t.discounts }}:
+                </p>
+
+                <ul class="list-unstyled mb-0 ms-4">
+                  <li v-for="d in reserva.descuentos" :key="d.id" class="small">
+                    • {{ d.nombre }} ({{ d.porcentaje }}%)
+                  </li>
+                </ul>
+              </div>
+              <p class="mb-1"><i class="bi bi-currency-euro me-1 text-primary"></i>{{ t.price }}: {{ reserva.coste }}€
               </p>
-              <p class="mb-1"><i class="bi bi-currency-euro me-1 text-primary"></i>{{ t.price }}: {{ reserva.coste }}€</p>
             </template>
 
             <!-- LISTA DE ESPERA -->
@@ -95,11 +106,13 @@
 
           <!-- ACCIONES -->
           <div class="mt-3 d-flex gap-2">
-            <button v-if="reserva.puede_cancelar && reserva.tipo !== 'LISTA_ESPERA'" class="btn btn-outline-danger btn-sm" @click="abrirConfirmacion(reserva)">
+            <button v-if="reserva.puede_cancelar && reserva.tipo !== 'LISTA_ESPERA'"
+              class="btn btn-outline-danger btn-sm" @click="abrirConfirmacion(reserva)">
               {{ t.cancel }}
             </button>
 
-            <button v-if="reserva.tipo === 'LISTA_ESPERA'" class="btn btn-outline-danger btn-sm" @click="abrirConfirmacionLista(reserva)">
+            <button v-if="reserva.tipo === 'LISTA_ESPERA'" class="btn btn-outline-danger btn-sm"
+              @click="abrirConfirmacionLista(reserva)">
               {{ t.leaveWaitingList }}
             </button>
           </div>
@@ -361,6 +374,7 @@ onMounted(async () => {
 
   try {
     reservas.value = await getReservasRealizadas()
+    console.log(reservas.value)
     configuracionStore.obtenerConfiguracion()
   } catch (e) {
     mensaje.value = t.value.unexpectedError
@@ -386,5 +400,18 @@ onMounted(async () => {
 button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.reserva-detalle {
+  font-size: 1.05rem;
+}
+
+.reserva-detalle p,
+.reserva-detalle li {
+  font-size: 1.05rem;
+}
+
+.reserva-detalle i {
+  font-size: 1.1rem;
 }
 </style>

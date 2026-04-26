@@ -1,5 +1,5 @@
 <template>
-  <div class="min-vh-100 bg-light">
+  <div class="min-vh-100" style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
     <div class="container py-5">
       <h1 class="text-center mb-5">{{ t.TDAEmptyTitle }}</h1>
 
@@ -8,22 +8,16 @@
           <i class="bi bi-credit-card-fill text-primary display-4 mb-3"></i>
           <p class="mb-4">{{ t.TDAinstructions }}</p>
 
-          <input
-            type="text"
-            class="form-control text-center mb-3"
-            :placeholder="t.inputPlaceholder"
-            v-model="codigo"
-          />
+          <input type="text" class="form-control text-center mb-3" :placeholder="t.inputPlaceholder" v-model="codigo" />
 
           <button class="btn btn-primary w-100 mb-4" @click="vincularTarjeta">{{ t.linkButton }}</button>
           <button class="btn btn-success w-100 mb-4" @click="comprarTDA">{{ t.buy }}</button>
 
-          <div v-if="mostrarMensaje" class="text-center mb-3">
-        <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
-          {{ mensaje }}
-        </div>
-      </div>
-
+          <div v-if="mostrarMensaje" class="text-center mb-2">
+            <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
+              {{ mensaje }}
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -63,9 +57,9 @@ const vincularTarjeta = async () => {
     return;
   }
 
-  const respuesta = await validarTDA({codigo: codigo.value})
+  const respuesta = await validarTDA({ codigo: codigo.value })
 
-  if(respuesta.status == "error") {
+  if (respuesta.status == "error") {
     error.value = true
     lanzarMensaje(t.value.TDAerror, "error")
   } else {

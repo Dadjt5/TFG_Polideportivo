@@ -28,6 +28,11 @@
                 <input type="checkbox" class="form-check-input" id="esUAM" v-model="formData.esUAM">
                 <label class="form-check-label" for="esUAM">{{ t.UAMmember }}</label>
               </div>
+
+              <div v-if="formData.esUAM" class="alert alert-warning mt-2 py-2 px-3 small rounded-3">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                {{ t.UAMMessage }}
+              </div>
             </div>
 
             <div class="col-12">
@@ -92,16 +97,17 @@
         <div v-if="step === 3">
           <h4 class="mb-3 text-primary">{{ t.credentials }}</h4>
           <div class="row g-3">
-            <div class="col-md-6">
+
+            <div class="col-md-6 position-relative">
               <input :type="showPassword ? 'text' : 'password'" class="form-control pe-5"
-                :class="{ 'is-invalid': errores.password }" :placeholder=t.passwordPlaceholder
-                v-model="formData.password">
+                :class="{ 'is-invalid': errores.password }" :placeholder="t.passwordPlaceholder"
+                v-model="formData.password" />
+
               <button type="button"
-                class="position-absolute end-0 me-3 border-0 bg-transparent d-flex align-items-center justify-content-center"
-                :style="{height: '100%', top: '0.1rem', left: errores.password ? '28.5rem' : '31rem'}"
-                @click="togglePassword">
+                class="position-absolute top-50 end-0 translate-middle-y border-0 bg-transparent d-flex align-items-center justify-content-center"
+                :class="errores.password ? 'me-5' : 'me-3'" @click="togglePassword">
                 <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"
-                  style="font-size: 1.2rem; color: #0072ff;"></i>
+                  style="font-size: 1.2rem; color:#0072ff;"></i>
               </button>
             </div>
 
@@ -110,9 +116,8 @@
                 :class="{ 'is-invalid': errores.confirmPassword }" :placeholder=t.passwordConfirm
                 v-model="formData.confirmPassword">
               <button type="button"
-                class="position-absolute end-0 me-3 border-0 bg-transparent d-flex align-items-center justify-content-center"
-                :style="{height: '100%', top: '0.1rem', left: errores.password ? '28.5rem' : '31rem'}"
-                @click="toggleConfirmPassword">
+                class="position-absolute top-50 end-0 translate-middle-y border-0 bg-transparent d-flex align-items-center justify-content-center"
+                :class="errores.password ? 'me-5' : 'me-3'" @click="toggleConfirmPassword">
                 <i :class="showConfirmPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"
                   style="font-size: 1.2rem; color: #0072ff;"></i>
               </button>
@@ -122,16 +127,17 @@
 
         <!-- Botones -->
         <div v-if="!showIdentifier" class="d-flex justify-content-between mt-4">
-          <button class="btn btn-outline-primary" :disabled="step === 1" @click="step--">{{ t.back }}</button>
+          <button class="btn btn-outline-primary" v-if="step === 1" @click="volver">{{ t.return }}</button>
+          <button class="btn btn-outline-primary" v-if="step !== 1" @click="step--">{{ t.back }}</button>
           <button class="btn btn-primary" v-if="step < 3" @click="siguiente()">{{ t.next }}</button>
           <button class="btn btn-success" v-else @click="handleFinish">{{ t.finish }}</button>
         </div>
 
         <div v-if="mostrarMensaje" class="text-center mb-3 mt-3">
-        <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
-          {{ mensaje }}
+          <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
+            {{ mensaje }}
+          </div>
         </div>
-      </div>
 
         <!-- Mensaje del identificador único -->
         <div v-if="showIdentifier" class="text-center mt-4">
@@ -351,7 +357,6 @@ const handleFinish = async () => {
     errores.value.password = false
   }
 
-
   if (formData.value.password != formData.value.confirmPassword) {
     errores.value.confirmPassword = true
     lanzarMensaje(t.value.passwordNotMatch, "error")
@@ -376,4 +381,8 @@ const handleFinish = async () => {
 const login = () => {
   router.push("/login");
 }
+
+const volver = () => {
+  router.back();
+};
 </script>
