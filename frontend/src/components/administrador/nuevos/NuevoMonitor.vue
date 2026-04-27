@@ -183,6 +183,24 @@ const toggleConfirmPassword = () => {
   showConfirmPassword.value = !showConfirmPassword.value
 }
 
+/* Letras para calcular la correcta letra del DNI */
+const letrasDNI = "TRWAGMYFPDXBNJZSQVHLCKE"
+
+function validarDNI(dni: string): boolean {
+  const regex = /^(\d{8})([A-Z])$/i
+  const match = dni.toUpperCase().match(regex)
+
+  if (!match) return false
+
+  const numero = parseInt(match[1], 10)
+  const letra = match[2]
+
+  const letraCorrecta = letrasDNI[numero % 23]
+
+  return letra === letraCorrecta
+}
+
+
 function validarFormulario() {
   let valido = true
 
@@ -190,7 +208,8 @@ function validarFormulario() {
   errores.value.apellidos = monitor.value.apellidos === ''
 	errores.value.dni = 
 		monitor.value.dni === '' ||
-		monitor.value.dni.length !== 9
+		monitor.value.dni.length !== 9 ||
+    !validarDNI(monitor.value.dni)
 	errores.value.email =
 		monitor.value.email === '' ||
 		!emailRegex.test(monitor.value.email)

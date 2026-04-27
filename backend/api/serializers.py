@@ -362,16 +362,32 @@ class CalleSerializer(serializers.ModelSerializer):
         model = Calle
         fields = '__all__'
 
+
 class PabellonSimpleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Pabellon
         fields = ('id', 'nombre', 'direccion')
 
 
+class InstalacionResumenSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Instalacion
+        fields = ['id', 'nombre', 'imagen', 'tipoInstalacion', 'aforoMaximo']
+
+
 class PabellonSerializer(serializers.ModelSerializer):
+    instalaciones = InstalacionResumenSerializer(many=True, read_only=True)
+
     class Meta:
         model = Pabellon
-        fields = '__all__'
+        fields = [
+            'id',
+            'nombre',
+            'descripcion',
+            'imagen',
+            'direccion',
+            'instalaciones'
+        ]
 
 
 class InstalacionSimpleSerializer(serializers.ModelSerializer):

@@ -181,7 +181,8 @@ function validarFormulario() {
 	errores.value.nombre = administrador.value.nombre === ''
 	errores.value.DNI = 
 		administrador.value.DNI === '' ||
-		administrador.value.DNI.length !== 9
+		administrador.value.DNI.length !== 9 ||
+    !validarDNI(administrador.value.DNI)
 	errores.value.email =
 		administrador.value.email === '' ||
 		!emailRegex.test(administrador.value.email)
@@ -198,6 +199,24 @@ function validarFormulario() {
 
   return valido
 }
+
+/* Letras para calcular la correcta letra del DNI */
+const letrasDNI = "TRWAGMYFPDXBNJZSQVHLCKE"
+
+function validarDNI(dni: string): boolean {
+  const regex = /^(\d{8})([A-Z])$/i
+  const match = dni.toUpperCase().match(regex)
+
+  if (!match) return false
+
+  const numero = parseInt(match[1], 10)
+  const letra = match[2]
+
+  const letraCorrecta = letrasDNI[numero % 23]
+
+  return letra === letraCorrecta
+}
+
 
 function comprobarPermisos() {
   if (!authStore.isAdminRaiz && administrador.value.rol == "Administrador raiz") {

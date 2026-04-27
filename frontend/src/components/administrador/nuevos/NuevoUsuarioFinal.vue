@@ -258,7 +258,7 @@ function validarFormulario() {
 
   errores.value.nombre = usuarioFinal.value.nombre === ''
   errores.value.apellidos = usuarioFinal.value.apellidos === ''
-  errores.value.DNI = usuarioFinal.value.dni === '' && !esMenor.value
+  errores.value.DNI = usuarioFinal.value.dni === '' || !validarDNI(usuarioFinal.value.dni) && !esMenor.value
   errores.value.sexo = usuarioFinal.value.sexo === ''
   errores.value.fechaNacimiento = usuarioFinal.value.fechaNacimiento === ''
   errores.value.telefono = usuarioFinal.value.telefono === ''
@@ -282,6 +282,24 @@ function validarFormulario() {
 
   return valido
 }
+
+/* Letras para calcular la correcta letra del DNI */
+const letrasDNI = "TRWAGMYFPDXBNJZSQVHLCKE"
+
+function validarDNI(dni: string): boolean {
+  const regex = /^(\d{8})([A-Z])$/i
+  const match = dni.toUpperCase().match(regex)
+
+  if (!match) return false
+
+  const numero = parseInt(match[1], 10)
+  const letra = match[2]
+
+  const letraCorrecta = letrasDNI[numero % 23]
+
+  return letra === letraCorrecta
+}
+
 
 const nuevoUsuario = async () => {
   if (!validarFormulario()) {

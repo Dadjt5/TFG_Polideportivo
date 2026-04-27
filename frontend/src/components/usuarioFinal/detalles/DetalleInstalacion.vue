@@ -1,6 +1,6 @@
 <template>
   <div class="min-vh-100" style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
-    <main class="container-fluid mt-2 px-5 py-4">
+    <main class="container-fluid px-5 py-4">
 
       <!-- Cabecera -->
       <div class="d-flex justify-content-center align-items-center mt-4 mb-5 gap-2">
@@ -317,7 +317,6 @@ import { getInstalacionDetalle, getAlquileresPorDia } from "@/services/detalleSe
 import { useUserStore } from '@/stores/usuarioFinal';
 import { useTiposStore } from '@/stores/tipos';
 import { descargarHorario } from '@/services/crearRecursosService';
-
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
 import type { Language } from "@/useI18N";

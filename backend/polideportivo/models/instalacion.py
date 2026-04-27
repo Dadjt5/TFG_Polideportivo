@@ -48,7 +48,7 @@ class Instalacion(models.Model):
     porcentajeTDA = models.FloatField(default=0.0)
     numeroCalles = models.PositiveIntegerField(default=0)
 
-    pabellon = models.ForeignKey(Pabellon, on_delete=models.RESTRICT)
+    pabellon = models.ForeignKey(Pabellon, on_delete=models.RESTRICT, related_name="instalaciones")
     tarifa = models.ForeignKey('TarifaInstalacion', on_delete=models.RESTRICT, blank=True, null=True)
 
     tipoInstalacion = models.CharField(default=TipoInstalacion.SALA_MULTIUSOS, choices=TipoInstalacion.choices)

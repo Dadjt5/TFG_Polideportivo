@@ -1,6 +1,6 @@
 <template>
   <div class="min-vh-100" style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
-    <main class="container-fluid mt-2 px-5 py-4">
+    <main class="container-fluid px-5 py-4">
 
       <!-- Cabecera -->
       <div class="d-flex justify-content-center align-items-center mt-4 mb-5 gap-2">

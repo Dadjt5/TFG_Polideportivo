@@ -205,6 +205,7 @@ export default {
   facility: "Instalación",
   pavilions: "Pabellones",
   pavilion: "Pabellón",
+  noFacilities: "Sin instalaciones",
 
   dayOfWeek: "Día de la semana",
   activityType: "Tipo de actividad",

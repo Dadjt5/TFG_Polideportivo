@@ -93,6 +93,10 @@ export const useUserStore = defineStore("user", {
       ...state.notificaciones.filter(n => !n.fijado && !n.leido),
       ...state.notificaciones.filter(n => !n.fijado && n.leido),
     ],
+    sortedNotificationsHome: (state) => [
+      ...state.notificaciones.filter(n => !n.leido),
+      ...state.notificaciones.filter(n => n.leido),
+    ],
     activityIsFavorite: (state) => (id: number) => {
       return state.favoritos.actividades.includes(id);
     },

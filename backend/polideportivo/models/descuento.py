@@ -37,7 +37,7 @@ class Descuento(models.Model):
 
         if actividad:
             descuentos = cls.objects.filter(
-                Q(deportes__in=[actividad.deportes]) |
+                Q(deportes=actividad.deportes) |
                 Q(tiposInstalacion__contains=actividad.instalacion.tipoInstalacion),
                 fechaInicio__lte=hoy,
                 fechaFinValidez__gte=hoy
@@ -60,20 +60,26 @@ class Descuento(models.Model):
         if not descuentos.exists():
             return None
 
-        prioritarios = descuentos.filter(prioritario=True)
-        if prioritarios.exists():
-            descuentos = prioritarios
-
         combinables = descuentos.filter(combinable=True)
-        no_combinable = descuentos.filter(combinable=False).order_by("-porcentaje").first()
+        esPrioritarioCombinables = combinables.filter(prioritario=True).exists()
 
+        no_combinables = descuentos.filter(combinable=False).order_by("-porcentaje")
+        if no_combinables.filter(prioritario=True).exists():
+            no_combinable = no_combinables.filter(prioritario=False).order_by("-porcentaje").first()
+            esPrioritarioNoCombinables = True
+        else:
+            no_combinable = no_combinables.first()
+            esPrioritarioNoCombinables = False
+        
         total_combinables = Descuento._calcular_porcentaje(combinables)
 
         if no_combinable and no_combinable.porcentaje >= total_combinables:
-            return {
-                "porcentaje_total": no_combinable.porcentaje,
-                "descuentos": [no_combinable]
-            }
+            # En caso de que el no combinable sea mayor revisamos con cuidado que la prioridad sea igual o mayor
+            if esPrioritarioCombinables and esPrioritarioNoCombinables or not esPrioritarioCombinables:
+                return {
+                    "porcentaje_total": no_combinable.porcentaje,
+                    "descuentos": [no_combinable]
+                }
 
         return {
             "porcentaje_total": total_combinables,

@@ -1,6 +1,6 @@
 <template>
   <div class="min-vh-100" style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
-    <main class="container-fluid mt-2 px-5 py-4">
+    <main class="container-fluid px-5 py-4">
 
       <!-- Cabecera -->
       <div class="text-center mt-4 mb-5">
@@ -41,16 +41,6 @@
 
             </div>
 
-            <div v-if="editando" class="mt-4 d-flex gap-3">
-              <button class="btn btn-gradient-success" @click="guardarCambios">
-                <i class="bi bi-check-lg me-1"></i>{{ t.save }}
-              </button>
-
-              <button class="btn btn-secondary btn-lg" @click="cancelarEdicion">
-                {{ t.cancel }}
-              </button>
-            </div>
-
           </div>
         </div>
 
@@ -67,13 +57,54 @@
             <span v-if="pabellon.imagen">
               <img :src="pabellon.imagen" class="img-fluid rounded mb-3 img-hover" />
             </span>
-             <span v-else class="text-center text-muted mt-5">
+            <span v-else class="text-center text-muted mt-5">
               <i class="bi bi-image fs-1"></i>
               <p class="mt-3">{{ t.noImage }}</p>
             </span>
           </div>
         </div>
 
+      </div>
+
+      <!-- INSTALACIONES -->
+      <div class="mt-5">
+        <div class="bg-white rounded-4 shadow-sm p-4 card-hover">
+          <h4 class="mb-4 d-flex align-items-center">
+            <i class="bi bi-grid-3x3-gap-fill text-primary me-2"></i>
+            {{ t.facilities }}
+          </h4>
+
+          <div v-if="pabellon.instalaciones?.length" class="row g-4">
+            <div v-for="instalacion in pabellon.instalaciones" :key="instalacion.id" class="col-md-6 col-xl-4">
+              <div class="border rounded-4 p-3 h-100 shadow-sm facility-card" style="cursor: pointer;" @click="facilityDetail(instalacion.id)">
+                <img v-if="instalacion.imagen" :src="instalacion.imagen" class="img-fluid rounded mb-3"
+                  style="height: 180px; width: 100%; object-fit: cover;" />
+
+                <div v-else class="text-center text-muted py-4">
+                  <i class="bi bi-image fs-2"></i>
+                </div>
+
+                <h5 class="fw-semibold">
+                  {{ instalacion.nombre }}
+                </h5>
+
+                <p class="text-muted small mb-2">
+                  {{ instalacion.tipoInstalacion }}
+                </p>
+
+                <p class="mb-0">
+                  <i class="bi bi-people-fill me-1 text-primary"></i>
+                  {{ t.capacity }}: {{ instalacion.aforoMaximo }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div v-else class="text-center text-muted">
+            <i class="bi bi-grid fs-1"></i>
+            <p class="mt-3">{{ t.noFacilities }}</p>
+          </div>
+        </div>
       </div>
 
       <!-- Botones -->
@@ -92,9 +123,7 @@
 import { inject, ref, onMounted, type Ref } from "vue"
 import { useRouter } from "vue-router"
 
-import { useAuthStore } from "@/stores/auth"
-
-import { getPabellonDetalle, modificarPabellon, eliminarPabellon } from "@/services/detalleService"
+import { getPabellonDetalle } from "@/services/detalleService"
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
 import type { Language } from "@/useI18N"
@@ -105,86 +134,30 @@ const props = defineProps<{ id: string }>();
 const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);
 
-const authStore = useAuthStore();
 const router = useRouter();
-
-const editando = ref(false)
 
 const pabellon = ref({
   id: 0,
   nombre: "",
   descripcion: "",
   imagen: "",
-  direccion: ""
+  direccion: "",
+  instalaciones: [] as {
+    id: number
+    nombre: string
+    imagen?: string
+    tipoInstalacion: string
+    aforoMaximo: number
+  }[]
 });
-
-const errores = ref({
-	nombre: false,
-  direccion: false
-})
 
 const pabellonOriginal = ref<any>(null);
 
-function validarFormulario() {
-  let valido = true
-
-	errores.value.nombre = pabellon.value.nombre === ''
-	errores.value.direccion = pabellon.value.direccion === ''
-
-  for (const key in errores.value) {
-    if(errores.value[key]) {
-      valido = false
-    }
-  }
-
-  return valido
-}
-
-function activarEdicion() {
-  pabellonOriginal.value = JSON.parse(JSON.stringify(pabellon.value))
-	Object.keys(errores.value).forEach(k => errores.value[k] = false)
-  editando.value = true
-}
-
-function cancelarEdicion() {
-  pabellonOriginal.value = JSON.parse(JSON.stringify(pabellon.value))
-  editando.value = false
-}
-
-/* Solo mandamos al backend para modificar los campos que se hayan modificado */
-function camposModificados() {
-  const data: any = {}
-
-	if(pabellonOriginal.value.nombre != pabellon.value.nombre) {
-      data["nombre"] = pabellon.value.nombre
-  }
-
-	if(pabellonOriginal.value.direccion != pabellon.value.direccion) {
-      data["direccion"] = pabellon.value.direccion
-  }
-
-  return data;
-}
-
-const guardarCambios = async () => {
-  try {
-		if (!validarFormulario()) return
-
-		const data = camposModificados();
-    if(Object.keys(data).length > 0) {
-      await modificarPabellon(pabellon.value.id, data);
-    }
-  } catch (e) {
-    console.error("Error al modificar el pabellon", e);
-  }
-}
-
-const eliminar = async () => {
-  try {
-    await eliminarPabellon(pabellon.value.id)
-  } catch (e) {
-    console.error("Error al eliminar el pabellon", e);
-  }
+const facilityDetail = (id: number) => {
+  router.push({
+    name: 'detalle-instalacion',
+    params: { id }
+  });
 }
 
 const volver = () => {
@@ -196,9 +169,9 @@ onMounted(async () => {
 
   try {
     pabellon.value = await getPabellonDetalle(id);
-		pabellonOriginal.value = JSON.parse(JSON.stringify(pabellon.value))
-  } catch(e) {
-		console.log("Error al obtener la informacion del pabellon", e);
-	}
+    pabellonOriginal.value = JSON.parse(JSON.stringify(pabellon.value))
+  } catch (e) {
+    console.log("Error al obtener la informacion del pabellon", e);
+  }
 });
 </script>

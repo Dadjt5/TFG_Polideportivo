@@ -1463,11 +1463,11 @@ class EditarInstalacionView(APIView):
                 if str(fecha) not in especiales_existentes:
                     res = instalacion.nuevoHorarioEspecial(fecha)
 
-                if not res:
-                    return Response(
-                        {"respuesta": f"Error creando día cerrado {fecha}", "tipo": "otro"},
-                        status=status.HTTP_400_BAD_REQUEST
-                    )
+                    if not res:
+                        return Response(
+                            {"respuesta": f"Error creando día cerrado {fecha}", "tipo": "otro"},
+                            status=status.HTTP_400_BAD_REQUEST
+                        )
 
             # Eliminar las que ya no existen
             for fecha, agenda in especiales_existentes.items():

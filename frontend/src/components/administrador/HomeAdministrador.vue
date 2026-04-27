@@ -37,7 +37,7 @@
                   {{ t.noNotificacions }}
                 </p>
               </div>
-              <div v-else v-for="notf in administradorStore.notificaciones" :key="notf.id" class="rounded p-3 mb-2"
+              <div v-else v-for="notf in administradorStore.sortedNotificationsHome" :key="notf.id" class="rounded p-3 mb-2"
                 :class="notf.leido ? 'bg-white bg-opacity-10 text-white' : 'bg-primary bg-opacity-20 text-white'">
                 <strong>{{ notf.titulo }}</strong>
                 <p class="mb-0 small text-white text-opacity-75">

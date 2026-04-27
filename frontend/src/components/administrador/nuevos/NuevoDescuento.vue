@@ -230,7 +230,7 @@ const crearDescuento = async () => {
     return
   }
 
-  if (descuento.value.tiposInstalacion.length == 0 || descuento.value.deportes.length == 0) {
+  if (descuento.value.tiposInstalacion.length == 0 && descuento.value.deportes_ids.length == 0) {
     lanzarMensaje(t.value.selectAtLeastOne, "error")
     return
   }

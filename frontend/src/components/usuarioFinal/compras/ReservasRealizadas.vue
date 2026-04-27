@@ -9,19 +9,60 @@
         </h1>
       </div>
 
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 gap-3">
+
+        <!-- Tabs -->
+        <ul class="nav nav-pills">
+          <li class="nav-item">
+            <button class="nav-link" :class="{ active: tabActiva === 'TODAS' }" @click="tabActiva = 'TODAS'">
+              {{ t.all }}
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" :class="{ active: tabActiva === 'RESERVA' }" @click="tabActiva = 'RESERVA'">
+              {{ t.activities }}
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" :class="{ active: tabActiva === 'ALQUILER' }" @click="tabActiva = 'ALQUILER'">
+              {{ t.rents }}
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" :class="{ active: tabActiva === 'LISTA_ESPERA' }"
+              @click="tabActiva = 'LISTA_ESPERA'">
+              {{ t.waitingList }}
+            </button>
+          </li>
+        </ul>
+
+        <!-- Orden -->
+        <div class="d-flex gap-2">
+          <select class="form-select form-select-sm" v-model="orden">
+            <option value="nombre">{{ t.name }}</option>
+          </select>
+
+          <button class="btn btn-outline-primary btn-sm" @click="cambiarOrden">
+            <i :class="ascendente ? 'bi bi-sort-down' : 'bi bi-sort-up'"></i>
+          </button>
+        </div>
+
+      </div>
+
       <!-- SIN RESERVAS -->
-      <div v-if="reservas.length === 0" class="text-center text-muted mt-5">
+      <div v-if="reservasFiltradas.length === 0" class="text-center text-muted mt-5">
         <i class="bi bi-calendar-x fs-1"></i>
         <p class="mt-3">{{ t.noBookings }}</p>
       </div>
 
       <!-- LISTA DE RESERVAS -->
       <div v-else class="row g-4">
-        <div v-for="reserva in reservas" :key="reserva.id" class="card-hover rounded-4 shadow-sm p-4 mb-4" :class="{
-          'border-start border-4 border-primary bg-primary-subtle': reserva.tipo === 'ALQUILER',
-          'border-start border-4 border-success bg-success-subtle': reserva.tipo === 'RESERVA',
-          'border-start border-4 border-warning bg-warning-subtle': reserva.tipo === 'LISTA_ESPERA'
-        }">
+        <div v-for="reserva in reservasFiltradas" :key="reserva.id" class="card-hover rounded-4 shadow-sm p-4 mb-4"
+          :class="{
+            'border-start border-4 border-primary bg-primary-subtle': reserva.tipo === 'ALQUILER',
+            'border-start border-4 border-success bg-success-subtle': reserva.tipo === 'RESERVA',
+            'border-start border-4 border-warning bg-warning-subtle': reserva.tipo === 'LISTA_ESPERA'
+          }">
           <!-- HEADER -->
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="mb-0 fw-semibold">
@@ -199,7 +240,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, inject, type Ref } from "vue"
+import { ref, onMounted, inject, type Ref, computed } from "vue"
 import { Modal } from 'bootstrap'
 
 import { getReservasRealizadas } from "@/services/usuarioFinalService"
@@ -255,6 +296,9 @@ const configuracionStore = useConfiguracionStore();
 const reservas = ref<Reserva[]>([])
 const mensaje = ref("")
 const eliminado = ref(false)
+const tabActiva = ref<"TODAS" | "RESERVA" | "ALQUILER" | "LISTA_ESPERA">("TODAS")
+const orden = ref<"nombre">("nombre")
+const ascendente = ref(true)
 
 let confirmModal: Modal
 let confirmModalLista: Modal
@@ -305,6 +349,37 @@ function abrirConfirmacionLista(reserva: Reserva) {
 
 function finalizar() {
   successModal.hide()
+}
+
+const reservasFiltradas = computed(() => {
+  let lista = [...reservas.value]
+
+  if (tabActiva.value !== "TODAS") {
+    lista = lista.filter(r => r.tipo === tabActiva.value)
+  }
+
+  lista.sort((a, b) => {
+    let valorA
+    let valorB
+
+    if (orden.value === "nombre") {
+      valorA = (a.actividad?.nombre || a.instalacion?.nombre || "").toLowerCase()
+      valorB = (b.actividad?.nombre || b.instalacion?.nombre || "").toLowerCase()
+    } else {
+      valorA = new Date(a.fecha || "").getTime()
+      valorB = new Date(b.fecha || "").getTime()
+    }
+
+    if (valorA < valorB) return ascendente.value ? -1 : 1
+    if (valorA > valorB) return ascendente.value ? 1 : -1
+    return 0
+  })
+
+  return lista
+})
+
+const cambiarOrden = () => {
+  ascendente.value = !ascendente.value
 }
 
 const cancelarReserva = async () => {
@@ -374,7 +449,6 @@ onMounted(async () => {
 
   try {
     reservas.value = await getReservasRealizadas()
-    console.log(reservas.value)
     configuracionStore.obtenerConfiguracion()
   } catch (e) {
     mensaje.value = t.value.unexpectedError

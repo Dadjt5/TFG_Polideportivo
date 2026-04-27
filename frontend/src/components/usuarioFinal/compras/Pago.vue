@@ -237,6 +237,12 @@ const handleBeforeUnload = () => {
 onBeforeUnmount(() => {
   window.removeEventListener("beforeunload", handleBeforeUnload)
 
+  clearInterval(countdown)
+
+  if (cardElement) {
+    cardElement.destroy()
+  }
+
   if(cancelar) {
     cancelarPago()
   }

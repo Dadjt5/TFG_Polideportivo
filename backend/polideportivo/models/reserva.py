@@ -170,7 +170,7 @@ class Alquiler(Reserva):
         """Calcula el precio final de la reserva usando la instalacion"""
         precio = 0.0
 
-        if self.horaFin >= time(9, 0):
+        if (self.horaFin > time(20, 0) or self.horaInicio < time(8,0)) and self.instalacion.luz:
             self.luz = True
             precio += self.instalacion.tarifa.costeIluminacion
 

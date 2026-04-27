@@ -152,8 +152,8 @@
               <i class="bi bi-images text-primary"></i> {{ t.images }}
             </h5>
 
-            <img :src="actividad.imagen" class="img-fluid rounded mb-3 img-hover"
-              v-if="actividad.imagen && !preview" style="max-height: 300px; object-fit: cover;" />
+            <img :src="actividad.imagen" class="img-fluid rounded mb-3 img-hover" v-if="actividad.imagen && !preview"
+              style="max-height: 300px; object-fit: cover;" />
 
             <input v-if="editando" type="file" class="form-control form-control-lg mt-2" @change="onFileChange" />
 
@@ -173,7 +173,7 @@
             </select>
           </div>
 
-          <div class="col-md-4 mb-3" v-if="instalacionDetalle.tipoInstalacion === 'Piscina'">
+          <div class="col-md-4 mb-3" v-if="instalacionDetalle?.tipoInstalacion === 'Piscina'">
             <label class="form-label fw-semibold">{{ t.poolStreets }}</label>
             <select class="form-select form-select-lg" v-model="calleSeleccionada">
               <option v-for="c in instalacionDetalle.calles" :key="c.id" :value="c.id">
@@ -189,17 +189,45 @@
           <div v-if="instalacionDetalle?.agenda?.length" class="card border-0 shadow-sm rounded-4 p-4 bg-light">
             <h5 class="fw-bold mb-3">{{ t.weekHours }}</h5>
 
-            <div class="mt-4 mb-2">
-              <span class="badge bg-success me-2">{{ t.free }}</span>
-              <span class="badge bg-primary me-2">{{ t.selected }}</span>
-              <span class="badge bg-warning text-dark">{{ t.activity }}</span>
+            <!-- SELECTOR TIPO VISTA -->
+            <div class="card border-0 shadow-sm rounded-4 p-3 bg-white mb-3">
+              <div class="row g-3 align-items-end">
+
+                <div class="col-md-4">
+                  <label class="form-label fw-semibold">{{ t.reserveType }}</label>
+                  <select class="form-select form-select-lg" v-model="tipoVista">
+                    <option value="actividades">{{ t.activities }}</option>
+                    <option value="alquileres">{{ t.rents }}</option>
+                  </select>
+                </div>
+
+                <div class="col-md-4" v-if="tipoVista === 'alquileres'">
+                  <label class="form-label fw-semibold">{{ t.selectedDate }}</label>
+                  <input type="date" class="form-control form-control-lg" v-model="reserva.seleccion.fecha" />
+                </div>
+
+              </div>
             </div>
 
-            <div class="row">
-              <div v-for="dia in instalacionDetalle.agenda" :key="dia.id" class="col-12 mb-3">
-                <div class="p-3 rounded-3 bg-white border shadow-sm">
+            <!-- LEYENDA -->
+            <div class="mt-2 mb-3">
+              <template v-if="tipoVista === 'actividades'">
+                <span class="badge bg-success me-2">{{ t.free }}</span>
+                <span class="badge bg-primary me-2">{{ t.selected }}</span>
+                <span class="badge bg-warning text-dark">{{ t.activity }}</span>
+              </template>
+              <template v-else>
+                <span class="badge bg-success me-2">{{ t.free }}</span>
+                <span class="badge bg-danger me-2">{{ t.rented }}</span>
+                <span class="badge bg-warning text-dark">{{ t.rentedNoPay }}</span>
+              </template>
+            </div>
 
-                  <!-- CABECERA CLICKABLE -->
+            <!-- VISTA ACTIVIDADES (agenda semanal) -->
+            <div v-if="tipoVista === 'actividades'" class="row">
+              <div v-for="dia in instalacionDetalle.agenda.filter(d => d.dia !== null)" :key="dia.id"
+                class="col-12 mb-3">
+                <div class="p-3 rounded-3 bg-white border shadow-sm">
                   <div class="d-flex justify-content-between align-items-center cursor-pointer"
                     @click="toggleDia(dia.id)">
                     <span class="fw-semibold">{{ dia.dia }}</span>
@@ -209,8 +237,6 @@
                       <i v-else class="bi bi-chevron-down"></i>
                     </span>
                   </div>
-
-                  <!-- DESPLEGABLE DE INTERVALOS -->
                   <transition name="fade">
                     <div v-if="dia.abierto && isOpen(dia.id)" class="mt-2">
                       <div class="d-flex flex-wrap gap-2">
@@ -225,10 +251,57 @@
                       </div>
                     </div>
                   </transition>
-
                 </div>
               </div>
             </div>
+
+            <!-- VISTA ALQUILERES (por fecha) -->
+            <div v-else-if="tipoVista === 'alquileres'">
+              <div v-if="reserva.fecha">
+
+                <div v-if="!reserva.fecha.abierto" class="text-center py-4">
+                  <span class="badge bg-danger fs-6 px-4 py-3">{{ t.close }}</span>
+                </div>
+
+                <div v-else class="p-3 rounded-3 bg-white border shadow-sm">
+
+                  <!-- Piscina: por calles -->
+                  <div v-if="instalacionDetalle?.tipoInstalacion === 'Piscina'">
+                    <div v-for="calle in reserva.fecha.calles" :key="calle.id" class="mb-3">
+                      <h6 class="fw-semibold mb-2">{{ t.street }} {{ calle.numero || calle.id }}</h6>
+                      <div class="d-flex flex-wrap gap-2">
+                        <div v-for="hora in calle.slots" :key="hora.horaInicio"
+                          class="small text-white text-center px-3 py-2 rounded" :class="{
+                            'bg-success': hora.estado === 'Libre',
+                            'bg-danger': hora.estado === 'Reservado' && hora.pagada,
+                            'bg-warning text-dark': hora.estado === 'Reservado' && !hora.pagada
+                          }">
+                          {{ hora.horaInicio }} - {{ hora.horaFin }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Normal: slots directos -->
+                  <div v-else class="d-flex flex-wrap gap-2">
+                    <div v-for="hora in reserva.fecha.slots" :key="hora.horaInicio"
+                      class="small text-white text-center px-3 py-2 rounded" :class="{
+                        'bg-success': hora.estado === 'Libre',
+                        'bg-danger': hora.estado === 'Reservado' && hora.pagada,
+                        'bg-warning text-dark': hora.estado === 'Reservado' && !hora.pagada
+                      }">
+                      {{ hora.horaInicio }} - {{ hora.horaFin }}
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              <div v-else class="text-center text-muted py-4">
+                {{ t.selectDate || 'Selecciona una fecha' }}
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -423,8 +496,8 @@
                       <input type="time" class="form-control form-control-sm" v-model="sesion.horaFin"
                         style="width: 120px;" />
 
-                      <select v-if="instalacionDetalle.tipoInstalacion === 'Piscina'"
-                        class="form-select form-select-sm" v-model="sesion.calle" style="width: 100px;">
+                      <select v-if="instalacionDetalle.tipoInstalacion === 'Piscina'" class="form-select form-select-sm"
+                        v-model="sesion.calle" style="width: 100px;">
                         <option v-for="c in instalacionDetalle.calles" :key="c.id" :value="c.id">
                           {{ c.numero || c.id }}
                         </option>
@@ -437,7 +510,8 @@
                     <div>
                       <strong>{{ sesion.dia }}</strong> |
                       {{ sesion.horaInicio }} - {{ sesion.horaFin }}
-                      <span v-if="instalacionDetalle?.tipoInstalacion === 'Piscina'">{{ t.street }} {{ sesion.calle }}</span>
+                      <span v-if="instalacionDetalle?.tipoInstalacion === 'Piscina'">{{ t.street }} {{ sesion.calle
+                        }}</span>
                     </div>
                   </template>
 
@@ -565,14 +639,15 @@
 
 
 <script setup lang="ts">
-import { ref, onMounted, inject, type Ref, computed, watch
+import {
+  ref, onMounted, inject, type Ref, computed, watch
 
- } from "vue"
+} from "vue"
 import { useRouter } from "vue-router"
 import { Modal } from 'bootstrap'
 
 import { getInstalacionesSimples, getMonitoresSimples, getTarifasActividadComun, getTarifasFisioterapia, getTarifasGrupoReducido, getDeportes } from "@/services/listadoService"
-import { eliminarActividad, getActividadDetalle, getInstalacionDetalle, modificarActividad } from "@/services/detalleService"
+import { eliminarActividad, getActividadDetalle, getInstalacionDetalle, modificarActividad, getAlquileresPorDia } from "@/services/detalleService"
 import { useTiposStore } from "@/stores/tipos"
 
 import type { Language } from "@/useI18N"
@@ -626,6 +701,7 @@ const mostrarMensaje = ref(false)
 const editando = ref(false)
 const callesDisponibles = ref<any[]>([])
 const calleSeleccionada = ref<number | null>(null)
+const tipoVista = ref<'actividades' | 'alquileres'>('actividades')
 
 const errores = ref<any>({
   nombre: false, plazasMaximas: false, plazasReservadas: false, edadMinima: false,
@@ -634,13 +710,28 @@ const errores = ref<any>({
   tarifa: false, periodo: false
 })
 
+const reserva = ref({
+  fecha: null as any,
+  seleccion: {
+    fecha: new Date().toISOString().slice(0, 10),
+  },
+})
+
+watch(
+  () => reserva.value.seleccion.fecha,
+  async (nuevaFecha) => {
+    if (!actividad.value.instalacion) return
+    reserva.value.fecha = await getAlquileresPorDia(actividad.value.instalacion, nuevaFecha)
+  }
+)
+
 function esPropio(intervalo: any, dia: any) {
   return sesiones.value.some(sesion => {
     return (
       sesion.calle === intervalo.calle &&
       sesion.dia === dia.dia &&
-      intervalo.horaInicio >= sesion.horaInicio &&
-      intervalo.horaFin <= sesion.horaFin
+      intervalo.horaInicio.slice(0, 5) >= sesion.horaInicio.slice(0, 5) &&
+      intervalo.horaFin.slice(0, 5) <= sesion.horaFin.slice(0, 5)
     )
   })
 }
@@ -753,7 +844,7 @@ const comprobarAlquiler = async () => {
   }
 
   if (instalacionDetalle.value.tipoInstalacion == "Piscina") {
-    if (actividad.value.plazasMaximas > instalacionDetalle.value.aforoMaximo/instalacionDetalle.value.numeroCalles) {
+    if (actividad.value.plazasMaximas > instalacionDetalle.value.aforoMaximo / instalacionDetalle.value.numeroCalles) {
       lanzarMensaje(t.value.errorPlaces, "error")
       return
     }

@@ -233,7 +233,6 @@ const mensaje = ref('')
 const tipoMensaje = ref<'success' | 'error' | ''>('')
 const mostrarMensaje = ref(false)
 
-
 function periodoPorFecha(fechaStr: string) {
   const fecha = new Date(fechaStr)
   const mes = fecha.getMonth() + 1
@@ -243,8 +242,6 @@ function periodoPorFecha(fechaStr: string) {
   if (mes >= 6 && mes <= 8) return "Meses de verano"
   return "Todo el año"
 }
-
-
 
 function esActividadValida(intervalo: any, fecha: string) {
   const periodoActual = periodoPorFecha(fecha)
@@ -461,6 +458,22 @@ watch(
     horasSeleccionadas.value = []
   }
 );
+
+watch(horasSeleccionadas, () => {
+  if (horasSeleccionadas.value.length === 0) {
+    reserva.value.seleccion.luz = false
+    return
+  }
+
+  const reservas = reserva.value.tarifa.reservas
+
+  const primeraHora = horasSeleccionadas.value[0]
+  const ultimaKey = horasSeleccionadas.value[horasSeleccionadas.value.length - 1]
+  const ultimaReserva = reservas.find(r => r.horaInicio === ultimaKey)
+  const horaFin = ultimaReserva?.horaFin ?? ''
+
+  reserva.value.seleccion.luz = primeraHora < '08:00' || horaFin > '21:00'
+}, { deep: true })
 
 const error = ref(false)
 

@@ -219,6 +219,9 @@ const mostrarMensaje = ref(false)
 /* Expresion regular para comprobar el email */
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+/* Letras para calcular la correcta letra del DNI */
+const letrasDNI = "TRWAGMYFPDXBNJZSQVHLCKE"
+
 function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
   mensaje.value = texto
   tipoMensaje.value = tipo
@@ -227,6 +230,20 @@ function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
   setTimeout(() => {
     mostrarMensaje.value = false
   }, 5000)
+}
+
+function validarDNI(dni: string): boolean {
+  const regex = /^(\d{8})([A-Z])$/i
+  const match = dni.toUpperCase().match(regex)
+
+  if (!match) return false
+
+  const numero = parseInt(match[1], 10)
+  const letra = match[2]
+
+  const letraCorrecta = letrasDNI[numero % 23]
+
+  return letra === letraCorrecta
 }
 
 /* Para evitar multiples llamadas al backend realizamos aqui ciertas comprobaciones */
@@ -264,7 +281,7 @@ const siguiente = () => {
       errores.value.fechaNacimiento = false
     }
 
-    if ((formData.value.dni == '' || formData.value.dni.length != 9) && !formData.value.esMenor) {
+    if ((formData.value.dni == '' || formData.value.dni.length != 9) && !formData.value.esMenor && !validarDNI(formData.value.dni)) {
       errores.value.dni = true
       continuar.value = false
     } else {

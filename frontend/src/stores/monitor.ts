@@ -58,6 +58,10 @@ export const useMonitorStore = defineStore("monitor", {
       ...state.notificaciones.filter(n => !n.fijado && !n.leido),
       ...state.notificaciones.filter(n => !n.fijado && n.leido),
     ],
+    sortedNotificationsHome: (state) => [
+      ...state.notificaciones.filter(n => !n.leido),
+      ...state.notificaciones.filter(n => n.leido),
+    ],
   },
 
   actions: {
