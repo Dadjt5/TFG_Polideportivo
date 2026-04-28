@@ -3,6 +3,7 @@ from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth.hashers import make_password, check_password
+import uuid
 
 from .usuario_final import UsuarioFinal
 from .tarifa import TarifaTDA
@@ -14,23 +15,15 @@ class TDA(models.Model):
 
     fechaInicio = models.DateField(auto_now_add=True)
     fechaExpiracion = models.DateField(blank=True, null=True)
-    codigo_secreto = models.CharField(max_length=128, blank=True)
+    codigo_qr = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
 
     estado = models.CharField(default=EstadoReserva.PENDIENTE, choices=EstadoReserva.choices)
 
     tarifa = models.ForeignKey('TarifaTDA', on_delete=models.RESTRICT, blank=True, null=True)
-    usuarioFinal = models.ForeignKey(UsuarioFinal, on_delete=models.CASCADE, related_name="tda", blank=True, null=True)
+    usuarioFinal = models.OneToOneField(UsuarioFinal, on_delete=models.CASCADE, related_name="tda", blank=True, null=True)
 
     def __str__(self):
         return f'Tarjeta deportiva anual con fecha de inicio: {self.fechaInicio} y fecha de expiracion: {self.fechaExpiracion}'
-
-    # Función apra generar un nuevo código secreto
-    def nuevoCodigoSecreto(self, codigo: str):
-        self._codigo_secreto_hash = make_password(codigo)
-
-    # FUnción para comprobar el codigo secreto
-    def comprobarCodigoSecreto(self, codigo: str):
-        return check_password(codigo, self._codigo_secreto_hash)
 
     # Función para comprar una TDA    
     @classmethod

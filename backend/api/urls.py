@@ -121,7 +121,7 @@ urlpatterns = [
     path("abonos/<int:compra_id>/cancelar/", views.CancelarAbonoView.as_view(), name="cancelar-abono"),
     path("bonos/<int:compra_id>/cancelar/", views.CancelarBonoView.as_view(), name="cancelar-bono"),
     path("stripe/webhook/", views.StripeWebhookView.as_view(), name="webhook-stripe"),
-    path("password_reset/", include("django_rest_passwordreset.urls", namespace="password_reset")),
+    path("password_reset/", views.CodigoNuevaPasswordView.as_view(), name="reset-password"),
     path("instalaciones/<int:instalacion_id>/descargar/horario/", views.DescargarHorarioView.as_view(), name="descargar-horario"),
     path("actividades/<int:actividad_id>/descargar/horario/", views.DescargarHorarioSesionesView.as_view(), name="descargar-horario-sesiones"),
     path('', include(router.urls)),

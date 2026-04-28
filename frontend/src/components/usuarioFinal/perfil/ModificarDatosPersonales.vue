@@ -253,7 +253,6 @@ const toggleConfirmPassword = () => {
   showConfirmPassword.value = !showConfirmPassword.value
 }
 
-
 function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
   mensaje.value = texto
   tipoMensaje.value = tipo

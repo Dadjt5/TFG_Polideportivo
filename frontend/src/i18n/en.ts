@@ -11,6 +11,7 @@ export default {
   logout: "Logout",
 
   /* Otros */
+  verifyCode: "Verify code",
   sportsSubscriptionDetail: "Sports subscription details",
   summerSubscriptionDetail: "Summer subscription details",
   deleteDiscount: "Delete discount",
@@ -40,6 +41,8 @@ export default {
   rentedNoPay: "Rented without paying",
   confirmCreate: "Confirm creation",
   noRegister: "The registration could not be completed",
+  noRegisterDNI: "This DNI already exists",
+  noRegisterEmail: "This email already exists",
   goToList: "Join the waiting list",
   noPlacesMessage: "There are no places available. You can join the waiting list.",
   loginToBook: "Log in to book",
@@ -119,6 +122,8 @@ export default {
   cannotChangeType: "You cannot change to this facility type",
   onTheHourWarning: "Sessions must begin and end on the hour",
   noPermissions: "You do not have permission to perform this action",
+  expiredOrIncorrectCode: "Incorrect or expired code",
+  errorCode: "Error verifying code",
 
   userNoCreated: 'There is already a user with that DNI or email address in the system',
   tariffNoCreated: 'The tariff could not be created',
@@ -173,7 +178,7 @@ export default {
   /* Recuperar y resetar contraseña */
   recoverPassword: "Recover password",
   sendToken: "Send link",
-  recoverPasswordAdvice: "Enter your email address and you will receive a link to reset your password.",
+  recoverPasswordAdvice: "Enter your email address and you will receive a code to reset your password.",
   resetPassword: "Reset password",
   newPassword: "New password",
   changePassword: "Change password",
@@ -181,6 +186,12 @@ export default {
   monitorIdentifier: "The monitor identifier created is",
   usuarioFinalIdentifier: "The end user identifier created is",
   adminIdentifier: "The administrator identifier created is",
+  codeSend: "Code sent to email",
+  errorSendingCode: "Error sending code",
+  invalidEmail: "Invalid email",
+  noEmail: "The email address was not found in the system",
+  resetPasswordCorrect: "Password updated successfully. Redirecting...",
+  resetPasswordError: "An error has occurred. Please try again.",
 
   /* Estadisticas de usuario final */
   myStadistics: "My statistics",
@@ -518,6 +529,17 @@ export default {
   hasTDA: "Has TDA",
   hasntTDA: "No TDA",
   newUserNoQues: "New final user",
+  tdaManagement: "TDA Management",
+  expiration: "Expiration",
+  unlink: "Unlink",
+  deleteTDA: "Delete TDA",
+  newTDA: "Create new TDA",
+  noTDA: "The end user has no linked TDA",
+  correctTDA: "The TDA created successfully",
+  errorTDA: "The TDA could not be created due to there is no tariff",
+  TDADeleted: "The TDA successfully deleted",
+  TDANoDeleted: "The TDA could not be deleted",
+  secretCode: "Secret code",
 
   /* Detalle monitor */
   monitorDetail: "Monitor detail",

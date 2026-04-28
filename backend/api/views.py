@@ -10,6 +10,7 @@ from rest_framework.permissions import (
 from django.db.models import Case, When, IntegerField
 from rest_framework import status
 import stripe
+from django.core.mail import send_mail
 from rest_framework.exceptions import PermissionDenied
 from django.utils.dateparse import parse_date
 from datetime import date
@@ -20,8 +21,10 @@ from django.conf import settings
 from django.db.models import Q
 from django.db.models import Sum, Count
 from django.utils.timezone import now
+from dateutil.relativedelta import relativedelta
 from django.db.models.functions import TruncMonth, ExtractWeekDay
 from datetime import timedelta, datetime
+import random
 from django.utils import timezone
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib.pagesizes import A4
@@ -59,7 +62,8 @@ from polideportivo.models import (
     ReservaActividad, Alquiler, Administrador, User, CompraBono, CompraAbono,
     Mensaje, Sesion, MapaReservas, TipoActividad, TipoInstalacion, FormaReserva,
     Terreno, Estado, Dia, ActividadComun, GrupoReducido, Fisioterapia, EstadoPago,
-    EstadoReserva, Periodo, Feedback, Calle, RolAdministrador, TipoReserva, TipoPago
+    EstadoReserva, Periodo, Feedback, Calle, RolAdministrador, TipoReserva, TipoPago,
+    CodigoResetPassword
 )
 
 
@@ -520,15 +524,34 @@ class FisioterapiaViewSet(viewsets.ModelViewSet):
 # ----------------
 
 class TDAViewSet(viewsets.ModelViewSet):
+    queryset = UsuarioFinal.objects.all()
     serializer_class = TDASerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAdministradorRaiz | IsAdministradorUsuarios]
     
     def perform_create(self, serializer):
-        usuario_final = UsuarioFinal.objects.get(user=self.request.user)
-        serializer.save(usuarioFinal=usuario_final)
+        usuario_id = self.request.data.get("usuario_id")
+        usuario_final = UsuarioFinal.objects.get(id=usuario_id)
 
-    def get_queryset(self):
-        return TDA.objects.filter(usuarioFinal__user=self.request.user)
+        tarifa = TarifaTDA.objects.first()
+
+        serializer.save(
+            usuarioFinal=usuario_final,
+            fechaExpiracion=now().date() + relativedelta(years=1),
+            estado=EstadoReserva.CONFIRMADA,
+            tarifa=tarifa
+        )
+
+        usuario_final.tieneTDA = True
+        usuario_final.save()
+    
+    def perform_destroy(self, instance):
+        usuario = instance.usuarioFinal
+
+        if usuario:
+            usuario.tieneTDA = False
+            usuario.save()
+
+        instance.delete()
 
 
 # ----------------
@@ -538,7 +561,7 @@ class TDAViewSet(viewsets.ModelViewSet):
 class UsuarioFinalViewSet(viewsets.ModelViewSet):
     queryset = UsuarioFinal.objects.all()
     serializer_class = UsuarioFinalSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
 # ----------------
 # Administradores
@@ -631,6 +654,52 @@ class meAPIView(APIView):
             data["rol"] = None
 
         return Response(data)
+
+
+class CodigoNuevaPasswordView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        email = request.data.get("email")
+        tipo = request.data.get("tipo")
+
+        # Dos posibilidades, o bien enviamos un codigo nuevo o bien verificamos un codigo
+        if tipo == "enviar":
+            codigo = str(random.randint(100000, 999999))
+
+            user = User.objects.filter(email=email).first()
+            if not user:
+                return Response({"respuesta": "El correo no existe en el sistema", "tipo": "email"}, status=status.HTTP_400_BAD_REQUEST)
+
+            CodigoResetPassword.objects.filter(email=email).delete()
+            CodigoResetPassword.objects.create(email=email, codigo=codigo)
+
+            send_mail(
+                "Código de recuperación",
+                f"Tu código de recuperación es: {codigo}",
+                settings.DEFAULT_FROM_EMAIL,
+                [email],
+                fail_silently=False
+            )
+
+            return Response({"message": "Código enviado"})
+
+        elif tipo == "verificar":
+            codigo = request.data.get("codigo")
+
+            try:
+                reset_code = CodigoResetPassword.objects.get(email=email, codigo=codigo)
+                if not reset_code.isValid():
+                    return Response({"respuesta": "Código expirado"}, status=status.HTTP_400_BAD_REQUEST)
+
+                user = User.objects.filter(email=email).first()
+                usuario = UsuarioFinal.objects.filter(user=user).first()
+                return Response({"respuesta": "Codigo correcto", "id_usuario": usuario.id}, status=status.HTTP_200_OK)
+
+            except CodigoResetPassword.DoesNotExist:
+                return Response({"respuesta": "Código inválido"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        return Response({"respuesta": "Error, decisión inválida"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Funcion auxuliar para obtener el formato de las enumeraciones
@@ -732,7 +801,7 @@ class RegistroView(APIView):
         )
 
         if respuesta["error"]:
-            return Response({"mensaje": respuesta["respuesta"]}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"mensaje": respuesta["respuesta"], "tipo": respuesta["tipo"]}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = UsuarioFinalSerializer(respuesta["respuesta"])
         usuarioFinal = serializer.data
@@ -876,12 +945,11 @@ class ValidarTDAView(APIView):
     def post(self, request):
         codigo = request.data.get("codigo")
 
-        tdas_libres = TDA.objects.filter(usuarioFinal__isnull=True)
+        tda = TDA.objects.filter(usuarioFinal__isnull=True, codigo_qr=codigo).first()
 
-        for tda in tdas_libres:
-            if tda.comprobar_codigo_secreto(codigo) or tda.codigo_secreto == codigo:
-                tda.asignar_usuario(request.user.usuario_final)
-                return Response({"respuesta": "TDA validada correctamente"}, status=status.HTTP_200_OK)
+        if tda:
+            tda.asignar_usuario(request.user.usuario_final)
+            return Response({"respuesta": "TDA validada correctamente"}, status=status.HTTP_200_OK)
 
         return Response({"respuesta": "Error al validar la TDA correctamente"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -2232,12 +2300,11 @@ class ComprarTDAView(APIView):
         if not compra:
             return Response({"respuesta": "Error al comprar la TDA"}, status=status.HTTP_400_BAD_REQUEST)
 
-        pago = Pago.nuevoPago(f'Pago por nueva TDA', request.user.usuario_final, TipoPago.ANUAL, compra)
-
+        pago = Pago.nuevoPago(f'Pago por nueva TDA', request.user.usuario_final, TipoPago.UNICO, compra)
         if compra and pago:
             return Response({"idPago": pago.id})
 
-        return Response({"respuesta": "Error al comprar la TDA"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"respuesta": "Error al realizar la compra de la TDA"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ResumenPagoView(APIView):

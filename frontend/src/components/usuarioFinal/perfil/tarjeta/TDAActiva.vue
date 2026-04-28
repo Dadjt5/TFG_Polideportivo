@@ -5,7 +5,7 @@
     <div class="text-center card shadow-lg rounded-4 p-4 mx-auto" style="max-width: 900px;">
 
       <h5 class="fs-2 mb-5">{{ t.qrTitle }}</h5>
-      <QRCodeVue3 :key="qrKey" :value="qrValue" :size="220" level="H" />
+      <QRCodeVue3 :value="qrValue" :size="220" level="H" />
 
       <div class="text-center bg-light rounded-3 p-4 h-100 mt-3">
         <h5 class="fs-2 mt-4 mb-3">{{ t.cardInfo }}</h5>
@@ -37,19 +37,16 @@
       </div>
 
       <div class="d-flex justify-content-center gap-3 mt-4">
-        <button class="btn btn-primary fs-5" @click="regenerarQR()">
-          🔄 {{ t.regenerateQR }}
-        </button>
-        <button class="btn btn-secondary fs-5" @click="descargarQR()">
-          ⬇️ {{ t.downloadQR }}
-        </button>
+        <router-link to="/perfil" class="btn btn-secondary btn-lg px-4">
+          {{ t.return }}
+        </router-link>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { type Ref, inject, computed, ref } from "vue";
+import { type Ref, inject, computed } from "vue";
 import QRCodeVue3 from 'qrcode-vue3';
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
@@ -63,26 +60,12 @@ const t = useI18n(language);
 
 const usuarioFinalStore = useUserStore();
 
-const qrKey = computed(() => token.value);
-let token = ref("1234")
-
 const qrValue = computed(() =>
   JSON.stringify({
     id: usuarioFinalStore.tda?.id,
     usuario: usuarioFinalStore.usuarioFinal.nombre,
-    token: token.value,
+    token: usuarioFinalStore.tda?.codigo_qr,
   })
 );
-
-const regenerarQR = () => {
-  if(token.value == "1234") {
-    token.value = "4321"
-  } else {
-    token.value = "1234"
-  }
-};
-
-const descargarQR = () => {
-};
 
 </script>

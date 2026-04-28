@@ -40,6 +40,7 @@ export interface TDA {
   fechaInicio: string;
   fechaExpiracion: string;
   estado: string;
+  codigo_qr: string;
 }
 
 export const useUserStore = defineStore("user", {

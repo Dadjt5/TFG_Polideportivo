@@ -2,7 +2,7 @@ import os
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
 from django.db import transaction
-from polideportivo.models import Administrador, RolAdministrador, Configuracion, Foro, Canal
+from polideportivo.models import Administrador, RolAdministrador, Configuracion, Foro, Canal, TarifaTDA
 
 User = get_user_model()
 
@@ -128,3 +128,4 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS("Canal para proponer nuevas actividades creado"))
         else:
             self.stdout.write(self.style.WARNING("El canal de nuevas actividades ya existe"))
+        

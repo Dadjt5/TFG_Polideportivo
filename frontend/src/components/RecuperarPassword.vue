@@ -9,43 +9,47 @@
             {{ t.recoverPassword }}
           </h1>
 
-          <!-- Card recuperar contraseña -->
           <div class="card border-0 rounded-4 p-4 mx-auto"
-               style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(10px);">
+            style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(10px);">
 
             <p class="text-center text-secondary mb-4">
               {{ t.recoverPasswordAdvice }}
             </p>
 
-            <!-- Email -->
-            <div class="mb-4 position-relative">
-              <input
-                type="email"
-                class="form-control py-2 rounded-3"
-                placeholder="Email"
-                v-model="email"
-                @keyup.enter="sendReset"
-              />
+            <div v-if="step === 1">
+              <div class="mb-4">
+                <input type="email" class="form-control py-2 rounded-3" placeholder="Email" v-model="email"
+                  @keyup.enter="sendCode" />
+              </div>
+
+              <button class="btn btn-primary w-100 py-2 fs-5 rounded-3 mb-2" @click="sendCode">
+                {{ t.sendToken }}
+              </button>
             </div>
 
-            <!-- Enviar enlace -->
-            <button
-              class="btn btn-primary w-100 py-2 fs-5 rounded-3 mb-2"
-              @click="sendReset"
-            >
-              {{ t.sendToken }}
-            </button>
+            <div v-else>
+              <!-- Código -->
+              <div class="mb-3">
+                <input type="text" class="form-control py-2 rounded-3" placeholder="Código recibido" v-model="codigo"
+                  @keyup.enter="verifyCode" />
+              </div>
 
-            <!-- Mensaje -->
-            <p v-if="message" class="text-center fw-medium mt-2 text-primary">
-              {{ message }}
-            </p>
+              <button class="btn btn-outline-primary w-100 py-2 rounded-3 mb-3" @click="verifyCode">
+                {{ t.verifyCode }}
+              </button>
+            </div>
 
-            <!-- Volver a login -->
-            <router-link to="/login" class="btn btn-outline-primary w-100 py-2 fs-5 rounded-3">
+            <!-- Mensaje global -->
+            <div v-if="mostrarMensaje" class="text-center mb-0 mt-3">
+              <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
+                {{ mensaje }}
+              </div>
+            </div>
+
+            <!-- Login -->
+            <router-link to="/login" class="btn btn-outline-primary w-100 py-2 fs-5 rounded-3 mt-3">
               {{ t.login }}
             </router-link>
-
           </div>
         </div>
       </div>
@@ -55,8 +59,9 @@
 
 <script setup lang="ts">
 import { ref, inject, Ref } from "vue"
+import { useRouter } from "vue-router";
 
-import { resetPassword } from '@/services/recuperarService'
+import { sendResetCode, verifyResetCode } from '@/services/recuperarService'
 
 import { useI18n } from "@/useI18N"
 import type { Language } from "@/useI18N"
@@ -64,20 +69,63 @@ import type { Language } from "@/useI18N"
 const language = inject<Ref<Language>>("language")!
 const t = useI18n(language)
 
-const email = ref("")
-const message = ref("")
+const step = ref(1)
+const router = useRouter();
 
-const sendReset = async () => {
+const email = ref("")
+const codigo = ref("")
+const mensaje = ref('')
+const tipoMensaje = ref<'success' | 'error' | ''>('')
+const mostrarMensaje = ref(false)
+
+function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
+  mensaje.value = texto
+  tipoMensaje.value = tipo
+  mostrarMensaje.value = true
+
+  setTimeout(() => {
+    mostrarMensaje.value = false
+  }, 5000)
+}
+
+const sendCode = async () => {
   if (!email.value) {
-    message.value = "Por favor ingresa un correo válido"
+    lanzarMensaje(t.value.invalidEmail, 'error')
     return
   }
 
   try {
-    await resetPassword(email.value)
-    message.value = "Si el email existe recibirás un enlace."
-  } catch (err) {
-    message.value = "Ocurrió un error, inténtalo de nuevo."
+    await sendResetCode(email.value)
+    lanzarMensaje(t.value.codeSend, 'success')
+    step.value = 2
+  } catch (e: any) {
+    if(e.response.data.tipo == "email") {
+      lanzarMensaje(t.value.noEmail, 'error')
+    } else {
+      lanzarMensaje(t.value.errorSendingCode, 'error')
+    }
+  }
+}
+
+const continuar = (id: number) => {
+  router.push({
+    name: 'reset-password',
+    params: { id }
+  });
+}
+
+const verifyCode = async () => {
+  try {
+    const res = await verifyResetCode(email.value, codigo.value)
+
+    if (res.respuesta != "Codigo correcto") {
+      lanzarMensaje(t.value.expiredOrIncorrectCode, 'error')
+      return
+    }
+
+    continuar(res.id_usuario)
+  } catch (e) {
+    lanzarMensaje(t.value.errorCode, 'error')
   }
 }
 </script>

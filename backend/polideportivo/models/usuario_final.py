@@ -137,12 +137,14 @@ class UsuarioFinal(Usuario):
         if dni and User.objects.filter(username=dni).exists():
             return {
                 "respuesta": "Ya existe un usuario con ese DNI",
+                "tipo": "dni",
                 "error": True
             }
 
         if User.objects.filter(email=email).exists():
             return {
                 "respuesta": "Ya existe un usuario con ese email",
+                "tipo": "email",
                 "error": True
             }
 

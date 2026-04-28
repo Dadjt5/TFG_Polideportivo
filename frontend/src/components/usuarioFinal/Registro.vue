@@ -281,7 +281,7 @@ const siguiente = () => {
       errores.value.fechaNacimiento = false
     }
 
-    if ((formData.value.dni == '' || formData.value.dni.length != 9) && !formData.value.esMenor && !validarDNI(formData.value.dni)) {
+    if ((formData.value.dni.length != 9 || !validarDNI(formData.value.dni)) && !formData.value.esMenor) {
       errores.value.dni = true
       continuar.value = false
     } else {
@@ -331,7 +331,7 @@ const siguiente = () => {
     }
   }
 
-  if (continuar.value || true) {
+  if (continuar.value) {
     step.value += 1
   } else {
     lanzarMensaje(t.value.missing, "error")
@@ -389,8 +389,14 @@ const handleFinish = async () => {
     showIdentifier.value = true;
     mensaje.value = data.mensaje;
 
-  } catch (e) {
-    lanzarMensaje(t.value.noRegister, "error")
+  } catch (e: any) {
+    if (e.response.data.tipo === "dni") {
+      lanzarMensaje(t.value.noRegisterDNI, "error")
+    } else if(e.response.data.tipo === "email") {
+      lanzarMensaje(t.value.noRegisterEmail, "error")
+    } else {
+      lanzarMensaje(t.value.noRegister, "error")
+    }
     console.error("Error al reguistrarse", e)
   }
 }

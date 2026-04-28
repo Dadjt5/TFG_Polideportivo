@@ -14,12 +14,13 @@
       </div>
 
       <!-- CARD PRINCIPAL -->
-      <div class="card shadow-sm rounded-4 p-4 p-md-5" style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(8px);">
+      <div class="card shadow-sm rounded-4 p-4 p-md-5"
+        style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(8px);">
 
         <!-- AVATAR -->
         <div class="d-flex flex-column flex-md-row align-items-center gap-4 mb-4">
           <div class="rounded-circle bg-info bg-opacity-10 d-flex align-items-center justify-content-center"
-               style="width:96px;height:96px">
+            style="width:96px;height:96px">
             <i class="bi bi-person-circle text-info fs-1"></i>
           </div>
 
@@ -36,13 +37,15 @@
 
           <div class="col-md-4">
             <label class="form-label fw-bold">{{ t.name }}</label>
-            <input v-if="isEditing" class="form-control" v-model="usuario.nombre" :class="{ 'is-invalid': errores.nombre }" />
+            <input v-if="isEditing" class="form-control" v-model="usuario.nombre"
+              :class="{ 'is-invalid': errores.nombre }" />
             <p v-else class="form-control-plaintext">{{ usuario.nombre || '-' }}</p>
           </div>
 
           <div class="col-md-4">
             <label class="form-label fw-bold">{{ t.surnames }}</label>
-            <input v-if="isEditing" class="form-control" v-model="usuario.apellidos" :class="{ 'is-invalid': errores.apellidos }" />
+            <input v-if="isEditing" class="form-control" v-model="usuario.apellidos"
+              :class="{ 'is-invalid': errores.apellidos }" />
             <p v-else class="form-control-plaintext">{{ usuario.apellidos || '-' }}</p>
           </div>
 
@@ -58,37 +61,43 @@
 
           <div class="col-md-4">
             <label class="form-label fw-bold">{{ t.birth }}</label>
-            <input v-if="isEditing" type="date" class="form-control" v-model="usuario.fechaNacimiento" :class="{ 'is-invalid': errores.fechaNacimiento }" />
+            <input v-if="isEditing" type="date" class="form-control" v-model="usuario.fechaNacimiento"
+              :class="{ 'is-invalid': errores.fechaNacimiento }" />
             <p v-else class="form-control-plaintext">{{ usuario.fechaNacimiento || '-' }}</p>
           </div>
 
           <div class="col-md-4">
             <label class="form-label fw-bold">{{ t.phoneNumber }}</label>
-            <input v-if="isEditing" class="form-control" v-model="usuario.telefono" :class="{ 'is-invalid': errores.telefono }" />
+            <input v-if="isEditing" class="form-control" v-model="usuario.telefono"
+              :class="{ 'is-invalid': errores.telefono }" />
             <p v-else class="form-control-plaintext">{{ usuario.telefono || '-' }}</p>
           </div>
 
           <div class="col-md-4">
             <label class="form-label fw-bold">{{ t.province }}</label>
-            <input v-if="isEditing" class="form-control" v-model="usuario.provincia" :class="{ 'is-invalid': errores.provincia }" />
+            <input v-if="isEditing" class="form-control" v-model="usuario.provincia"
+              :class="{ 'is-invalid': errores.provincia }" />
             <p v-else class="form-control-plaintext">{{ usuario.provincia || '-' }}</p>
           </div>
 
           <div class="col-md-4">
             <label class="form-label fw-bold">{{ t.municipality }}</label>
-            <input v-if="isEditing" class="form-control" v-model="usuario.municipio" :class="{ 'is-invalid': errores.municipio }" />
+            <input v-if="isEditing" class="form-control" v-model="usuario.municipio"
+              :class="{ 'is-invalid': errores.municipio }" />
             <p v-else class="form-control-plaintext">{{ usuario.municipio || '-' }}</p>
           </div>
 
           <div class="col-md-4">
             <label class="form-label fw-bold">{{ t.locality }}</label>
-            <input v-if="isEditing" class="form-control" v-model="usuario.localidad" :class="{ 'is-invalid': errores.localidad }" />
+            <input v-if="isEditing" class="form-control" v-model="usuario.localidad"
+              :class="{ 'is-invalid': errores.localidad }" />
             <p v-else class="form-control-plaintext">{{ usuario.localidad || '-' }}</p>
           </div>
 
           <div class="col-md-4">
             <label class="form-label fw-bold">{{ t.postalCode }}</label>
-            <input v-if="isEditing" class="form-control" v-model="usuario.codigoPostal" :class="{ 'is-invalid': errores.codigoPostal }" />
+            <input v-if="isEditing" class="form-control" v-model="usuario.codigoPostal"
+              :class="{ 'is-invalid': errores.codigoPostal }" />
             <p v-else class="form-control-plaintext">{{ usuario.codigoPostal || '-' }}</p>
           </div>
 
@@ -127,11 +136,6 @@
               <input class="form-check-input" type="checkbox" v-model="usuario.tieneAbono">
               <label class="form-check-label">{{ t.hasSubscripcion }}</label>
             </div>
-
-            <div class="form-check form-switch">
-              <input class="form-check-input" type="checkbox" v-model="usuario.tieneTDA">
-              <label class="form-check-label">{{ t.hasTDA }}</label>
-            </div>
           </div>
 
           <div v-else class="d-flex gap-3 flex-wrap">
@@ -139,11 +143,85 @@
               {{ usuario.esUAM ? t.UAMuser : t.externalUser }}
             </span>
             <span class="badge" :class="usuario.tieneAbono ? 'bg-primary' : 'bg-secondary'">
-              {{ usuario.tieneAbono ? t.hasSubscripcion : t.hasntSubscripcion  }}
+              {{ usuario.tieneAbono ? t.hasSubscripcion : t.hasntSubscripcion }}
             </span>
-            <span class="badge" :class="usuario.tieneTDA ? 'bg-warning text-dark' : 'bg-secondary'">
-              {{ usuario.tieneTDA ? t.hasTDA : t.hasntTDA  }}
-            </span>
+          </div>
+        </div>
+
+        <!-- GESTIÓN TDA -->
+        <div class="mt-5">
+          <h5 class="fw-semibold mb-4 d-flex align-items-center gap-2">
+            <i class="bi bi-credit-card-2-front text-primary"></i>
+            {{ t.tdaManagement }}
+          </h5>
+
+          <!-- Si tiene TDA -->
+          <div v-if="usuario.tieneTDA" class="border rounded-4 p-4 shadow-sm"
+            style="background: rgba(255,255,255,0.75); backdrop-filter: blur(6px);">
+            <div class="row g-4">
+
+              <div class="col-md-4 text-center">
+                <small class="fw-bold d-block">ID TDA</small>
+                <div class="fs-5 fw-semibold">
+                  {{ usuario.tda?.id }}
+                </div>
+              </div>
+
+              <div class="col-md-4 text-center">
+                <small class="fw-bold d-block">{{ t.status }}</small>
+                <span v-if="usuario.tda?.estado === 'Confirmada'" class="fs-5 badge px-3 py-2 rounded-pill bg-success">
+                  {{ t.active }}
+                </span>
+
+                <span v-else class="fs-5 badge px-3 py-2 rounded-pill bg-warning text-dark">
+                  {{ t.inactive }}
+                </span>
+              </div>
+
+              <div class="col-md-4 text-center">
+                <small class="fw-bold d-block">{{ t.expiration }}</small>
+                <div class="fs-6 fw-semibold">
+                  {{ usuario.tda?.fechaExpiracion }}
+                </div>
+              </div>
+
+              <div class="col-12">
+                <label class="form-label fw-bold mb-2">{{ t.secretCode }}</label>
+
+                <div class="input-group">
+                  <input class="form-control rounded-start-pill" :type="mostrarCodigoQR ? 'text' : 'password'"
+                    :value="usuario.tda?.codigo_qr" readonly />
+
+                  <button class="btn btn-outline-secondary" type="button" @click="mostrarCodigoQR = !mostrarCodigoQR">
+                    <i :class="mostrarCodigoQR ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-end mt-4">
+              <button class="btn btn-danger rounded-pill px-4" @click="cancelarTDA">
+                <i class="bi bi-trash me-2"></i>
+                {{ t.deleteTDA }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Si NO tiene TDA -->
+          <div v-else class="border rounded-4 p-5 text-center shadow-sm"
+            style="background: rgba(255,255,255,0.75); backdrop-filter: blur(6px);">
+            <div class="mb-3">
+              <i class="bi bi-credit-card text-secondary display-5"></i>
+            </div>
+
+            <p class="mb-4 text-muted fs-5">
+              {{ t.noTDA }}
+            </p>
+
+            <button class="btn btn-success rounded-pill px-4" @click="crearTDA">
+              <i class="bi bi-plus-circle me-2"></i>
+              {{ t.newTDA }}
+            </button>
           </div>
         </div>
 
@@ -221,6 +299,7 @@ import { useRouter } from 'vue-router'
 import { Modal } from 'bootstrap'
 
 import { getUsuarioFinal, modificarUsuarioFinal, eliminarUsuarioFinal } from '@/services/usuarioFinalService';
+import { eliminarTDA, nuevaTDA } from '@/services/crearRecursosService';
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
 import type { Language } from "@/useI18N";
@@ -236,9 +315,10 @@ const isEditing = ref(false);
 const mensajeEditar = ref('')
 const tipoMensaje = ref<'success' | 'error' | ''>('')
 const mostrarMensaje = ref(false)
+const mostrarCodigoQR = ref(false)
 
 const usuario = ref({
-	id: 0,
+  id: 0,
   nombre: '',
   apellidos: '',
   DNI: '',
@@ -255,11 +335,17 @@ const usuario = ref({
   esUAM: false,
   tieneAbono: false,
   tieneTDA: false,
+  tda: null as null | {
+    id: number
+    estado: string
+    fechaExpiracion: string
+    codigo_qr: string
+  },
   deportesFavoritos: []
 });
 
 const errores = ref({
-	nombre: false,
+  nombre: false,
   apellidos: false,
   sexo: false,
   fechaNacimiento: false,
@@ -278,8 +364,8 @@ function validarFormulario() {
   const hoy = new Date()
   const fechaNacimiento = new Date(usuario.value.fechaNacimiento)
 
-	errores.value.nombre = usuario.value.nombre === ''
-	errores.value.apellidos = usuario.value.apellidos === ''
+  errores.value.nombre = usuario.value.nombre === ''
+  errores.value.apellidos = usuario.value.apellidos === ''
   errores.value.sexo = usuario.value.sexo === ''
   errores.value.fechaNacimiento = usuario.value.fechaNacimiento === ''
   errores.value.telefono = usuario.value.telefono === ''
@@ -292,7 +378,7 @@ function validarFormulario() {
     !usuario.value.fechaNacimiento || fechaNacimiento >= hoy
 
   for (const key in errores.value) {
-    if(errores.value[key]) {
+    if (errores.value[key]) {
       valido = false
     }
   }
@@ -312,9 +398,35 @@ function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
 
 const mensaje = ref("")
 
+async function crearTDA() {
+  try {
+    await nuevaTDA({
+      usuario_id: usuario.value.id
+    })
+
+    usuario.value = await getUsuarioFinal(usuario.value.id)
+
+    lanzarMensaje(t.value.correctTDA, "success")
+  } catch (error) {
+    lanzarMensaje(t.value.errorTDA, "error")
+  }
+}
+
+async function cancelarTDA() {
+  try {
+    await eliminarTDA(usuario.value.tda.id)
+
+    usuario.value = await getUsuarioFinal(usuario.value.id)
+
+    lanzarMensaje(t.value.TDADeleted, "success")
+  } catch (error) {
+    lanzarMensaje(t.value.TDANoDeleted, "error")
+  }
+}
+
 function activarEdicion() {
   usuarioOriginal.value = JSON.parse(JSON.stringify(usuario.value))
-	Object.keys(errores.value).forEach(k => errores.value[k] = false)
+  Object.keys(errores.value).forEach(k => errores.value[k] = false)
   isEditing.value = true
 }
 
@@ -345,15 +457,15 @@ function camposModificados() {
   ];
 
   camposDirectos.forEach(campo => {
-    if(usuarioOriginal.value[campo] !== usuario.value[campo]) {
+    if (usuarioOriginal.value[campo] !== usuario.value[campo]) {
       data[campo] = usuario.value[campo];
     }
   });
 
-  const favoritosActuales = ((usuarioOriginal.value.deportes as {id: number, titulo: string}[]) || []).map(d => d.id).sort();
+  const favoritosActuales = ((usuarioOriginal.value.deportes as { id: number, titulo: string }[]) || []).map(d => d.id).sort();
   const favoritosNuevosIds = [...usuario.value.deportesFavoritos].sort();
 
-  if(JSON.stringify(favoritosActuales) !== JSON.stringify(favoritosNuevosIds)) {
+  if (JSON.stringify(favoritosActuales) !== JSON.stringify(favoritosNuevosIds)) {
     data["deportes_ids"] = favoritosNuevosIds;
   }
 
@@ -365,10 +477,10 @@ const guardarCambios = async () => {
     lanzarMensaje(t.value.missing, "error")
     return
   }
-  
+
   try {
-		const data = camposModificados();
-    if(Object.keys(data).length > 0) {
+    const data = camposModificados();
+    if (Object.keys(data).length > 0) {
       await modificarUsuarioFinal(usuario.value.id, data);
       lanzarMensaje(t.value.correctlyUpdate, "success")
     } else {
@@ -429,12 +541,13 @@ onMounted(async () => {
   confirmModal = new Modal(document.getElementById('confirmDeleteModal')!)
   successModal = new Modal(document.getElementById('successDeleteModal')!)
 
-	try {
-	  usuario.value = await getUsuarioFinal(id);
-		usuarioOriginal.value = JSON.parse(JSON.stringify(usuario.value))
-	} catch(e) {
+  try {
+    usuario.value = await getUsuarioFinal(id);
+    console.log(usuario.value)
+    usuarioOriginal.value = JSON.parse(JSON.stringify(usuario.value))
+  } catch (e) {
     mensaje.value = t.value.unexpectedError
-		console.log("Error al obtener informacion del usuario final", e);
-	}
+    console.log("Error al obtener informacion del usuario final", e);
+  }
 });
 </script>

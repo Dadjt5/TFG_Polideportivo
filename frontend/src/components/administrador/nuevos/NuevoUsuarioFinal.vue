@@ -37,7 +37,7 @@
                 v-model="usuarioFinal.fechaNacimiento" @change="checkAge" />
             </div>
 
-            <div class="col-md-6" v-if="!esMenor">
+            <div class="col-md-6" v-if="!usuarioFinal.esMenor">
               <input class="form-control" :class="{ 'is-invalid': errores.DNI }" placeholder="DNI"
                 v-model="usuarioFinal.dni" />
             </div>
@@ -175,7 +175,6 @@ const t = useI18n(language);
 
 const userIdentifier = ref("");
 const showIdentifier = ref(false);
-const esMenor = ref(false)
 
 const mensajeEditar = ref('')
 const tipoMensaje = ref<'success' | 'error' | ''>('')
@@ -247,7 +246,7 @@ const checkAge = () => {
   let age = now.getFullYear() - birth.getFullYear()
   const m = now.getMonth() - birth.getMonth()
   if (m < 0 || (m === 0 && now.getDate() < birth.getDate())) age--
-  esMenor.value = age < 18
+  usuarioFinal.value.esMenor = age < 18
 }
 
 function validarFormulario() {
@@ -255,10 +254,10 @@ function validarFormulario() {
 
   const hoy = new Date()
   const fechaNacimiento = new Date(usuarioFinal.value.fechaNacimiento)
-
+  console.log(usuarioFinal.value.esMenor)
   errores.value.nombre = usuarioFinal.value.nombre === ''
   errores.value.apellidos = usuarioFinal.value.apellidos === ''
-  errores.value.DNI = usuarioFinal.value.dni === '' || !validarDNI(usuarioFinal.value.dni) && !esMenor.value
+  errores.value.DNI = (usuarioFinal.value.dni === '' || !validarDNI(usuarioFinal.value.dni)) && !usuarioFinal.value.esMenor
   errores.value.sexo = usuarioFinal.value.sexo === ''
   errores.value.fechaNacimiento = usuarioFinal.value.fechaNacimiento === ''
   errores.value.telefono = usuarioFinal.value.telefono === ''
@@ -312,8 +311,14 @@ const nuevoUsuario = async () => {
 
     userIdentifier.value = data.codigo_usuario;
     showIdentifier.value = true;
-  } catch (e) {
-    lanzarMensaje(t.value.userNoCreated, "error")
+  } catch (e: any) {
+    if (e.response.data.tipo === "dni") {
+      lanzarMensaje(t.value.noRegisterDNI, "error")
+    } else if(e.response.data.tipo === "email") {
+      lanzarMensaje(t.value.noRegisterEmail, "error")
+    } else {
+      lanzarMensaje(t.value.userNoCreated, "error")
+    }
     console.log("Error al crear el nuevo usuario", e);
   }
 };

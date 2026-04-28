@@ -21,6 +21,19 @@ export const nuevoDescuento = async (payload: Payload): Promise<any> => {
   return response.data
 }
 
+/* Función para crear una nueva TDA de oficio por parte del administrador */
+export const nuevaTDA = async (payload: { usuario_id: number }) => {
+  const response = await api.post("api/v1/tdas/", payload)
+  return response.data
+}
+
+/* Función para eliminar una TDA por parte del administrador */
+export const eliminarTDA = async (id: number) => {
+  const response = await api.delete(`api/v1/tdas/${id}/`);
+  return response.data;
+};
+
+
 /* Función para crear un nuevo pabellon */
 export const nuevoPabellon = async (payload: FormData): Promise<any> => {
   const response = await api.post("api/v1/pabellones/", payload, {

@@ -11,6 +11,7 @@ export default {
   logout: "Cerrar sesión",
 
   /* Otros */
+  verifyCode: "Verificar código",
   sportsSubscriptionDetail: "Detalles del abono deportivo",
   summerSubscriptionDetail: "Detalles del abono de verano",
   deleteDiscount: "Eliminar descuento",
@@ -40,6 +41,8 @@ export default {
   rentedNoPay: "Alquilado sin pagar",
   confirmCreate: "Confirmar creación",
   noRegister: "No se ha podido efectuar el registro",
+  noRegisterDNI: "El DNI ya existe en el sistema",
+  noRegisterEmail: "El email ya existe en el sistema",
   goToList: "Pasar a la lista de espera",
   noPlacesMessage: "No quedan plazas disponibles. Puedes apuntarte a la lista de espera.",
   loginToBook: "Inicia sesión para reservar",
@@ -150,6 +153,8 @@ export default {
   wrongBookingType: "Esta actividad no se puede reservar por internet",
   wrongPeriodToBook: "La actividad no se esta realizando en este momento",
   wrongAge: "No tiene edad suficiente para reservar esta actividad",
+  expiredOrIncorrectCode: "Código incorrecto o expirado",
+  errorCode: "Error verificando código",
 
   /* Perfil */
   role: "Rol",
@@ -175,7 +180,7 @@ export default {
 
   /* Recuperar y resetear constraseña */
   recoverPassword: "Recuperar contraseña",
-  recoverPasswordAdvice: "Ingresa tu correo y recibirás un enlace para restablecer tu contraseña",
+  recoverPasswordAdvice: "Ingresa tu correo y recibirás un código para poder restablecer tu contraseña",
   sendToken: "Enviar enlace",
   resetPassword: "Restablecer contraseña",
   newPassword: "Nueva contraseña",
@@ -184,6 +189,12 @@ export default {
   monitorIdentifier: "El identificador del monitor creado es",
   usuarioFinalIdentifier: "El identificador del usuario final creado es",
   adminIdentifier: "El identificador del administrador creado es",
+  codeSend: "Código enviado al email",
+  errorSendingCode: "Error enviando código",
+  invalidEmail: "Email invalido",
+  noEmail: "El email no se encuentra en el sistema",
+  resetPasswordCorrect: "Contraseña actualizada correctamente. Redirigiendo...",
+  resetPasswordError: "Ha ocurrido un error. Inténtalo de nuevo.",
 
   /* Estadisticas de usuario final */
   myStadistics: "Mis estadísticas",
@@ -521,6 +532,17 @@ export default {
   hasTDA: "Tiene TDA",
   hasntTDA: "No tiene TDA",
   newUserNoQues: "Nuevo usuario final",
+  tdaManagement: "Gestión de la TDA",
+  expiration: "Caducidad",
+  unlink: "Desvincular",
+  deleteTDA: "Eliminar TDA",
+  newTDA: "Crear nueva TDA",
+  noTDA: "El usuario final no tiene una TDA",
+  correctTDA: "TDA creada correctamente",
+  errorTDA: "No se pudo crear la TDA porque no existe ninguna tarifa",
+  TDADeleted: "TDA eliminada correctamente",
+  TDANoDeleted: "No se pudo eliminar la TDA",
+  secretCode: "Código secreto",
 
   /* Detalle monitor */
   monitorDetail: "Detalles del monitor",

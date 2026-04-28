@@ -41,6 +41,22 @@ class DeporteSerializer(serializers.ModelSerializer):
 
 
 # --------------------
+# TDA
+# --------------------
+
+class TDASerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TDA
+        fields = [
+            "id",
+            "fechaInicio",
+            "fechaExpiracion",
+            "estado",
+            "codigo_qr"
+        ]
+
+
+# --------------------
 # Usuarios
 # --------------------
 
@@ -59,6 +75,8 @@ class UsuarioFinalSerializer(serializers.ModelSerializer):
     # La contraseña no se pasa cuando se hace un get, solo para modificarla
     password = serializers.CharField(write_only=True, required=False, allow_blank=True)
     deportesFavoritos = DeporteSerializer(many=True, read_only=True)
+    tda = TDASerializer(read_only=True)
+ 
     email = serializers.SerializerMethodField()
     codigo_usuario = serializers.SerializerMethodField()
     deportes_ids = serializers.PrimaryKeyRelatedField(
@@ -93,6 +111,7 @@ class UsuarioFinalSerializer(serializers.ModelSerializer):
             "sexo",
             "rol",
             "user",
+            "tda",
             "email",
             "actividadesFavoritas",
             "instalacionesFavoritas",
@@ -979,12 +998,3 @@ class AlquilerSimpleSerializer(serializers.ModelSerializer):
     def get_nombre(self, obj):
         return obj.instalacion.nombre
 
-
-# --------------------
-# TDA
-# --------------------
-
-class TDASerializer(serializers.ModelSerializer):
-    class Meta:
-        model = TDA
-        fields = '__all__'

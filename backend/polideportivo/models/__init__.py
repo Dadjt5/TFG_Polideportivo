@@ -22,4 +22,5 @@ from .usuario import Usuario
 from .usuario_final import UsuarioFinal
 from .administrador import Administrador
 from .user import User
+from .codigo_reset_password import CodigoResetPassword
 from .feedback import Feedback

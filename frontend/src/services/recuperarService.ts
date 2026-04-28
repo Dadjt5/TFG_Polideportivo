@@ -1,13 +1,13 @@
 import api from "./api";
 
-/* Función para mandar una nueva contraseña */
-export const resetPassword = async (email: string) => {
-  const response = await api.post("/api/v1/password_reset/", { email });
+/* Función para enviar un codigo de verificacion */
+export const sendResetCode = async (email: any) => {
+  const response = await api.post('api/v1/password_reset/', {"email": email, "tipo": "enviar"});
   return response.data;
 };
 
-/* Función para resetear una contraseña */
-export const confirmacionResetPassword = async (token: any, password: string) => {
-  const response = await api.post('/api/password_reset/confirm/', { token, password });
+/* Función para validar un codigo de verificacion */
+export const verifyResetCode = async (email: any, codigo: any) => {
+  const response = await api.post('api/v1/password_reset/', { "email": email, "codigo": codigo, "tipo": "verificar" });
   return response.data;
 };

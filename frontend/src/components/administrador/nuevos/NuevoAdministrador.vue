@@ -242,8 +242,14 @@ const crearAdministrador = async () => {
 
     userIdentifier.value = data.codigo_usuario;
     showIdentifier.value = true;
-  } catch (e) {
-    lanzarMensaje(t.value.userNoCreated, "error")
+  } catch (e: any) {
+    if (e.response.data.tipo === "dni") {
+      lanzarMensaje(t.value.noRegisterDNI, "error")
+    } else if(e.response.data.tipo === "email") {
+      lanzarMensaje(t.value.noRegisterEmail, "error")
+    } else {
+      lanzarMensaje(t.value.userNoCreated, "error")
+    }
     console.error("Error al crear el administrador", e)
   }
 }

@@ -108,7 +108,7 @@ const routes = [
   { path: '/home', component: Home, meta: { public: true } },
   { path: '/login', component: Login, meta: { public: true } },
   { path: '/recuperar-password', component: RecuperarPassword, meta: { public: true } },
-  { path: '/reset-password/:token', component: ResetPassword, name: 'reset-password', props: true, meta: { public: true } },
+  { path: '/reset-password/:id', component: ResetPassword, name: 'reset-password', props: true, meta: { public: true } },
   { path: '/buscar', component: Buscar, meta: { public: true } },
   { path: '/actividades', component: ListaDeActividades, meta: { public: true } },
   { path: '/foro', component: Foro, name: 'foro', meta: { requiresAuth: true } },

@@ -262,6 +262,7 @@ class Pago(models.Model):
             "expand": ["latest_invoice.confirmation_secret"],
         }
 
+        # Esto esta pensado para cuando las TDAs eran de pago anual y no unico, para manejar que solo las reservas de actividades comiencen a principio de mes
         if isinstance(self.objeto, ReservaActividad):
             subscription_data["billing_cycle_anchor"] = inicio_ts
             subscription_data["trial_end"] = inicio_ts

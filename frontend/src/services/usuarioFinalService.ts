@@ -1,19 +1,19 @@
 import api from "./api";
 
 /* Función para recuperar el usuario final con todos sus campos */
-export const getUsuarioFinal = async (id: number) => {
+export const getUsuarioFinal = async (id: any) => {
   const response = await api.get(`api/v1/usuariosFinales/${id}/`);
   return response.data;
 };
 
 /* Función para cambiar ciertos campos del usuario final */
-export const modificarUsuarioFinal = async (id: number, data: Record<string, any>) => {
+export const modificarUsuarioFinal = async (id: any, data: Record<string, any>) => {
   const response = await api.patch(`api/v1/usuariosFinales/${id}/`, data);
   return response.data;
 };
 
 /* Función para eliminar un usuario final */
-export const eliminarUsuarioFinal = async (id: number) => {
+export const eliminarUsuarioFinal = async (id: any) => {
   const response = await api.delete(`api/v1/usuariosFinales/${id}/`);
   return response.data;
 };
