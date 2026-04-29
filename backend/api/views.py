@@ -110,7 +110,7 @@ class AbonoVeranoViewSet(viewsets.ModelViewSet):
 class CompraAbonoViewSet(viewsets.ModelViewSet):
     serializer_class = CompraAbonoSerializer
     permission_classes = [IsUsuarioFinal]
-    
+
     def perform_create(self, serializer):
         usuario_final = UsuarioFinal.objects.get(user=self.request.user)
         serializer.save(usuarioFinal=usuario_final)
@@ -2228,7 +2228,7 @@ class ReservarActividadView(APIView):
 
 class ReservaInstalacionView(APIView):
     permission_classes = [IsUsuarioFinal]
-    
+
     def post(self, request, instalacion_id):
         instalacion = get_object_or_404(Instalacion, id=instalacion_id)
         config = Configuracion.objects.first()

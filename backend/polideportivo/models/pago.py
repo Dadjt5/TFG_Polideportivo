@@ -2,7 +2,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, date
 from django.utils import timezone
 import stripe
 from django.conf import settings
@@ -105,7 +105,7 @@ class Pago(models.Model):
             porcentajeExtra = 0.0
 
             if usuario.tieneAbono:
-                compraAbono = usuario.abono.filter(abonoVerano=None).first()
+                compraAbono = usuario.abono.filter(abonoVerano__isnull=True, fechaExpiracion__gte=date.today()).first()
                 if compraAbono and compraAbono.abonoDeportivo:
                     descripcionPorcentajes["Descuento por abono deportivo"] = {}
                     if usuario.actividadesRealizadas == 0:
@@ -129,7 +129,7 @@ class Pago(models.Model):
             porcentajeExtra = 0.0
 
             if usuario.tieneAbono:
-                compraAbono = usuario.abono.filter(abonoVerano=None).first()
+                compraAbono = usuario.abono.filter(abonoVerano__isnull=True, fechaExpiracion__gte=date.today()).first()
 
                 if compraAbono and compraAbono.abonoDeportivo:
                     descripcionPorcentajes["Descuento por abono deportivo"] = {}

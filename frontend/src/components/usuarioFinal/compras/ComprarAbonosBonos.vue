@@ -111,7 +111,7 @@
                         <li class="mb-2">{{ t.otherActivitiesDiscount }}: <strong>{{ ab.descuentoRestoActividades
                             }}%</strong></li>
                         <li>{{ t.outdoorDiscount }}: <strong>{{ ab.descuentoActividadesExteriores }}%</strong></li>
-                        <li>{{ t.rentDiscount }}: <strong>{{ ab.decuentoAlquileres }}%</strong></li>
+                        <li>{{ t.rentDiscount }}: <strong>{{ ab.descuentoAlquileres }}%</strong></li>
                       </ul>
                       <div class="border-top pt-3 mt-auto">
                         <p class="mb-1"><strong>{{ t.monthlyPrice }}:</strong> {{ ab.precioTotalMensual }}€</p>
@@ -207,7 +207,7 @@ const abonos = ref({
     descuentoPrimeraActividad: 0.0,
     descuentoRestoActividades: 0.0,
     descuentoActividadesExteriores: 0.0,
-    decuentoAlquileres: 0.0,
+    descuentoAlquileres: 0.0,
     precioTotalMensual: 0.0,
     precioPagoUnicoUAM: 0.0,
     precioFamiliar: 0.0,
