@@ -228,7 +228,11 @@ function validarFormulario() {
 
 const crearMonitor = async () => {
 	if (!validarFormulario()) {
-    lanzarMensaje(t.value.missing, "error")
+    if (errores.value.dni) {
+      lanzarMensaje(t.value.DNIError, "error")
+    } else {
+      lanzarMensaje(t.value.missing, "error")
+    }
     return
   }
 

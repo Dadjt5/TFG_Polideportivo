@@ -7,6 +7,7 @@ from .configuracion import Configuracion
 from .usuario_final import UsuarioFinal
 from .monitor import Monitor
 from .administrador import Administrador
+from .constantes import EstadoReserva
 
 
 class Notificacion(models.Model):
@@ -62,13 +63,13 @@ class Notificacion(models.Model):
 
         elif tipoUsuarios == "ACTIVIDAD":
             # Trae todos los usuarios finales que tengan asistencia en alguna sesión de la actividad
-            usuarios = User.objects.filter(id__in=UsuarioFinal.objects.filter(reservas_actividad__actividad_id=complemento).values_list('user_id', flat=True)).distinct()
+            usuarios = User.objects.filter(id__in=UsuarioFinal.objects.filter(reservas_actividad__actividad_id=complemento, reservas_actividad__estado=EstadoReserva.CONFIRMADA).values_list('user_id', flat=True)).distinct()
 
         elif tipoUsuarios == "INSTALACION":
-            usuarios = User.objects.filter(id__in=UsuarioFinal.objects.filter(alquileres__instalacion_id=complemento).values_list('user_id', flat=True)).distinct()
+            usuarios = User.objects.filter(id__in=UsuarioFinal.objects.filter(alquileres__instalacion_id=complemento, alquileres__estado=EstadoReserva.CONFIRMADA).values_list('user_id', flat=True)).distinct()
 
         elif tipoUsuarios == "PABELLON":
-            usuarios = User.objects.filter(id__in=UsuarioFinal.objects.filter(alquileres__instalacion__pabellon_id=complemento).values_list('user_id', flat=True)).distinct()
+            usuarios = User.objects.filter(id__in=UsuarioFinal.objects.filter(alquileres__instalacion__pabellon_id=complemento, alquileres__estado=EstadoReserva.CONFIRMADA).values_list('user_id', flat=True)).distinct()
 
         else:
             usuarios = User.objects.none()
@@ -105,7 +106,7 @@ class Notificacion(models.Model):
     def notificarActividadUsuarioFinal(cls, actividad, sesion):
         configuracion = Configuracion.objects.all().first()
 
-        usuarios = UsuarioFinal.objects.filter(reservas_actividad__actividad=actividad).distinct()
+        usuarios = UsuarioFinal.objects.filter(reservas_actividad__actividad=actividad, reservas_actividad__estado=EstadoReserva.CONFIRMADA).distinct()
 
         for usuario in usuarios:
             cls.objects.create(
@@ -156,7 +157,7 @@ class Notificacion(models.Model):
     def notificarNuevoMaterial(cls, actividad):
         configuracion = Configuracion.objects.all().first()
         
-        usuarios = UsuarioFinal.objects.filter(reservas_actividad__actividad=actividad).distinct()
+        usuarios = UsuarioFinal.objects.filter(reservas_actividad__actividad=actividad, reservas_actividad__estado=EstadoReserva.CONFIRMADA).distinct()
 
         for usuario in usuarios:
             cls.objects.create(
@@ -171,7 +172,7 @@ class Notificacion(models.Model):
     def notificarCambioSesiones(cls, actividad):
         configuracion = Configuracion.objects.all().first()
         
-        usuarios = UsuarioFinal.objects.filter(reservas_actividad__actividad=actividad).distinct()
+        usuarios = UsuarioFinal.objects.filter(reservas_actividad__actividad=actividad, reservas_actividad__estado=EstadoReserva.CONFIRMADA).distinct()
 
         for usuario in usuarios:
             cls.objects.create(
@@ -230,3 +231,33 @@ class Notificacion(models.Model):
             actividad=actividad,
             debeMarcar=True
         )
+    
+    # Función para notificar automaticamente la eliminacion de una actividad
+    @classmethod
+    def notificarEliminacionActividad(cls, actividad):
+        configuracion = Configuracion.objects.all().first()
+        
+        usuarios = UsuarioFinal.objects.filter(reservas_actividad__actividad=actividad, reservas_actividad__estado=EstadoReserva.CONFIRMADA).distinct()
+
+        for usuario in usuarios:
+            cls.objects.create(
+                titulo=configuracion.titulo_actividad_eliminada,
+                descripcion=configuracion.texto_actividad_eliminada,
+                usuario=usuario.user,
+                actividad=actividad
+            )
+        
+    # Función para notificar automaticamente la eliminacion de una instalacion
+    @classmethod
+    def notificarEliminacionInstalacion(cls, instalacion):
+        configuracion = Configuracion.objects.all().first()
+
+        usuarios = UsuarioFinal.objects.filter(alquileres__instalacion=instalacion, alquileres__estado=EstadoReserva.CONFIRMADA).distinct()
+
+        for usuario in usuarios:
+            cls.objects.create(
+                titulo=configuracion.titulo_instalacion_eliminada,
+                descripcion=configuracion.texto_instalacion_eliminada,
+                usuario=usuario.user,
+                instalacion=instalacion
+            )

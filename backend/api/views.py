@@ -135,6 +135,25 @@ class ActividadViewSet(viewsets.ModelViewSet):
 
         return Actividad.objects.all()
 
+    def destroy(self, request, *args, **kwargs):
+        actividad = self.get_object()
+
+        Notificacion.notificarEliminacionActividad(actividad)
+
+        reservas = ReservaActividad.objects.filter(
+            actividad=actividad,
+            estado=EstadoReserva.CONFIRMADA
+        )
+
+        for reserva in reservas:
+            reserva_ct = ContentType.objects.get_for_model(ReservaActividad)
+            pago = Pago.objects.get(content_type=reserva_ct, object_id=reserva.id)
+
+            pago.cancelarPago()
+
+        self.perform_destroy(actividad)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class ActividadSimpleViewSet(viewsets.ModelViewSet):
     queryset = Actividad.objects.all()
@@ -327,6 +346,25 @@ class InstalacionViewSet(viewsets.ModelViewSet):
     serializer_class = InstalacionSerializer
     permission_classes = [AllowAny]
     authentication_classes = []
+
+    def destroy(self, request, *args, **kwargs):
+        instalacion = self.get_object()
+
+        Notificacion.notificarEliminacionInstalacion(instalacion)
+
+        reservas = Alquiler.objects.filter(
+            instalacion=instalacion,
+            estado=EstadoReserva.CONFIRMADA
+        )
+
+        for reserva in reservas:
+            reserva_ct = ContentType.objects.get_for_model(Alquiler)
+            pago = Pago.objects.get(content_type=reserva_ct, object_id=reserva.id)
+
+            pago.cancelarPago()
+
+        self.perform_destroy(instalacion)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class InstalacionSimpleViewSet(viewsets.ModelViewSet):
@@ -1057,6 +1095,10 @@ class ReservasView(APIView):
         for alquiler in alquileres:
             pago = Pago.objects.get(content_type=alquiler_ct, object_id=alquiler.id)
 
+            calle = None
+            if alquiler.calle:
+                calle = alquiler.calle.numero
+
             reservas.append({
                 "id": alquiler.id,
                 "tipo": "ALQUILER",
@@ -1069,6 +1111,7 @@ class ReservasView(APIView):
                 },
                 "actividad": None,
                 "fecha": str(alquiler.fecha) if hasattr(alquiler, "fecha") else None,
+                "calle": calle,
                 "horaInicio": alquiler.horaInicio,
                 "horaFin": alquiler.horaFin,
                 "coste": pago.costeFinal,
@@ -1600,10 +1643,10 @@ class NuevaActividadView(APIView):
 
             calle = None
             if instalacion.tipoInstalacion == TipoInstalacion.PISCINA:
-                calle = instalacion.calles.filter(numero=calleNum).first()
+                calle = instalacion.calles.filter(id=calleNum).first()
 
                 if not calle:
-                    return Response({"respuesta": "Calle no válida"}, status=status.HTTP_400_BAD_REQUEST, tipo="calle")
+                    return Response({"respuesta": "Calle no válida", "tipo": "calle"}, status=status.HTTP_400_BAD_REQUEST)
 
             if not instalacion.controlarHorarioActividad(dia, horaInicio, horaFin, periodo, calle=calle):
                 return Response(
@@ -1630,7 +1673,7 @@ class NuevaActividadView(APIView):
 
             calle = None
             if instalacion.tipoInstalacion == TipoInstalacion.PISCINA:
-                calle = instalacion.calles.filter(numero=calleNum).first()
+                calle = instalacion.calles.filter(id=calleNum).first()
 
             actividad.nuevaSesion(
                 sesion.get('dia'),
@@ -1702,7 +1745,7 @@ class EditarActividadView(APIView):
                 
                 calle = None
                 if instalacion.tipoInstalacion == TipoInstalacion.PISCINA:
-                    calle = instalacion.calles.filter(numero=calleNum).first()
+                    calle = instalacion.calles.filter(id=calleNum).first()
 
                 respuesta = instalacion.controlarHorarioActividad(dia, horaInicio, horaFin, periodo, sesion_id, calle)
 
@@ -1791,8 +1834,11 @@ class TarifaActividadView(APIView):
     
     def get(self, request, actividad_id):
         actividad = get_object_or_404(Actividad, id=actividad_id)
+        usuarioFinal = request.user.usuario_final
 
-        precios = actividad.obtenerPrecios()
+        numeroSesiones = ReservaActividad.objects.filter(actividad=actividad, usuarioFinal=usuarioFinal).exclude(tipoSesion="consulta").count()
+
+        precios = actividad.obtenerPrecios(numeroSesiones)
         data = {
             "tarifa": {
                 "idActividad": actividad.id,
@@ -1800,6 +1846,7 @@ class TarifaActividadView(APIView):
                 "numeroHoras": actividad.calcularHorasSemanales(),
                 "horario": actividad.getHorario(),
                 "tipo": actividad.tipoActividad,
+                "numeroSesiones": numeroSesiones,
                 "datos": precios
             },
             "descuento": {
@@ -1865,7 +1912,7 @@ class TarifaInstalacionView(APIView):
                     mapas = dia.mapa_reservas.filter(calle=calle)
                     reservas_serializer = MapaReservasSerializer(mapas, many=True)
 
-                    calles.append({"numero": calle.numero, "reservas": reservas_serializer.data})
+                    calles.append({"id": calle.id, "numero": calle.numero, "reservas": reservas_serializer.data})
 
             else:
                 reservas_serializer = MapaReservasSerializer(
@@ -1876,7 +1923,7 @@ class TarifaInstalacionView(APIView):
                 calles = None
                 reservas = reservas_serializer.data
             
-            alquileres_serializer = AlquilerSimpleSerializer(Alquiler.objects.filter(fecha=fecha).exclude(estado=EstadoReserva.CANCELADO), many=True)
+            alquileres_serializer = AlquilerSimpleSerializer(Alquiler.objects.filter(fecha=fecha, instalacion=instalacion).exclude(estado=EstadoReserva.CANCELADO), many=True)
             alquileres = alquileres_serializer.data
             horaApertura = dia.horaApertura
             horaCierre = dia.horaCierre
@@ -2010,6 +2057,7 @@ class ReservasPorDiaView(APIView):
                 mapas = dia.mapa_reservas.filter(calle=calle)
 
                 calles.append({
+                    "id": calle.id,
                     "numero": calle.numero,
                     "slots": self.generar_slots(mapas, alquileres, calle)
                 })
@@ -2166,7 +2214,7 @@ class ReservarActividadView(APIView):
         else:
             return Response({"respuesta": "No se puede reservar la actividad de esta forma"}, status=status.HTTP_400_BAD_REQUEST)
 
-        res = ReservaActividad.nuevaReserva(request.user.usuario_final, actividad)
+        res = ReservaActividad.nuevaReserva(request.user.usuario_final, actividad, complementos)
         if not res:
             return Response({"respuesta": "Error al reservar la actividad"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -2197,7 +2245,7 @@ class ReservaInstalacionView(APIView):
             if not calle:
                 return Response({"respuesta": "Debe seleccionar una calle"}, status=status.HTTP_400_BAD_REQUEST)
 
-            calle_obj = instalacion.calles.filter(numero=calle).first()
+            calle_obj = instalacion.calles.filter(id=calle).first()
             if not calle_obj:
                 return Response({"respuesta": "Calle inválida"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -2767,14 +2815,14 @@ class ObtenerEstadisticasUsuarioFinalView(APIView):
         # RESERVAS TOTALES
         reservas_totales = ReservaActividad.objects.filter(
             usuarioFinal=usuario
-        ).count()
+        ).exclude(estado=EstadoReserva.CANCELADO).count()
 
         # RESERVAS ESTE MES
         reservas_mes = ReservaActividad.objects.filter(
             usuarioFinal=usuario,
             created_at__year=hoy.year,
             created_at__month=hoy.month
-        ).count()
+        ).exclude(estado=EstadoReserva.CANCELADO).count()
 
         # CANCELACIONES
         cancelaciones = ReservaActividad.objects.filter(
@@ -2794,7 +2842,8 @@ class ObtenerEstadisticasUsuarioFinalView(APIView):
             ReservaActividad.objects
             .filter(
                 usuarioFinal=usuario,
-                created_at__gte=hoy - timedelta(days=365)
+                created_at__gte=hoy - timedelta(days=365),
+                estado=EstadoReserva.CONFIRMADA
             )
             .annotate(mes=TruncMonth("created_at"))
             .values("mes")
@@ -2813,7 +2862,7 @@ class ObtenerEstadisticasUsuarioFinalView(APIView):
         # ACTIVIDADES MÁS RESERVADAS POR EL USUARIO
         actividades_top = (
             ReservaActividad.objects
-            .filter(usuarioFinal=usuario)
+            .filter(usuarioFinal=usuario, estado=EstadoReserva.CONFIRMADA)
             .values("actividad__nombre")
             .annotate(total=Count("id"))
             .order_by("-total")[:5]
@@ -2830,7 +2879,7 @@ class ObtenerEstadisticasUsuarioFinalView(APIView):
         # ACTIVIDAD FAVORITA
         actividad_favorita = (
             ReservaActividad.objects
-            .filter(usuarioFinal=usuario)
+            .filter(usuarioFinal=usuario, estado=EstadoReserva.CONFIRMADA)
             .values("actividad__nombre")
             .annotate(total=Count("id"))
             .order_by("-total")
@@ -2843,7 +2892,7 @@ class ObtenerEstadisticasUsuarioFinalView(APIView):
         # INSTALACION FAVORITA
         instalacion_favorita = (
             ReservaActividad.objects
-            .filter(usuarioFinal=usuario)
+            .filter(usuarioFinal=usuario, estado=EstadoReserva.CONFIRMADA)
             .values("actividad__instalacion__nombre")
             .annotate(total=Count("id"))
             .order_by("-total")
@@ -2856,7 +2905,7 @@ class ObtenerEstadisticasUsuarioFinalView(APIView):
         # RESERVAS POR DÍA DE LA SEMANA
         reservas_por_dia_qs = (
             ReservaActividad.objects
-            .filter(usuarioFinal=usuario)
+            .filter(usuarioFinal=usuario, estado=EstadoReserva.CONFIRMADA)
             .annotate(dia=ExtractWeekDay("created_at"))
             .values("dia")
             .annotate(total=Count("id"))

@@ -131,8 +131,8 @@ class Instalacion(models.Model):
 
             calle = None
             if self.tipoInstalacion == TipoInstalacion.PISCINA and calle_sesion:
-                calle_num = calle_sesion.numero
-                calle = self.calles.filter(numero=calle_num).first()
+                calle_num = calle_sesion
+                calle = self.calles.filter(id=calle_num).first()
 
             agenda = Agenda.objects.filter(instalacion=self, dia__iexact=dia).first()
 

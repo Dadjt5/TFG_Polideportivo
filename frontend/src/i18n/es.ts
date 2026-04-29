@@ -11,6 +11,7 @@ export default {
   logout: "Cerrar sesión",
 
   /* Otros */
+  streetCapacity: "Capacidad por calle",
   verifyCode: "Verificar código",
   sportsSubscriptionDetail: "Detalles del abono deportivo",
   summerSubscriptionDetail: "Detalles del abono de verano",
@@ -155,6 +156,8 @@ export default {
   wrongAge: "No tiene edad suficiente para reservar esta actividad",
   expiredOrIncorrectCode: "Código incorrecto o expirado",
   errorCode: "Error verificando código",
+  DNIError: "DNI incorrecto o inválido",
+  fisioSessionNotice: "El precio puede variar según el número total de sesiones realizadas con anterioridad.",
 
   /* Perfil */
   role: "Rol",
@@ -458,6 +461,7 @@ export default {
   cancel: "Cancelar",
   payContinue: "Continuar con el pago",
   prices: "Precios",
+  heldSessions: "Sesiones realizadas",
 
   /* Configurar compra abono */
   configurationSubscription: "Configurar compra abono",

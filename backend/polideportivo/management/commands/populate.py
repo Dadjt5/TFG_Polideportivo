@@ -72,6 +72,8 @@ class Command(BaseCommand):
                 titulo_avisos_sobre_actividades_usuarios="Actividad próxima",
                 titulo_avisos_sobre_actividades_monitores="Actividad próxima",
                 titulo_aviso_devolucion_dinero_alquiler="Devolución de dinero por alquiler",
+                titulo_actividad_eliminada="Una actividad ha sido eliminada",
+                titulo_instalacion_eliminada="Una instalación ha sido eliminada",
                 
                 texto_cambios_cancelaciones="Los tiempos mínimos de las cancelaciones han cambiado.",
                 texto_avisos_actividades="Hay una nueva actividad que podría interesarle.",
@@ -83,6 +85,8 @@ class Command(BaseCommand):
                 texto_avisos_sobre_actividades_usuarios="Una actividad en la que esta inscrito comienza en poco tiempo",
                 texto_avisos_sobre_actividades_monitores="Una actividad que dirige comienza en poco tiempo",
                 texto_aviso_devolucion_dinero_alquiler="Debido a la creación de una nueva actividad se ha tenido que cancelar su alquiler, el dinero le ha sido devuelto, sentimos las molestias",
+                texto_actividad_eliminada="Lamentamos comunicarle que una actividad ha sido eliminada. Se ha cancelado su reserva, sentimos las molestias.",
+                texto_instalacion_eliminada="Lamentamos comunicarle que una instalacion ha sido eliminada. Se ha cancelado su alquiler y se le ha devuelto el dinero. Sentimos las molestias."
             )
 
             self.stdout.write(self.style.SUCCESS("Configuración global creada"))

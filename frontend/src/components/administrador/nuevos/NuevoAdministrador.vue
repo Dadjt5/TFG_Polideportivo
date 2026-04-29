@@ -228,7 +228,11 @@ function comprobarPermisos() {
 
 const crearAdministrador = async () => {
   if (!validarFormulario()) {
-    lanzarMensaje(t.value.missing, "error")
+    if (errores.value.DNI) {
+      lanzarMensaje(t.value.DNIError, "error")
+    } else {
+      lanzarMensaje(t.value.missing, "error")
+    }
     return
   }
 

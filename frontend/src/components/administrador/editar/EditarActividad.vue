@@ -177,13 +177,16 @@
             <label class="form-label fw-semibold">{{ t.poolStreets }}</label>
             <select class="form-select form-select-lg" v-model="calleSeleccionada">
               <option v-for="c in instalacionDetalle.calles" :key="c.id" :value="c.id">
-                {{ t.street }} {{ c.numero || c.id }}
+                {{ t.street }} {{ c.numero }}
               </option>
             </select>
           </div>
 
           <div class="col-md-4 mb-3 fw-bold" v-if="instalacionDetalle">
-            {{ t.totalCapacity }}: {{ instalacionDetalle?.aforoMaximo }}
+            {{ t.totalCapacity }}: {{ instalacionDetalle?.aforoMaximo }}.
+            <span v-if="instalacionDetalle?.tipoInstalacion === 'Piscina'" class="fw-semibold">
+              {{ t.streetCapacity }}: {{ instalacionDetalle.aforoMaximo/instalacionDetalle.numeroCalles }}
+            </span>   
           </div>
 
           <div v-if="instalacionDetalle?.agenda?.length" class="card border-0 shadow-sm rounded-4 p-4 bg-light">
@@ -268,7 +271,7 @@
                   <!-- Piscina: por calles -->
                   <div v-if="instalacionDetalle?.tipoInstalacion === 'Piscina'">
                     <div v-for="calle in reserva.fecha.calles" :key="calle.id" class="mb-3">
-                      <h6 class="fw-semibold mb-2">{{ t.street }} {{ calle.numero || calle.id }}</h6>
+                      <h6 class="fw-semibold mb-2">{{ t.street }} {{ calle.numero }}</h6>
                       <div class="d-flex flex-wrap gap-2">
                         <div v-for="hora in calle.slots" :key="hora.horaInicio"
                           class="small text-white text-center px-3 py-2 rounded" :class="{
@@ -298,7 +301,7 @@
               </div>
 
               <div v-else class="text-center text-muted py-4">
-                {{ t.selectDate || 'Selecciona una fecha' }}
+                {{ t.date || 'Selecciona una fecha' }}
               </div>
             </div>
 
@@ -409,18 +412,6 @@
                       <p class="mb-1">{{ t.sessions6plus }}: {{ tarifaSeleccionada.precioSesiones6Otros }} €</p>
                     </div>
                   </div>
-
-                  <!-- Información general -->
-                  <div class="col-6">
-                    <div class="p-3 bg-light rounded-3 shadow-sm">
-                      <strong>{{ t.weekHours }}:</strong> {{ tarifaSeleccionada.numeroHoras }}
-                    </div>
-                  </div>
-                  <div class="col-6">
-                    <div class="p-3 bg-light rounded-3 shadow-sm">
-                      <strong>{{ t.people }}:</strong> {{ tarifaSeleccionada.numeroPersonas }}
-                    </div>
-                  </div>
                 </div>
               </div>
             </transition>
@@ -437,7 +428,7 @@
               <select class="form-select" v-model="crearSesion.calle">
                 <option value="">--</option>
                 <option v-for="c in instalacionDetalle.calles" :key="c.id" :value="c.id">
-                  {{ t.street }} {{ c.numero || c.id }}
+                  {{ t.street }} {{ c.numero }}
                 </option>
               </select>
             </div>
@@ -499,7 +490,7 @@
                       <select v-if="instalacionDetalle.tipoInstalacion === 'Piscina'" class="form-select form-select-sm"
                         v-model="sesion.calle" style="width: 100px;">
                         <option v-for="c in instalacionDetalle.calles" :key="c.id" :value="c.id">
-                          {{ c.numero || c.id }}
+                          {{ c.numero  }}
                         </option>
                       </select>
                     </div>
@@ -510,7 +501,7 @@
                     <div>
                       <strong>{{ sesion.dia }}</strong> |
                       {{ sesion.horaInicio }} - {{ sesion.horaFin }}
-                      <span v-if="instalacionDetalle?.tipoInstalacion === 'Piscina'">{{ t.street }} {{ sesion.calle
+                      <span v-if="instalacionDetalle?.tipoInstalacion === 'Piscina'">{{ t.street }} {{ sesion.numeroCalle
                         }}</span>
                     </div>
                   </template>

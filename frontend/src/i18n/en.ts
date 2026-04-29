@@ -11,6 +11,7 @@ export default {
   logout: "Logout",
 
   /* Otros */
+  streetCapacity: "Capacity per lane",
   verifyCode: "Verify code",
   sportsSubscriptionDetail: "Sports subscription details",
   summerSubscriptionDetail: "Summer subscription details",
@@ -124,6 +125,8 @@ export default {
   noPermissions: "You do not have permission to perform this action",
   expiredOrIncorrectCode: "Incorrect or expired code",
   errorCode: "Error verifying code",
+  DNIError: "incorrect or invalid DNI",
+  fisioSessionNotice: "The price may vary depending on the total number of sessions held.",
 
   userNoCreated: 'There is already a user with that DNI or email address in the system',
   tariffNoCreated: 'The tariff could not be created',
@@ -152,6 +155,7 @@ export default {
   wrongBookingType: "This activity cannot be booked online",
   wrongPeriodToBook: "The activity is not currently taking place",
   wrongAge: "You are not old enough to book this activity",
+
 
   /* Perfil */
   role: "Role",
@@ -455,6 +459,7 @@ export default {
   cancel: "Cancel",
   payContinue: "Proceed with payment",
   prices: "Prices",
+  heldSessions: "sessions held",
 
   /* Configurar compra abono */
   configurationSubscription: "Configure subscription purchase",

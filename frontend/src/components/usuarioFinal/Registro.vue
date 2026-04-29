@@ -334,7 +334,11 @@ const siguiente = () => {
   if (continuar.value) {
     step.value += 1
   } else {
-    lanzarMensaje(t.value.missing, "error")
+    if (errores.value.dni) {
+      lanzarMensaje(t.value.DNIError, "error")
+    } else {
+      lanzarMensaje(t.value.missing, "error")
+    }
   }
 }
 

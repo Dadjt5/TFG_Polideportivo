@@ -100,7 +100,8 @@ class Pago(models.Model):
             )
 
         elif isinstance(objeto, ReservaActividad):
-            coste = objeto.calcularPrecio()
+            numeroSesiones = ReservaActividad.objects.filter(actividad=objeto.actividad, usuarioFinal=usuario).exclude(tipoSesion="consulta").count()
+            coste = objeto.calcularPrecio(numeroSesiones)
             porcentajeExtra = 0.0
 
             if usuario.tieneAbono:

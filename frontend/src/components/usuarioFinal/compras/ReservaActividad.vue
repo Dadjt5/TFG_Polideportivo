@@ -1,164 +1,183 @@
 <template>
-  <div class="min-vh-100" style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
+  <div class="min-vh-100 d-flex justify-content-center position-relative overflow-hidden"
+    style="background: linear-gradient(135deg, #ffe7d1, #d1f0ff);">
+
+    <!-- Fondo decorativo -->
+    <div class="position-absolute top-0 start-0 w-100 h-100 opacity-25"
+      style="background:
+        radial-gradient(circle at 20% 20%, #0072ff55, transparent 40%),
+        radial-gradient(circle at 80% 70%, #ff7a0055, transparent 40%);">
+    </div>
+
     <div class="container py-4">
 
-      <!-- Cabecera -->
-      <div class="text-center mb-4">
-        <h2 class="fw-bold text-primary mb-1" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.15);">
-          {{ t.activityBookingTitle }}
-        </h2>
+      <!-- Título -->
+      <div class="text-center mt-4 mb-4">
+        <h2 class="fw-bold">{{ t.activityBookingTitle }}</h2>
         <p class="text-muted">{{ t.activityBookingSubtitle }}</p>
       </div>
 
-      <!-- Card principal -->
-      <div class="rounded-3 shadow-sm p-4 card-hover"
-        style="background-color: rgba(255,255,255,0.85); backdrop-filter: blur(8px);">
-        <h5 class="fw-bold mb-3">{{ reserva.tarifa.nombre }}</h5>
+      <!-- Información actividad -->
+      <div class="card shadow-sm rounded-4 mb-4"
+        style="backdrop-filter: blur(6px); background: rgba(255,255,255,0.85);">
+        <div class="card-body">
+          <h5 class="fw-bold mb-3 fs-3">{{ reserva.tarifa.nombre }}</h5>
 
-        <!-- Horarios -->
-        <ul class="list-group list-group-flush mb-4">
-          <li v-if="reserva.tarifa.horario.length" v-for="(h, index) in reserva.tarifa.horario" :key="index"
-            class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2">
-            <span class="fw-semibold">
-              <i class="bi bi-calendar-event me-2 text-muted"></i>{{ h.dia }}
-            </span>
-            <span class="badge bg-primary-subtle text-primary fw-semibold px-3 py-2 rounded-pill">
-              <i class="bi bi-clock me-1"></i>{{ h.horaInicio }} – {{ h.horaFin }}
-            </span>
-          </li>
-          <li v-else class="list-group-item border-0 px-0 py-2 text-muted fs-5">{{ t.noSession }}</li>
-        </ul>
-
-        <!-- Tarifas -->
-        <h6 class="fw-bold mb-2">{{ t.tariff }}</h6>
-
-        <!-- Tipo OTROS -->
-        <table v-if="reserva.tarifa.tipo === 'Otros'" class="table table-sm mb-4">
-          <tbody>
-            <tr :class="{ 'table-primary': usuarioFinalStore.isUAM }">
-              <td>UAM</td>
-              <td class="text-end">{{ reserva.tarifa.datos.precioUAM }} € / {{ reserva.tarifa.datos.numeroHorasSemana }}
-                {{ t.weekHours }}</td>
-            </tr>
-            <tr :class="{ 'table-primary': !usuarioFinalStore.isUAM }">
-              <td>{{ t.others }}</td>
-              <td class="text-end">{{ reserva.tarifa.datos.precioOtros }} € / {{ reserva.tarifa.datos.numeroHorasSemana
-                }} {{ t.weekHours }}</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <!-- Tipo GRUPOS_REDUCIDOS -->
-        <table v-else-if="reserva.tarifa.tipo === 'Grupos reducidos'" class="table table-sm mb-4 align-middle">
-          <tbody>
-            <tr>
-              <td><i class="bi bi-people me-2"></i>{{ t.people }}</td>
-              <td class="text-end" style="max-width: 120px">
-                <input type="number" class="form-control form-control-sm text-end"
-                  v-model.number="reserva.seleccion.personas" :min="1" :max="reserva.tarifa.datos.numeroPersonas" />
-              </td>
-            </tr>
-            <tr>
-              <td><i class="bi bi-credit-card me-2"></i>{{ t.paymentMethod }}</td>
-              <td class="text-end">
-                <select class="form-select form-select-sm text-end" v-model="reserva.seleccion.modalidad">
-                  <option value="Pago mensual">{{ t.monthly }}</option>
-                  <option value="Pago cuatrimestral">{{ t.quarterly }}</option>
-                  <option value="Pago unico">{{ t.fullPayment }}</option>
-                </select>
-              </td>
-            </tr>
-            <tr>
-              <td colspan="2">
-                <hr class="my-2">
-              </td>
-            </tr>
-            <tr>
-              <td>{{ t.hours }}</td>
-              <td class="text-end">{{ reserva.tarifa.datos.numeroHoras }}</td>
-            </tr>
-            <tr>
-              <td>{{ t.people }}</td>
-              <td class="text-end">{{ reserva.tarifa.datos.numeroPersonas }}</td>
-            </tr>
-            <tr>
-              <td>{{ t.monthly }}</td>
-              <td class="text-end">{{ reserva.tarifa.datos.precioMensual }} €</td>
-            </tr>
-            <tr>
-              <td>{{ t.quarterly }}</td>
-              <td class="text-end">{{ reserva.tarifa.datos.precioCuatrimestre }} €</td>
-            </tr>
-            <tr class="table-light fw-bold">
-              <td>{{ t.fullPayment }}</td>
-              <td class="text-end">{{ reserva.tarifa.datos.precio }} €</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <!-- Tipo FISIOTERAPIA -->
-        <table v-else-if="reserva.tarifa.tipo === 'Fisioterapia'" class="table table-sm mb-4">
-          <tbody>
-            <tr>
-              <td>{{ t.sessionType }}</td>
-              <td class="text-end">
-                <select class="form-select form-select-sm text-end" v-model="reserva.seleccion.tipoSesion">
-                  <option value="consulta">{{ t.initialConsultation }}</option>
-                  <option value="sesiones1_5">{{ t.sessions1to5 }}</option>
-                  <option value="sesiones6">{{ t.sessions6plus }}</option>
-                </select>
-              </td>
-            </tr>
-            <tr :class="{ 'table-primary': usuarioFinalStore.hasTda }">
-              <td>TDA</td>
-              <td class="text-end">{{ precioFisioTDA }} €</td>
-            </tr>
-            <tr :class="{ 'table-primary': usuarioFinalStore.isUAM }">
-              <td>UAM</td>
-              <td class="text-end">{{ precioFisioUAM }} €</td>
-            </tr>
-            <tr :class="{ 'table-primary': !usuarioFinalStore.isUAM && !usuarioFinalStore.hasTda }">
-              <td>{{ t.others }}</td>
-              <td class="text-end">{{ precioFisioOtros }} €</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <!-- Descuentos -->
-        <div v-if="reserva.descuento.aplicados.length" class="alert alert-success py-2 rounded-3">
-          <div class="fw-bold mb-1">{{ t.discount }}: {{ reserva.descuento.porcentaje_total }}%</div>
-          <ul class="mb-0 ps-3">
-            <li v-for="descuento in reserva.descuento.aplicados" :key="descuento.id">
-              {{ descuento.nombre }} ({{ descuento.porcentaje }}%)
-            </li>
-          </ul>
-        </div>
-
-        <!-- Total -->
-        <div class="border-top pt-3 mt-3">
-          <div class="d-flex justify-content-between">
-            <span class="text-muted">{{ t.basePrice }}</span>
-            <span>{{ precioBase }} €</span>
+          <div v-if="reserva.tarifa.horario.length">
+            <div
+              v-for="(h,index) in reserva.tarifa.horario"
+              :key="index"
+              class="d-flex justify-content-between border-bottom py-2">
+              <span>{{ h.dia }}</span>
+              <span class="text-primary">{{ h.horaInicio }} - {{ h.horaFin }}</span>
+            </div>
           </div>
 
-          <div class="d-flex justify-content-between mt-2">
-            <span class="fw-bold">{{ t.finalPrice }}</span>
-            <span class="fw-bold text-success">{{ total }} €</span>
+          <p v-else class="text-muted mb-0">
+            {{ t.noSession }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Tarifas -->
+      <div class="card shadow-sm rounded-4"
+        style="backdrop-filter: blur(6px); background: rgba(255,255,255,0.85);">
+        <div class="card-body">
+
+          <h5 class="fw-bold mb-3">{{ t.tariff }}</h5>
+
+          <!-- OTROS -->
+          <table v-if="reserva.tarifa.tipo === 'Otros'" class="table table-sm mb-4">
+            <tbody>
+              <tr :class="{ 'table-primary': usuarioFinalStore.isUAM }">
+                <td>UAM</td>
+                <td class="text-end">{{ reserva.tarifa.datos.precioUAM }} € / {{ reserva.tarifa.datos.numeroHorasSemana }} {{ t.weekHours }}</td>
+              </tr>
+              <tr :class="{ 'table-primary': !usuarioFinalStore.isUAM }">
+                <td>{{ t.others }}</td>
+                <td class="text-end">{{ reserva.tarifa.datos.precioOtros }} € / {{ reserva.tarifa.datos.numeroHorasSemana }} {{ t.weekHours }}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- GRUPOS REDUCIDOS -->
+          <div v-else-if="reserva.tarifa.tipo === 'Grupos reducidos'">
+            <div class="mb-3">
+              <label class="form-label">{{ t.people }}</label>
+              <input
+                type="number"
+                class="form-control"
+                v-model.number="reserva.seleccion.personas"
+                :min="1"
+                :max="reserva.tarifa.datos.numeroPersonas"
+              />
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">{{ t.paymentMethod }}</label>
+              <select class="form-select" v-model="reserva.seleccion.modalidad">
+                <option value="Pago mensual">{{ t.monthly }}</option>
+                <option value="Pago cuatrimestral">{{ t.quarterly }}</option>
+                <option value="Pago unico">{{ t.fullPayment }}</option>
+              </select>
+            </div>
+
+            <table class="table table-sm mb-4">
+              <tbody>
+                <tr>
+                  <td>{{ t.monthly }}</td>
+                  <td class="text-end">{{ reserva.tarifa.datos.precioMensual }} € / {{ reserva.tarifa.datos.numeroPersonas }} {{ t.people }} * {{ reserva.tarifa.datos.numeroHoras }} {{ t.weekHours }}</td>
+                </tr>
+                <tr>
+                  <td>{{ t.quarterly }}</td>
+                  <td class="text-end">{{ reserva.tarifa.datos.precioCuatrimestre }} € / {{ reserva.tarifa.datos.numeroPersonas }} {{ t.people }} * {{ reserva.tarifa.datos.numeroHoras }} {{ t.weekHours }}</td>
+                </tr>
+                <tr>
+                  <td>{{ t.fullPayment }}</td>
+                  <td class="text-end">{{ reserva.tarifa.datos.precio }} € / {{ reserva.tarifa.datos.numeroPersonas }} {{ t.people }} * {{ reserva.tarifa.datos.numeroHoras }} {{ t.weekHours }}</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-        </div>
 
-        <div v-if="mostrarMensaje" class="text-center mb-3 mt-3">
-          <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
-            {{ mensaje }}
+          <!-- FISIOTERAPIA -->
+          <div v-else-if="reserva.tarifa.tipo === 'Fisioterapia'">
+            <div class="mb-3">
+              <label class="form-label">{{ t.sessionType }}</label>
+              <select class="form-select" v-model="reserva.seleccion.tipoSesion">
+                <option value="consulta">{{ t.initialConsultation }}</option>
+                <option value="sesiones">{{ t.sessions }}</option>
+              </select>
+            </div>
+
+            <div
+              v-if="reserva.seleccion.tipoSesion === 'sesiones'"
+              class="alert alert-info py-2">
+              {{ t.fisioSessionNotice }} {{ t.heldSessions }}: {{ reserva.tarifa.numeroSesiones }}
+            </div>
+
+            <table class="table table-sm mb-4">
+              <tbody>
+                <tr :class="{ 'table-primary': usuarioFinalStore.hasTda }">
+                  <td>TDA</td>
+                  <td class="text-end">{{ precioFisioTDA }} €</td>
+                </tr>
+                <tr :class="{ 'table-primary': usuarioFinalStore.isUAM }">
+                  <td>UAM</td>
+                  <td class="text-end">{{ precioFisioUAM }} €</td>
+                </tr>
+                <tr :class="{ 'table-primary': !usuarioFinalStore.isUAM && !usuarioFinalStore.hasTda }">
+                  <td>{{ t.others }}</td>
+                  <td class="text-end">{{ precioFisioOtros }} €</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-        </div>
 
-        <!-- Botones -->
-        <div class="d-flex justify-content-end gap-2 mt-4">
-          <button class="btn btn-outline-secondary" @click="cancelar">{{ t.cancel }}</button>
-          <button class="btn btn-primary" @click="continuarPago">{{ t.payContinue }}</button>
-        </div>
+          <!-- Descuentos -->
+          <div v-if="reserva.descuento.aplicados.length" class="alert alert-success py-2">
+            <div class="fw-bold mb-1">
+              {{ t.discount }}: {{ reserva.descuento.porcentaje_total }}%
+            </div>
+            <ul class="mb-0 ps-3">
+              <li v-for="descuento in reserva.descuento.aplicados" :key="descuento.id">
+                {{ descuento.nombre }} ({{ descuento.porcentaje }}%)
+              </li>
+            </ul>
+          </div>
 
+          <!-- Total -->
+          <div class="border-top pt-3 mt-3">
+            <div class="d-flex justify-content-between">
+              <span class="text-muted">{{ t.basePrice }}</span>
+              <span>{{ precioBase.toFixed(2) }} €</span>
+            </div>
+
+            <div class="d-flex justify-content-between mt-2">
+              <span class="fw-bold">{{ t.finalPrice }}</span>
+              <span class="fw-bold text-success">{{ total.toFixed(2) }} €</span>
+            </div>
+          </div>
+
+          <!-- Mensajes -->
+          <div v-if="mostrarMensaje" class="text-center mb-3 mt-3">
+            <div class="alert"
+              :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">
+              {{ mensaje }}
+            </div>
+          </div>
+
+          <!-- Acciones -->
+          <div class="d-flex justify-content-end mt-4 gap-2">
+            <button class="btn btn-outline-secondary" @click="cancelar">
+              {{ t.cancel }}
+            </button>
+            <button class="btn btn-primary" @click="continuarPago">
+              {{ t.payContinue }}
+            </button>
+          </div>
+
+        </div>
       </div>
     </div>
   </div>
@@ -192,6 +211,7 @@ const reserva = ref({
     idActividad: 0,
     nombre: '',
     numeroHoras: 0,
+    numeroSesiones: 0,
     horario: [] as {
       dia: '',
       horaInicio: '',
@@ -271,27 +291,16 @@ function obtenerPrecioFisioterapia(precios: any, sel: any) {
     } else if (usuarioFinalStore.isUAM) {
       precio = precios.precioConsultaUAM;
     }
-  } else if (sel.tipoSesion == "sesiones1_5") {
-    precioFisioUAM.value = precios.precioSesiones1_5UAM;
-    precioFisioTDA.value = precios.precioSesiones1_5TDA;
-    precioFisioOtros.value = precios.precioSesiones1_5Otros;
+  } else if (sel.tipoSesion == "sesiones") {
+    precioFisioUAM.value = precios.precioSesionesUAM;
+    precioFisioTDA.value = precios.precioSesionesTDA;
+    precioFisioOtros.value = precios.precioSesionesOtros;
 
-    precio = precios.precioSesiones1_5Otros;
+    precio = precios.precioSesionesOtros;
     if (usuarioFinalStore.hasTda) {
-      precio = precios.precioSesiones1_5TDA;
+      precio = precios.precioSesionesTDA;
     } else if (usuarioFinalStore.isUAM) {
-      precio = precios.precioSesiones1_5UAM;
-    }
-  } else if (sel.tipoSesion == "sesiones6") {
-    precioFisioUAM.value = precios.precioSesiones6UAM;
-    precioFisioTDA.value = precios.precioSesiones6TDA;
-    precioFisioOtros.value = precios.precioSesiones6Otros;
-
-    precio = precios.precioSesiones6Otros;
-    if (usuarioFinalStore.hasTda) {
-      precio = precios.precioSesiones6TDA;
-    } else if (usuarioFinalStore.isUAM) {
-      precio = precios.precioSesiones6UAM;
+      precio = precios.precioSesionesUAM;
     }
   }
 
@@ -304,7 +313,6 @@ const precioBase = computed(() => {
   const sel = reserva.value.seleccion;
 
   if (tipo === 'Otros') {
-
     return obtenerPrecioComun(datos);
   }
 

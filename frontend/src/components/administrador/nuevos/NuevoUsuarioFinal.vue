@@ -302,7 +302,11 @@ function validarDNI(dni: string): boolean {
 
 const nuevoUsuario = async () => {
   if (!validarFormulario()) {
-    lanzarMensaje(t.value.missing, "error")
+    if (errores.value.DNI) {
+      lanzarMensaje(t.value.DNIError, "error")
+    } else {
+      lanzarMensaje(t.value.missing, "error")
+    }
     return
   }
 

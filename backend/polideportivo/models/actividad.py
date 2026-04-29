@@ -71,7 +71,7 @@ class Actividad(models.Model):
         return True
 
     # Función para obtener los precios de la tarifa aplicada a la actividad dependiendo de su tipo
-    def obtenerPrecios(self):
+    def obtenerPrecios(self, numeroSesiones):
         if self.tipoActividad == TipoActividad.OTROS:
             return {
                 "precioUAM": self.tarifa.actividadcomun.precioUAM,
@@ -87,22 +87,27 @@ class Actividad(models.Model):
                 "precioMensual": self.tarifa.gruporeducido.precioMensual
             }
         elif self.tipoActividad == TipoActividad.FISIOTERAPIA:
+            precioConsultaSesionesTDA = self.tarifa.fisioterapia.precioSesiones1_5TDA
+            precioConsultaSesionesUAM = self.tarifa.fisioterapia.precioSesiones1_5UAM
+            precioConsultaSesionesOtros = self.tarifa.fisioterapia.precioSesiones1_5Otros
+            if numeroSesiones > 5:
+                precioConsultaSesionesTDA = self.tarifa.fisioterapia.precioSesiones6TDA
+                precioConsultaSesionesUAM = self.tarifa.fisioterapia.precioSesiones6UAM
+                precioConsultaSesionesOtros = self.tarifa.fisioterapia.precioSesiones6Otros
+
             return {
                 "precioConsultaTDA": self.tarifa.fisioterapia.precioConsultaTDA,
                 "precioConsultaUAM": self.tarifa.fisioterapia.precioConsultaUAM,
                 "precioConsultaOtros": self.tarifa.fisioterapia.precioConsultaOtros,
-                "precioSesiones1_5TDA": self.tarifa.fisioterapia.precioSesiones1_5TDA,
-                "precioSesiones1_5UAM": self.tarifa.fisioterapia.precioSesiones1_5UAM,
-                "precioSesiones1_5Otros": self.tarifa.fisioterapia.precioSesiones1_5Otros,
-                "precioSesiones6TDA": self.tarifa.fisioterapia.precioSesiones6TDA,
-                "precioSesiones6UAM": self.tarifa.fisioterapia.precioSesiones6UAM,
-                "precioSesiones6Otros": self.tarifa.fisioterapia.precioSesiones6Otros
+                "precioSesionesTDA": precioConsultaSesionesTDA,
+                "precioSesionesUAM": precioConsultaSesionesUAM,
+                "precioSesionesOtros": precioConsultaSesionesOtros
             }
 
         raise Http404("Tipo de actividad no válido")
 
     # Función de ayuda para calcular el precio base de la actividad basandose en la tarifa y el tipo de actividad
-    def _calcular_precio_base(self, usuario, numeroHorasSemana=0, numeroPersonas=0, tipoPago='', tipoSesion=''):
+    def _calcular_precio_base(self, usuario, numeroHorasSemana=0, numeroPersonas=0, tipoPago='', tipoSesion='', numeroSesiones=0):
         """Devuelve el precio base según tipo de actividad y parámetros"""
         if self.tipoActividad == TipoActividad.OTROS:
             if self.tarifa.actividadcomun.numeroHorasSemana == 0:
@@ -132,23 +137,23 @@ class Actividad(models.Model):
             if usuario.tieneTDA:
                 if tipoSesion.lower() == "consulta":
                     precio = self.tarifa.fisioterapia.precioConsultaTDA
-                elif tipoSesion.lower() == "sesiones1_5":
+                elif numeroSesiones <= 5: 
                     precio = self.tarifa.fisioterapia.precioSesiones1_5TDA
-                elif tipoSesion.lower() == "sesiones6":
+                else:
                     precio = self.tarifa.fisioterapia.precioSesiones6TDA
 
             elif usuario.esUAM:
                 if tipoSesion.lower() == "consulta":
                     precio = self.tarifa.fisioterapia.precioConsultaUAM
-                elif tipoSesion.lower() == "sesiones1_5":
+                elif numeroSesiones <= 5: 
                     precio = self.tarifa.fisioterapia.precioSesiones1_5UAM
-                elif tipoSesion.lower() == "sesiones6":
+                else:
                     precio = self.tarifa.fisioterapia.precioSesiones6UAM
 
             else:
-                if tipoSesion.lower() == "sesiones1_5":
+                if numeroSesiones <= 5:
                     precio = self.tarifa.fisioterapia.precioSesiones1_5Otros
-                elif tipoSesion.lower() == "sesiones6":
+                else:
                     precio = self.tarifa.fisioterapia.precioSesiones6Otros
 
             return precio

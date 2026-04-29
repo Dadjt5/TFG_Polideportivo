@@ -61,8 +61,7 @@
                   <option value="" disabled>--</option>
                   <option v-for="t in tiposStore.tiposInstalacion" :key="t" :value="t">{{ t }}</option>
                 </select>
-                <div v-else class="form-control form-control-lg bg-light text-muted">{{ instalacion.tipoInstalacion ||
-                  '---' }}</div>
+                <div v-else class="form-control form-control-lg bg-light text-muted">{{ instalacion.tipoInstalacion || '---' }}</div>
               </div>
 
               <div class="col-md-4" v-if="instalacion.tipoInstalacion === 'Piscina'">
@@ -84,7 +83,8 @@
                 <label class="form-label fw-semibold">TDA (%)</label>
                 <input v-if="editando" type="number" min="0" max="100" step="0.1" class="form-control form-control-lg"
                   v-model.number="instalacion.porcentajeTDA" :class="{ 'is-invalid': errores.porcentajeTDA }" />
-                <div v-else class="form-control form-control-lg bg-light text-muted">{{ instalacion.porcentajeTDA }}%
+                <div v-else class="form-control form-control-lg bg-light text-muted">
+                  {{ instalacion.porcentajeTDA }}%
                 </div>
               </div>
 
@@ -165,7 +165,7 @@
                       <label class="form-label fw-semibold">{{ t.poolStreet }}</label>
                       <select class="form-select form-select-lg" v-model="calleSeleccionada">
                         <option v-for="c in instalacion.calles" :key="c.id" :value="c.id">
-                          {{ t.street }} {{ c.numero || c.id }}
+                          {{ t.street }} {{ c.numero }}
                         </option>
                       </select>
                     </div>
@@ -226,7 +226,7 @@
 
                   <div v-else class="text-center w-100 py-4">
                     <span class="badge bg-danger fs-6 px-4 py-3">
-                      {{ t.close || 'Instalación cerrada' }}
+                      {{ t.close }}
                     </span>
                   </div>
                 </div>
@@ -513,7 +513,7 @@ const reservasActuales = computed(() => {
   }
 
   const calle = reserva.value.fecha.calles?.find(
-    (c: any) => c.numero === calleSeleccionada.value
+    (c: any) => c.id === calleSeleccionada.value
   )
 
   return calle ? calle.slots : []
@@ -782,7 +782,11 @@ watch(
   }
 )
 
-watch(() => periodo, () => {
+watch(() => periodo.value, () => {
+  openDias.value = []
+})
+
+watch(calleSeleccionada, () => {
   openDias.value = []
 })
 

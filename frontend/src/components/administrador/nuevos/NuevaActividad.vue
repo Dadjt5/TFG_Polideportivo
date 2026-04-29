@@ -197,13 +197,16 @@
             <label class="form-label fw-semibold">{{ t.poolStreets }}</label>
             <select class="form-select form-select-lg" v-model="calleSeleccionada">
               <option v-for="c in callesDisponibles" :key="c.id" :value="c.id">
-                {{ t.street }} {{ c.numero || c.id }}
+                {{ t.street }} {{ c.numero }}
               </option>
             </select>
           </div>
 
           <div class="col-md-4 mb-3 fw-bold" v-if="instalacionDetalle">
-            {{ t.totalCapacity }}: {{ instalacionDetalle?.aforoMaximo }}
+            {{ t.totalCapacity }}: {{ instalacionDetalle?.aforoMaximo }}.
+            <span v-if="instalacionDetalle?.tipoInstalacion === 'Piscina'" class="fw-semibold">
+              {{ t.streetCapacity }}: {{ instalacionDetalle.aforoMaximo/instalacionDetalle.numeroCalles }}
+            </span>            
           </div>
 
           <!-- HORARIO -->
@@ -364,23 +367,10 @@
                       <p class="mb-1">{{ t.sessions6plus }}: {{ tarifaSeleccionada.precioSesiones6Otros }} €</p>
                     </div>
                   </div>
-
-                  <!-- Información general -->
-                  <div class="col-6">
-                    <div class="p-3 bg-light rounded-3 shadow-sm">
-                      <strong>{{ t.weekHours }}:</strong> {{ tarifaSeleccionada.numeroHoras }}
-                    </div>
-                  </div>
-                  <div class="col-6">
-                    <div class="p-3 bg-light rounded-3 shadow-sm">
-                      <strong>{{ t.people }}:</strong> {{ tarifaSeleccionada.numeroPersonas }}
-                    </div>
-                  </div>
                 </div>
               </div>
             </transition>
           </div>
-
         </div>
 
         <!-- TAB 4 SESIONES -->
@@ -391,7 +381,7 @@
               <select class="form-select form-select-lg" v-model="crearSesion.calle">
                 <option value="">--</option>
                 <option v-for="c in callesDisponibles" :key="c.id" :value="c.id">
-                  {{ t.street }} {{ c.numero || c.id }}
+                  {{ t.street }} {{ c.numero }}
                 </option>
               </select>
             </div>
@@ -431,7 +421,7 @@
 
               <span>
                 {{ s.dia }} | {{ s.horaInicio }} - {{ s.horaFin }} <span
-                  v-if="instalacionDetalle.tipoInstalacion === 'Piscina'">{{ t.street }} {{ s.calle }}</span>
+                  v-if="instalacionDetalle.tipoInstalacion === 'Piscina'">{{ t.street }} {{ obtenerNumeroCalle(s.calle) }}</span>
               </span>
 
               <button type="button" class="btn btn-sm btn-danger" @click="sesiones.splice(index, 1)">
@@ -721,6 +711,10 @@ function validarFormulario() {
 }
 
 const openDias = ref([])
+
+function obtenerNumeroCalle(id: number | null) {
+  return callesDisponibles.value.find(c => c.id === id)?.numero ?? "-"
+}
 
 const toggleDia = (id: any) => {
   if (openDias.value.includes(id)) {

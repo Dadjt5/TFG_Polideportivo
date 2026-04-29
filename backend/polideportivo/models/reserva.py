@@ -3,6 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from django.db import transaction
 from datetime import time
+from django.db.models import Q
 
 from .constantes import EstadoReserva
 from .descuento import Descuento
@@ -35,7 +36,7 @@ class Reserva(models.Model):
 class ReservaActividad(Reserva):
     """Modelo para representar una reserva en una actividad"""
 
-    numeroHorasSemana = models.IntegerField(default=0)
+    numeroHorasSemana = models.IntegerField(default=1)
     numeroPersonas = models.IntegerField(default=1)
     tipoPago = models.CharField(default="total")
     tipoSesion = models.CharField(default="consulta")
@@ -47,14 +48,15 @@ class ReservaActividad(Reserva):
         return f'Reserva de {self.actividad}'
 
     # Función para calcular el precio de la actividad
-    def calcularPrecio(self):
+    def calcularPrecio(self, numeroSesiones):
         """Calcula el precio final de la reserva usando la actividad"""
         return self.actividad._calcular_precio_base(
             usuario=self.usuarioFinal,
             numeroHorasSemana=self.numeroHorasSemana,
             numeroPersonas=self.numeroPersonas,
             tipoPago=self.tipoPago,
-            tipoSesion=self.tipoSesion
+            tipoSesion=self.tipoSesion,
+            numeroSesiones=numeroSesiones
         )
     
     # Función para confirmar la reserva de la actividad
@@ -104,7 +106,7 @@ class ReservaActividad(Reserva):
 
     # Función para crear una nueva reserva de una actividad    
     @classmethod
-    def nuevaReserva(cls, usuario, actividad, lista=False):
+    def nuevaReserva(cls, usuario, actividad, complementos, lista=False):
         if actividad.tipoReserva == FormaReserva.PRESENCIAL or actividad.tipoReserva == FormaReserva.NINGUNA:
             return None
 
@@ -127,6 +129,10 @@ class ReservaActividad(Reserva):
 
             reserva = cls.objects.create(
                 usuarioFinal=usuario,
+                numeroHorasSemana=actividad.calcularHorasSemanales(),
+                numeroPersonas=complementos["personas"],
+                tipoSesion=complementos["tipoSesion"],
+                tipoPago=complementos["forma"],
                 actividad=actividad,
                 estado=EstadoReserva.PENDIENTE
             )
@@ -153,14 +159,6 @@ class Alquiler(Reserva):
     usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.CASCADE, related_name="alquileres")
     instalacion = models.ForeignKey('Instalacion', on_delete=models.CASCADE, related_name="reservas")
     calle = models.ForeignKey('Calle', on_delete=models.SET_NULL, null=True, blank=True)
-    
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=["instalacion", "fecha", "horaInicio", "calle"],
-                name="unique_reserva_instalacion_calle"
-            )
-        ]
 
     def __str__(self):
         return f'Alquiler de {self.instalacion}, en {self.fecha} de {self.horaInicio} a {self.horaFin}'

@@ -85,6 +85,8 @@
 
             <!-- ALQUILER -->
             <template v-if="reserva.tipo === 'ALQUILER'">
+              <p v-if="reserva.calle" class="mb-1"><i class="bi bi-water me-1 text-primary"></i>{{ t.poolStreet }}: {{ reserva.calle }}
+              </p>
               <p class="mb-1"><i class="bi bi-calendar-event me-1 text-primary"></i>{{ t.date }}: {{ reserva.fecha }}
               </p>
               <p class="mb-1"><i class="bi bi-clock me-1 text-success"></i>{{ t.hours }}: {{ reserva.horaInicio }} -
@@ -278,6 +280,7 @@ type Reserva = {
   }
 
   fecha?: string
+  calle?: number
   horaInicio?: string | number
   horaFin?: string | number
   coste?: number

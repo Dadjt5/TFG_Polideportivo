@@ -23,7 +23,9 @@ class Configuracion(models.Model):
     titulo_avisos_sobre_actividades_usuarios = models.CharField(max_length=1024, blank=True)
     titulo_avisos_sobre_actividades_monitores = models.CharField(max_length=1024, blank=True)
     titulo_aviso_devolucion_dinero_alquiler = models.CharField(max_length=1024, blank=True)
-
+    titulo_actividad_eliminada = models.CharField(max_length=1024, blank=True)
+    titulo_instalacion_eliminada = models.CharField(max_length=1024, blank=True)
+    
     texto_cambios_cancelaciones = models.CharField(max_length=1024, blank=True)
     texto_avisos_actividades = models.CharField(max_length=1024, blank=True)
     texto_problemas_pago = models.CharField(max_length=1024, blank=True)
@@ -34,6 +36,8 @@ class Configuracion(models.Model):
     texto_avisos_sobre_actividades_usuarios = models.CharField(max_length=1024, blank=True)
     texto_avisos_sobre_actividades_monitores = models.CharField(max_length=1024, blank=True)
     texto_aviso_devolucion_dinero_alquiler = models.CharField(max_length=1024, blank=True)
+    texto_actividad_eliminada = models.CharField(max_length=1024, blank=True)
+    texto_instalacion_eliminada = models.CharField(max_length=1024, blank=True)
 
     # Función para sobreescribir el guardado y evitar crear mas de un objeto configuracion
     def save(self, *args, **kwargs):

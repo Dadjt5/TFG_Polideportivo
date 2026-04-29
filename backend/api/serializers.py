@@ -455,6 +455,8 @@ class InstalacionSerializer(serializers.ModelSerializer):
 # --------------------
 
 class SesionSerializer(serializers.ModelSerializer):
+    numeroCalle = serializers.SerializerMethodField()
+
     class Meta:
         model = Sesion
         fields = (
@@ -462,8 +464,12 @@ class SesionSerializer(serializers.ModelSerializer):
             "dia",
             "horaInicio",
             "horaFin",
-            "calle"
+            "calle",
+            "numeroCalle"
         )
+    
+    def get_numeroCalle(self, obj):
+        return obj.calle.numero
 
 
 class ActividadSimpleSerializer(serializers.ModelSerializer):
@@ -980,6 +986,8 @@ class AlquilerSerializer(serializers.ModelSerializer):
 
 class AlquilerSimpleSerializer(serializers.ModelSerializer):
     nombre = serializers.SerializerMethodField()
+    numeroCalle = serializers.SerializerMethodField()
+
     pago = PagoSerializer(read_only=True)
 
     class Meta:
@@ -992,9 +1000,13 @@ class AlquilerSimpleSerializer(serializers.ModelSerializer):
             "numeroHoras",
             "pago",
             "nombre",
-            "estado"
+            "estado",
+            "calle",
+            "numeroCalle"
         )
 
     def get_nombre(self, obj):
         return obj.instalacion.nombre
 
+    def get_numeroCalle(self, obj):
+        return obj.calle.numero

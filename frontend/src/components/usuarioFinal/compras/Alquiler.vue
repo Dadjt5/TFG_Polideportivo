@@ -46,7 +46,7 @@
           <label class="form-label">{{ t.poolStreet }}</label>
 
           <select class="form-select" v-model="reserva.seleccion.calle">
-            <option v-for="calle in reserva.tarifa.calles" :key="calle.numero" :value="calle.numero">
+            <option v-for="calle in reserva.tarifa.calles" :key="calle.id" :value="calle.id">
               {{ t.poolStreet }} {{ calle.numero }}
             </option>
           </select>
@@ -183,6 +183,7 @@ type ReservaMapa = {
 };
 
 type CalleMapa = {
+  id: number;
   numero: number;
   reservas: ReservaMapa[];
 };
@@ -209,13 +210,14 @@ const reserva = ref({
       horaFin: string,
       horaInicio: string,
       nombre: string,
-      numeroHoras: number
+      numeroHoras: number,
+      calle: number
     }[],
     calles: [] as CalleMapa[]
   },
   seleccion: {
     fecha: new Date().toISOString().slice(0, 10),
-    calle: 1,
+    calle: null as number | null,
     luz: false
   },
   descuento: {
@@ -268,7 +270,7 @@ const reservasActuales = computed(() => {
     return reserva.value.tarifa.reservas
 
   const calle = reserva.value.tarifa.calles.find(
-    c => c.numero === reserva.value.seleccion.calle
+    c => c.id === reserva.value.seleccion.calle
   )
 
   return calle ? calle.reservas : []
@@ -322,6 +324,9 @@ const esAlquilerUsuario = (hora: any) => {
   const fechaSeleccionada = reserva.value.seleccion.fecha
   return reserva.value.tarifa.alquileres.some(a => {
     if (a.fecha !== fechaSeleccionada) return false
+    if (reserva.value.tarifa.numeroCalles != 0) {
+      if (hora.calle != a.calle) return false
+    }
     return hora.horaInicio >= a.horaInicio && hora.horaInicio < a.horaFin
   })
 }
@@ -356,7 +361,7 @@ const toggleHora = (intervalo: any) => {
     return
   }
 
-  const horas = reserva.value.tarifa.reservas.map(r => r.horaInicio)
+  const horas = reservasActuales.value.map(r => r.horaInicio)
   const indexActual = horas.indexOf(key)
   const indexSeleccionada = horas.indexOf(horasSeleccionadas.value[0])
 
@@ -443,8 +448,13 @@ watch(
     try {
       const id = parseInt(props.id);
       const data = await getTarifaDescuentoInstalacion(id, reserva.value.seleccion.fecha)
+      console.log(data)
       reserva.value.tarifa = data.tarifa
       reserva.value.descuento = data.descuento
+      if (data.tarifa.calles?.length) {
+        reserva.value.seleccion.calle = data.tarifa.calles[0].id
+      }
+
     } catch (e: any) {
       lanzarMensaje(t.value.unexpectedError, "error")
       console.error("Error al actualizar la fecha:", e);
@@ -481,9 +491,13 @@ onMounted(async () => {
   const id = parseInt(props.id);
   try {
     const data = await getTarifaDescuentoInstalacion(id, reserva.value.seleccion.fecha)
+
     configuracionStore.obtenerConfiguracion()
     reserva.value.tarifa = data.tarifa
     reserva.value.descuento = data.descuento
+    if (data.tarifa.calles?.length) {
+      reserva.value.seleccion.calle = data.tarifa.calles[0].id
+    }
   } catch (e: any) {
     error.value = true
     console.error("Error al actualizar la fecha:", e);

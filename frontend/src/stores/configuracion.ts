@@ -22,6 +22,8 @@ export const useConfiguracionStore = defineStore("configuracion", {
 		titulo_avisos_sobre_actividades_usuarios: '',
 		titulo_avisos_sobre_actividades_monitores: '',
 		titulo_aviso_devolucion_dinero_alquiler: '',
+		titulo_actividad_eliminada: '',
+		titulo_instalacion_eliminada: '',
 
 		texto_cambios_cancelaciones: '',
 		texto_avisos_actividades: '',
@@ -33,6 +35,8 @@ export const useConfiguracionStore = defineStore("configuracion", {
 		texto_avisos_sobre_actividades_usuarios: '',
 		texto_avisos_sobre_actividades_monitores: '',
 		texto_aviso_devolucion_dinero_alquiler: '',
+		texto_actividad_eliminada: '',
+		texto_instalacion_eliminada: '',
 
 		modificado: false
 	}),
@@ -60,6 +64,9 @@ export const useConfiguracionStore = defineStore("configuracion", {
 				this.titulo_avisos_sobre_actividades_usuarios = data.titulo_avisos_sobre_actividades_usuarios;
 				this.titulo_avisos_sobre_actividades_monitores = data.titulo_avisos_sobre_actividades_monitores;
 				this.titulo_aviso_devolucion_dinero_alquiler = data.titulo_aviso_devolucion_dinero_alquiler;
+				this.titulo_actividad_eliminada = data.titulo_actividad_eliminada;
+				this.titulo_instalacion_eliminada = data.titulo_instalacion_eliminada;
+
 
 				this.texto_cambios_cancelaciones = data.texto_cambios_cancelaciones;
 				this.texto_avisos_actividades = data.texto_avisos_actividades;
@@ -71,6 +78,8 @@ export const useConfiguracionStore = defineStore("configuracion", {
 				this.texto_avisos_sobre_actividades_usuarios = data.texto_avisos_sobre_actividades_usuarios;
 				this.texto_avisos_sobre_actividades_monitores = data.texto_avisos_sobre_actividades_monitores;
 				this.texto_aviso_devolucion_dinero_alquiler = data.texto_aviso_devolucion_dinero_alquiler;
+				this.texto_actividad_eliminada = data.texto_actividad_eliminada;
+				this.texto_instalacion_eliminada = data.texto_instalacion_eliminada;
 
 				this.guardarEnLocalStorage();
 
@@ -100,6 +109,8 @@ export const useConfiguracionStore = defineStore("configuracion", {
 					titulo_avisos_sobre_actividades_usuarios: this.titulo_avisos_sobre_actividades_usuarios,
 					titulo_avisos_sobre_actividades_monitores: this.titulo_avisos_sobre_actividades_monitores,
 					titulo_aviso_devolucion_dinero_alquiler: this.titulo_aviso_devolucion_dinero_alquiler,
+					titulo_actividad_eliminada: this.titulo_actividad_eliminada,
+					titulo_instalacion_eliminada: this.titulo_instalacion_eliminada,
 
 					texto_cambios_cancelaciones: this.texto_cambios_cancelaciones,
 					texto_avisos_actividades: this.texto_avisos_actividades,
@@ -111,6 +122,8 @@ export const useConfiguracionStore = defineStore("configuracion", {
 					texto_avisos_sobre_actividades_usuarios: this.texto_avisos_sobre_actividades_usuarios,
 					texto_avisos_sobre_actividades_monitores: this.texto_avisos_sobre_actividades_monitores,
 					texto_aviso_devolucion_dinero_alquiler: this.texto_aviso_devolucion_dinero_alquiler,
+					texto_actividad_eliminada: this.texto_actividad_eliminada,
+					texto_instalacion_eliminada: this.texto_instalacion_eliminada,
 				};
 
 				const data = await editarConfiguracion(payload);
@@ -146,6 +159,8 @@ export const useConfiguracionStore = defineStore("configuracion", {
 				titulo_avisos_sobre_actividades_usuarios: this.titulo_avisos_sobre_actividades_usuarios,
 				titulo_avisos_sobre_actividades_monitores: this.titulo_avisos_sobre_actividades_monitores,
 				titulo_aviso_devolucion_dinero_alquiler: this.titulo_aviso_devolucion_dinero_alquiler,
+				titulo_actividad_eliminada: this.titulo_actividad_eliminada,
+				titulo_instalacion_eliminada: this.titulo_instalacion_eliminada,
 
 				texto_cambios_cancelaciones: this.texto_cambios_cancelaciones,
 				texto_avisos_actividades: this.texto_avisos_actividades,
@@ -157,6 +172,8 @@ export const useConfiguracionStore = defineStore("configuracion", {
 				texto_avisos_sobre_actividades_usuarios: this.texto_avisos_sobre_actividades_usuarios,
 				texto_avisos_sobre_actividades_monitores: this.texto_avisos_sobre_actividades_monitores,
 				texto_aviso_devolucion_dinero_alquiler: this.texto_aviso_devolucion_dinero_alquiler,
+				texto_actividad_eliminada: this.texto_actividad_eliminada,
+				texto_instalacion_eliminada: this.texto_instalacion_eliminada,
 			}));
 		}
 	}
