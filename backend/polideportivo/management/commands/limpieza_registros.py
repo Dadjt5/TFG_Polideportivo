@@ -1,47 +1,60 @@
 from django.core.management.base import BaseCommand
 from datetime import date
 from django.db.models import Q
-from miapp.models import Alquiler, ReservaActividad, CompraBono, CompraAbono, TDA, Pago, EstadoReserva, EstadoPago
+
+from miapp.models import (
+    Alquiler, ReservaActividad, CompraBono,
+    CompraAbono, TDA, Pago, EstadoReserva, EstadoPago
+)
 
 class Command(BaseCommand):
-    help = "Elimina registros caducados o cancelados automáticamente"
+    help = "Marca como cancelados los registros caducados del sistema"
 
     def handle(self, *args, **kwargs):
         hoy = date.today()
 
-        # Alquileres caducados o cancelados
-        alquileres_qs = Alquiler.objects.filter(Q(fecha__lt=hoy) | Q(estado=EstadoReserva.CANCELADO))
-        alquileres_eliminados = alquileres_qs.count()
-        alquileres_qs.delete()
+        # ALQUILERES caducados
+        alquileres = Alquiler.objects.filter(fecha__lt=hoy, estado=EstadoReserva.CONFIRMADO)
+        alquileres.update(estado=EstadoReserva.CANCELADO)
 
-        # Actividades canceladas
-        actividades_qs = ReservaActividad.objects.filter(estado=EstadoReserva.CANCELADO)
-        actividades_eliminadas = actividades_qs.count()
-        actividades_qs.delete()
+        # ACTIVIDADES caducadas (por fecha de actividad si tienes)
+        actividades = ReservaActividad.objects.filter(
+            fecha__lt=hoy,
+            estado=EstadoReserva.CONFIRMADO
+        )
+        actividades.update(estado=EstadoReserva.CANCELADO)
 
-        # Bonos caducados o cancelados
-        bonos_qs = CompraBono.objects.filter(Q(fechaExpiracion__lt=hoy) | Q(estado=EstadoReserva.CANCELADO))
-        bonos_eliminados = bonos_qs.count()
-        bonos_qs.delete()
+        # BONOS caducados
+        bonos = CompraBono.objects.filter(
+            fechaExpiracion__lt=hoy,
+            estado=EstadoReserva.CONFIRMADO
+        )
+        bonos.update(estado=EstadoReserva.CANCELADO)
 
-        # Abonos caducados o cancelados
-        abonos_qs = CompraAbono.objects.filter(Q(fechaExpiracion__lt=hoy) | Q(estado=EstadoReserva.CANCELADO))
-        abonos_eliminados = abonos_qs.count()
-        abonos_qs.delete()
+        # ABONOS caducados
+        abonos = CompraAbono.objects.filter(
+            fechaExpiracion__lt=hoy,
+            estado=EstadoReserva.CONFIRMADO
+        )
+        abonos.update(estado=EstadoReserva.CANCELADO)
 
-        # TDA caducados o cancelados
-        tdas_qs = TDA.objects.filter(Q(fechaExpiracion__lt=hoy) | Q(estado=EstadoReserva.CANCELADO))
-        tdas_eliminadas = tdas_qs.count()
-        tdas_qs.delete()
+        # TDA caducados
+        tdas = TDA.objects.filter(
+            fechaExpiracion__lt=hoy,
+            estado=EstadoReserva.CONFIRMADO
+        )
+        tdas.update(estado=EstadoReserva.CANCELADO)
 
-        # Pagos cancelados
-        pagos_qs = Pago.objects.filter(estadoPago=EstadoPago.CANCELADO)
-        pagos_eliminados = pagos_qs.count()
-        pagos_qs.delete()
+        # PAGOS asociados a reservas canceladas
+        pagos = Pago.objects.filter(
+            estadoPago=EstadoPago.PENDIENTE
+        ).filter(
+            Q(content_type__model='alquiler', object_id__in=alquileres.values('id')) |
+            Q(content_type__model='reservactividad', object_id__in=actividades.values('id'))
+        )
+
+        pagos.update(estadoPago=EstadoPago.CANCELADO)
 
         self.stdout.write(self.style.SUCCESS(
-            f"Limpieza completada: {alquileres_eliminados} alquileres, "
-            f"{actividades_eliminadas} actividades, "
-            f"{bonos_eliminados} bonos, {abonos_eliminados} abonos, "
-            f"{tdas_eliminadas} tdas, {pagos_eliminados} pagos eliminados."
+            "Limpieza completada: elementos caducados marcados como CANCELADO correctamente."
         ))
