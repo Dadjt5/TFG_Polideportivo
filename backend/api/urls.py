@@ -124,5 +124,6 @@ urlpatterns = [
     path("password_reset/", views.CodigoNuevaPasswordView.as_view(), name="reset-password"),
     path("instalaciones/<int:instalacion_id>/descargar/horario/", views.DescargarHorarioView.as_view(), name="descargar-horario"),
     path("actividades/<int:actividad_id>/descargar/horario/", views.DescargarHorarioSesionesView.as_view(), name="descargar-horario-sesiones"),
+    path("usuariosFinales/<int:usuario_id>/bonos/", views.BonosUsuarioFinalView.as_view(), name="manejar-bonos-usuarioFinal"),
     path('', include(router.urls)),
 ]

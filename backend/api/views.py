@@ -562,7 +562,7 @@ class FisioterapiaViewSet(viewsets.ModelViewSet):
 # ----------------
 
 class TDAViewSet(viewsets.ModelViewSet):
-    queryset = UsuarioFinal.objects.all()
+    queryset = TDA.objects.all()
     serializer_class = TDASerializer
     permission_classes = [IsAdministradorRaiz | IsAdministradorUsuarios]
     
@@ -583,11 +583,11 @@ class TDAViewSet(viewsets.ModelViewSet):
         usuario_final.save()
     
     def perform_destroy(self, instance):
-        usuario = instance.usuarioFinal
+        usuario_final = instance.usuarioFinal
 
-        if usuario:
-            usuario.tieneTDA = False
-            usuario.save()
+        if usuario_final:
+            usuario_final.tieneTDA = False
+            usuario_final.save()
 
         instance.delete()
 
@@ -2195,6 +2195,36 @@ class PasarListaEsperaView(APIView):
             return Response({"respuesta": "Error, no se ha podido salir de la lista"}, status=status.HTTP_404_NOT_FOUND)
         
         return Response({"respuesta": "Salida correcta de la lista de espera"}, status=status.HTTP_200_OK)
+
+
+class BonosUsuarioFinalView(APIView):
+    permission_classes = [IsAdministradorRaiz | IsAdministradorUsuarios]
+
+    def get(self, request, usuario_id):
+        usuarioFinal = get_object_or_404(UsuarioFinal, id=usuario_id)
+
+        bonos = CompraBono.objects.filter(usuarioFinal=usuarioFinal, estado=EstadoReserva.CONFIRMADA)
+
+        return Response(CompraBonoSerializer(bonos, many=True).data)
+    
+    def post(self, request, usuario_id):
+        usuarioFinal = get_object_or_404(UsuarioFinal, id=usuario_id)
+        id = request.data.get("bono_id")
+        cantidad = int(request.data.get("cantidad"))
+
+        bono = get_object_or_404(CompraBono, id=id, usuarioFinal=usuarioFinal, estado=EstadoReserva.CONFIRMADA)
+        if not bono.activo:
+            bono.estado = EstadoReserva.CANCELADO
+            bono.save()
+
+        bono.vecesUsado += cantidad
+        bono.save()
+
+        if bono.usosRestantes <= 0:
+            bono.estado = EstadoReserva.CANCELADO
+            bono.save()
+
+        return Response({"respuesta": "Operacion exitosa"}, status=status.HTTP_200_OK)
 
 
 class ReservarActividadView(APIView):

@@ -66,3 +66,22 @@ export const responderListaEspera = async (id: number, aceptar: boolean) => {
   const response = await api.post(`api/v1/notificaciones/${id}/responder/`, {"aceptar": aceptar});
   return response.data;
 }
+
+
+/* Función para obtener los bonos del usuario */
+export const obtenerBonosUsuario = async (id_usuario: number): Promise<any> => {
+  const response = await api.get(`api/v1/usuariosFinales/${id_usuario}/bonos/`)
+  return response.data
+}
+
+/* Función para aumentar en uno los usos del bono de un usuario */
+export const sumar1Bono = async (id_usuario: number, bono_id: number): Promise<any> => {
+  const response = await api.post(`api/v1/usuariosFinales/${id_usuario}/bonos/`, { "bono_id": bono_id, "cantidad": 1 })
+  return response.data
+}
+
+/* Función para aumentar en uno los usos del bono de un usuario */
+export const restar1Bono = async (id_usuario: number, bono_id: number): Promise<any> => {
+  const response = await api.post(`api/v1/usuariosFinales/${id_usuario}/bonos/`, { "bono_id": bono_id, "cantidad": -1 })
+  return response.data
+}
