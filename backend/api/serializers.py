@@ -645,6 +645,7 @@ class BonoSerializer(serializers.ModelSerializer):
 
 
 class CompraBonoSerializer(serializers.ModelSerializer):
+    usos = serializers.SerializerMethodField()
     bono = BonoSerializer(read_only=True)
 
     class Meta:
@@ -654,9 +655,13 @@ class CompraBonoSerializer(serializers.ModelSerializer):
             "fecha",
             "fechaExpiracion",
             "vecesUsado",
+            "usos",
             "bono",
             "estado"
         )
+    
+    def get_usos(self, obj):
+        return obj.bono.usos
 
 # --------------------
 # Configuración
