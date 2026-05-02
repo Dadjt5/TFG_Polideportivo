@@ -551,10 +551,28 @@ class FisioterapiaViewSet(viewsets.ModelViewSet):
 # ----------------
 
 class TDAViewSet(viewsets.ModelViewSet):
-    queryset = TDA.objects.all()
     serializer_class = TDASerializer
-    permission_classes = [IsAdministradorRaiz | IsAdministradorUsuarios]
     
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            # El usuario puede ver su TDA
+            permission_classes = [IsAuthenticated]
+        elif self.action in ['destroy', 'update', 'partial_update', 'create']:
+            # Solo administrador puede modificar/borrar/crear
+            permission_classes = [IsAdministradorUsuarios]
+        else:
+            permission_classes = [IsAdministradorUsuarios]
+        
+        return [permission() for permission in permission_classes]
+
+    def get_queryset(self):
+        try:
+            if self.request.user.usuario_final:
+                return TDA.objects.filter(usuarioFinal__user=self.request.user)
+            return TDA.objects.all()
+        except:
+            return TDA.objects.all()
+
     def perform_create(self, serializer):
         usuario_id = self.request.data.get("usuario_id")
         usuario_final = UsuarioFinal.objects.get(id=usuario_id)
@@ -689,6 +707,10 @@ class CodigoNuevaPasswordView(APIView):
     def post(self, request):
         email = request.data.get("email")
         tipo = request.data.get("tipo")
+        import os
+        print("EMAIL USER:", os.environ.get('EMAIL_HOST_USER'))
+        print("EMAIL PASS:", os.environ.get('EMAIL_HOST_PASSWORD'))
+        print("EMAIL PASS length:", len(os.environ.get('EMAIL_HOST_PASSWORD', '')))
 
         # Dos posibilidades, o bien enviamos un codigo nuevo o bien verificamos un codigo
         if tipo == "enviar":

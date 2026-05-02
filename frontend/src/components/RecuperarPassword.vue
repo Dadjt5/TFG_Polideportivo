@@ -99,7 +99,7 @@ const sendCode = async () => {
     lanzarMensaje(t.value.codeSend, 'success')
     step.value = 2
   } catch (e: any) {
-    if(e.response.data.tipo == "email") {
+    if(e?.response?.data?.tipo == "email") {
       lanzarMensaje(t.value.noEmail, 'error')
     } else {
       lanzarMensaje(t.value.errorSendingCode, 'error')

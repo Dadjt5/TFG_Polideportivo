@@ -175,6 +175,7 @@ export const useUserStore = defineStore("user", {
 
       this.usuarioFinal = null;
       this.notificaciones = [];
+      this.tda = null; 
 
       localStorage.removeItem("usuarioFinal");
       localStorage.removeItem("notificaciones");

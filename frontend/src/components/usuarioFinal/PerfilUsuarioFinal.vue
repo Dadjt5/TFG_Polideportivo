@@ -16,7 +16,7 @@
             </div>
 
             <div class="col-md-6 text-center">
-              <QRCodeVue3 :key="qrKey" :value="qrValue" level="H" :size="100" />
+              <QRCodeVue3 :value="qrValue" level="H" :size="100" />
             </div>
           </div>
 
@@ -118,14 +118,11 @@ const router = useRouter();
 const authStore = useAuthStore();
 const usuarioFinalStore = useUserStore();
 
-const qrKey = computed(() => token.value);
-let token = ref("1234")
-
 const qrValue = computed(() =>
   JSON.stringify({
     id: usuarioFinalStore.tda?.id,
     usuario: usuarioFinalStore.usuarioFinal.nombre,
-    token: token.value,
+    token: usuarioFinalStore.tda?.codigo_qr,
   })
 );
 
