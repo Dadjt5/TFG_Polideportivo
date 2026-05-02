@@ -29,6 +29,7 @@ from django.utils import timezone
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
+import threading
 from reportlab.lib.styles import getSampleStyleSheet
 from django.http import HttpResponse
 
@@ -704,6 +705,18 @@ class meAPIView(APIView):
 class CodigoNuevaPasswordView(APIView):
     permission_classes = [AllowAny]
 
+    def enviar_email_async(email, codigo):
+        try:
+            send_mail(
+                "Código de recuperación",
+                f"Tu código de recuperación es: {codigo}",
+                settings.DEFAULT_FROM_EMAIL,
+                [email],
+                fail_silently=False
+            )
+        except Exception as e:
+            print("ERROR SEND MAIL:", type(e).__name__, str(e))
+
     def post(self, request):
         email = request.data.get("email")
         tipo = request.data.get("tipo")
@@ -719,20 +732,8 @@ class CodigoNuevaPasswordView(APIView):
             CodigoResetPassword.objects.filter(email=email).delete()
             CodigoResetPassword.objects.create(email=email, codigo=codigo)
 
-            try:
-                send_mail(
-                    "Código de recuperación",
-                    f"Tu código de recuperación es: {codigo}",
-                    settings.DEFAULT_FROM_EMAIL,
-                    [email],
-                    fail_silently=False
-                )
-
-                return Response({"message": "Código enviado"})
-            except Exception as e:
-                print("ERROR SEND MAIL:", type(e).__name__, str(e))
-                return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+            thread = threading.Thread(target=enviar_email_async, args=(email, codigo))
+            thread.start()
         elif tipo == "verificar":
             codigo = request.data.get("codigo")
 
