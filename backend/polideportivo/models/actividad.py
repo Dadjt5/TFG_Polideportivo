@@ -165,7 +165,7 @@ class Actividad(models.Model):
     def calcularHorasSemanales(self):
         horas = 0.0
         for sesion in self.sesiones.all():
-            horas += sesion.numeroHoras
+            horas += sesion.numeroHoras or 0.0
 
         return math.ceil(horas)
 
