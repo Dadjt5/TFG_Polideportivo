@@ -7,6 +7,8 @@ from rest_framework.permissions import (
     IsAuthenticated,
     AllowAny
 )
+import resend
+import os
 from django.db.models import Case, When, IntegerField
 from rest_framework import status
 import stripe
@@ -704,12 +706,11 @@ class meAPIView(APIView):
 
 class CodigoNuevaPasswordView(APIView):
     permission_classes = [AllowAny]
-
+    
     def post(self, request):
         email = request.data.get("email")
         tipo = request.data.get("tipo")
 
-        # Dos posibilidades, o bien enviamos un codigo nuevo o bien verificamos un codigo
         if tipo == "enviar":
             codigo = str(random.randint(100000, 999999))
             user = User.objects.filter(email=email).first()
@@ -721,13 +722,15 @@ class CodigoNuevaPasswordView(APIView):
             CodigoResetPassword.objects.create(email=email, codigo=codigo)
 
             try:
-                send_mail(
-                    "Código de recuperación",
-                    f"Tu código de recuperación es: {codigo}",
-                    settings.DEFAULT_FROM_EMAIL,
-                    [email],
-                    fail_silently=False
-                )
+                resend.api_key = os.environ.get("RESEND_API_KEY")
+                resend.Emails.send({
+                    "from": "Polideportivo <onboarding@resend.dev>",
+                    "to": email,
+                    "subject": "Código de recuperación",
+                    "text": f"Tu código de recuperación es: {codigo}"
+                })
+
+                print("EMAIL ENVIADO CORRECTAMENTE A:", email)
 
             except Exception as e:
                 print("ERROR SEND MAIL:", type(e).__name__, str(e))
@@ -749,7 +752,7 @@ class CodigoNuevaPasswordView(APIView):
 
             except CodigoResetPassword.DoesNotExist:
                 return Response({"respuesta": "Código inválido"}, status=status.HTTP_400_BAD_REQUEST)
-        
+
         return Response({"respuesta": "Error, decisión inválida"}, status=status.HTTP_400_BAD_REQUEST)
 
 
