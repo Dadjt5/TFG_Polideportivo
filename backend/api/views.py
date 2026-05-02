@@ -732,7 +732,7 @@ class CodigoNuevaPasswordView(APIView):
             CodigoResetPassword.objects.filter(email=email).delete()
             CodigoResetPassword.objects.create(email=email, codigo=codigo)
 
-            thread = threading.Thread(target=enviar_email_async, args=(email, codigo))
+            thread = threading.Thread(target=self.enviar_email_async, args=(email, codigo))
             thread.start()
         elif tipo == "verificar":
             codigo = request.data.get("codigo")
