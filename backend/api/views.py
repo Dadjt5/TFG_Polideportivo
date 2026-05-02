@@ -705,7 +705,7 @@ class meAPIView(APIView):
 class CodigoNuevaPasswordView(APIView):
     permission_classes = [AllowAny]
 
-    def enviar_email_async(email, codigo):
+    def enviar_email_async(self, email, codigo):
         try:
             send_mail(
                 "Código de recuperación",
