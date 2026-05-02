@@ -705,8 +705,9 @@ class meAPIView(APIView):
 class CodigoNuevaPasswordView(APIView):
     permission_classes = [AllowAny]
 
-    def enviar_email_async(self, email, codigo):
+    def enviar_email_async(email, codigo):
         try:
+            print("INTENTANDO ENVIAR A:", email)
             send_mail(
                 "Código de recuperación",
                 f"Tu código de recuperación es: {codigo}",
@@ -714,6 +715,7 @@ class CodigoNuevaPasswordView(APIView):
                 [email],
                 fail_silently=False
             )
+            print("EMAIL ENVIADO CORRECTAMENTE A:", email)
         except Exception as e:
             print("ERROR SEND MAIL:", type(e).__name__, str(e))
 
@@ -721,6 +723,7 @@ class CodigoNuevaPasswordView(APIView):
         email = request.data.get("email")
         tipo = request.data.get("tipo")
 
+        print(tipo, email)
         # Dos posibilidades, o bien enviamos un codigo nuevo o bien verificamos un codigo
         if tipo == "enviar":
             codigo = str(random.randint(100000, 999999))
@@ -734,6 +737,8 @@ class CodigoNuevaPasswordView(APIView):
 
             thread = threading.Thread(target=self.enviar_email_async, args=(email, codigo))
             thread.start()
+            return Response({"message": "Código enviado"})
+
         elif tipo == "verificar":
             codigo = request.data.get("codigo")
 
