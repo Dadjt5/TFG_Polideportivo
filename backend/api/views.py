@@ -707,10 +707,6 @@ class CodigoNuevaPasswordView(APIView):
     def post(self, request):
         email = request.data.get("email")
         tipo = request.data.get("tipo")
-        import os
-        print("EMAIL USER:", os.environ.get('EMAIL_HOST_USER'))
-        print("EMAIL PASS:", os.environ.get('EMAIL_HOST_PASSWORD'))
-        print("EMAIL PASS length:", len(os.environ.get('EMAIL_HOST_PASSWORD', '')))
 
         # Dos posibilidades, o bien enviamos un codigo nuevo o bien verificamos un codigo
         if tipo == "enviar":
@@ -723,15 +719,19 @@ class CodigoNuevaPasswordView(APIView):
             CodigoResetPassword.objects.filter(email=email).delete()
             CodigoResetPassword.objects.create(email=email, codigo=codigo)
 
-            send_mail(
-                "Código de recuperación",
-                f"Tu código de recuperación es: {codigo}",
-                settings.DEFAULT_FROM_EMAIL,
-                [email],
-                fail_silently=False
-            )
+            try:
+                send_mail(
+                    "Código de recuperación",
+                    f"Tu código de recuperación es: {codigo}",
+                    settings.DEFAULT_FROM_EMAIL,
+                    [email],
+                    fail_silently=False
+                )
 
-            return Response({"message": "Código enviado"})
+                return Response({"message": "Código enviado"})
+            except Exception as e:
+                print("ERROR SEND MAIL:", type(e).__name__, str(e))
+                return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         elif tipo == "verificar":
             codigo = request.data.get("codigo")
