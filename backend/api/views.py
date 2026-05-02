@@ -705,7 +705,7 @@ class meAPIView(APIView):
 class CodigoNuevaPasswordView(APIView):
     permission_classes = [AllowAny]
 
-    def enviar_email_async(email, codigo):
+    def enviar_email_async(self, email, codigo):
         try:
             print("INTENTANDO ENVIAR A:", email)
             send_mail(
@@ -723,7 +723,6 @@ class CodigoNuevaPasswordView(APIView):
         email = request.data.get("email")
         tipo = request.data.get("tipo")
 
-        print(tipo, email)
         # Dos posibilidades, o bien enviamos un codigo nuevo o bien verificamos un codigo
         if tipo == "enviar":
             codigo = str(random.randint(100000, 999999))
