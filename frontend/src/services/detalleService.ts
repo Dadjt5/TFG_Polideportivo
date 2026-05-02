@@ -83,9 +83,16 @@ export const eliminarPabellon = async (id: number) => {
 
 /* Función para obtener la informacion de instalaciones y actividades indicadas */
 export const getActividadesInstalaciones = async (payload: any) => {
-  const response = await api.post('/api/v1/obtener/favoritas/', payload);
+  const response = await api.post('/api/v1/obtener/instalaciones/actividades/', payload);
   return response.data;
 };
+
+/* Función para obtener la informacion de instalaciones y actividades favoritas */
+export const getActividadesInstalacionesFavoritas = async () => {
+  const response = await api.post('/api/v1/obtener/favoritas/');
+  return response.data;
+};
+
 
 /* Función para obtener la informacion de una sesión */
 export const getSesionDetalle = async (idActividad: string, idSesion: string) => {

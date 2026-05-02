@@ -65,7 +65,7 @@ class Descuento(models.Model):
 
         no_combinables = descuentos.filter(combinable=False).order_by("-porcentaje")
         if no_combinables.filter(prioritario=True).exists():
-            no_combinable = no_combinables.filter(prioritario=False).order_by("-porcentaje").first()
+            no_combinable = no_combinables.filter(prioritario=True).order_by("-porcentaje").first()
             esPrioritarioNoCombinables = True
         else:
             no_combinable = no_combinables.first()

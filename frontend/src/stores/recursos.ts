@@ -59,7 +59,7 @@ export const useResourceStore = defineStore("recursos", {
 
         const response = await getActividadesInstalaciones({
           actividad_ids: actividadIds,
-          instalacion_ids: instalacionIds,
+          instalacion_ids: instalacionIds
         });
 
         response.actividades.forEach((act: Actividad) => {

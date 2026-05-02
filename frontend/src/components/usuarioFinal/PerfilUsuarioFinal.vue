@@ -129,8 +129,8 @@ const qrValue = computed(() =>
   })
 );
 
-const logout = () => {
-  usuarioFinalStore.cerrarSesion();
+const logout = async () => {
+  await usuarioFinalStore.cerrarSesion();
   authStore.logout();
   router.push("/");
 };

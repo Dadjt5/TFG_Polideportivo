@@ -49,23 +49,24 @@ class ReservaIntegrationTest(TestCase):
     def test_nueva_reserva_actividad(self):
         reserva = ReservaActividad.nuevaReserva(
             usuario=self.usuarioFinal,
-            actividad=self.actividad
+            actividad=self.actividad,
+            complementos={"personas": 0, "tipoSesion": "", "forma": ""}
         )
 
         self.assertIsNotNone(reserva)
         self.assertEqual(reserva.estado, EstadoReserva.PENDIENTE)
 
     def test_reserva_no_duplicada(self):
-        primera = ReservaActividad.nuevaReserva(self.usuarioFinal, self.actividad)
+        primera = ReservaActividad.nuevaReserva(self.usuarioFinal, self.actividad, {"personas": 0, "tipoSesion": "", "forma": ""})
         primera.estado = EstadoReserva.CONFIRMADA
         primera.save()
 
-        segunda = ReservaActividad.nuevaReserva(self.usuarioFinal, self.actividad)
+        segunda = ReservaActividad.nuevaReserva(self.usuarioFinal, self.actividad, {"personas": 0, "tipoSesion": "", "forma": ""})
 
         self.assertIsNone(segunda)
 
     def test_cancelar_reserva_actualiza_plazas(self):
-        reserva = ReservaActividad.nuevaReserva(self.usuarioFinal, self.actividad)
+        reserva = ReservaActividad.nuevaReserva(self.usuarioFinal, self.actividad, {"personas": 0, "tipoSesion": "", "forma": ""})
 
         self.actividad.refresh_from_db()
         plazas_antes = self.actividad.plazasReservadas
@@ -82,7 +83,8 @@ class ReservaIntegrationTest(TestCase):
 
         reserva = ReservaActividad.nuevaReserva(
             self.usuarioFinal,
-            self.actividad
+            self.actividad,
+            {"personas": 0, "tipoSesion": "", "forma": ""}
         )
 
         self.assertIsNone(reserva)
@@ -93,7 +95,8 @@ class ReservaIntegrationTest(TestCase):
 
         reserva = ReservaActividad.nuevaReserva(
             self.usuarioFinal,
-            self.actividad
+            self.actividad,
+            {"personas": 0, "tipoSesion": "", "forma": ""}
         )
 
         self.assertIsNone(reserva)
@@ -101,7 +104,8 @@ class ReservaIntegrationTest(TestCase):
     def test_confirmar_reserva_incrementa_actividades(self):
         reserva = ReservaActividad.nuevaReserva(
             self.usuarioFinal,
-            self.actividad
+            self.actividad,
+            {"personas": 0, "tipoSesion": "", "forma": ""}
         )
 
         reserva.confirmarCompra()
@@ -112,7 +116,8 @@ class ReservaIntegrationTest(TestCase):
     def test_cancelar_reserva_actualiza_plazas(self):
         reserva = ReservaActividad.nuevaReserva(
             self.usuarioFinal,
-            self.actividad
+            self.actividad,
+            {"personas": 0, "tipoSesion": "", "forma": ""}
         )
 
         reserva.confirmarCompra()
@@ -137,7 +142,8 @@ class ReservaIntegrationTest(TestCase):
 
         reserva = ReservaActividad.nuevaReserva(
             self.usuarioFinal,
-            self.actividad
+            self.actividad,
+            {"personas": 0, "tipoSesion": "", "forma": ""}
         )
 
         reserva.descuentos.add(descuento)
@@ -153,7 +159,7 @@ class ReservaIntegrationTest(TestCase):
             fecha=date.today() + timedelta(days=1),
             horaInicio=time(10, 0),
             horaFin=time(11, 0),
-            luz=False
+            luz=False,
         )
 
         self.assertIsNotNone(alquiler)
@@ -192,7 +198,8 @@ class ReservaIntegrationTest(TestCase):
 
         nueva = ReservaActividad.nuevaReserva(
             self.usuarioFinal,
-            self.actividad
+            self.actividad,
+            {"personas": 0, "tipoSesion": "", "forma": ""}
         )
 
         anterior.refresh_from_db()
@@ -262,7 +269,8 @@ class ReservaIntegrationTest(TestCase):
 
         reserva = ReservaActividad.nuevaReserva(
             self.usuarioFinal,
-            self.actividad
+            self.actividad,
+            {"personas": 0, "tipoSesion": "", "forma": ""}
         )
 
         self.assertIsNone(reserva)

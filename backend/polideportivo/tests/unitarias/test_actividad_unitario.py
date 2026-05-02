@@ -160,16 +160,16 @@ class ActividadUnitTest(TestCase):
         self.usuario.tieneTDA = True
         self.usuario.esUAM = False
 
-        precios = self.actividad.obtenerPrecios()
+        precios = self.actividad.obtenerPrecios(2)
         self.assertEqual(precios["precioConsultaTDA"], 1)
 
         resultado = self.actividad._calcular_precio_base(self.usuario, tipoSesion="consulta")
         self.assertEqual(resultado, 1)
 
-        resultado = self.actividad._calcular_precio_base(self.usuario, tipoSesion="sesiones1_5")
+        resultado = self.actividad._calcular_precio_base(self.usuario, tipoSesion="sesiones", numeroSesiones=2)
         self.assertEqual(resultado, 4)
 
-        resultado = self.actividad._calcular_precio_base(self.usuario, tipoSesion="sesiones6")
+        resultado = self.actividad._calcular_precio_base(self.usuario, tipoSesion="sesiones", numeroSesiones=7)
         self.assertEqual(resultado, 7)
     
     def test_obtener_precios_fisioterapia_ninguno(self):
@@ -190,16 +190,16 @@ class ActividadUnitTest(TestCase):
         self.usuario.tieneTDA = False
         self.usuario.esUAM = False
 
-        precios = self.actividad.obtenerPrecios()
+        precios = self.actividad.obtenerPrecios(7)
         self.assertEqual(precios["precioConsultaTDA"], 1)
 
         resultado = self.actividad._calcular_precio_base(self.usuario, tipoSesion="consulta")
         self.assertEqual(resultado, 3)
 
-        resultado = self.actividad._calcular_precio_base(self.usuario, tipoSesion="sesiones1_5")
+        resultado = self.actividad._calcular_precio_base(self.usuario, tipoSesion="sesiones", numeroSesiones=2)
         self.assertEqual(resultado, 6)
 
-        resultado = self.actividad._calcular_precio_base(self.usuario, tipoSesion="sesiones6")
+        resultado = self.actividad._calcular_precio_base(self.usuario, tipoSesion="sesiones", numeroSesiones=7)
         self.assertEqual(resultado, 9)
     
     def test_obtener_precios_fisioterapia_fallo(self):
@@ -238,16 +238,16 @@ class ActividadUnitTest(TestCase):
         self.actividad.tarifa = tarifa
         self.usuario.esUAM = True
 
-        precios = self.actividad.obtenerPrecios()
+        precios = self.actividad.obtenerPrecios(2)
         self.assertEqual(precios["precioConsultaTDA"], 1)
 
         resultado = self.actividad._calcular_precio_base(self.usuario, tipoSesion="consulta")
         self.assertEqual(resultado, 2)
 
-        resultado = self.actividad._calcular_precio_base(self.usuario, tipoSesion="sesiones1_5")
+        resultado = self.actividad._calcular_precio_base(self.usuario, tipoSesion="sesiones", numeroSesiones=2)
         self.assertEqual(resultado, 5)
 
-        resultado = self.actividad._calcular_precio_base(self.usuario, tipoSesion="sesiones6")
+        resultado = self.actividad._calcular_precio_base(self.usuario, tipoSesion="sesiones", numeroSesiones=7)
         self.assertEqual(resultado, 8)
 
     def test_obtener_precios_tipo_invalido(self):
@@ -255,7 +255,7 @@ class ActividadUnitTest(TestCase):
         self.actividad.tarifa = None
 
         with self.assertRaises(Http404):
-            self.actividad.obtenerPrecios()
+            self.actividad.obtenerPrecios(2)
         
     def test_buscar_por_nombre(self):
         Actividad.objects.create(

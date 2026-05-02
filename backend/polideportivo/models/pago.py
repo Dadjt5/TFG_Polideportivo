@@ -12,7 +12,8 @@ from .bono import CompraBono
 from .reserva import ReservaActividad, Alquiler
 from .tda import TDA
 from .configuracion import Configuracion
-from .constantes import EstadoPago, TipoPago, Periodo
+from .constantes import EstadoPago, TipoPago, Periodo, EstadoReserva
+
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -105,7 +106,7 @@ class Pago(models.Model):
             porcentajeExtra = 0.0
 
             if usuario.tieneAbono:
-                compraAbono = usuario.abono.filter(abonoVerano__isnull=True, fechaExpiracion__gte=date.today()).first()
+                compraAbono = usuario.abono.filter(abonoVerano__isnull=True, estado=EstadoReserva.CONFIRMADA).first()
                 if compraAbono and compraAbono.abonoDeportivo:
                     descripcionPorcentajes["Descuento por abono deportivo"] = {}
                     if usuario.actividadesRealizadas == 0:
@@ -129,7 +130,7 @@ class Pago(models.Model):
             porcentajeExtra = 0.0
 
             if usuario.tieneAbono:
-                compraAbono = usuario.abono.filter(abonoVerano__isnull=True, fechaExpiracion__gte=date.today()).first()
+                compraAbono = usuario.abono.filter(abonoVerano__isnull=True, estado=EstadoReserva.CONFIRMADA).first()
 
                 if compraAbono and compraAbono.abonoDeportivo:
                     descripcionPorcentajes["Descuento por abono deportivo"] = {}

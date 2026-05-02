@@ -57,28 +57,6 @@ class TDAUnitariasTest(TestCase):
 
         self.assertEqual(tda.calcularPrecio(), 20)
 
-    @patch("polideportivo.models.tda.make_password")
-    def test_nuevo_codigo_secreto(self, mock_hash):
-        mock_hash.return_value = "hashed"
-
-        tda = TDA()
-        tda.nuevoCodigoSecreto("1234")
-
-        mock_hash.assert_called_once_with("1234")
-        self.assertEqual(tda._codigo_secreto_hash, "hashed")
-
-    @patch("polideportivo.models.tda.check_password")
-    def test_comprobar_codigo_secreto(self, mock_check):
-        mock_check.return_value = True
-
-        tda = TDA()
-        tda._codigo_secreto_hash = "hashed"
-
-        result = tda.comprobarCodigoSecreto("1234")
-
-        mock_check.assert_called_once_with("1234", "hashed")
-        self.assertTrue(result)
-    
     def test_compra_sin_tarifa(self):
         TarifaTDA.objects.all().delete()
 

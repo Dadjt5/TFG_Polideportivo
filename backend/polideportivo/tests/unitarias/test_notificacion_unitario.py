@@ -16,28 +16,7 @@ class NotificacionUnitTest(TestCase):
             password="test"
         )
 
-        self.config = Configuracion.objects.create(
-            titulo_avisos_actividades="titulo",
-            texto_avisos_actividades="texto",
-            titulo_cambios_cancelaciones="titulo",
-            texto_cambios_cancelaciones="texto",
-            titulo_problemas_pago="titulo",
-            texto_problemas_pago="texto",
-            titulo_salida_lista_espera="titulo",
-            texto_salida_lista_espera="texto",
-            titulo_ausencias="titulo",
-            texto_ausencias="texto",
-            titulo_material_especial="titulo",
-            texto_material_especial="texto",
-            titulo_cambios_sesiones="titulo",
-            texto_cambios_sesiones="texto",
-            titulo_avisos_sobre_actividades_usuarios="titulo",
-            texto_avisos_sobre_actividades_usuarios="texto",
-            titulo_avisos_sobre_actividades_monitores="titulo",
-            texto_avisos_sobre_actividades_monitores="texto",
-            titulo_aviso_devolucion_dinero_alquiler="titulo",
-            texto_aviso_devolucion_dinero_alquiler="texto",
-        )
+        self.config = Configuracion.objects.create()
 
     def test_contar_notificaciones(self):
         Notificacion.objects.create(titulo="t", descripcion="d", usuario=self.user)

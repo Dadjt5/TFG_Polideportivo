@@ -52,6 +52,10 @@ export const useUserStore = defineStore("user", {
       actividades: JSON.parse(localStorage.getItem("actividadesFavoritas") || "[]") as number[],
       instalaciones: JSON.parse(localStorage.getItem("instalacionesFavoritas") || "[]") as number[],
     },
+    favoritosUI: {
+      actividades: [] as number[],
+      instalaciones: [] as number[],
+    },
     cambiosPendientes: false,
     cambiosFavoritos: false,
   }),
@@ -99,10 +103,17 @@ export const useUserStore = defineStore("user", {
       ...state.notificaciones.filter(n => n.leido),
     ],
     activityIsFavorite: (state) => (id: number) => {
-      return state.favoritos.actividades.includes(id);
+      return (
+        state.favoritos.actividades.includes(id) ||
+        state.favoritosUI.actividades.includes(id)
+      );
     },
+
     facilityIsFavorite: (state) => (id: number) => {
-      return state.favoritos.instalaciones.includes(id);
+      return (
+        state.favoritos.instalaciones.includes(id) ||
+        state.favoritosUI.instalaciones.includes(id)
+      );
     },
   },
 
@@ -111,8 +122,10 @@ export const useUserStore = defineStore("user", {
       try {
         const data = await getUsuarioFinal(id);
         this.usuarioFinal = data;
+
         this.favoritos.actividades = data.actividades_favoritas ?? [];
         this.favoritos.instalaciones = data.instalaciones_favoritas ?? [];
+
         localStorage.setItem("actividadesFavoritas", JSON.stringify(this.favoritos.actividades));
         localStorage.setItem("instalacionesFavoritas", JSON.stringify(this.favoritos.instalaciones));
         localStorage.setItem("usuarioFinal", JSON.stringify(data));
@@ -157,9 +170,12 @@ export const useUserStore = defineStore("user", {
       }
     },
 
-    cerrarSesion() {
+    async cerrarSesion() {
+      await this.sincronizarFavoritos();
+
       this.usuarioFinal = null;
       this.notificaciones = [];
+
       localStorage.removeItem("usuarioFinal");
       localStorage.removeItem("notificaciones");
       localStorage.removeItem("actividadesFavoritas");
@@ -201,6 +217,8 @@ export const useUserStore = defineStore("user", {
     },
 
     marcarInstalacionFavorita(id: number) {
+      this.favoritosUI.instalaciones = this.favoritosUI.instalaciones.filter(f => f !== id);
+
       if (this.favoritos.instalaciones.includes(id)) {
         this.favoritos.instalaciones = this.favoritos.instalaciones.filter(
           favoritoId => favoritoId !== id
@@ -214,6 +232,8 @@ export const useUserStore = defineStore("user", {
     },
 
     marcarActividadFavorita(id: number) {
+      this.favoritosUI.actividades = this.favoritosUI.actividades.filter(f => f !== id);
+
       if (this.favoritos.actividades.includes(id)) {
         this.favoritos.actividades = this.favoritos.actividades.filter(
           favoritoId => favoritoId !== id
@@ -221,9 +241,36 @@ export const useUserStore = defineStore("user", {
       } else {
         this.favoritos.actividades.push(id);
       }
+
       this.cambiosFavoritos = true;
 
       localStorage.setItem("actividadesFavoritas", JSON.stringify(this.favoritos.actividades));
+    },
+
+    setFavoritosUI(data: any) {
+      this.favoritosUI.actividades = data.actividades.map((a: any) => a.id);
+      this.favoritosUI.instalaciones = data.instalaciones.map((i: any) => i.id);
+    },
+
+    combinarFavoritos() {
+      this.favoritosUI.actividades = [
+        ...new Set([
+          ...this.favoritosUI.actividades,
+          ...this.favoritos.actividades
+        ])
+      ];
+
+      this.favoritosUI.instalaciones = [
+        ...new Set([
+          ...this.favoritosUI.instalaciones,
+          ...this.favoritos.instalaciones
+        ])
+      ];
+    },
+
+    limpiarFavoritosUI() {
+      this.favoritosUI.actividades = [];
+      this.favoritosUI.instalaciones = [];
     },
 
     async sincronizarFavoritos() {
@@ -233,9 +280,10 @@ export const useUserStore = defineStore("user", {
         await marcarFavoritos({
           actividad_ids: this.favoritos.actividades,
           instalacion_ids: this.favoritos.instalaciones,
-        })
+        });
 
         this.cambiosFavoritos = false;
+
       } catch (e) {
         console.warn("No se han sincronizado las actividades favoritas", e);
       }

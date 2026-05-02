@@ -71,7 +71,7 @@ class Actividad(models.Model):
         return True
 
     # Función para obtener los precios de la tarifa aplicada a la actividad dependiendo de su tipo
-    def obtenerPrecios(self, numeroSesiones):
+    def obtenerPrecios(self, numeroSesiones=0):
         if self.tipoActividad == TipoActividad.OTROS:
             return {
                 "precioUAM": self.tarifa.actividadcomun.precioUAM,
@@ -133,7 +133,6 @@ class Actividad(models.Model):
             return precio * (numeroPersonas/self.tarifa.gruporeducido.numeroPersonas)
 
         elif self.tipoActividad == TipoActividad.FISIOTERAPIA:
-            precio = self.tarifa.fisioterapia.precioConsultaOtros
             if usuario.tieneTDA:
                 if tipoSesion.lower() == "consulta":
                     precio = self.tarifa.fisioterapia.precioConsultaTDA
@@ -151,7 +150,9 @@ class Actividad(models.Model):
                     precio = self.tarifa.fisioterapia.precioSesiones6UAM
 
             else:
-                if numeroSesiones <= 5:
+                if tipoSesion.lower() == "consulta":
+                    precio = self.tarifa.fisioterapia.precioConsultaOtros
+                elif numeroSesiones <= 5:
                     precio = self.tarifa.fisioterapia.precioSesiones1_5Otros
                 else:
                     precio = self.tarifa.fisioterapia.precioSesiones6Otros

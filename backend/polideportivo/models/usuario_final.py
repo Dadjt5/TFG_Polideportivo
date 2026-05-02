@@ -117,6 +117,7 @@ class UsuarioFinal(Usuario):
             actividad=actividad,
             instalacion=instalacion
         )
+
         return True
 
     # Función para contar el número de usuarios finales del sistema

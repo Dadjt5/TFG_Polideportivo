@@ -111,10 +111,6 @@ class CompraAbonoViewSet(viewsets.ModelViewSet):
     serializer_class = CompraAbonoSerializer
     permission_classes = [IsUsuarioFinal]
 
-    def perform_create(self, serializer):
-        usuario_final = UsuarioFinal.objects.get(user=self.request.user)
-        serializer.save(usuarioFinal=usuario_final)
-
     def get_queryset(self):
         return CompraAbono.objects.filter(usuarioFinal__user=self.request.user, estado=EstadoReserva.CONFIRMADA)
 
@@ -320,16 +316,9 @@ class DescuentoViewSet(viewsets.ModelViewSet):
 # ----------------
 
 class FavoritoViewSet(viewsets.ModelViewSet):
+    queryset = Favorito.objects.all()
     serializer_class = FavoritoSerializer
     permission_classes = [IsAuthenticated]
-
-    def perform_create(self, serializer):
-        usuario_final = UsuarioFinal.objects.get(user=self.request.user)
-        serializer.save(usuarioFinal=usuario_final)
-
-    def get_queryset(self):
-        return Favorito.objects.filter(usuarioFinal__user=self.request.user)
-
 
 # ----------------
 # Instalaciones
@@ -1009,7 +998,26 @@ class ObtenerActividadesInstalaciones(APIView):
         }
 
         return Response(data)
-    
+
+
+# Obtener actividades e instalaciones favoritos de un usuario
+class ObtenerActividadesInstalacionesFavoritas(APIView):
+    permission_classes = [IsUsuarioFinal]
+
+    def post(self, request):
+        usuarioFinal = request.user.usuario_final
+
+        actividades = Actividad.objects.filter(favorita__usuarioFinal=usuarioFinal)
+        instalaciones = Instalacion.objects.filter(favorito__usuarioFinal=usuarioFinal)
+
+        data = {
+            "actividades": ActividadSerializer(actividades, many=True).data,
+            "instalaciones": InstalacionSerializer(instalaciones, many=True).data,
+        }
+
+        return Response(data)
+
+
 
 # Crear nuevas sesiones en una actividad
 class NuevaSesionView(APIView):
@@ -1050,7 +1058,7 @@ class AlterarFavoritosView(APIView):
 
         actividad_ids = request.data.get("actividad_ids", [])
         instalacion_ids = request.data.get("instalacion_ids", [])
-        
+
         if not actividad_ids and not instalacion_ids:
             return Response({"status": "error"})
 

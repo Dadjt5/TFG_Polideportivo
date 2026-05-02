@@ -47,7 +47,6 @@ function logoutUsuario() {
   localStorage.removeItem("access");
   localStorage.removeItem("refresh");
 
-  console.log("buenas")
   router.push("/");
 }
 

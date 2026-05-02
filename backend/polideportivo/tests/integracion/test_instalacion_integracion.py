@@ -18,7 +18,6 @@ User = get_user_model()
 class InstalacionIntegrationFullTest(TestCase):
 
     def setUp(self):
-        # ------------------ base sistema ------------------
         self.pabellon = Pabellon.objects.create(nombre="P1")
 
         self.instalacion = Instalacion.objects.create(
@@ -36,11 +35,9 @@ class InstalacionIntegrationFullTest(TestCase):
 
         Configuracion.objects.create()
 
-        # calles
         self.calle1 = Calle.objects.create(instalacion=self.instalacion, numero=1)
         self.calle2 = Calle.objects.create(instalacion=self.instalacion, numero=2)
 
-        # agenda activa
         self.agenda = Agenda.objects.create(
             instalacion=self.instalacion,
             dia=Dia.LUNES,
@@ -49,7 +46,6 @@ class InstalacionIntegrationFullTest(TestCase):
             abierto=True
         )
 
-        # Usuario
         self.user = User.objects.create(username="user", password="1234")
         self.usuario = UsuarioFinal.objects.create(
             nombre="user1",
@@ -64,13 +60,10 @@ class InstalacionIntegrationFullTest(TestCase):
         )
 
 
-    # -------------------------
-    # BASIC INSTALACION
-    # -------------------------
-
     def test_str_and_contar(self):
         self.assertIn("Piscina", str(self.instalacion))
         self.assertGreaterEqual(Instalacion.contar(), 1)
+
 
     # -------------------------
     # HORARIOS
@@ -151,7 +144,7 @@ class InstalacionIntegrationFullTest(TestCase):
             "dia": "Lunes",
             "horaInicio": "08:00",
             "horaFin": "09:00",
-            "calle": self.calle1
+            "calle": self.calle1.id
         }]
 
         MapaReservas.objects.create(
@@ -174,7 +167,7 @@ class InstalacionIntegrationFullTest(TestCase):
             "dia": "Lunes",
             "horaInicio": "08:00",
             "horaFin": "09:00",
-            "calle": self.calle1
+            "calle": self.calle1.id
         }]
 
         self.instalacion.actualizarMapa(sesiones)
@@ -187,7 +180,7 @@ class InstalacionIntegrationFullTest(TestCase):
             "dia": "Martes",
             "horaInicio": "08:00",
             "horaFin": "09:00",
-            "calle": self.calle1
+            "calle": self.calle1.id
         }]
 
         self.instalacion.actualizarMapa(sesiones)
@@ -211,7 +204,7 @@ class InstalacionIntegrationFullTest(TestCase):
             "dia": "Lunes",
             "horaInicio": "08:00",
             "horaFin": "10:00",
-            "calle": self.calle1
+            "calle": self.calle1.id
         }]
 
         self.instalacion.actualizarMapa(sesiones)

@@ -133,8 +133,8 @@ const toggleLanguage = () => {
   language.value = language.value === "es" ? "en" : "es";
 };
 
-const logout = () => {
-  activeStore.value.cerrarSesion();
+const logout = async () => {
+  await activeStore.value.cerrarSesion();
   userStore.logout();
   router.push("/");
 };

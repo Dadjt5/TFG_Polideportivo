@@ -222,7 +222,7 @@ import { useAuthStore } from "@/stores/auth";
 import { useUserStore } from "@/stores/usuarioFinal";
 import { useEstadisticasStore } from "@/stores/estadisticas";
 
-import { getActividadesInstalaciones } from "@/services/detalleService";
+import { getActividadesInstalaciones, getActividadesInstalacionesFavoritas } from "@/services/detalleService";
 
 /* Importamos la funcion de uso y tambien los valores posibles de lenguaje */
 import type { Language } from "@/useI18N";
@@ -390,21 +390,35 @@ const resultados = ref<Resultados>({
 const actividadesFavoritas = computed(() => {
   if (!resultados.value.actividades) return []
 
-  return [...resultados.value.actividades].sort((a, b) => {
-    return a.nombre.localeCompare(b.nombre)
-  })
+  return [...resultados.value.actividades]
+    .sort((a, b) => a.nombre.localeCompare(b.nombre))
 })
 
 const instalacionesFavoritas = computed(() => {
   if (!resultados.value.instalaciones) return []
 
-  return [...resultados.value.instalaciones].sort((a, b) => {
-    return a.nombre.localeCompare(b.nombre)
-  })
+  return [...resultados.value.instalaciones]
+    .sort((a, b) => a.nombre.localeCompare(b.nombre))
 })
 
 const longitudActividades = computed(() => actividadesFavoritas.value.length);
 const longitudInstalaciones = computed(() => instalacionesFavoritas.value.length);
+
+import { watch } from "vue";
+
+watch(
+  () => [
+    usuarioFinalStore.favoritosUI.actividades,
+    usuarioFinalStore.favoritosUI.instalaciones
+  ],
+  async () => {
+    resultados.value = await getActividadesInstalaciones({
+      actividad_ids: usuarioFinalStore.favoritosUI.actividades,
+      instalacion_ids: usuarioFinalStore.favoritosUI.instalaciones
+    });
+  },
+  { deep: true }
+);
 
 onMounted(async () => {
   if (!estadisticasStore.data.modificado) {
@@ -415,9 +429,18 @@ onMounted(async () => {
     await usuarioFinalStore.fetchUser(userStore.user?.usuario_final_id)
   }
 
+  if (usuarioFinalStore.favoritosUI.actividades.length === 0 && usuarioFinalStore.favoritosUI.instalaciones.length === 0) {
+    resultados.value = await getActividadesInstalacionesFavoritas();
+  } else {
+    resultados.value = await getActividadesInstalaciones({actividad_ids: usuarioFinalStore.favoritosUI.actividades, instalacion_ids: usuarioFinalStore.favoritosUI.instalaciones})
+  }
+
+  usuarioFinalStore.setFavoritosUI(resultados.value);
+  usuarioFinalStore.combinarFavoritos()
+
   resultados.value = await getActividadesInstalaciones({
-    actividad_ids: usuarioFinalStore.favoritos.actividades,
-    instalacion_ids: usuarioFinalStore.favoritos.instalaciones,
+    actividad_ids: usuarioFinalStore.favoritosUI.actividades,
+    instalacion_ids: usuarioFinalStore.favoritosUI.instalaciones
   });
 
   await usuarioFinalStore.fetchNotificaciones();

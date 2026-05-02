@@ -36,6 +36,10 @@ const props = defineProps<{
   theme?: 'light' | 'dark';
 }>()
 
+const diasUnicos = computed(() => {
+  return [...new Set(props.actividad.dias)]
+})
+
 const cambiarFavorito = () => {
   usuarioFinalStore.marcarActividadFavorita(props.actividad.id)
 }
@@ -96,7 +100,7 @@ const badgeClass = computed(() =>
       <div :class="['small', textOpacityClass]">
         <div class="d-flex justify-content-between mb-1">
           <span>{{ t.days }}</span>
-          <strong>{{ actividad.dias.join(', ') }}</strong>
+          <strong>{{ diasUnicos.join(', ') }}</strong>
         </div>
 
         <div class="d-flex justify-content-between mb-1">

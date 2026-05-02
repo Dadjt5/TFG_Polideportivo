@@ -19,7 +19,7 @@ class ReservaUnitTest(TestCase):
         self.usuario = UsuarioFinal.objects.create(fechaNacimiento=date(2001,1,1), user=self.user)
 
         self.pabellon = Pabellon.objects.create()
-        self.instalacion = Instalacion.objects.create(pabellon=self.pabellon)
+        self.instalacion = Instalacion.objects.create(pabellon=self.pabellon, luz=True)
 
         self.user2 = User.objects.create(username="monitor", password="1234")
         self.monitor = Monitor.objects.create(user=self.user2)
@@ -100,7 +100,7 @@ class ReservaUnitTest(TestCase):
 
         self.actividad._calcular_precio_base = lambda **kwargs: 50
 
-        precio = reserva.calcularPrecio()
+        precio = reserva.calcularPrecio(2)
 
         self.assertEqual(precio, 50)
     
@@ -111,8 +111,8 @@ class ReservaUnitTest(TestCase):
         alquiler = Alquiler(
             usuarioFinal=self.usuario,
             instalacion=self.instalacion,
-            horaInicio=time(8, 0),
-            horaFin=time(10, 0)
+            horaInicio=time(20, 0),
+            horaFin=time(22, 0)
         )
         alquiler.numeroHoras = 2
 
@@ -128,8 +128,8 @@ class ReservaUnitTest(TestCase):
         alquiler = Alquiler(
             usuarioFinal=self.usuario,
             instalacion=self.instalacion,
-            horaInicio=time(7, 0),
-            horaFin=time(8, 0)
+            horaInicio=time(9, 0),
+            horaFin=time(10, 0)
         )
         alquiler.numeroHoras = 1
 

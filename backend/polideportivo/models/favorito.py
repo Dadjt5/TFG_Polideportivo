@@ -7,8 +7,8 @@ class Favorito(models.Model):
     """Modelo para representar las instalaciones y actividades marcadas como favoritas por un usuario final"""
 
     usuarioFinal = models.ForeignKey('UsuarioFinal', on_delete=models.CASCADE, related_name="favoritos")
-    actividad = models.ForeignKey('Actividad', on_delete=models.CASCADE, null=True)
-    instalacion = models.ForeignKey('Instalacion', on_delete=models.CASCADE, null=True)
+    actividad = models.ForeignKey('Actividad', on_delete=models.CASCADE, null=True, related_name="favorita")
+    instalacion = models.ForeignKey('Instalacion', on_delete=models.CASCADE, null=True, related_name="favorito")
     
     # Función para contar el número de favoritos
     @classmethod

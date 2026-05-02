@@ -5,7 +5,8 @@ from datetime import date, time
 from ...models import (
     Notificacion, UsuarioFinal, Actividad, Sesion, Deporte, 
     Monitor, Instalacion, Pabellon, Configuracion, Alquiler,
-    TipoActividad, Periodo, ReservaActividad, Administrador
+    TipoActividad, Periodo, ReservaActividad, Administrador,
+    EstadoReserva
 )
 
 User = get_user_model()
@@ -82,7 +83,7 @@ class NotificacionIntegrationTest(TestCase):
         self.assertFalse(Notificacion.objects.exists())
     
     def test_notificar_material_cambia_con_usuarios(self):
-        ReservaActividad.objects.create(usuarioFinal=self.usuarioFinal, actividad=self.actividad)
+        ReservaActividad.objects.create(usuarioFinal=self.usuarioFinal, actividad=self.actividad, estado=EstadoReserva.CONFIRMADA)
         Notificacion.notificarNuevoMaterial(self.actividad)
 
         self.assertTrue(Notificacion.objects.filter(actividad=self.actividad).exists())
@@ -102,13 +103,13 @@ class NotificacionIntegrationTest(TestCase):
         self.assertEqual(n.actividad, self.actividad)
 
     def test_notificar_cambio_sesiones(self):
-        ReservaActividad.objects.create(usuarioFinal=self.usuarioFinal, actividad=self.actividad)
+        ReservaActividad.objects.create(usuarioFinal=self.usuarioFinal, actividad=self.actividad, estado=EstadoReserva.CONFIRMADA)
         Notificacion.notificarCambioSesiones(self.actividad)
 
         self.assertTrue(Notificacion.objects.filter(actividad=self.actividad).exists())
     
     def test_notificarActividadUsuarioFinal(self):
-        ReservaActividad.objects.create(usuarioFinal=self.usuarioFinal, actividad=self.actividad)
+        ReservaActividad.objects.create(usuarioFinal=self.usuarioFinal, actividad=self.actividad, estado=EstadoReserva.CONFIRMADA)
         Notificacion.notificarActividadUsuarioFinal(self.actividad, self.sesion)
         n = Notificacion.objects.first()
 
@@ -127,6 +128,25 @@ class NotificacionIntegrationTest(TestCase):
     
     def test_notificarCambioCancelacion(self):
         Notificacion.notificarCambioCancelacion()
+    
+        self.assertTrue(Notificacion.objects.exists())
+    
+    def test_notificarEliminacionActividad(self):
+        ReservaActividad.objects.create(usuarioFinal=self.usuarioFinal, actividad=self.actividad, estado=EstadoReserva.CONFIRMADA)
+        Notificacion.notificarEliminacionActividad(self.actividad)
+    
+        self.assertTrue(Notificacion.objects.exists())
+    
+    def test_notificarEliminacionInstalacion(self):
+        Alquiler.objects.create(
+            usuarioFinal=self.usuarioFinal,
+            instalacion=self.instalacion,
+            horaInicio=time(9,0),
+            horaFin=time(10,0),
+            estado=EstadoReserva.CONFIRMADA
+        )
+
+        Notificacion.notificarEliminacionInstalacion(self.instalacion)
     
         self.assertTrue(Notificacion.objects.exists())
 
@@ -178,7 +198,8 @@ class NotificacionIntegrationTest(TestCase):
     def test_nueva_notificacion_actividad(self):
         ReservaActividad.objects.create(
             usuarioFinal=self.usuarioFinal,
-            actividad=self.actividad
+            actividad=self.actividad,
+            estado=EstadoReserva.CONFIRMADA
         )
 
         Notificacion.nuevaNotificacion(
@@ -198,7 +219,8 @@ class NotificacionIntegrationTest(TestCase):
             usuarioFinal=self.usuarioFinal,
             instalacion=self.instalacion,
             horaInicio=time(9,0),
-            horaFin=time(10,0)
+            horaFin=time(10,0),
+            estado=EstadoReserva.CONFIRMADA
         )
 
         Notificacion.nuevaNotificacion(
@@ -218,7 +240,8 @@ class NotificacionIntegrationTest(TestCase):
             usuarioFinal=self.usuarioFinal,
             instalacion=self.instalacion,
             horaInicio=time(9,0),
-            horaFin=time(10,0)
+            horaFin=time(10,0),
+            estado=EstadoReserva.CONFIRMADA
         )
 
         Notificacion.nuevaNotificacion(

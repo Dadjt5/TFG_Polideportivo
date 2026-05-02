@@ -142,6 +142,7 @@
             <div v-for="s in actividad.sesiones" :key="s.id"
               class="d-flex justify-content-between align-items-center p-3 mb-2 border rounded-3 bg-light session-hover">
               <div>
+                <div v-if="s.calle" class="fw-semibold">{{ t.poolStreet }}: {{ s.calle }}</div>
                 <div class="fw-semibold">{{ s.dia }}</div>
                 <div class="text-muted">{{ s.horaInicio }} - {{ s.horaFin }}</div>
               </div>
