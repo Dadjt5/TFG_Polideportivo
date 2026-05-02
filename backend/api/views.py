@@ -705,20 +705,6 @@ class meAPIView(APIView):
 class CodigoNuevaPasswordView(APIView):
     permission_classes = [AllowAny]
 
-    def enviar_email_async(self, email, codigo):
-        try:
-            print("INTENTANDO ENVIAR A:", email)
-            send_mail(
-                "Código de recuperación",
-                f"Tu código de recuperación es: {codigo}",
-                settings.DEFAULT_FROM_EMAIL,
-                [email],
-                fail_silently=False
-            )
-            print("EMAIL ENVIADO CORRECTAMENTE A:", email)
-        except Exception as e:
-            print("ERROR SEND MAIL:", type(e).__name__, str(e))
-
     def post(self, request):
         email = request.data.get("email")
         tipo = request.data.get("tipo")
@@ -726,16 +712,27 @@ class CodigoNuevaPasswordView(APIView):
         # Dos posibilidades, o bien enviamos un codigo nuevo o bien verificamos un codigo
         if tipo == "enviar":
             codigo = str(random.randint(100000, 999999))
-
             user = User.objects.filter(email=email).first()
+
             if not user:
                 return Response({"respuesta": "El correo no existe en el sistema", "tipo": "email"}, status=status.HTTP_400_BAD_REQUEST)
 
             CodigoResetPassword.objects.filter(email=email).delete()
             CodigoResetPassword.objects.create(email=email, codigo=codigo)
 
-            thread = threading.Thread(target=self.enviar_email_async, args=(email, codigo))
-            thread.start()
+            try:
+                send_mail(
+                    "Código de recuperación",
+                    f"Tu código de recuperación es: {codigo}",
+                    settings.DEFAULT_FROM_EMAIL,
+                    [email],
+                    fail_silently=False
+                )
+
+            except Exception as e:
+                print("ERROR SEND MAIL:", type(e).__name__, str(e))
+                return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
             return Response({"message": "Código enviado"})
 
         elif tipo == "verificar":
