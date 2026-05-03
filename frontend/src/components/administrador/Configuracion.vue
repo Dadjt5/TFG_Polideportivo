@@ -27,9 +27,16 @@
           <!-- DIAS MINIMO CANCELACION -->
           <div class="col-md-4">
             <div class="card h-100 shadow-lg rounded-4"
-                 style="background-color: rgba(180,220,255,0.6); backdrop-filter: blur(10px);">
+              style="background-color: rgba(180,220,255,0.6); backdrop-filter: blur(10px);">
               <div class="card-body">
-                <h5 class="card-title">{{ t.minCancellationDays }}</h5>
+                <div class="d-flex align-items-center gap-2 mb-2">
+                  <h5 class="card-title mb-0">{{ t.minCancellationDays }}</h5>
+                  <span tabindex="0"
+                    class="badge rounded-circle bg-secondary d-flex align-items-center justify-content-center"
+                    style="width: 18px; height: 18px; font-size: 11px; cursor: pointer;" data-bs-toggle="popover"
+                    data-bs-trigger="hover focus" data-bs-placement="top"
+                    :data-bs-content="t.minCancellationDaysInfo">i</span>
+                </div>
                 <input type="number" class="form-control" v-model.number="configuracionStore.dias_minimo_cancelacion" />
               </div>
             </div>
@@ -38,9 +45,16 @@
           <!-- DIAS MINIMO ALQUILER -->
           <div class="col-md-4">
             <div class="card h-100 shadow-lg rounded-4"
-                 style="background-color: rgba(180,220,255,0.6); backdrop-filter: blur(10px);">
+              style="background-color: rgba(180,220,255,0.6); backdrop-filter: blur(10px);">
               <div class="card-body">
-                <h5 class="card-title">{{ t.minDaysFacilityReservation }}</h5>
+                <div class="d-flex align-items-center gap-2 mb-2">
+                  <h5 class="card-title mb-0">{{ t.minDaysFacilityReservation }}</h5>
+                  <span tabindex="0"
+                    class="badge rounded-circle bg-secondary d-flex align-items-center justify-content-center"
+                    style="width: 18px; height: 18px; font-size: 11px; cursor: pointer;" data-bs-toggle="popover"
+                    data-bs-trigger="hover focus" data-bs-placement="top"
+                    :data-bs-content="t.minFacilityReservationDaysInfo">i</span>
+                </div>
                 <input type="number" class="form-control" v-model.number="configuracionStore.dias_minimo_alquiler" />
               </div>
             </div>
@@ -49,9 +63,16 @@
           <!-- DIAS MAXIMO ALQUILER -->
           <div class="col-md-4">
             <div class="card h-100 shadow-lg rounded-4"
-                 style="background-color: rgba(180,220,255,0.6); backdrop-filter: blur(10px);">
+              style="background-color: rgba(180,220,255,0.6); backdrop-filter: blur(10px);">
               <div class="card-body">
-                <h5 class="card-title">{{ t.maxDaysFacilityReservation }}</h5>
+                <div class="d-flex align-items-center gap-2 mb-2">
+                  <h5 class="card-title mb-0">{{ t.maxDaysFacilityReservation }}</h5>
+                  <span tabindex="0"
+                    class="badge rounded-circle bg-secondary d-flex align-items-center justify-content-center"
+                    style="width: 18px; height: 18px; font-size: 11px; cursor: pointer;" data-bs-toggle="popover"
+                    data-bs-trigger="hover focus" data-bs-placement="top"
+                    :data-bs-content="t.maxFacilityReservationDaysInfo ">i</span>
+                </div>
                 <input type="number" class="form-control" v-model.number="configuracionStore.dias_maximo_alquiler" />
               </div>
             </div>
@@ -60,10 +81,18 @@
           <!-- DIAS MAXIMO ALQUILER -->
           <div class="col-md-4">
             <div class="card h-100 shadow-lg rounded-4"
-                 style="background-color: rgba(180,220,255,0.6); backdrop-filter: blur(10px);">
+              style="background-color: rgba(180,220,255,0.6); backdrop-filter: blur(10px);">
               <div class="card-body">
-                <h5 class="card-title">{{ t.consecutiveHours }}</h5>
-                <input type="number" class="form-control" v-model.number="configuracionStore.horas_alquiler_consecutivas" />
+                <div class="d-flex align-items-center gap-2 mb-2">
+                  <h5 class="card-title mb-0">{{ t.consecutiveHours }}</h5>
+                  <span tabindex="0"
+                    class="badge rounded-circle bg-secondary d-flex align-items-center justify-content-center"
+                    style="width: 18px; height: 18px; font-size: 11px; cursor: pointer;" data-bs-toggle="popover"
+                    data-bs-trigger="hover focus" data-bs-placement="top"
+                    :data-bs-content="t.consecutiveHoursInfo ">i</span>
+                </div>
+                <input type="number" class="form-control"
+                  v-model.number="configuracionStore.horas_alquiler_consecutivas" />
               </div>
             </div>
           </div>
@@ -71,10 +100,18 @@
           <!-- MAX DEPORTES POR USUARIO -->
           <div class="col-md-4">
             <div class="card h-100 shadow-lg rounded-4"
-                 style="background-color: rgba(180,220,255,0.6); backdrop-filter: blur(10px);">
+              style="background-color: rgba(180,220,255,0.6); backdrop-filter: blur(10px);">
               <div class="card-body">
-                <h5 class="card-title">{{ t.sportsUserMaxNumber }}</h5>
-                <input type="number" class="form-control" v-model.number="configuracionStore.max_deportes_por_usuario" />
+                <div class="d-flex align-items-center gap-2 mb-2">
+                  <h5 class="card-title mb-0">{{ t.sportsUserMaxNumber }}</h5>
+                  <span tabindex="0"
+                    class="badge rounded-circle bg-secondary d-flex align-items-center justify-content-center"
+                    style="width: 18px; height: 18px; font-size: 11px; cursor: pointer;" data-bs-toggle="popover"
+                    data-bs-trigger="hover focus" data-bs-placement="top"
+                    :data-bs-content="t.sportsUserMaxNumberInfo">i</span>
+                </div>
+                <input type="number" class="form-control"
+                  v-model.number="configuracionStore.max_deportes_por_usuario" />
               </div>
             </div>
           </div>
@@ -82,9 +119,16 @@
           <!-- PORCENTAJE MAXIMO -->
           <div class="col-md-4">
             <div class="card h-100 shadow-lg rounded-4"
-                 style="background-color: rgba(180,220,255,0.6); backdrop-filter: blur(10px);">
+              style="background-color: rgba(180,220,255,0.6); backdrop-filter: blur(10px);">
               <div class="card-body">
-                <h5 class="card-title">{{ t.maxPercentage }}</h5>
+                <div class="d-flex align-items-center gap-2 mb-2">
+                  <h5 class="card-title mb-0">{{ t.maxPercentage }}</h5>
+                  <span tabindex="0"
+                    class="badge rounded-circle bg-secondary d-flex align-items-center justify-content-center"
+                    style="width: 18px; height: 18px; font-size: 11px; cursor: pointer;" data-bs-toggle="popover"
+                    data-bs-trigger="hover focus" data-bs-placement="top"
+                    :data-bs-content="t.maxPercentageInfo">i</span>
+                </div>
                 <input type="number" class="form-control" v-model.number="configuracionStore.porcentaje_maximo" />
               </div>
             </div>
@@ -96,19 +140,17 @@
 
       <!-- NOTIFICACIONES -->
       <div v-if="activeTab === 'notifs'" class="card shadow-lg rounded-4"
-           style="background-color: rgba(180,220,255,0.6); backdrop-filter: blur(10px);">
+        style="background-color: rgba(180,220,255,0.6); backdrop-filter: blur(10px);">
         <div class="card-body">
           <h4 class="mb-4">{{ t.notificationTitle }}</h4>
 
           <!-- CAMBIOS Y CANCELACIONES -->
           <div class="mb-4">
             <label class="form-label fw-semibold">{{ t.title }} - {{ t.textChangesCancellations }}</label>
-            <input type="text" class="form-control mb-2"
-              v-model="configuracionStore.titulo_cambios_cancelaciones" />
+            <input type="text" class="form-control mb-2" v-model="configuracionStore.titulo_cambios_cancelaciones" />
 
             <label class="form-label fw-semibold">{{ t.textChangesCancellations }}</label>
-            <textarea class="form-control" rows="3"
-              v-model="configuracionStore.texto_cambios_cancelaciones" />
+            <textarea class="form-control" rows="3" v-model="configuracionStore.texto_cambios_cancelaciones" />
           </div>
 
           <!-- AVISOS SOBRE ACTIVIDAD USUARIOS FINALES -->
@@ -136,12 +178,10 @@
           <!-- AVISOS NUEVA ACTIVIDAD -->
           <div class="mb-4">
             <label class="form-label fw-semibold">{{ t.title }} - {{ t.textActivityNotices }}</label>
-            <input type="text" class="form-control mb-2"
-              v-model="configuracionStore.titulo_avisos_actividades" />
+            <input type="text" class="form-control mb-2" v-model="configuracionStore.titulo_avisos_actividades" />
 
             <label class="form-label fw-semibold">{{ t.textActivityNotices }}</label>
-            <textarea class="form-control" rows="3"
-              v-model="configuracionStore.texto_avisos_actividades" />
+            <textarea class="form-control" rows="3" v-model="configuracionStore.texto_avisos_actividades" />
           </div>
 
           <!-- AVISOS CANCELACION Y DEVOLUCION DE DINERO -->
@@ -158,56 +198,46 @@
           <!-- PROBLEMAS PAGO -->
           <div class="mb-4">
             <label class="form-label fw-semibold">{{ t.title }} - {{ t.textPaymentProblems }}</label>
-            <input type="text" class="form-control mb-2"
-              v-model="configuracionStore.titulo_problemas_pago" />
+            <input type="text" class="form-control mb-2" v-model="configuracionStore.titulo_problemas_pago" />
 
             <label class="form-label fw-semibold">{{ t.textPaymentProblems }}</label>
-            <textarea class="form-control" rows="3"
-              v-model="configuracionStore.texto_problemas_pago" />
+            <textarea class="form-control" rows="3" v-model="configuracionStore.texto_problemas_pago" />
           </div>
 
           <!-- SALIDA LISTA ESPERA -->
           <div class="mb-4">
             <label class="form-label fw-semibold">{{ t.title }} - {{ t.textWaitingListExit }}</label>
-            <input type="text" class="form-control mb-2"
-              v-model="configuracionStore.titulo_salida_lista_espera" />
+            <input type="text" class="form-control mb-2" v-model="configuracionStore.titulo_salida_lista_espera" />
 
             <label class="form-label fw-semibold">{{ t.textWaitingListExit }}</label>
-            <textarea class="form-control" rows="3"
-              v-model="configuracionStore.texto_salida_lista_espera" />
+            <textarea class="form-control" rows="3" v-model="configuracionStore.texto_salida_lista_espera" />
           </div>
 
           <!-- AUSENCIAS -->
           <div class="mb-4">
             <label class="form-label fw-semibold">{{ t.title }} - {{ t.textAbsences }}</label>
-            <input type="text" class="form-control mb-2"
-              v-model="configuracionStore.titulo_ausencias" />
+            <input type="text" class="form-control mb-2" v-model="configuracionStore.titulo_ausencias" />
 
             <label class="form-label fw-semibold">{{ t.textAbsences }}</label>
-            <textarea class="form-control" rows="3"
-              v-model="configuracionStore.texto_ausencias" />
+            <textarea class="form-control" rows="3" v-model="configuracionStore.texto_ausencias" />
           </div>
 
           <!-- MATERIAL ESPECIAL -->
           <div class="mb-4">
             <label class="form-label fw-semibold">{{ t.title }} - {{ t.textSpecialMaterial }}</label>
-            <input type="text" class="form-control mb-2"
-              v-model="configuracionStore.titulo_material_especial" />
+            <input type="text" class="form-control mb-2" v-model="configuracionStore.titulo_material_especial" />
 
             <label class="form-label fw-semibold">{{ t.textSpecialMaterial }}</label>
-            <textarea class="form-control" rows="3"
-              v-model="configuracionStore.texto_material_especial" />
+            <textarea class="form-control" rows="3" v-model="configuracionStore.texto_material_especial" />
           </div>
 
           <!-- CAMBIO SESIONES -->
           <div class="mb-4">
             <label class="form-label fw-semibold">{{ t.title }} - {{ t.textSessionChanges }}</label>
-            <input type="text" class="form-control mb-2"
-              v-model="configuracionStore.titulo_cambios_sesiones" />
+            <input type="text" class="form-control mb-2" v-model="configuracionStore.titulo_cambios_sesiones" />
 
             <label class="form-label fw-semibold">{{ t.textSessionChanges }}</label>
-            <textarea class="form-control" rows="3"
-              v-model="configuracionStore.texto_cambios_sesiones" />
+            <textarea class="form-control" rows="3" v-model="configuracionStore.texto_cambios_sesiones" />
           </div>
 
         </div>
@@ -231,6 +261,7 @@
 
 <script setup lang="ts">
 import { type Ref, ref, inject, onMounted } from "vue";
+import { Popover } from 'bootstrap'
 
 import { useConfiguracionStore } from "@/stores/configuracion";
 
@@ -260,7 +291,7 @@ function lanzarMensaje(texto: string, tipo: 'success' | 'error') {
 const guardarConfiguracion = async () => {
   const response = await configuracionStore.editarConfiguracion()
 
-  if(response) {
+  if (response) {
     lanzarMensaje(t.value.configurationSuccess, "success")
   } else {
     lanzarMensaje(t.value.noModify, "error")
@@ -271,5 +302,9 @@ onMounted(async () => {
   if (!configuracionStore.modificado) {
     configuracionStore.obtenerConfiguracion()
   }
+
+  document.querySelectorAll('[data-bs-toggle="popover"]').forEach(el => {
+    new Popover(el)
+  })
 });
 </script>

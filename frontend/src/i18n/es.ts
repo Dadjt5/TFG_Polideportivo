@@ -53,6 +53,7 @@ export default {
   position: "Posicion",
   waitingListInfo: "Te avisaremos cuando haya una plaza disponible",
   leaveWaitingList: "Salir de la lista",
+  activityCancelationMessage: "Para cancelar una actividad debes esperar hasta el periodo permitido. Podrás cancelar en",
   leave: "Salir de la lista",
   confirmExit: "Confirmar salida",
   confirmLeaveListDelete: "Confirmar salida de la lista de espera",
@@ -690,6 +691,12 @@ export default {
   maxDaysFacilityReservation: "Días máximos para alquilar",
   consecutiveHours: "Cantidad de horas consecutivas máxima para alquilar",
   textDevolutionNotice: "Aviso devolución de dinero y cancelación",
+  minCancellationDaysInfo: "Mínimo número de días antes del mes siguiente para cancelar una inscripción en una actividad.",
+  minFacilityReservationDaysInfo: "Mínimo número de días con los que se puede realizar un alquiler.",
+  maxFacilityReservationDaysInfo: "Máximo número de días con los que se puede realizar un alquiler.",
+  consecutiveHoursInfo: "Máximo número de horas consecutivas que se puede realizar un alquiler en un día.",
+  sportsUserMaxNumberInfo: "Máximo número de deportes que un usuario final puede marcar como favorito en su perfil.",
+  maxPercentageInfo: "Máximo porcentaje aplicable debido a descuentos de cualquier tipo.",
 
   /* Foro administrador */
   channelName: "Nombre del canal",

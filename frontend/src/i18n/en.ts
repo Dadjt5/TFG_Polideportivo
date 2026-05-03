@@ -53,6 +53,7 @@ export default {
   position: "Position",
   waitingListInfo: "We'll let you know when a place becomes available",
   leaveWaitingList: "Leave the list",
+  activityCancelationMessage: "To cancel an activity, you must wait until the permitted period. You can cancel within",
   leave: "Leave waiting list",
   confirmExit: "Confirm removal",
   confirmLeaveListDelete: "Confirm removal from the waiting list",
@@ -689,6 +690,12 @@ export default {
   maxDaysFacilityReservation: "Maximum number of days to rent the facility",
   consecutiveHours: "Maximum consecutive hours for hire",
   textDevolutionNotice: "Refund and cancellation advice",
+  minCancellationDaysInfo: "Minimum number of days before the following month required to cancel a booking for an activity.",
+  minFacilityReservationDaysInfo: "Minimum number of days for which a booking can be made.",
+  maxFacilityReservationDaysInfo: "Maximum number of days for which a booking can be made.",
+  consecutiveHoursInfo: "Maximum number of consecutive hours for which a booking can be made in a single day.",
+  sportsUserMaxNumberInfo: "Maximum number of sports that an end user can mark as a favourite in their profile.",
+  maxPercentageInfo: "Maximum applicable percentage due to discounts of any kind.",
 
   /* Nueva notificacion */
   newNotification: "New notification",

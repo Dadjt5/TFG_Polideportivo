@@ -85,7 +85,8 @@
 
             <!-- ALQUILER -->
             <template v-if="reserva.tipo === 'ALQUILER'">
-              <p v-if="reserva.calle" class="mb-1"><i class="bi bi-water me-1 text-primary"></i>{{ t.poolStreet }}: {{ reserva.calle }}
+              <p v-if="reserva.calle" class="mb-1"><i class="bi bi-water me-1 text-primary"></i>{{ t.poolStreet }}: {{
+                reserva.calle }}
               </p>
               <p class="mb-1"><i class="bi bi-calendar-event me-1 text-primary"></i>{{ t.date }}: {{ reserva.fecha }}
               </p>
@@ -150,7 +151,8 @@
           <!-- ACCIONES -->
           <div class="mt-3 d-flex gap-2">
             <button v-if="reserva.puede_cancelar && reserva.tipo !== 'LISTA_ESPERA'"
-              class="btn btn-outline-danger btn-sm" @click="abrirConfirmacion(reserva)">
+              class="btn btn-outline-danger btn-sm" @click="abrirConfirmacion(reserva)"
+              :disabled="!puedeCancelar(reserva)">
               {{ t.cancel }}
             </button>
 
@@ -158,6 +160,15 @@
               @click="abrirConfirmacionLista(reserva)">
               {{ t.leaveWaitingList }}
             </button>
+          </div>
+
+          <div v-if="!puedeCancelar(reserva)"
+            class="alert alert-warning d-flex align-items-start gap-2 px-3 mb-0 mt-2" style="font-size: 0.85rem;">
+            <i class="bi bi-exclamation-triangle-fill mt-1 flex-shrink-0"></i>
+            <span>
+              {{ t.activityCancelationMessage }} 
+              <strong>{{ diasParaPodercancelar(reserva) }}</strong> {{ t.days }}
+            </span>
           </div>
         </div>
       </div>
@@ -307,11 +318,27 @@ let confirmModal: Modal
 let confirmModalLista: Modal
 let successModal: Modal
 
+const diasParaPodercancelar = (reserva: Reserva) => {
+  const hoy = new Date()
+  
+  // Primer día del mes siguiente
+  const primerDiaMesSiguiente = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 1)
+  
+  const fechaLimite = new Date(primerDiaMesSiguiente)
+  fechaLimite.setDate(fechaLimite.getDate() - configuracionStore.dias_minimo_cancelacion)
+  
+  const diff = fechaLimite - hoy
+  const dias = Math.ceil(diff / (1000 * 60 * 60 * 24))
+  
+  return dias > 0 ? dias : 0
+}
+
 const puedeCancelar = (reserva: Reserva) => {
   if (!reserva.puede_cancelar) return false
   if (reserva.estado !== "Confirmada") return false
 
   if (!reserva.actividad) return reserva.tipo === "ALQUILER" ? true : false
+  if (!reserva.actividad) return reserva.tipo === "LISTA_ESPERA" ? true : false
 
   const hoy = new Date()
   const mesProximo = hoy.getMonth() + 2
@@ -453,6 +480,7 @@ onMounted(async () => {
   try {
     reservas.value = await getReservasRealizadas()
     configuracionStore.obtenerConfiguracion()
+    console.log(configuracionStore)
   } catch (e) {
     mensaje.value = t.value.unexpectedError
     console.error("Error al obtener reservas", e)
