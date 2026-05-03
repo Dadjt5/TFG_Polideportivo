@@ -469,7 +469,7 @@ class SesionSerializer(serializers.ModelSerializer):
         )
     
     def get_numeroCalle(self, obj):
-        return obj.calle.numero
+        return obj.calle.numero if obj.calle else None
 
 
 class ActividadSimpleSerializer(serializers.ModelSerializer):
@@ -1014,4 +1014,4 @@ class AlquilerSimpleSerializer(serializers.ModelSerializer):
         return obj.instalacion.nombre
 
     def get_numeroCalle(self, obj):
-        return obj.calle.numero
+        return obj.calle.numero if obj.calle else None
