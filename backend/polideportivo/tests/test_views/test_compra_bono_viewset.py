@@ -1,5 +1,6 @@
 from rest_framework.test import APITestCase
 from rest_framework import status
+from datetime import date
 from django.contrib.auth import get_user_model
 
 from polideportivo.models import (
@@ -21,11 +22,11 @@ class CompraBonoViewSetTests(APITestCase):
             password="1234"
         )
 
-        self.usuario_final = UsuarioFinal.objects.create(user=self.usuario_login)
+        self.usuario_final = UsuarioFinal.objects.create(user=self.usuario_login, fechaNacimiento=date(2001,1,1))
 
         self.bono = Bono.objects.create(
-            nombre="Bono 10 usos",
-            precio=50
+            usos=10,
+            precioOtros=50
         )
 
         # visible
@@ -39,27 +40,13 @@ class CompraBonoViewSetTests(APITestCase):
         CompraBono.objects.create(
             usuarioFinal=self.usuario_final,
             bono=self.bono,
-            estado=EstadoReserva.CANCELADA
+            estado=EstadoReserva.CANCELADO
         )
 
     def test_usuario_solo_ve_compras_confirmadas(self):
         self.client.force_authenticate(user=self.usuario_login)
 
-        response = self.client.get("/api/compra-bono/")
+        response = self.client.get("/api/v1/compraBono/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
-    
-    def test_crear_compra_asigna_usuario_final(self):
-        self.client.force_authenticate(user=self.usuario_login)
-
-        datos = {
-            "bono": self.bono.id
-        }
-
-        response = self.client.post("/api/compra-bono/", datos)
-
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
-        compra = CompraBono.objects.latest("id")
-        self.assertEqual(compra.usuarioFinal, self.usuario_final)

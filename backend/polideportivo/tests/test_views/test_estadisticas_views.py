@@ -2,30 +2,42 @@ from rest_framework.test import APITestCase
 from rest_framework import status
 from django.contrib.auth import get_user_model
 from django.utils.timezone import now
+from datetime import date
+from django.contrib.auth import get_user_model
 
 from polideportivo.models import (
-    ReservaActividad,
-    Alquiler,
-    Pago,
-    Actividad,
-    Instalacion,
-    Pabellon,
-    Sesion,
-    Deporte,
-    Monitor,
-    UsuarioFinal,
-    EstadoReserva,
-    EstadoPago
+    Actividad, Instalacion, Pabellon, Deporte,
+    UsuarioFinal, Administrador, Monitor
 )
 
 
 class EstadisticasViewTests(APITestCase):
 
     def setUp(self):
+        User = get_user_model()
         Deporte.objects.create(titulo="Fútbol")
-        Instalacion.objects.create(nombre="Pista 1")
-        Actividad.objects.create(nombre="Yoga")
-        Pabellon.objects.create(nombre="Pabellón A")
+
+        self.user2 = User.objects.create_user(
+            username="user2",
+            password="1234"
+        )
+
+        self.pabellon = Pabellon.objects.create(nombre="Pabellón A")
+
+        self.instalacion = Instalacion.objects.create(
+            id=1,
+            pabellon=self.pabellon,
+            nombre="Pista 1"
+        )
+
+        self.monitor = Monitor.objects.create(user=self.user2)
+
+        self.actividad = Actividad.objects.create(
+            id=1,
+            monitor=self.monitor,
+            instalacion=self.instalacion,
+            nombre="Yoga"
+        )
 
     def test_estadisticas_devuelve_estructura_correcta(self):
         response = self.client.get("/api/v1/estadisticas/")
@@ -67,6 +79,9 @@ class ObtenerEstadisticasAdministradorViewTests(APITestCase):
             password="1234"
         )
 
+        self.administrador = Administrador.objects.create(user=self.admin)
+
+
     def test_estadisticas_admin_ok(self):
         self.client.force_authenticate(user=self.admin)
 
@@ -97,7 +112,7 @@ class ObtenerEstadisticasUsuarioFinalViewTests(APITestCase):
             password="1234"
         )
 
-        self.usuario_final = self.user
+        self.usuario_final = UsuarioFinal.objects.create(user=self.user, fechaNacimiento=date(2001,1,1))
 
     def test_estadisticas_usuario_ok(self):
         self.client.force_authenticate(user=self.user)

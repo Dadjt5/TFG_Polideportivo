@@ -1,6 +1,10 @@
 from rest_framework.test import APITestCase
 from rest_framework import status
 
+from polideportivo.models import (
+    Administrador, RolAdministrador
+)
+
 
 class RegistroViewTests(APITestCase):
 
@@ -21,7 +25,7 @@ class RegistroViewTests(APITestCase):
             "esUAM": False
         }
 
-        response = self.client.post("/api/v1/registro/", datos)
+        response = self.client.post("/api/v1/registrarse/", datos)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("email", response.data)
@@ -44,7 +48,7 @@ class RegistroViewTests(APITestCase):
         }
 
         # simulamos error forzado
-        response = self.client.post("/api/v1/registro/", datos)
+        response = self.client.post("/api/v1/registrarse/", datos)
 
         self.assertIn(response.status_code, [200, 400])
 
@@ -59,8 +63,8 @@ class RegistroMonitorTests(APITestCase):
             username="admin",
             password="1234"
         )
-        self.admin.is_administrador = True
-        self.admin.save()
+
+        Administrador.objects.create(user=self.admin, rol=RolAdministrador.RAIZ)
 
     def test_crear_monitor_correcto(self):
         self.client.force_authenticate(user=self.admin)
@@ -73,7 +77,7 @@ class RegistroMonitorTests(APITestCase):
             "password": "1234"
         }
 
-        response = self.client.post("/api/v1/registro-monitor/", datos)
+        response = self.client.post("/api/v1/registrar/monitor/", datos)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -87,20 +91,20 @@ class RegistroAdministradorTests(APITestCase):
             username="admin",
             password="1234"
         )
-        self.admin.is_administrador = True
-        self.admin.save()
+
+        Administrador.objects.create(user=self.admin, rol=RolAdministrador.RAIZ)
 
     def test_crear_administrador_correcto(self):
         self.client.force_authenticate(user=self.admin)
 
         datos = {
             "nombre": "Admin",
-            "rol": "BASICO",
+            "rol": RolAdministrador.USUARIOS,
             "email": "admin@test.com",
             "DNI": "12345678A",
             "password": "1234"
         }
 
-        response = self.client.post("/api/v1/registro-admin/", datos)
+        response = self.client.post("/api/v1/registrar/administrador/", datos)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)

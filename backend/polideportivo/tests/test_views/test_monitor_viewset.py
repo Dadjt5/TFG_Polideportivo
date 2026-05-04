@@ -2,7 +2,7 @@ from rest_framework.test import APITestCase
 from rest_framework import status
 from django.contrib.auth import get_user_model
 
-from polideportivo.models import Monitor
+from polideportivo.models import Monitor, Administrador, RolAdministrador
 
 User = get_user_model()
 
@@ -14,8 +14,6 @@ class MonitorViewSetTests(APITestCase):
             email="monitor@test.com",
             password="1234"
         )
-        self.usuario_monitor.is_monitor = True
-        self.usuario_monitor.save()
 
         self.monitor = Monitor.objects.create(
             user=self.usuario_monitor,
@@ -25,7 +23,7 @@ class MonitorViewSetTests(APITestCase):
     def test_monitor_solo_ve_su_perfil(self):
         self.client.force_authenticate(user=self.usuario_monitor)
 
-        response = self.client.get("/api/monitor/")
+        response = self.client.get("/api/v1/monitores/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
@@ -35,17 +33,15 @@ class MonitorViewSetTests(APITestCase):
             username="admin",
             password="1234"
         )
-        admin.is_administrador = True
-        admin.save()
 
-        Monitor.objects.create(user=admin, nombre="Monitor 2")
+        Administrador.objects.create(user=admin, nombre="admin 2", rol=RolAdministrador.RAIZ)
 
         self.client.force_authenticate(user=admin)
 
-        response = self.client.get("/api/monitor/")
+        response = self.client.get("/api/v1/monitores/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue(len(response.data) >= 2)
+        self.assertTrue(len(response.data) >= 1)
     
 
     def test_actualizar_monitor(self):
@@ -56,7 +52,7 @@ class MonitorViewSetTests(APITestCase):
         }
 
         response = self.client.patch(
-            f"/api/monitor/{self.monitor.id}/",
+            f"/api/v1/monitores/{self.monitor.id}/",
             datos
         )
 

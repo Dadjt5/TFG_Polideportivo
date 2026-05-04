@@ -11,6 +11,7 @@ export default {
   logout: "Cerrar sesión",
 
   /* Otros */
+  add: "Añadir",
   streetCapacity: "Capacidad por calle",
   verifyCode: "Verificar código",
   sportsSubscriptionDetail: "Detalles del abono deportivo",

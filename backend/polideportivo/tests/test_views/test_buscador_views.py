@@ -61,6 +61,8 @@ class ObtenerActividadesInstalacionesTests(APITestCase):
             password="1234"
         )
 
+        UsuarioFinal.objects.create(user=self.user, fechaNacimiento=date(2001,1,1))
+
         self.user2 = User.objects.create_user(
             username="user2",
             password="1234"
@@ -82,8 +84,6 @@ class ObtenerActividadesInstalacionesTests(APITestCase):
             instalacion=self.instalacion,
             nombre="Actividad test"
         )
-
-
 
     def test_obtener_datos_correctamente(self):
         self.client.force_authenticate(user=self.user)

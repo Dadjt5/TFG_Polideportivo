@@ -53,6 +53,19 @@ class TDA(models.Model):
 
             return tda
     
+    # Función para asignar un usuario a una tda si el codigo es valido
+    def asignar_usuario(self, codigo, usuarioFinal):
+        if not usuarioFinal or not codigo:
+            return False
+
+        codigo_uuid = uuid.UUID(codigo)
+        if codigo_uuid == self.codigo_qr:
+            self.usuarioFinal = usuarioFinal
+            self.save()
+            return True
+
+        return False
+
     # Función para calcular el precio de compra basandose en la tarifa
     def calcularPrecio(self):
         precio = self.tarifa.precioOtros

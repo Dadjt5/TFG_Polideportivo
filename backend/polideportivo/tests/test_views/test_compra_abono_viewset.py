@@ -1,5 +1,6 @@
 from rest_framework.test import APITestCase
 from rest_framework import status
+from datetime import date
 from django.contrib.auth import get_user_model
 
 from polideportivo.models import (
@@ -27,39 +28,39 @@ class CompraAbonoViewSetTests(APITestCase):
             password="1234"
         )
 
-        self.usuario_final_1 = UsuarioFinal.objects.create(user=self.usuario_login_1)
-        self.usuario_final_2 = UsuarioFinal.objects.create(user=self.usuario_login_2)
+        self.usuario_final_1 = UsuarioFinal.objects.create(user=self.usuario_login_1, fechaNacimiento=date(2001,1,1))
+        self.usuario_final_2 = UsuarioFinal.objects.create(user=self.usuario_login_2, fechaNacimiento=date(2001,1,1))
 
         self.abono = AbonoDeportivo.objects.create(
             nombre="Abono mensual",
-            precio=20
+            precioPagoUnicoOtros=20
         )
 
         # Compra que sí debe aparecer
         self.compra_visible = CompraAbono.objects.create(
             usuarioFinal=self.usuario_final_1,
-            abono=self.abono,
+            abonoDeportivo=self.abono,
             estado=EstadoReserva.CONFIRMADA
         )
 
         # Compra de otro usuario
         CompraAbono.objects.create(
             usuarioFinal=self.usuario_final_2,
-            abono=self.abono,
+            abonoDeportivo=self.abono,
             estado=EstadoReserva.CONFIRMADA
         )
 
         # Compra no confirmada
         CompraAbono.objects.create(
             usuarioFinal=self.usuario_final_1,
-            abono=self.abono,
-            estado=EstadoReserva.CANCELADA
+            abonoDeportivo=self.abono,
+            estado=EstadoReserva.CANCELADO
         )
 
     def test_usuario_solo_ve_sus_compras_confirmadas(self):
         self.client.force_authenticate(user=self.usuario_login_1)
 
-        response = self.client.get("/api/compra-abonos/")
+        response = self.client.get("/api/v1/compraAbono/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)

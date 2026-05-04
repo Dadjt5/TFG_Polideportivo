@@ -2,21 +2,12 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from rest_framework.test import APITestCase
 from rest_framework import status
-from datetime import date
+from datetime import date, timedelta
 
 from polideportivo.models import (
-    Actividad,
-    Instalacion,
-    Alquiler,
-    ReservaActividad,
-    CompraAbono,
-    CompraBono,
-    TDA,
-    AbonoDeportivo,
-    Pago,
-    Bono,
-    TipoPago,
-    TipoInstalacion
+    Actividad, Instalacion, Alquiler, ReservaActividad, CompraAbono, CompraBono,
+    TDA, AbonoDeportivo, Pago, Bono, TipoPago, TipoInstalacion, UsuarioFinal,
+    Pabellon, Monitor, Configuracion
 )
 
 class ReservarActividadViewTests(APITestCase):
@@ -29,8 +20,20 @@ class ReservarActividadViewTests(APITestCase):
             password="1234"
         )
 
-        self.usuario_final = self.user
-        self.actividad = Actividad.objects.create(nombre="Actividad test")
+
+        self.usuario_final = UsuarioFinal.objects.create(user=self.user, fechaNacimiento=date(2001,1,1))
+
+        self.pabellon = Pabellon.objects.create()
+        self.instalacion = Instalacion.objects.create(pabellon=self.pabellon)
+
+        self.user2 = User.objects.create_user(
+            username="user2",
+            password="1234"
+        )
+
+        self.monitor = Monitor.objects.create(user=self.user2)
+
+        self.actividad = Actividad.objects.create(nombre="Actividad test", instalacion=self.instalacion, monitor=self.monitor)
 
     def test_reserva_actividad_ok(self):
         self.client.force_authenticate(user=self.user)
@@ -80,9 +83,15 @@ class ReservaInstalacionViewTests(APITestCase):
             password="1234"
         )
 
+        Configuracion.objects.create()
+
+        self.usuario_final = UsuarioFinal.objects.create(user=self.user, fechaNacimiento=date(2001,1,1))
+        self.pabellon = Pabellon.objects.create()
+
         self.instalacion = Instalacion.objects.create(
             nombre="Instalacion test",
-            tipoInstalacion=TipoInstalacion.PISTA,
+            pabellon=self.pabellon,
+            tipoInstalacion=TipoInstalacion.SALA_MULTIUSOS,
             numeroCalles=0
         )
 
@@ -94,7 +103,7 @@ class ReservaInstalacionViewTests(APITestCase):
 
         data = {
             "complementos": {
-                "fecha": str(date.today()),
+                "fecha": str(date.today() + timedelta(days=1)),
                 "horas": ["10:00:00", "11:00:00"],
                 "luz": False
             }
@@ -136,6 +145,8 @@ class ComprarAbonoViewTests(APITestCase):
             username="user",
             password="1234"
         )
+
+        self.usuario_final = UsuarioFinal.objects.create(user=self.user, fechaNacimiento=date(2001,1,1))
 
         self.abono = AbonoDeportivo.objects.create(nombre="Abono test")
 
@@ -189,7 +200,9 @@ class ComprarBonoViewTests(APITestCase):
             password="1234"
         )
 
-        self.bono = Bono.objects.create(nombre="Bono test")
+        self.usuario_final = UsuarioFinal.objects.create(user=self.user, fechaNacimiento=date(2001,1,1))
+
+        self.bono = Bono.objects.create(usos=10)
 
     def test_comprar_bono_ok(self):
         self.client.force_authenticate(user=self.user)
@@ -224,6 +237,8 @@ class ComprarTDAViewTests(APITestCase):
             username="user",
             password="1234"
         )
+
+        self.usuario_final = UsuarioFinal.objects.create(user=self.user, fechaNacimiento=date(2001,1,1))
 
     def test_comprar_tda_ok(self):
         self.client.force_authenticate(user=self.user)

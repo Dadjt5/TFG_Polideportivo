@@ -1,12 +1,10 @@
 from rest_framework.test import APITestCase
 from rest_framework import status
 from django.contrib.auth import get_user_model
+from datetime import date
 
 from polideportivo.models import (
     UsuarioFinal,
-    Monitor,
-    Administrador,
-    RolAdministrador
 )
 
 User = get_user_model()
@@ -20,14 +18,12 @@ class MeAPIViewTests(APITestCase):
             password="1234"
         )
 
-        self.usuario_final = UsuarioFinal.objects.create(user=self.user)
-        self.user.is_usuario_final = True
-        self.user.save()
+        self.usuario_final = UsuarioFinal.objects.create(user=self.user, fechaNacimiento=date(2001,1,1))
 
     def test_usuario_autenticado_recibe_su_info(self):
         self.client.force_authenticate(user=self.user)
 
-        response = self.client.get("/api/me/")
+        response = self.client.get("/api/v1/me/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -39,7 +35,7 @@ class MeAPIViewTests(APITestCase):
     def test_usuario_sin_relaciones(self):
         self.client.force_authenticate(user=self.user)
 
-        response = self.client.get("/api/me/")
+        response = self.client.get("/api/v1/me/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -48,6 +44,6 @@ class MeAPIViewTests(APITestCase):
 
 
     def test_usuario_no_autenticado_no_puede_acceder(self):
-        response = self.client.get("/api/me/")
+        response = self.client.get("/api/v1/me/")
 
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)

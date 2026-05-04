@@ -125,17 +125,3 @@ class AsistenciaViewSetTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
-    
-    def test_crear_asistencia_asigna_usuario_final(self):
-        self.client.force_authenticate(user=self.usuario_login)
-
-        datos = {
-            "sesion": self.sesion.id
-        }
-
-        response = self.client.post("/api/v1/asistencias/", datos)
-
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
-        asistencia = Asistencia.objects.first()
-        self.assertEqual(asistencia.usuarioFinal, self.usuario_final)

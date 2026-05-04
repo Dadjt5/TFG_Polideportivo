@@ -1,20 +1,12 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from rest_framework.test import APITestCase
-from rest_framework import status
+from datetime import date
 
 from polideportivo.models import (
-    UsuarioFinal,
-    Monitor,
-    Administrador,
-    Pabellon,
-    Instalacion,
-    TarifaInstalacion,
-    TarifaTDA,
-    ActividadComun,
-    GrupoReducido,
-    Fisioterapia,
-    Configuracion
+    UsuarioFinal, Monitor, Administrador, Pabellon, Instalacion,
+    TarifaInstalacion, TarifaTDA, ActividadComun, GrupoReducido,
+    Fisioterapia, Configuracion, RolAdministrador
 )
 
 class GestionUsuariosViewTests(APITestCase):
@@ -22,16 +14,24 @@ class GestionUsuariosViewTests(APITestCase):
     def setUp(self):
         User = get_user_model()
 
+        self.user = User.objects.create_user(
+            username="user",
+            password="1234"
+        )
+
         self.admin = User.objects.create_user(
             username="admin",
             password="1234"
         )
-        self.admin.is_administrador_usuarios = True
-        self.admin.save()
 
-        UsuarioFinal.objects.create(nombre="U1")
-        Monitor.objects.create(nombre="M1")
-        Administrador.objects.create(rol="A1")
+        self.monitor = User.objects.create_user(
+            username="monitor",
+            password="1234"
+        )
+
+        UsuarioFinal.objects.create(nombre="U1", fechaNacimiento=date(2001,1,1), user=self.user)
+        Monitor.objects.create(nombre="M1", user=self.monitor)
+        Administrador.objects.create(rol=RolAdministrador.USUARIOS, user=self.admin)
 
     def test_get_usuarios_ok(self):
         self.client.force_authenticate(user=self.admin)
@@ -45,7 +45,7 @@ class GestionUsuariosViewTests(APITestCase):
 
     def test_sin_auth(self):
         response = self.client.get("/api/v1/usuarios/")
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 401)
 
 class GestionEspaciosViewTests(APITestCase):
 
@@ -56,11 +56,11 @@ class GestionEspaciosViewTests(APITestCase):
             username="admin",
             password="1234"
         )
-        self.admin.is_administrador_espacios = True
-        self.admin.save()
 
-        Pabellon.objects.create(nombre="P1")
-        Instalacion.objects.create(nombre="I1")
+        Administrador.objects.create(rol=RolAdministrador.ESPACIOS, user=self.admin)
+
+        self.pabellon = Pabellon.objects.create(nombre="P1")
+        Instalacion.objects.create(nombre="I1", pabellon=self.pabellon)
 
     def test_get_espacios_ok(self):
         self.client.force_authenticate(user=self.admin)
@@ -73,7 +73,7 @@ class GestionEspaciosViewTests(APITestCase):
 
     def test_sin_auth(self):
         response = self.client.get("/api/v1/espacios/")
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 401)
 
 
 class GestionTarifasViewTests(APITestCase):
@@ -85,8 +85,8 @@ class GestionTarifasViewTests(APITestCase):
             username="admin",
             password="1234"
         )
-        self.admin.is_administrador_tarifas = True
-        self.admin.save()
+
+        Administrador.objects.create(rol=RolAdministrador.TARIFAS, user=self.admin)
 
         TarifaInstalacion.objects.create(titulo="TI1")
         TarifaTDA.objects.create(titulo="T1")
@@ -108,7 +108,7 @@ class GestionTarifasViewTests(APITestCase):
 
     def test_sin_auth(self):
         response = self.client.get("/api/v1/tarifas/")
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 401)
 
     
 class ObtenerConfiguracionViewTests(APITestCase):
@@ -120,6 +120,8 @@ class ObtenerConfiguracionViewTests(APITestCase):
             username="user",
             password="1234"
         )
+
+        Administrador.objects.create(rol=RolAdministrador.RAIZ, user=self.user)
 
         Configuracion.objects.create()
 
@@ -145,7 +147,7 @@ class ObtenerConfiguracionViewTests(APITestCase):
 
         self.assertEqual(response.status_code, 200)
 
-    def test_patch_configuracion_error(self):
+    def test_patch_configuracion_ok(self):
         self.client.force_authenticate(user=self.user)
 
         response = self.client.patch(
@@ -154,4 +156,4 @@ class ObtenerConfiguracionViewTests(APITestCase):
             format="json"
         )
 
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 200)

@@ -166,12 +166,12 @@
                 {{ t.specialDates }}
               </h5>
 
-              <!-- Selección de fecha -->
+              <!-- Seleccion de fecha -->
               <input type="date" v-model="tempFecha" class="form-control mb-3" />
 
-              <!-- Botón añadir -->
+              <!-- Boton añadir -->
               <button class="btn btn-danger btn-sm mb-3" @click="handleAddFechaEspecial">
-                {{ t.close }}
+                {{ t.add }}
               </button>
 
               <!-- Lista -->

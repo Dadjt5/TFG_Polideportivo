@@ -1,17 +1,12 @@
 from rest_framework.test import APITestCase
 from rest_framework import status
 from django.contrib.auth import get_user_model
-
-from django.contrib.auth import get_user_model
-from django.shortcuts import get_object_or_404
+from datetime import date
 
 User = get_user_model()
 
 from polideportivo.models import (
-    Foro,
-    Canal,
-    Mensaje,
-    UsuarioFinal
+    Foro, Canal, UsuarioFinal, Administrador, UsuarioCanal
 )
 
 class ForoViewTests(APITestCase):
@@ -21,15 +16,15 @@ class ForoViewTests(APITestCase):
             username="user",
             password="1234"
         )
-        self.user_final.is_usuario_final = True
-        self.user_final.save()
+
+        self.usuario = UsuarioFinal.objects.create(user=self.user_final, fechaNacimiento=date(2001,1,1))
 
         self.admin = User.objects.create_user(
             username="admin",
             password="1234"
         )
-        self.admin.is_administrador = True
-        self.admin.save()
+
+        self.administrador = Administrador.objects.create(user=self.admin)
 
     def test_foro_usuario_final(self):
         self.client.force_authenticate(user=self.user_final)
@@ -46,15 +41,16 @@ class CanalAdministradorViewTests(APITestCase):
             username="admin",
             password="1234"
         )
-        self.admin.is_administrador = True
-        self.admin.save()
+
+        self.administrador = Administrador.objects.create(user=self.admin)
 
     def test_ver_canal_admin(self):
         self.client.force_authenticate(user=self.admin)
 
-        canal = Canal.objects.create(titulo="Test")
+        self.foro = Foro.objects.create()
+        canal = Canal.objects.create(titulo="Test", foro=self.foro, numeroParticipantes=10)
 
-        response = self.client.get(f"/api/v1/canal/{canal.id}/admin/")
+        response = self.client.get(f"/api/v1/canales/{canal.id}/admin/")
 
         self.assertEqual(response.status_code, 200)
 
@@ -66,8 +62,8 @@ class NuevoCanalViewTests(APITestCase):
             username="admin",
             password="1234"
         )
-        self.admin.is_administrador = True
-        self.admin.save()
+        
+        self.administrador = Administrador.objects.create(user=self.admin)
 
         self.foro = Foro.objects.create()
 
@@ -82,7 +78,7 @@ class NuevoCanalViewTests(APITestCase):
         }
 
         response = self.client.post(
-            f"/api/v1/foro/{self.foro.id}/canal/",
+            f"/api/v1/foros/{self.foro.id}/canal/",
             datos
         )
 
@@ -97,12 +93,17 @@ class MensajesCanalViewTests(APITestCase):
             password="1234"
         )
 
-        self.canal = Canal.objects.create(titulo="Canal test")
+        self.usuario = UsuarioFinal.objects.create(user=self.user, fechaNacimiento=date(2001,1,1))
+
+        self.foro = Foro.objects.create()
+        self.canal = Canal.objects.create(titulo="Canal test", foro=self.foro, numeroParticipantes=10)
+
+        UsuarioCanal.objects.create(canal=self.canal, usuarioFinal=self.usuario)
 
     def test_ver_mensajes(self):
         self.client.force_authenticate(user=self.user)
 
-        response = self.client.get(f"/api/v1/canal/{self.canal.id}/mensajes/")
+        response = self.client.get(f"/api/v1/canales/{self.canal.id}/mensajes/")
 
         self.assertEqual(response.status_code, 200)
 
@@ -110,7 +111,7 @@ class MensajesCanalViewTests(APITestCase):
         self.client.force_authenticate(user=self.user)
 
         response = self.client.post(
-            f"/api/v1/canal/{self.canal.id}/mensajes/",
+            f"/api/v1/canales/{self.canal.id}/mensajes/",
             {"texto": "Hola"}
         )
 
@@ -125,24 +126,27 @@ class GestionarUsuarioCanalTests(APITestCase):
             username="admin",
             password="1234"
         )
-        self.admin.is_administrador = True
-        self.admin.save()
+
+        self.administrador = Administrador.objects.create(user=self.admin)
 
         self.user = User.objects.create_user(
             username="user",
             password="1234"
         )
 
-        self.usuario_final = UsuarioFinal.objects.create(user=self.user)
+        self.usuario_final = UsuarioFinal.objects.create(user=self.user, fechaNacimiento=date(2001,1,1))
 
-        self.canal = Canal.objects.create(titulo="Canal test")
+        self.foro = Foro.objects.create()
+        self.canal = Canal.objects.create(titulo="Canal test", foro=self.foro, numeroParticipantes=10)
+
+        UsuarioCanal.objects.create(canal=self.canal, usuarioFinal=self.usuario_final)
 
     def test_silenciar_usuario(self):
         self.client.force_authenticate(user=self.admin)
 
         response = self.client.patch(
-            f"/api/v1/canal/{self.canal.id}/usuario/{self.usuario_final.id}/",
-            {"accion": "silenciar"},
+            f"/api/v1/canales/{self.canal.id}/modificar/{self.usuario_final.id}/",
+            "silenciar",
             format="json"
         )
 
@@ -152,8 +156,8 @@ class GestionarUsuarioCanalTests(APITestCase):
         self.client.force_authenticate(user=self.admin)
 
         response = self.client.patch(
-            f"/api/v1/canal/{self.canal.id}/usuario/{self.usuario_final.id}/",
-            {"accion": "expulsar"},
+            f"/api/v1/canales/{self.canal.id}/modificar/{self.usuario_final.id}/",
+            "expulsar",
             format="json"
         )
 
@@ -163,8 +167,8 @@ class GestionarUsuarioCanalTests(APITestCase):
         self.client.force_authenticate(user=self.admin)
 
         response = self.client.patch(
-            f"/api/v1/canal/{self.canal.id}/usuario/{self.usuario_final.id}/",
-            {"accion": "loquesea"},
+            f"/api/v1/canales/{self.canal.id}/modificar/{self.usuario_final.id}/",
+            "loquesea",
             format="json"
         )
 

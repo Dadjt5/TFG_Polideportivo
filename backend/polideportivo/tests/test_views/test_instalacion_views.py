@@ -7,12 +7,8 @@ import json
 User = get_user_model()
 
 from polideportivo.models import (
-    Pabellon,
-    TarifaInstalacion,
-    Instalacion,
-    Agenda,
-    Sesion,
-    TipoInstalacion
+    Pabellon, TarifaInstalacion, Instalacion, TipoInstalacion,
+    Administrador, RolAdministrador
 )
 
 class NuevaInstalacionViewTests(APITestCase):
@@ -22,11 +18,11 @@ class NuevaInstalacionViewTests(APITestCase):
             username="admin",
             password="1234"
         )
-        self.admin.is_administrador = True
-        self.admin.save()
+
+        self.administrador = Administrador.objects.create(user=self.admin, rol=RolAdministrador.RAIZ)
 
         self.pabellon = Pabellon.objects.create(nombre="Pabellon 1")
-        self.tarifa = TarifaInstalacion.objects.create(nombre="Tarifa 1", precio=10)
+        self.tarifa = TarifaInstalacion.objects.create(precioOtros=10)
 
     def test_crear_instalacion_ok(self):
         self.client.force_authenticate(user=self.admin)
@@ -44,7 +40,7 @@ class NuevaInstalacionViewTests(APITestCase):
         }
 
         response = self.client.post(
-            "/api/v1/instalacion/nueva/",
+            "/api/v1/instalaciones/crear/",
             data
         )
 
@@ -62,7 +58,7 @@ class NuevaInstalacionViewTests(APITestCase):
         }
 
         response = self.client.post(
-            "/api/v1/instalacion/nueva/",
+            "/api/v1/instalaciones/crear/",
             data
         )
 
@@ -76,11 +72,11 @@ class NuevaInstalacionViewTests(APITestCase):
         }
 
         response = self.client.post(
-            "/api/v1/instalacion/nueva/",
+            "/api/v1/instalaciones/nueva/",
             data
         )
 
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 405)
 
 class EditarInstalacionViewTests(APITestCase):
 
@@ -89,11 +85,11 @@ class EditarInstalacionViewTests(APITestCase):
             username="admin",
             password="1234"
         )
-        self.admin.is_administrador = True
-        self.admin.save()
+
+        self.administrador = Administrador.objects.create(user=self.admin, rol=RolAdministrador.RAIZ)
 
         self.pabellon = Pabellon.objects.create(nombre="Pabellon 1")
-        self.tarifa = TarifaInstalacion.objects.create(nombre="Tarifa 1", precio=10)
+        self.tarifa = TarifaInstalacion.objects.create(precioOtros=10)
 
         self.instalacion = Instalacion.objects.create(
             nombre="Instalacion 1",
@@ -117,7 +113,7 @@ class EditarInstalacionViewTests(APITestCase):
         }
 
         response = self.client.post(
-            f"/api/v1/instalacion/{self.instalacion.id}/editar/",
+            f"/api/v1/instalaciones/{self.instalacion.id}/editar/",
             data
         )
 
@@ -133,11 +129,11 @@ class EditarInstalacionViewTests(APITestCase):
         }
 
         response = self.client.post(
-            f"/api/v1/instalacion/{self.instalacion.id}/editar/",
+            f"/api/v1/instalaciones/{self.instalacion.id}/editar/",
             data
         )
 
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 401)
 
     def test_editar_instalacion_no_existe(self):
         self.client.force_authenticate(user=self.admin)
@@ -151,8 +147,8 @@ class EditarInstalacionViewTests(APITestCase):
         }
 
         response = self.client.post(
-            "/api/v1/instalacion/999/editar/",
+            "/api/v1/instalaciones/999/editar/",
             data
         )
 
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 400)

@@ -6,15 +6,8 @@ from datetime import date
 import json
 
 from polideportivo.models import (
-    Actividad,
-    Instalacion,
-    ReservaActividad,
-    Alquiler,
-    Agenda,
-    Descuento,
-    TipoInstalacion,
-    EstadoReserva,
-    Dia
+    Actividad, Instalacion, TipoInstalacion, UsuarioFinal, Pabellon, TarifaInstalacion,
+    Monitor, ActividadComun
 )
 
 class TarifaActividadViewTests(APITestCase):
@@ -27,11 +20,31 @@ class TarifaActividadViewTests(APITestCase):
             password="1234"
         )
 
-        self.user.usuario_final = True
-        self.user.save()
+        self.usuario = UsuarioFinal.objects.create(user=self.user, fechaNacimiento=date(2001,1,1))
+
+        self.user2 = User.objects.create_user(
+            username="user2",
+            password="1234"
+        )
+
+        self.pabellon = Pabellon.objects.create()
+
+        self.instalacion = Instalacion.objects.create(
+            id=1,
+            pabellon=self.pabellon,
+            nombre="Instalacion test"
+        )
+
+        self.monitor = Monitor.objects.create(user=self.user2)
+
+        self.tarifa = ActividadComun.objects.create()
 
         self.actividad = Actividad.objects.create(
-            nombre="Actividad test"
+            id=1,
+            monitor=self.monitor,
+            instalacion=self.instalacion,
+            nombre="Actividad test",
+            tarifa=self.tarifa
         )
 
     def test_obtener_tarifa_actividad_ok(self):
@@ -50,7 +63,7 @@ class TarifaActividadViewTests(APITestCase):
             f"/api/v1/tarifas/actividades/{self.actividad.id}/"
         )
 
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 401)
 
 class TarifaInstalacionViewTests(APITestCase):
 
@@ -62,14 +75,19 @@ class TarifaInstalacionViewTests(APITestCase):
             password="1234"
         )
 
-        self.user.usuario_final = True
-        self.user.save()
+        self.usuario = UsuarioFinal.objects.create(user=self.user, fechaNacimiento=date(2001,1,1))
+
+        self.pabellon = Pabellon.objects.create()
+
+        self.tarifa = TarifaInstalacion.objects.create()
 
         self.instalacion = Instalacion.objects.create(
             nombre="Instalacion test",
-            tipoInstalacion=TipoInstalacion.PISTA,
+            tipoInstalacion=TipoInstalacion.SALA_MULTIUSOS,
             luz=True,
-            numeroCalles=0
+            pabellon=self.pabellon,
+            numeroCalles=0,
+            tarifa=self.tarifa
         )
 
     def test_tarifa_instalacion_ok(self):
@@ -96,16 +114,19 @@ class TarifaInstalacionViewTests(APITestCase):
             f"/api/v1/tarifas/instalaciones/{self.instalacion.id}/"
         )
 
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 401)
 
 
 class ReservasPorDiaViewTests(APITestCase):
 
     def setUp(self):
+        self.pabellon = Pabellon.objects.create()
+
         self.instalacion = Instalacion.objects.create(
             nombre="Instalacion test",
-            tipoInstalacion=TipoInstalacion.PISTA,
-            numeroCalles=0
+            tipoInstalacion=TipoInstalacion.SALA_MULTIUSOS,
+            numeroCalles=0,
+            pabellon=self.pabellon,
         )
 
         self.fecha = date.today()

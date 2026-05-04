@@ -11,6 +11,7 @@ export default {
   logout: "Logout",
 
   /* Otros */
+  add: "Add",
   streetCapacity: "Capacity per lane",
   verifyCode: "Verify code",
   sportsSubscriptionDetail: "Sports subscription details",

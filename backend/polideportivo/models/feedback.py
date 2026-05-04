@@ -9,32 +9,14 @@ class Feedback(models.Model):
         BUG = "Bug"
         SUGERENCIA = "Sugerencia"
 
-    usuario = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        verbose_name="Usuario"
-    )
-
-    tipo = models.CharField(
-        max_length=20,
-        choices=TipoFeedback.choices,
-        default=TipoFeedback.GENERAL,
-        verbose_name="Tipo de feedback"
-    )
-
     mensaje = models.TextField(verbose_name="Mensaje")
-
-    valoracion = models.IntegerField(
-        null=True,
-        blank=True,
-        verbose_name="Valoración"
-    )
-
+    valoracion = models.IntegerField(null=True, blank=True, verbose_name="Valoración")
     revisado = models.BooleanField(default=False, verbose_name="Revisado por admin")
-
     fecha = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de envío")
+
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Usuario")
+
+    tipo = models.CharField(max_length=20, choices=TipoFeedback.choices, default=TipoFeedback.GENERAL, verbose_name="Tipo de feedback")
 
     def __str__(self):
         return f"{self.tipo} - {self.fecha.strftime('%Y-%m-%d %H:%M')}"
