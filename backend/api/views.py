@@ -1002,7 +1002,7 @@ class ValidarTDAView(APIView):
         tda = TDA.objects.filter(usuarioFinal__isnull=True, codigo_qr=codigo).first()
 
         if tda:
-            resultado = tda.asignar_usuario(codigo, request.user.usuario_final)
+            resultado = tda.asignarUsuario(codigo, request.user.usuario_final)
             if resultado:
                 return Response({"respuesta": "TDA validada correctamente"}, status=status.HTTP_200_OK)
 

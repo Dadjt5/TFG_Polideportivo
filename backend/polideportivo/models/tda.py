@@ -54,7 +54,7 @@ class TDA(models.Model):
             return tda
     
     # Función para asignar un usuario a una tda si el codigo es valido
-    def asignar_usuario(self, codigo, usuarioFinal):
+    def asignarUsuario(self, codigo, usuarioFinal):
         if not usuarioFinal or not codigo:
             return False
 

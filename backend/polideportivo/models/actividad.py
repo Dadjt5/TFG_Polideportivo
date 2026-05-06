@@ -212,6 +212,9 @@ class Actividad(models.Model):
             "terreno",
             "periodo",
             "estado",
+            "inscripcion",
+            "descripcion",
+            "tipoActividad"
         ]
 
         # Validaciones especiales

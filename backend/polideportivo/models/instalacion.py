@@ -107,7 +107,8 @@ class Instalacion(models.Model):
             "aforoMaximo",
             "luz",
             "porcentajeTDA",
-            "numeroCalles"
+            "numeroCalles",
+            "tipoInstalacion"
         ]
 
         for campo in campos_simples:
@@ -116,7 +117,7 @@ class Instalacion(models.Model):
 
         self.tarifa = tarifa
         self.pabellon = pabellon
-        self.imagenURL = imagen
+        self.imagen = imagen
 
         self.save()
         return True
