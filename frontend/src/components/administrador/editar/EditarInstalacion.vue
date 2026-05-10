@@ -435,7 +435,7 @@ import { useRouter } from "vue-router";
 import { Modal } from 'bootstrap'
 
 /* Importamos la comunicacion para recuperar la informacion de instalaciones del backend */
-import { getInstalacionDetalle, modificarInstalacion, eliminarInstalacion, getAlquileresPorDia } from "@/services/detalleService";
+import { getInstalacionDetalleSinAgenda, modificarInstalacion, eliminarInstalacion, getAlquileresPorDia, getAgendaInstalacion } from "@/services/detalleService";
 import { getPabellonesSimples, getTarifasInstalacion } from "@/services/listadoService"
 
 import { useTiposStore } from '@/stores/tipos';
@@ -805,12 +805,20 @@ onMounted(async () => {
   successModal = new Modal(document.getElementById('successDeleteModal')!)
 
   try {
-    const data = await getInstalacionDetalle(id)
+    const data = await getInstalacionDetalleSinAgenda(id)
     pabellones.value = await getPabellonesSimples()
     tarifas.value = await getTarifasInstalacion()
 
-    agenda.value = data.agenda.filter((a: any) => a.dia && !a.fecha)
-    fechasEspeciales.value = data.agenda
+    const agendasInstalacion = await Promise.all(
+      data.agenda.map((agendaId: number) =>
+        getAgendaInstalacion(agendaId)
+      )
+    )
+
+    const agendaCompleta = agendasInstalacion.flat()
+
+    agenda.value = agendaCompleta.filter((a: any) => a.dia && !a.fecha)
+    fechasEspeciales.value = agendaCompleta
       .filter((a: any) => a.fecha)
       .map((a: any) => ({
       fecha: a.fecha

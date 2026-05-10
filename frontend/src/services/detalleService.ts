@@ -32,9 +32,21 @@ export const eliminarDeporte = async (id: number) => {
   return response.data;
 };
 
+/* Función para obtener la agenda de una instalacion sin la agenda*/
+export const getInstalacionDetalleSinAgenda = async (id: number) => {
+  const response = await api.get(`/api/v1/instalacionesSinAgenda/${id}/`);
+  return response.data;
+};
+
 /* Función para obtener la informacion de una instalacion */
 export const getInstalacionDetalle = async (id: number) => {
   const response = await api.get(`/api/v1/instalaciones/${id}/`);
+  return response.data;
+};
+
+/* Función para obtener la agenda de una instalacion */
+export const getAgendaInstalacion = async (id: number) => {
+  const response = await api.get(`/api/v1/agendas/${id}/`);
   return response.data;
 };
 

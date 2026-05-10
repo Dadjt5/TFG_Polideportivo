@@ -48,7 +48,7 @@
 
               <div class="col-12 col-sm-4">
                 <p><i class="bi bi-people-fill text-success me-1"></i><span class="fw-medium">{{ t.availablePlaces
-                    }}:</span> {{ actividad.plazasMaximas }}</p>
+                }}:</span> {{ actividad.plazasMaximas }}</p>
               </div>
 
               <div class="col-12 col-sm-4" v-if="actividad.nivel">
@@ -68,17 +68,17 @@
 
               <div class="col-12 col-sm-4" v-if="actividad.terreno">
                 <p><i class="bi bi-signpost-split-fill text-secondary me-1"></i><span class="fw-medium">{{ t.terrainType
-                    }}:</span> {{ actividad.terreno }}</p>
+                }}:</span> {{ actividad.terreno }}</p>
               </div>
 
               <div class="col-12 col-sm-4">
                 <p><i class="bi bi-credit-card-2-front-fill text-success me-1"></i><span class="fw-medium">{{ t.credits
-                    }}:</span> {{ actividad.numeroCreditos }}</p>
+                }}:</span> {{ actividad.numeroCreditos }}</p>
               </div>
 
               <div class="col-12 col-sm-4" v-if="actividad.año">
                 <p><i class="bi bi-calendar-year text-info me-1"></i><span class="fw-medium">{{ t.academicYear
-                    }}:</span> {{ actividad.año }}</p>
+                }}:</span> {{ actividad.año }}</p>
               </div>
 
               <div class="col-12 col-sm-4" v-if="actividad.instalacion">
@@ -105,6 +105,14 @@
               <div class="col-12 col-sm-4">
                 <p><i class="bi bi-activity text-info me-1"></i><span class="fw-medium">{{ t.sport }}:</span> {{
                   actividad.nombreDeporte || "-" }}</p>
+              </div>
+
+              <div class="col-12 col-sm-4" v-if="actividad.inscripcion !== undefined">
+                <p>
+                  <i class="bi bi-bookmark-check text-info me-1"></i>
+                  <span class="fw-medium">{{ t.canBook }}:</span>
+                  {{ actividad.inscripcion ? t.yes : 'No' }}
+                </p>
               </div>
             </div>
           </div>
@@ -155,30 +163,33 @@
         </div>
       </div>
 
-      <div v-if="actividad.plazasReservadas >= actividad.plazasMaximas && actividad.id != -1"
-        class="alert alert-warning text-center mt-4 shadow-sm">
+      <span v-if="usuarioFinalStore.usuarioFinal">
+        <div v-if="actividad.plazasReservadas >= actividad.plazasMaximas && actividad.id != -1"
+          class="alert alert-warning text-center mt-4 shadow-sm">
 
-        <i class="bi bi-exclamation-triangle-fill me-2"></i>
-        {{ t.noPlacesMessage }}
-      </div>
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          {{ t.noPlacesMessage }}
+        </div>
 
-      <div
-        v-else-if="actividad.tipoReserva !== 'Permite la reserva solo online' && actividad.tipoReserva !== 'Permite ambos tipos de reserva' && actividad.id != -1"
-        class="alert alert-warning text-center mt-4 shadow-sm">
+        <div
+          v-else-if="actividad.tipoReserva !== 'Permite la reserva solo online' && actividad.tipoReserva !== 'Permite ambos tipos de reserva' && actividad.id != -1"
+          class="alert alert-warning text-center mt-4 shadow-sm">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          {{ t.wrongBookingType }}
+        </div>
 
-        <i class="bi bi-exclamation-triangle-fill me-2"></i>
-        {{ t.wrongBookingType }}
-      </div>
+        <div v-else-if="!mesDentroDePeriodo(actividad.periodo) && actividad.id != -1"
+          class="alert alert-warning text-center mt-4 shadow-sm">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          {{ t.wrongPeriodToBook }}
+        </div>
 
-      <div v-else-if="!mesDentroDePeriodo(actividad.periodo) && actividad.id != -1" class="alert alert-warning text-center mt-4 shadow-sm">
-        <i class="bi bi-exclamation-triangle-fill me-2"></i>
-        {{ t.wrongPeriodToBook }}
-      </div>
-
-      <div v-else-if="actividad.edadMinima > usuarioFinalStore.edad && actividad.id != -1" class="alert alert-warning text-center mt-4 shadow-sm">
-        <i class="bi bi-exclamation-triangle-fill me-2"></i>
-        {{ t.wrongAge }}
-      </div>
+        <div v-else-if="actividad.edadMinima > usuarioFinalStore.edad && actividad.id != -1"
+          class="alert alert-warning text-center mt-4 shadow-sm">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          {{ t.wrongAge }}
+        </div>
+      </span>
 
       <div v-if="mostrarMensaje" class="text-center mb-3 mt-3">
         <div class="alert" :class="tipoMensaje === 'success' ? 'alert-success' : 'alert-danger'">

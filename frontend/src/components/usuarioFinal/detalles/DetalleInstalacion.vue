@@ -313,7 +313,7 @@ import { inject, ref, onMounted, type Ref, watch, computed } from 'vue';
 import { useRouter } from "vue-router";
 
 /* Importamos la comunicacion para recuperar la informacion de instalaciones del backend */
-import { getInstalacionDetalle, getAlquileresPorDia } from "@/services/detalleService";
+import { getInstalacionDetalleSinAgenda, getAlquileresPorDia, getAgendaInstalacion } from "@/services/detalleService";
 import { useUserStore } from '@/stores/usuarioFinal';
 import { useTiposStore } from '@/stores/tipos';
 import { descargarHorario } from '@/services/crearRecursosService';
@@ -484,11 +484,19 @@ onMounted(async () => {
   const id = parseInt(props.id);
 
   try {
-    const data = await getInstalacionDetalle(id)
+    const data = await getInstalacionDetalleSinAgenda(id)
+
+    const agendasInstalacion = await Promise.all(
+      data.agenda.map((agendaId: number) =>
+        getAgendaInstalacion(agendaId)
+      )
+    )
+
+    const agendaCompleta = agendasInstalacion.flat()
     tiposStore.obtenerTipos()
 
-    agenda.value = data.agenda.filter((a: any) => a.dia && !a.fecha)
-    fechasEspeciales.value = data.agenda
+    agenda.value = agendaCompleta.filter((a: any) => a.dia && !a.fecha)
+    fechasEspeciales.value = agendaCompleta
       .filter((a: any) => a.fecha)
       .map((a: any) => ({
         fecha: a.fecha

@@ -417,6 +417,38 @@ class InstalacionSimpleSerializer(serializers.ModelSerializer):
         fields = ("id", "nombre", "numeroCalles", "tipoInstalacion", "pabellon", "aforoMaximo")
 
 
+class InstalacionSinAgendaSerializer(serializers.ModelSerializer):
+    calles = CalleSerializer(many=True, read_only=True)
+    pabellon = PabellonSimpleSerializer(read_only=True)
+    plazasMinimas = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Instalacion
+        fields = (
+            "id",
+            "nombre",
+            "tipoInstalacion",
+            "aforoMaximo",
+            "luz",
+            "imagen",
+            "porcentajeTDA",
+            "pabellon",
+            "agenda",
+            "tarifa",
+            "numeroCalles",
+            "calles",
+            "plazasMinimas"
+        )
+
+    def get_plazasMinimas(self, obj):
+        actividades = obj.actividad.all()
+
+        if not actividades:
+            return -1
+
+        return min(act.plazasMaximas for act in actividades)
+
+
 class InstalacionSerializer(serializers.ModelSerializer):
     agenda = AgendaSerializer(many=True, read_only=True)
     calles = CalleSerializer(many=True, read_only=True)

@@ -223,6 +223,7 @@ export default {
 
   dayOfWeek: "Day of the week",
   activityType: "Activity type",
+  canBook: "Can be reserved",
   sessionTime: "Session time",
   facilityType: "Facility type",
   openingHours: "Opening hours",

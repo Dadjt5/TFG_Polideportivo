@@ -67,6 +67,8 @@ router.register(r'instalacionesSimple', views.InstalacionSimpleViewSet, basename
 router.register(r'actividadesSimple', views.ActividadSimpleViewSet, basename="actividades-simple")
 router.register(r'monitoresSimple', views.MonitorSimpleViewSet, basename="monitores-simple")
 
+router.register(r'instalacionesSinAgenda', views.InstalacionSinAgendaViewSet, basename="instalaciones-sin-agenda")
+
 urlpatterns = [
     path("me/", views.meAPIView.as_view(), name="me"),
     path("estadisticas/", views.EstadisticasView.as_view(), name="estadisticas"),

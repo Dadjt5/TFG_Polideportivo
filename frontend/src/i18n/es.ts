@@ -225,6 +225,7 @@ export default {
 
   dayOfWeek: "Día de la semana",
   activityType: "Tipo de actividad",
+  canBook: "Se puede reservar",
   sessionTime: "Horario de sesión",
   facilityType: "Tipo de instalación",
   openingHours: "Horario de apertura",

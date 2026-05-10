@@ -54,7 +54,7 @@ from .serializers import (
     FisioterapiaSerializer, TarifaInstalacionSimpleSerializer, TarifaTDASimpleSerializer,
     ActividadComunSimpleSerializer, GrupoReducidoSimpleSerializer, FisioterapiaSimpleSerializer,
     CanalSerializer, CanalAdministradorSerializer, ReservaActividadSimpleSerializer,
-    AlquilerSimpleSerializer, FeedbackSerializer, CalleSerializer
+    AlquilerSimpleSerializer, FeedbackSerializer, CalleSerializer, InstalacionSinAgendaSerializer
 )
 
 from polideportivo.models import (
@@ -357,6 +357,15 @@ class InstalacionViewSet(viewsets.ModelViewSet):
 
         self.perform_destroy(instalacion)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class InstalacionSinAgendaViewSet(viewsets.ModelViewSet):
+    serializer_class = InstalacionSinAgendaSerializer
+    permission_classes = [AllowAny]
+    authentication_classes = []
+
+    def get_queryset(self):
+        return Instalacion.objects.prefetch_related("agenda")
 
 
 class InstalacionSimpleViewSet(viewsets.ModelViewSet):
