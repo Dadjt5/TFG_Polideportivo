@@ -13,6 +13,10 @@ class PagoUnitariasTest(TestCase):
         self.usuario.user.email = "test@test.com"
 
         self.objeto = MagicMock()
+        self.objeto = MagicMock(spec=[
+            'id', 'calcularPrecio', 'calcularDescuento', 'confirmarCompra', 'cancelarCompra'
+        ])
+
         self.objeto.id = 10
         self.objeto.calcularPrecio.return_value = 100
         self.objeto.calcularDescuento.return_value = {}

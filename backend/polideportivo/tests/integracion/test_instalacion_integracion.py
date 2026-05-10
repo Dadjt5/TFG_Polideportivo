@@ -1050,3 +1050,14 @@ class InstalacionIntegrationFullTest(TestCase):
         )
 
         self.assertEqual(res["alquileres"], 0)
+
+    def test_actualizar_mapa_con_objeto_calle(self):
+        sesiones = [
+            {
+                "dia": "Lunes",
+                "horaInicio": "10:00",
+                "horaFin": "11:00",
+                "calle": self.calle1
+            }
+        ]
+        self.instalacion.actualizarMapa(sesiones)

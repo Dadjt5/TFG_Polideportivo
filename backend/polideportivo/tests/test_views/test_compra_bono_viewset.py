@@ -14,7 +14,6 @@ User = get_user_model()
 
 
 class CompraBonoViewSetTests(APITestCase):
-
     def setUp(self):
         self.usuario_login = User.objects.create_user(
             username="usuario",
@@ -36,7 +35,6 @@ class CompraBonoViewSetTests(APITestCase):
             estado=EstadoReserva.CONFIRMADA
         )
 
-        # otro estado (no debe aparecer)
         CompraBono.objects.create(
             usuarioFinal=self.usuario_final,
             bono=self.bono,

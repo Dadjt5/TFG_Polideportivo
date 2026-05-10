@@ -2,6 +2,7 @@ from django.test import TestCase
 from unittest.mock import patch
 from django.contrib.auth import get_user_model
 from datetime import date, timedelta
+import uuid
 
 from ...models import (
     TDA, TarifaTDA, UsuarioFinal, EstadoReserva
@@ -28,11 +29,6 @@ class TDAUnitariasTest(TestCase):
             user=self.user,
             fechaNacimiento=date(2001,1,1),
             esUAM=True
-        )
-
-        self.tarifa = TarifaTDA.objects.create(
-            precioUAM=10,
-            precioOtros=20
         )
 
     def test_str(self):
@@ -99,3 +95,28 @@ class TDAUnitariasTest(TestCase):
         resultado = TDA.compraTDA(self.usuario)
 
         self.assertIsNotNone(resultado)
+    
+    def test_asignar_usuario_codigo_correcto(self):
+        tda = TDA.objects.create(
+            usuarioFinal=None,
+            tarifa=self.tarifa
+        )
+        resultado = tda.asignarUsuario(str(tda.codigo_qr), self.usuario)
+        self.assertTrue(resultado)
+        self.assertEqual(tda.usuarioFinal, self.usuario)
+
+    def test_asignar_usuario_codigo_incorrecto(self):
+        tda = TDA.objects.create(
+            usuarioFinal=None,
+            tarifa=self.tarifa
+        )
+        resultado = tda.asignarUsuario(str(uuid.uuid4()), self.usuario)
+        self.assertFalse(resultado)
+
+    def test_asignar_usuario_sin_codigo(self):
+        tda = TDA.objects.create(tarifa=self.tarifa)
+        self.assertFalse(tda.asignarUsuario(None, self.usuario))
+
+    def test_asignar_usuario_sin_usuario(self):
+        tda = TDA.objects.create(tarifa=self.tarifa)
+        self.assertFalse(tda.asignarUsuario(str(uuid.uuid4()), None))
