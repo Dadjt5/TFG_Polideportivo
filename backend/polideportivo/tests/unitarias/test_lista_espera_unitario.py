@@ -68,6 +68,11 @@ class ListaEsperaUnitTest(TestCase):
 
         self.assertIsNotNone(siguiente)
         self.assertEqual(siguiente.usuarioFinal, self.usuario1)
+    
+    def test_siguiente_usuario_fallo(self):
+        siguiente = self.lista.siguienteUsuario()
+
+        self.assertIsNone(siguiente)
 
 
 class EntradaListaEsperaUnitTest(TestCase):

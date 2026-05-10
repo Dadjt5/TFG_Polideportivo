@@ -112,7 +112,8 @@ class ReservaIntegrationTest(TestCase):
         self.usuarioFinal.refresh_from_db()
 
         self.assertEqual(self.usuarioFinal.actividadesRealizadas, 1)
-    
+
+
     def test_cancelar_reserva_actualiza_plazas(self):
         reserva = ReservaActividad.nuevaReserva(
             self.usuarioFinal,
@@ -129,7 +130,7 @@ class ReservaIntegrationTest(TestCase):
 
         self.assertEqual(reserva.estado, EstadoReserva.CANCELADO)
         self.assertLess(self.actividad.plazasReservadas, plazas_antes)
-    
+
     def test_nueva_reserva_con_descuentos(self):
         descuento = Descuento.objects.create(
             nombre="D1",
@@ -259,7 +260,35 @@ class ReservaIntegrationTest(TestCase):
         self.actividad.refresh_from_db()
 
         self.assertEqual(self.actividad.plazasReservadas, 1)
-    
+
+    def test_cancelar_reserva_activa_lista_espera_sin_usuarios(self):
+        user3 = User.objects.create(username="otro", password="test")
+        usuario_espera = UsuarioFinal.objects.create(
+            user=user3,
+            fechaNacimiento=date(2000, 1, 1)
+        )
+
+        from ...models import ListaEspera
+
+        lista = ListaEspera.objects.create(actividad=self.actividad)
+
+        self.actividad.plazasMaximas = 2
+        self.actividad.plazasReservadas = 1
+        self.actividad.save()
+
+        reserva = ReservaActividad.objects.create(
+            usuarioFinal=self.usuarioFinal,
+            actividad=self.actividad,
+            estado=EstadoReserva.CONFIRMADA
+        )
+
+        reserva.cancelarCompra()
+
+        self.actividad.refresh_from_db()
+
+        self.assertEqual(self.actividad.plazasReservadas, 0)
+
+
     def test_nueva_reserva_existente_confirmada(self):
         ReservaActividad.objects.create(
             usuarioFinal=self.usuarioFinal,
