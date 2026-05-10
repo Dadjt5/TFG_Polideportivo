@@ -41,7 +41,7 @@ class Actividad(models.Model):
     periodo = models.CharField(default=Periodo.ANUAL, choices=Periodo.choices)
 
     def __str__(self):
-        return f'{self.nombre}, en la instalacion {self.instalacion}'
+        return f'{self.id}: {self.nombre}, en la instalacion {self.instalacion}'
 
     # Función para activar la asistencia de un usuario a las sesiones de la actividad para la que se ha inscrito
     def activarAsistencia(self, usuario):

@@ -8,6 +8,7 @@ from django.db.models import Q
 from .constantes import EstadoReserva
 from .descuento import Descuento
 from .actividad import Actividad
+from .notificacion import Notificacion
 from .constantes import FormaReserva, TipoInstalacion
 
 
@@ -96,6 +97,8 @@ class ReservaActividad(Reserva):
 
                     actividad.plazasReservadas += 1
                     actividad.save()
+
+                    Notificacion.notificarSalidaListaDeEspera(entrada.usuarioFinal, actividad)
             except:
                 pass
 

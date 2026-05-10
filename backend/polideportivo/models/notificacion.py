@@ -231,7 +231,7 @@ class Notificacion(models.Model):
             actividad=actividad,
             debeMarcar=True
         )
-    
+
     # Función para notificar automaticamente la eliminacion de una actividad
     @classmethod
     def notificarEliminacionActividad(cls, actividad):
@@ -246,7 +246,7 @@ class Notificacion(models.Model):
                 usuario=usuario.user,
                 actividad=actividad
             )
-        
+
     # Función para notificar automaticamente la eliminacion de una instalacion
     @classmethod
     def notificarEliminacionInstalacion(cls, instalacion):

@@ -205,7 +205,7 @@
         </button>
 
         <!-- LISTA DE ESPERA -->
-        <button v-else-if="actividad.plazasReservadas >= actividad.plazasMaximas && actividad.id != -1"
+        <button v-else-if="usuarioFinalStore.usuarioFinal && actividad.plazasReservadas >= actividad.plazasMaximas && actividad.id != -1"
           class="btn btn-warning btn-lg px-5 shadow-sm d-flex align-items-center gap-2" @click="pasarAEspera">
           {{ t.goToList }}
         </button>

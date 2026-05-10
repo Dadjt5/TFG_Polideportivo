@@ -1840,6 +1840,7 @@ class EditarActividadView(APIView):
             instalacion.revisarAlquileres(sesiones_recibidas, periodo, True)
 
             if cambios:
+                instalacion.actualizarMapa(sesiones_recibidas)
                 Notificacion.notificarCambioSesiones(actividad)
 
             return Response({"respuesta": "Deporte asignado correctamente"}, status=status.HTTP_200_OK)
@@ -2234,6 +2235,7 @@ class PasarListaEsperaView(APIView):
     def delete(self, request, actividad_id):
         actividad = get_object_or_404(Actividad, id=actividad_id)
 
+        print(actividad)
         respuesta = actividad.salirListaEspera(request.user.usuario_final)
 
         if not respuesta:

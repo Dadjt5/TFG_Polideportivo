@@ -157,7 +157,7 @@
             </button>
 
             <button v-if="reserva.tipo === 'LISTA_ESPERA'" class="btn btn-outline-danger btn-sm"
-              @click="abrirConfirmacionLista(reserva)">
+              @click="abrirConfirmacionLista(reserva)" :disabled="!puedeCancelar(reserva)">
               {{ t.leaveWaitingList }}
             </button>
           </div>
@@ -335,10 +335,9 @@ const diasParaPodercancelar = (reserva: Reserva) => {
 
 const puedeCancelar = (reserva: Reserva) => {
   if (!reserva.puede_cancelar) return false
-  if (reserva.estado !== "Confirmada") return false
+  if (reserva.estado !== "Confirmada" && reserva.tipo !== "LISTA_ESPERA") return false
 
   if (!reserva.actividad) return reserva.tipo === "ALQUILER" ? true : false
-  if (!reserva.actividad) return reserva.tipo === "LISTA_ESPERA" ? true : false
 
   const hoy = new Date()
   const mesProximo = hoy.getMonth() + 2
@@ -447,9 +446,11 @@ const cancelarReserva = async () => {
 const salirListaEspera = async () => {
   const reserva = reservaElegida.value
 
+  if (!puedeCancelar(reserva)) return
+
   try {
     if (reserva.tipo === "LISTA_ESPERA") {
-      await salirLista(reserva.id)
+      await salirLista(reserva.actividad.id)
     } else {
       return
     }

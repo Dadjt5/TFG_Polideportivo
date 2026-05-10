@@ -28,7 +28,7 @@
           <div class="col-md-4">
             <div class="card h-100 shadow-lg rounded-4"
               style="background-color: rgba(180,220,255,0.6); backdrop-filter: blur(10px);">
-              <div class="card-body">
+              <div class="card-body d-flex flex-column">
                 <div class="d-flex align-items-center gap-2 mb-2">
                   <h5 class="card-title mb-0">{{ t.minCancellationDays }}</h5>
                   <span tabindex="0"
@@ -37,7 +37,7 @@
                     data-bs-trigger="hover focus" data-bs-placement="top"
                     :data-bs-content="t.minCancellationDaysInfo">i</span>
                 </div>
-                <input type="number" class="form-control" v-model.number="configuracionStore.dias_minimo_cancelacion" />
+                <input type="number" class="form-control mt-auto" v-model.number="configuracionStore.dias_minimo_cancelacion" />
               </div>
             </div>
           </div>
@@ -46,7 +46,7 @@
           <div class="col-md-4">
             <div class="card h-100 shadow-lg rounded-4"
               style="background-color: rgba(180,220,255,0.6); backdrop-filter: blur(10px);">
-              <div class="card-body">
+              <div class="card-body d-flex flex-column">
                 <div class="d-flex align-items-center gap-2 mb-2">
                   <h5 class="card-title mb-0">{{ t.minDaysFacilityReservation }}</h5>
                   <span tabindex="0"
@@ -55,7 +55,7 @@
                     data-bs-trigger="hover focus" data-bs-placement="top"
                     :data-bs-content="t.minFacilityReservationDaysInfo">i</span>
                 </div>
-                <input type="number" class="form-control" v-model.number="configuracionStore.dias_minimo_alquiler" />
+                <input type="number" class="form-control mt-auto" v-model.number="configuracionStore.dias_minimo_alquiler" />
               </div>
             </div>
           </div>
@@ -64,7 +64,7 @@
           <div class="col-md-4">
             <div class="card h-100 shadow-lg rounded-4"
               style="background-color: rgba(180,220,255,0.6); backdrop-filter: blur(10px);">
-              <div class="card-body">
+              <div class="card-body d-flex flex-column">
                 <div class="d-flex align-items-center gap-2 mb-2">
                   <h5 class="card-title mb-0">{{ t.maxDaysFacilityReservation }}</h5>
                   <span tabindex="0"
@@ -73,7 +73,7 @@
                     data-bs-trigger="hover focus" data-bs-placement="top"
                     :data-bs-content="t.maxFacilityReservationDaysInfo ">i</span>
                 </div>
-                <input type="number" class="form-control" v-model.number="configuracionStore.dias_maximo_alquiler" />
+                <input type="number" class="form-control mt-auto" v-model.number="configuracionStore.dias_maximo_alquiler" />
               </div>
             </div>
           </div>
@@ -82,7 +82,7 @@
           <div class="col-md-4">
             <div class="card h-100 shadow-lg rounded-4"
               style="background-color: rgba(180,220,255,0.6); backdrop-filter: blur(10px);">
-              <div class="card-body">
+              <div class="card-body d-flex flex-column">
                 <div class="d-flex align-items-center gap-2 mb-2">
                   <h5 class="card-title mb-0">{{ t.consecutiveHours }}</h5>
                   <span tabindex="0"
@@ -91,7 +91,7 @@
                     data-bs-trigger="hover focus" data-bs-placement="top"
                     :data-bs-content="t.consecutiveHoursInfo ">i</span>
                 </div>
-                <input type="number" class="form-control"
+                <input type="number" class="form-control mt-auto"
                   v-model.number="configuracionStore.horas_alquiler_consecutivas" />
               </div>
             </div>
@@ -101,7 +101,7 @@
           <div class="col-md-4">
             <div class="card h-100 shadow-lg rounded-4"
               style="background-color: rgba(180,220,255,0.6); backdrop-filter: blur(10px);">
-              <div class="card-body">
+              <div class="card-body d-flex flex-column">
                 <div class="d-flex align-items-center gap-2 mb-2">
                   <h5 class="card-title mb-0">{{ t.sportsUserMaxNumber }}</h5>
                   <span tabindex="0"
@@ -110,7 +110,7 @@
                     data-bs-trigger="hover focus" data-bs-placement="top"
                     :data-bs-content="t.sportsUserMaxNumberInfo">i</span>
                 </div>
-                <input type="number" class="form-control"
+                <input type="number" class="form-control mt-auto"
                   v-model.number="configuracionStore.max_deportes_por_usuario" />
               </div>
             </div>
@@ -120,7 +120,7 @@
           <div class="col-md-4">
             <div class="card h-100 shadow-lg rounded-4"
               style="background-color: rgba(180,220,255,0.6); backdrop-filter: blur(10px);">
-              <div class="card-body">
+              <div class="card-body d-flex flex-column">
                 <div class="d-flex align-items-center gap-2 mb-2">
                   <h5 class="card-title mb-0">{{ t.maxPercentage }}</h5>
                   <span tabindex="0"
@@ -129,7 +129,7 @@
                     data-bs-trigger="hover focus" data-bs-placement="top"
                     :data-bs-content="t.maxPercentageInfo">i</span>
                 </div>
-                <input type="number" class="form-control" v-model.number="configuracionStore.porcentaje_maximo" />
+                <input type="number" class="form-control mt-auto" v-model.number="configuracionStore.porcentaje_maximo" />
               </div>
             </div>
           </div>
@@ -250,7 +250,7 @@
       </div>
 
       <div class="text-center mt-4">
-        <button class="fs-4 btn btn-primary rounded-pill px-4 mt-4" @click="guardarConfiguracion">
+        <button class="fs-5 btn btn-primary rounded-pill px-4 mt-4" @click="guardarConfiguracion">
           {{ t.save }}
         </button>
       </div>

@@ -59,7 +59,7 @@ class Pago(models.Model):
         elif tipo == "subscripcion":
             if self.stripe_subscription_id:
                 stripe.Subscription.delete(self.stripe_subscription_id)
-        
+
         self.objeto.cancelarCompra()
         self.estadoPago = EstadoPago.CANCELADO
         self.stripe_payment_intent = None
