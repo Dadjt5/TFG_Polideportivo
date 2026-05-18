@@ -85,7 +85,7 @@ const errorClasses = computed(() => {
     </div>
 
     <div class="d-flex justify-content-center mb-3">
-      <button :class="['btn px-3', props.theme === 'dark' ? 'btn-primary' : 'btn-dark']" @click="apply()">
+      <button :class="['btn px-3', props.theme === 'dark' ? 'btn-primary' : 'btn-primary']" @click="apply()">
         {{ t.apply }}
       </button>
     </div>

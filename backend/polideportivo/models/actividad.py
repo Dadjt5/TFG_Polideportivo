@@ -5,6 +5,7 @@ from django.utils import timezone
 from datetime import time
 from django.http import Http404
 from datetime import time, datetime, timedelta, date
+from django.db.models import Q
 
 from .notificacion import Notificacion
 from .constantes import TipoActividad, FormaReserva, Terreno, Estado, Periodo, Dia
@@ -261,14 +262,18 @@ class Actividad(models.Model):
         if tipo:
             res = res.filter(tipoActividad__in=tipo)
 
-        if horaInicio:
-            res = res.filter(sesiones__horaInicio__lte=horaInicio)
-
-        if horaFin:
-            res = res.filter(sesiones__horaFin__gte=horaFin)
+        if horaInicio and horaFin:
+            res = res.filter(
+                sesiones__horaInicio__lt=horaFin,
+                sesiones__horaFin__gt=horaInicio
+            )
 
         if dias:
-            res = res.filter(sesiones__dia__in=dias)
+            query = Q()
+            for dia in dias:
+                query |= Q(sesiones__dia__iexact=dia)
+            
+            res = res.filter(query)
 
         return res.distinct()
 

@@ -48,13 +48,9 @@ const apply = () => {
 // Computed para clases de botones según theme y selección
 const buttonClasses = (selected: boolean) => {
   if (props.theme === 'dark') {
-    return selected
-      ? 'btn btn-primary text-white'
-      : 'btn btn-outline-light text-white text-opacity-75';
+    return selected ? 'btn btn-primary text-white' : 'btn btn-outline-light text-white text-opacity-75';
   } else {
-    return selected
-      ? 'btn btn-dark text-white'
-      : 'btn btn-outline-dark text-dark text-opacity-75';
+    return selected ? 'btn btn-primary text-dark' : 'btn btn-outline-secondary text-dark text-opacity-75';
   }
 };
 
@@ -67,7 +63,7 @@ const titleClass = computed(() =>
 
 // Clase para el botón de aplicar según theme
 const applyBtnClass = computed(() =>
-  props.theme === 'dark' ? 'btn btn-primary px-3' : 'btn btn-dark px-3'
+  props.theme === 'dark' ? 'btn btn-primary px-3' : 'btn btn-primary px-3'
 );
 </script>
 

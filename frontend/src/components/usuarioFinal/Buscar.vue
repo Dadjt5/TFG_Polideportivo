@@ -20,6 +20,19 @@
 
       </div>
 
+      <!-- Tabs -->
+      <div class="tabs-hero mb-3">
+
+        <button :class="{ active: activeTab === 'activities' }" @click="activeTab = 'activities'">
+          {{ t.activities }}
+        </button>
+
+        <button :class="{ active: activeTab === 'facilities' }" @click="activeTab = 'facilities'">
+          {{ t.facilities }}
+        </button>
+
+      </div>
+
       <!-- TAB CONTENT -->
       <div class="tab-content mb-3">
         <!-- ACTIVIDADES -->
@@ -249,10 +262,10 @@ const actividadesOrdenadas = computed(() => {
     } else if (orderBy.value === 'nombre_desc') {
       return b.nombre.localeCompare(a.nombre)
     } else if (orderBy.value === 'plazas_asc') {
-      return a.plazasReservadas.localeCompare(b.plazasReservadas)
+      return a.plazasReservadas - b.plazasReservadas
     }
 
-    return b.plazasReservadas.localeCompare(a.plazasReservadas)
+    return b.plazasReservadas - a.plazasReservadas
   })
 })
 
