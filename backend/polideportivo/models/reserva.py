@@ -114,7 +114,7 @@ class ReservaActividad(Reserva):
             return None
 
         with transaction.atomic():
-            actividad.refresh_from_db()
+            actividad = Actividad.objects.select_for_update().get(id=actividad.id)
 
             descuentos = Descuento.obtenerDescuentos(actividad=actividad)
 
@@ -196,8 +196,10 @@ class Alquiler(Reserva):
     # Función para crear un nuevo alquiler en la instalación indicada    
     @classmethod
     def nuevaReserva(cls, usuario, instalacion, fecha, horaInicio, horaFin, luz, calle=None):
+        from .instalacion import Instalacion
+
         with transaction.atomic():
-            instalacion.refresh_from_db()
+            instalacion = Instalacion.objects.select_for_update().get(id=instalacion.id)
 
             descuentos = Descuento.obtenerDescuentos(instalacion=instalacion)
             conflictos = cls.objects.filter(

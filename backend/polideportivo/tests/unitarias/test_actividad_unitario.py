@@ -328,6 +328,18 @@ class ActividadUnitTest(TestCase):
 
         self.assertTrue(res.exists())
 
+    def test_buscar_por_hora_inicio_fin(self):
+        Sesion.objects.create(
+            actividad=self.actividad,
+            dia=Dia.LUNES,
+            horaInicio=time(10, 0),
+            horaFin=time(12, 0)
+        )
+
+        res = Actividad.buscar(horaInicio=time(10, 0), horaFin=time(11, 0))
+
+        self.assertTrue(res.exists())
+
 
 class SesionUnitTest(TestCase):
 
