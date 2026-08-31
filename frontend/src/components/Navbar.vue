@@ -18,12 +18,6 @@
         <ul class="navbar-nav ms-auto align-items-lg-center">
 
           <li class="nav-item fs-5">
-            <router-link to="/feedback" class="nav-link text-white" @click="menuOpen = false">
-              Feedback
-            </router-link>
-          </li>
-
-          <li class="nav-item fs-5">
             <router-link to="/" class="nav-link text-white" @click="menuOpen = false">
               {{ t.home }}
             </router-link>
