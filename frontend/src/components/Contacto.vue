@@ -60,9 +60,9 @@ const language = inject<Ref<Language>>("language")!;
 const t = useI18n(language);
 
 const contactInfo = {
-  phone: "91 497 85 56",
+  phone: "912123123312",
   email: "instalacionesdeportivas@informacion.es",
-  address: "C. de Erasmo de Rotterdam, 1, Fuencarral-El Pardo, 28049 Madrid, España",
+  address: "C. de Erasmo, 123, Granada, España",
 };
 
 const copied = ref(false);
