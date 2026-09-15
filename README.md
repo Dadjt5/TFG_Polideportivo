@@ -81,6 +81,3 @@ El objetivo principal fue desarrollar una plataforma web que centralizara la ges
 ## Autor
 
 Desarrollado por **David Juzgado Torell**.
-
-🔗 [LinkedIn](AÑADIR_URL) · 🔗 [Portfolio](AÑADIR_URL)
-
