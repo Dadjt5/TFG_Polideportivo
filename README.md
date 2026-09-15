@@ -6,9 +6,9 @@ El proyecto está compuesto por un frontend desarrollado con **Vue.js** y un bac
 
 ## Demo
 
-🔗 **Aplicación en producción:** https://polideportivo-xg7l.onrender.com/home
+**Aplicación en producción:** https://polideportivo-xg7l.onrender.com/home
 
-## 🛠️ Tecnologías
+## Tecnologías
 
 **Frontend**
 
