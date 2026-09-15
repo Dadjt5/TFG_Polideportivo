@@ -4,7 +4,7 @@ Aplicación web full-stack para la gestión de un polideportivo, desarrollada co
 
 El proyecto está compuesto por un frontend desarrollado con **Vue.js** y un backend desarrollado con **Django + Django REST Framework**, comunicados mediante una **API REST**.
 
-## 🚀 Demo
+## Demo
 
 🔗 **Aplicación en producción:** https://polideportivo-xg7l.onrender.com/home
 
@@ -32,7 +32,7 @@ El proyecto está compuesto por un frontend desarrollado con **Vue.js** y un bac
 
 * Render
 
-## ✨ Funcionalidades
+## Funcionalidades
 
 * Gestión de usuarios y autenticación mediante JWT
 * Gestión de instalaciones deportivas
@@ -42,7 +42,7 @@ El proyecto está compuesto por un frontend desarrollado con **Vue.js** y un bac
 * Persistencia de datos mediante PostgreSQL
 * Despliegue de la aplicación en producción
 
-## 🏗️ Arquitectura
+## Arquitectura
 
 ```text
 ┌──────────────────┐
@@ -63,7 +63,7 @@ El proyecto está compuesto por un frontend desarrollado con **Vue.js** y un bac
 └──────────────────┘
 ```
 
-## 📂 Estructura del proyecto
+## Estructura del proyecto
 
 ```text
 TFG_Polideportivo/
@@ -72,13 +72,13 @@ TFG_Polideportivo/
 └── README.md
 ```
 
-## 🎓 Sobre el proyecto
+## Sobre el proyecto
 
 Este proyecto fue desarrollado como mi **Trabajo de Fin de Grado**, aplicando conocimientos de desarrollo web full-stack, diseño de APIs REST, gestión de bases de datos, autenticación y despliegue de aplicaciones.
 
 El objetivo principal fue desarrollar una plataforma web que centralizara la gestión de las diferentes funcionalidades de un polideportivo.
 
-## 👨‍💻 Autor
+## Autor
 
 Desarrollado por **David Juzgado Torell**.
 
